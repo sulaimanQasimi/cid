@@ -94,14 +94,9 @@ class InfoController extends Controller
         // Check authorization
         Gate::authorize('create', Info::class);
 
-        // Get data for dropdowns from cache or fetch them
-        $infoTypes = Cache::remember('info_types_all', now()->addHours(6), function () {
-            return InfoType::orderBy('name')->get();
-        });
-
-        $infoCategories = Cache::remember('info_categories_all', now()->addHours(6), function () {
-            return InfoCategory::orderBy('name')->get();
-        });
+        // Get data for dropdowns without caching
+        $infoTypes = InfoType::orderBy('name')->get();
+        $infoCategories = InfoCategory::orderBy('name')->get();
 
         return Inertia::render('Info/Create', [
             'infoTypes' => $infoTypes,
@@ -168,16 +163,8 @@ class InfoController extends Controller
         // Create the record within a transaction
         try {
             DB::beginTransaction();
-
             $info = Info::create($validated);
-
-            // Store cache key for later invalidation
-            $this->storeCacheKey("infos.");
-
             DB::commit();
-
-            // Clear the infos cache
-            $this->clearInfosCache();
 
             return Redirect::route('infos.index')->with('success', 'Info created successfully.');
         } catch (\Exception $e) {
@@ -194,13 +181,11 @@ class InfoController extends Controller
         // Check if the user can view this info
         Gate::authorize('view', $info);
 
-        // Check if we have a cached version
-        $cachedInfo = Cache::remember("info_{$info->id}", now()->addHour(), function () use ($info) {
-            return $info->load(['infoType', 'infoCategory', 'user', 'creator', 'confirmer']);
-        });
+        // Load related data without caching
+        $info->load(['infoType', 'infoCategory', 'user', 'creator', 'confirmer']);
 
         return Inertia::render('Info/Show', [
-            'info' => $cachedInfo,
+            'info' => $info,
         ]);
     }
 
@@ -212,14 +197,9 @@ class InfoController extends Controller
         // Check authorization
         Gate::authorize('update', $info);
 
-        // Get data for dropdowns from cache or fetch them
-        $infoTypes = Cache::remember('info_types_all', now()->addHours(6), function () {
-            return InfoType::orderBy('name')->get();
-        });
-
-        $infoCategories = Cache::remember('info_categories_all', now()->addHours(6), function () {
-            return InfoCategory::orderBy('name')->get();
-        });
+        // Get data for dropdowns without caching
+        $infoTypes = InfoType::orderBy('name')->get();
+        $infoCategories = InfoCategory::orderBy('name')->get();
 
         return Inertia::render('Info/Edit', [
             'info' => $info,
@@ -292,14 +272,8 @@ class InfoController extends Controller
         // Update the record within a transaction
         try {
             DB::beginTransaction();
-
             $info->update($validated);
-
             DB::commit();
-
-            // Clear the infos cache
-            $this->clearInfosCache();
-            Cache::forget("info_{$info->id}");
 
             return Redirect::route('infos.index')->with('success', 'Info updated successfully.');
         } catch (\Exception $e) {
@@ -318,48 +292,13 @@ class InfoController extends Controller
 
         try {
             DB::beginTransaction();
-
             $info->delete();
-
             DB::commit();
-
-            // Clear the infos cache
-            $this->clearInfosCache();
-            Cache::forget("info_{$info->id}");
 
             return Redirect::route('infos.index')->with('success', 'Info deleted successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
             return Redirect::back()->with('error', 'An error occurred while deleting the info: ' . $e->getMessage());
         }
-    }
-
-    /**
-     * Store a cache key for later invalidation
-     */
-    private function storeCacheKey(string $keyPrefix)
-    {
-        $keys = Cache::get('cache_keys_infos', []);
-        $keys[] = $keyPrefix . time();
-        Cache::put('cache_keys_infos', $keys, now()->addDays(1));
-    }
-
-    /**
-     * Clear all infos-related cache keys
-     */
-    private function clearInfosCache()
-    {
-        // Clear all cache keys starting with 'infos.'
-        $keys = Cache::get('cache_keys_infos', []);
-        foreach ($keys as $key) {
-            Cache::forget($key);
-        }
-
-        // Reset the keys array
-        Cache::put('cache_keys_infos', [], now()->addDays(1));
-
-        // Clear list cache keys
-        Cache::forget('info_types_for_filter');
-        Cache::forget('info_categories_for_filter');
     }
 }
