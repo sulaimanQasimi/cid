@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import React, { useState } from 'react';
+import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash, Eye } from 'lucide-react';
+import { Plus, Pencil, Trash, Search, ArrowUpDown, FilterX, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -12,20 +12,36 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface InfoRecord {
   id: number;
-  title: string;
+  name: string;
+  code: string | null;
   description: string | null;
-  info_type_id: number | null;
-  info_category_id: number | null;
+  info_type_id: number;
+  info_category_id: number;
   created_at: string;
   updated_at: string;
-  type?: {
+  infoType?: {
+    id: number;
     name: string;
   };
-  category?: {
+  infoCategory?: {
+    id: number;
     name: string;
   };
 }
@@ -46,10 +62,44 @@ interface InfoType {
   updated_at: string;
 }
 
+interface PaginationLinks {
+  first: string | null;
+  last: string | null;
+  prev: string | null;
+  next: string | null;
+}
+
+interface PaginationMeta {
+  current_page: number;
+  from: number;
+  last_page: number;
+  links: Array<{
+    url: string | null;
+    label: string;
+    active: boolean;
+  }>;
+  path: string;
+  per_page: number;
+  to: number;
+  total: number;
+}
+
 interface Props {
-  infos: InfoRecord[];
-  categories: InfoCategory[];
+  infos: {
+    data?: InfoRecord[];
+    links?: PaginationLinks;
+    meta?: PaginationMeta;
+  };
   types: InfoType[];
+  categories: InfoCategory[];
+  filters: {
+    search: string;
+    sort: string;
+    direction: string;
+    per_page: number;
+    type_id?: string;
+    category_id?: string;
+  };
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -63,43 +113,159 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ];
 
-export default function InfoIndex({ infos = [], categories = [], types = [] }: Props) {
-  // Debug log to see what data we're receiving
-  useEffect(() => {
-    console.log('Main Index Page Data:', {
-      infos,
-      categories,
-      types,
-      categoriesCount: categories?.length
+const sortOptions = [
+  { value: 'name', label: 'Name' },
+  { value: 'info_type_id', label: 'Type' },
+  { value: 'info_category_id', label: 'Category' },
+  { value: 'created_at', label: 'Created Date' },
+  { value: 'updated_at', label: 'Updated Date' },
+];
+
+const perPageOptions = [
+  { value: 10, label: '10 per page' },
+  { value: 25, label: '25 per page' },
+  { value: 50, label: '50 per page' },
+  { value: 100, label: '100 per page' },
+];
+
+export default function InfoIndex({
+  infos = {
+    data: [],
+    links: { first: null, last: null, prev: null, next: null },
+    meta: {
+      current_page: 1,
+      from: 1,
+      last_page: 1,
+      links: [],
+      path: '',
+      per_page: 10,
+      to: 0,
+      total: 0
+    }
+  },
+  types = [],
+  categories = [],
+  filters
+}: Props) {
+  const [searchQuery, setSearchQuery] = useState(filters.search);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [infoToDelete, setInfoToDelete] = useState<InfoRecord | null>(null);
+  const [selectedType, setSelectedType] = useState<string>(filters.type_id || '');
+  const [selectedCategory, setSelectedCategory] = useState<string>(filters.category_id || '');
+
+  // Handle search form submission
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    applyFilters({ search: searchQuery });
+  };
+
+  // Handle sort change
+  const handleSortChange = (value: string) => {
+    applyFilters({ sort: value });
+  };
+
+  // Handle direction change
+  const handleDirectionChange = () => {
+    const newDirection = filters.direction === 'asc' ? 'desc' : 'asc';
+    applyFilters({ direction: newDirection });
+  };
+
+  // Handle per page change
+  const handlePerPageChange = (value: string) => {
+    applyFilters({ per_page: parseInt(value) });
+  };
+
+  // Handle type filter change
+  const handleTypeChange = (value: string) => {
+    setSelectedType(value);
+    applyFilters({ type_id: value || undefined });
+  };
+
+  // Handle category filter change
+  const handleCategoryChange = (value: string) => {
+    setSelectedCategory(value);
+    applyFilters({ category_id: value || undefined });
+  };
+
+  // Navigate to page
+  const goToPage = (page: number) => {
+    router.get(route('infos.index'),
+      { ...filters, page },
+      { preserveState: true, preserveScroll: true }
+    );
+  };
+
+  // Apply filters to the URL
+  const applyFilters = (newFilters: Partial<Props['filters']>) => {
+    router.get(route('infos.index'),
+      { ...filters, ...newFilters, page: 1 },
+      { preserveState: true, preserveScroll: true }
+    );
+  };
+
+  // Reset all filters
+  const resetFilters = () => {
+    setSearchQuery('');
+    setSelectedType('');
+    setSelectedCategory('');
+    router.get(route('infos.index'), {
+      search: '',
+      sort: 'name',
+      direction: 'asc',
+      per_page: 10,
+      page: 1,
+      type_id: undefined,
+      category_id: undefined
     });
-  }, [infos, categories, types]);
+  };
+
+  // Open delete confirmation dialog
+  const openDeleteDialog = (info: InfoRecord) => {
+    setInfoToDelete(info);
+    setIsDeleteDialogOpen(true);
+  };
+
+  // Handle delete confirmation
+  const confirmDelete = () => {
+    if (infoToDelete) {
+      router.delete(route('infos.destroy', infoToDelete.id), {
+        onSuccess: () => {
+          setInfoToDelete(null);
+          setIsDeleteDialogOpen(false);
+        },
+      });
+    }
+  };
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Info Records" />
-      <div className="py-12">
-        <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-          {/* Debug info */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle>Debug Information</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="p-4 bg-yellow-50 border border-yellow-300 rounded-md">
-                <h2 className="font-bold">Categories Data:</h2>
-                <pre className="text-xs mt-2 overflow-auto max-h-40">
-                  {JSON.stringify({ receivedCategories: categories }, null, 2)}
-                </pre>
-                <p className="mt-2 text-sm">Expected categories from database: 2 records</p>
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* Info Records Section */}
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-center">
-                <CardTitle>Info Records</CardTitle>
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the info record "{infoToDelete?.name}".
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <div className="py-12">
+        <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+          <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div className="p-6 text-gray-900">
+              <div className="flex justify-between items-center mb-6">
+                <h1 className="text-2xl font-bold">Info Records</h1>
                 <Button asChild>
                   <Link href={route('infos.create')}>
                     <Plus className="mr-2 h-4 w-4" />
@@ -107,13 +273,152 @@ export default function InfoIndex({ infos = [], categories = [], types = [] }: P
                   </Link>
                 </Button>
               </div>
-            </CardHeader>
-            <CardContent>
+
+              {/* Filters */}
+              <Card className="mb-6">
+                <CardContent className="pt-6">
+                  <div className="flex flex-col md:flex-row gap-4">
+                    <div className="flex-1">
+                      <form onSubmit={handleSearch} className="flex w-full items-center space-x-2">
+                        <Input
+                          type="search"
+                          placeholder="Search info records..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="flex-1"
+                        />
+                        <Button type="submit" size="sm">
+                          <Search className="h-4 w-4 mr-2" />
+                          Search
+                        </Button>
+                      </form>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <div className="flex items-center gap-2">
+                        <Select
+                          value={filters.sort}
+                          onValueChange={handleSortChange}
+                        >
+                          <SelectTrigger className="w-[130px]">
+                            <SelectValue placeholder="Sort by" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {sortOptions.map(option => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={handleDirectionChange}
+                          title={filters.direction === 'asc' ? 'Ascending' : 'Descending'}
+                        >
+                          <ArrowUpDown className={`h-4 w-4 ${filters.direction === 'asc' ? '' : 'transform rotate-180'}`} />
+                        </Button>
+                      </div>
+
+                      <Select
+                        value={filters.per_page.toString()}
+                        onValueChange={handlePerPageChange}
+                      >
+                        <SelectTrigger className="w-[130px]">
+                          <SelectValue placeholder="Items per page" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {perPageOptions.map(option => (
+                            <SelectItem key={option.value} value={option.value.toString()}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                      {/* Reset filters button */}
+                      {(filters.search || filters.sort !== 'name' || filters.direction !== 'asc' ||
+                        filters.per_page !== 10 || filters.type_id || filters.category_id) && (
+                        <Button variant="ghost" size="sm" onClick={resetFilters} className="ml-2">
+                          <FilterX className="h-4 w-4 mr-2" />
+                          Reset
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Type and Category Filters */}
+                  <div className="flex flex-col sm:flex-row gap-4 mt-4">
+                    <div className="flex-1">
+                      <Select
+                        value={selectedType}
+                        onValueChange={handleTypeChange}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Filter by Type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">All Types</SelectItem>
+                          {types.map(type => (
+                            <SelectItem key={type.id} value={type.id.toString()}>
+                              {type.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex-1">
+                      <Select
+                        value={selectedCategory}
+                        onValueChange={handleCategoryChange}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Filter by Category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">All Categories</SelectItem>
+                          {categories.map(category => (
+                            <SelectItem key={category.id} value={category.id.toString()}>
+                              {category.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* Active filters */}
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    {filters.search && (
+                      <Badge variant="secondary" className="px-3 py-1">
+                        Search: {filters.search}
+                        <button className="ml-2" onClick={() => applyFilters({ search: '' })}>×</button>
+                      </Badge>
+                    )}
+                    {filters.type_id && (
+                      <Badge variant="secondary" className="px-3 py-1">
+                        Type: {types.find(t => t.id.toString() === filters.type_id)?.name || filters.type_id}
+                        <button className="ml-2" onClick={() => handleTypeChange('')}>×</button>
+                      </Badge>
+                    )}
+                    {filters.category_id && (
+                      <Badge variant="secondary" className="px-3 py-1">
+                        Category: {categories.find(c => c.id.toString() === filters.category_id)?.name || filters.category_id}
+                        <button className="ml-2" onClick={() => handleCategoryChange('')}>×</button>
+                      </Badge>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Table */}
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>ID</TableHead>
-                    <TableHead>Title</TableHead>
+                    <TableHead>Name</TableHead>
                     <TableHead>Type</TableHead>
                     <TableHead>Category</TableHead>
                     <TableHead>Created At</TableHead>
@@ -121,13 +426,13 @@ export default function InfoIndex({ infos = [], categories = [], types = [] }: P
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {infos && infos.length > 0 ? (
-                    infos.map((info) => (
+                  {infos.data && infos.data.length > 0 ? (
+                    infos.data.map((info: InfoRecord) => (
                       <TableRow key={info.id}>
                         <TableCell>{info.id}</TableCell>
-                        <TableCell className="font-medium">{info.title}</TableCell>
-                        <TableCell>{info.type?.name || '-'}</TableCell>
-                        <TableCell>{info.category?.name || '-'}</TableCell>
+                        <TableCell className="font-medium">{info.name}</TableCell>
+                        <TableCell>{info.infoType?.name || '-'}</TableCell>
+                        <TableCell>{info.infoCategory?.name || '-'}</TableCell>
                         <TableCell>{new Date(info.created_at).toLocaleDateString()}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
@@ -141,7 +446,11 @@ export default function InfoIndex({ infos = [], categories = [], types = [] }: P
                                 <Pencil className="h-4 w-4" />
                               </Link>
                             </Button>
-                            <Button size="sm" variant="destructive">
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => openDeleteDialog(info)}
+                            >
                               <Trash className="h-4 w-4" />
                             </Button>
                           </div>
@@ -157,124 +466,51 @@ export default function InfoIndex({ infos = [], categories = [], types = [] }: P
                   )}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
 
-          {/* Types Section */}
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-center">
-                <CardTitle>Info Types</CardTitle>
-                <Button asChild>
-                  <Link href={route('info-types.create')}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Create Info Type
-                  </Link>
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Created At</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {types && types.length > 0 ? (
-                    types.map((type) => (
-                      <TableRow key={type.id}>
-                        <TableCell>{type.id}</TableCell>
-                        <TableCell className="font-medium">{type.name}</TableCell>
-                        <TableCell>{type.description || '-'}</TableCell>
-                        <TableCell>{new Date(type.created_at).toLocaleDateString()}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button size="sm" variant="outline" asChild>
-                              <Link href={route('info-types.edit', type.id)}>
-                                <Pencil className="h-4 w-4" />
-                              </Link>
-                            </Button>
-                            <Button size="sm" variant="destructive">
-                              <Trash className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-center py-4">
-                        No info types found. Create your first one!
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-
-          {/* Categories Section */}
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-center">
-                <CardTitle>Info Categories</CardTitle>
-                <Button asChild>
-                  <Link href={route('info-categories.create')}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Create Category
-                  </Link>
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Created At</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {categories && categories.length > 0 ? (
-                    categories.map((category) => (
-                      <TableRow key={category.id}>
-                        <TableCell>{category.id}</TableCell>
-                        <TableCell className="font-medium">{category.name}</TableCell>
-                        <TableCell>{category.description || '-'}</TableCell>
-                        <TableCell>{new Date(category.created_at).toLocaleDateString()}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button size="sm" variant="outline" asChild>
-                              <Link href={route('info-categories.edit', category.id)}>
-                                <Pencil className="h-4 w-4" />
-                              </Link>
-                            </Button>
-                            <Button size="sm" variant="destructive">
-                              <Trash className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-center py-4">
-                        No categories found. Create your first one!
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+              {/* Pagination */}
+              {infos?.meta && infos.meta.last_page > 1 && (
+                <div className="flex items-center justify-between mt-4">
+                  <div className="text-sm text-gray-500">
+                    Showing {infos?.meta?.from} to {infos?.meta?.to} of {infos?.meta?.total} results
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => goToPage((infos?.meta?.current_page || 1) - 1)}
+                      disabled={!infos?.links || !infos.links.prev}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    {infos?.meta?.links && infos?.meta?.links.slice(1, -1).map((link, i) => (
+                      <Button
+                        key={i}
+                        variant={link.active ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => {
+                          if (link.url) {
+                            const page = new URL(link.url).searchParams.get('page');
+                            page && goToPage(parseInt(page));
+                          }
+                        }}
+                        disabled={!link.url}
+                      >
+                        {link.label}
+                      </Button>
+                    ))}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => goToPage((infos?.meta?.current_page || 1) + 1)}
+                      disabled={!infos?.links || !infos.links.next}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </AppLayout>

@@ -38,13 +38,13 @@ class InfoController extends Controller
 
         $perPage = $validated['per_page'] ?? 10;
         $search = $validated['search'] ?? '';
-        $sort = $validated['sort'] ?? 'created_at';
-        $direction = $validated['direction'] ?? 'desc';
+        $sort = $validated['sort'] ?? 'name';
+        $direction = $validated['direction'] ?? 'asc';
         $typeFilter = $validated['type_id'] ?? null;
         $categoryFilter = $validated['category_id'] ?? null;
 
         // Apply search and filters
-        $query = Info::with(['infoType', 'infoCategory', 'user']);
+        $query = Info::with(['infoType', 'infoCategory']);
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -64,10 +64,10 @@ class InfoController extends Controller
 
         $query->orderBy($sort, $direction);
 
-        // Get data without caching for real-time results
+        // Get paginated results
         $infos = $query->paginate($perPage)->withQueryString();
 
-        // Get all types and categories for display without caching
+        // Get all types and categories for filtering
         $types = InfoType::orderBy('name')->get();
         $categories = InfoCategory::orderBy('name')->get();
 
@@ -79,9 +79,9 @@ class InfoController extends Controller
                 'search' => $search,
                 'sort' => $sort,
                 'direction' => $direction,
+                'per_page' => $perPage,
                 'type_id' => $typeFilter,
                 'category_id' => $categoryFilter,
-                'per_page' => $perPage,
             ],
         ]);
     }
