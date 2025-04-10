@@ -22,6 +22,10 @@ class Info extends Model
         'code',
         'description',
         'value',
+        'user_id',
+        'confirmed',
+        'created_by',
+        'confirmed_by',
     ];
 
     /**
@@ -31,6 +35,7 @@ class Info extends Model
      */
     protected $casts = [
         'value' => 'array',
+        'confirmed' => 'boolean',
     ];
 
     /**
@@ -47,5 +52,29 @@ class Info extends Model
     public function infoCategory(): BelongsTo
     {
         return $this->belongsTo(InfoCategory::class);
+    }
+
+    /**
+     * Get the user that owns the info.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the user who created the info.
+     */
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * Get the user who confirmed the info.
+     */
+    public function confirmer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'confirmed_by');
     }
 }
