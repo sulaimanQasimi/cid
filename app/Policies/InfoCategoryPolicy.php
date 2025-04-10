@@ -13,7 +13,7 @@ class InfoCategoryPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true; // All authenticated users can view the list
     }
 
     /**
@@ -21,7 +21,7 @@ class InfoCategoryPolicy
      */
     public function view(User $user, InfoCategory $infoCategory): bool
     {
-        return false;
+        return true; // All authenticated users can view info categories
     }
 
     /**
@@ -29,7 +29,9 @@ class InfoCategoryPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        // Only users with admin rights should create info categories
+        // In a real app, check for admin role
+        return $this->isAdmin($user);
     }
 
     /**
@@ -37,7 +39,8 @@ class InfoCategoryPolicy
      */
     public function update(User $user, InfoCategory $infoCategory): bool
     {
-        return false;
+        // Only users with admin rights should update info categories
+        return $this->isAdmin($user);
     }
 
     /**
@@ -45,7 +48,13 @@ class InfoCategoryPolicy
      */
     public function delete(User $user, InfoCategory $infoCategory): bool
     {
-        return false;
+        // Only users with admin rights should delete info categories
+        // First check if there are any infos using this category
+        if ($infoCategory->infos()->count() > 0) {
+            return false;
+        }
+
+        return $this->isAdmin($user);
     }
 
     /**
@@ -53,7 +62,8 @@ class InfoCategoryPolicy
      */
     public function restore(User $user, InfoCategory $infoCategory): bool
     {
-        return false;
+        // Only users with admin rights should restore info categories
+        return $this->isAdmin($user);
     }
 
     /**
@@ -61,6 +71,27 @@ class InfoCategoryPolicy
      */
     public function forceDelete(User $user, InfoCategory $infoCategory): bool
     {
-        return false;
+        // Only users with admin rights should force delete info categories
+        // First check if there are any infos using this category
+        if ($infoCategory->infos()->count() > 0) {
+            return false;
+        }
+
+        return $this->isAdmin($user);
+    }
+
+    /**
+     * Check if user is an admin
+     * This is a placeholder - implement proper role checking
+     */
+    private function isAdmin(User $user): bool
+    {
+        // Implement proper admin check based on your user roles system
+        // For now, we'll return true for specific test users
+        // In a real app, you would check roles and permissions
+        return in_array($user->email, [
+            'admin@example.com',
+            // Add other admin emails
+        ]);
     }
 }

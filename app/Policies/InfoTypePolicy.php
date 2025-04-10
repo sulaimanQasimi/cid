@@ -13,7 +13,7 @@ class InfoTypePolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true; // All authenticated users can view the list
     }
 
     /**
@@ -21,7 +21,7 @@ class InfoTypePolicy
      */
     public function view(User $user, InfoType $infoType): bool
     {
-        return false;
+        return true; // All authenticated users can view info types
     }
 
     /**
@@ -29,7 +29,9 @@ class InfoTypePolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        // Only users with admin rights should create info types
+        // In a real app, check for admin role
+        return $this->isAdmin($user);
     }
 
     /**
@@ -37,7 +39,8 @@ class InfoTypePolicy
      */
     public function update(User $user, InfoType $infoType): bool
     {
-        return false;
+        // Only users with admin rights should update info types
+        return $this->isAdmin($user);
     }
 
     /**
@@ -45,7 +48,13 @@ class InfoTypePolicy
      */
     public function delete(User $user, InfoType $infoType): bool
     {
-        return false;
+        // Only users with admin rights should delete info types
+        // First check if there are any infos using this type
+        if ($infoType->infos()->count() > 0) {
+            return false;
+        }
+
+        return $this->isAdmin($user);
     }
 
     /**
@@ -53,7 +62,8 @@ class InfoTypePolicy
      */
     public function restore(User $user, InfoType $infoType): bool
     {
-        return false;
+        // Only users with admin rights should restore info types
+        return $this->isAdmin($user);
     }
 
     /**
@@ -61,6 +71,27 @@ class InfoTypePolicy
      */
     public function forceDelete(User $user, InfoType $infoType): bool
     {
-        return false;
+        // Only users with admin rights should force delete info types
+        // First check if there are any infos using this type
+        if ($infoType->infos()->count() > 0) {
+            return false;
+        }
+
+        return $this->isAdmin($user);
+    }
+
+    /**
+     * Check if user is an admin
+     * This is a placeholder - implement proper role checking
+     */
+    private function isAdmin(User $user): bool
+    {
+        // Implement proper admin check based on your user roles system
+        // For now, we'll return true for specific test users
+        // In a real app, you would check roles and permissions
+        return in_array($user->email, [
+            'admin@example.com',
+            // Add other admin emails
+        ]);
     }
 }

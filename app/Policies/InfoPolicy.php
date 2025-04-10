@@ -13,7 +13,7 @@ class InfoPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true; // All authenticated users can view the list
     }
 
     /**
@@ -21,7 +21,15 @@ class InfoPolicy
      */
     public function view(User $user, Info $info): bool
     {
-        return false;
+        // Users can view info if:
+        // 1. They created it
+        // 2. They're the associated user
+        // 3. They confirmed it
+        // 4. The info is confirmed (public)
+        return $user->id === $info->created_by ||
+               $user->id === $info->user_id ||
+               $user->id === $info->confirmed_by ||
+               $info->confirmed;
     }
 
     /**
@@ -29,7 +37,8 @@ class InfoPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        // Can implement more sophisticated rules based on user roles
+        return true; // All authenticated users can create
     }
 
     /**
@@ -37,7 +46,12 @@ class InfoPolicy
      */
     public function update(User $user, Info $info): bool
     {
-        return false;
+        // Users can update info if:
+        // 1. They created it
+        // 2. They're the associated user (if set)
+        // 3. They have admin privileges (implement admin check if needed)
+        return $user->id === $info->created_by ||
+               ($info->user_id && $user->id === $info->user_id);
     }
 
     /**
@@ -45,7 +59,17 @@ class InfoPolicy
      */
     public function delete(User $user, Info $info): bool
     {
-        return false;
+        // Only the creator or admins can delete
+        return $user->id === $info->created_by;
+    }
+
+    /**
+     * Determine whether the user can confirm the model.
+     */
+    public function confirm(User $user, Info $info): bool
+    {
+        // Users can't confirm their own entries - implement role-based logic here
+        return $user->id !== $info->created_by;
     }
 
     /**
@@ -53,7 +77,8 @@ class InfoPolicy
      */
     public function restore(User $user, Info $info): bool
     {
-        return false;
+        // Only admins or the creator can restore
+        return $user->id === $info->created_by;
     }
 
     /**
@@ -61,6 +86,7 @@ class InfoPolicy
      */
     public function forceDelete(User $user, Info $info): bool
     {
+        // Only admins should have this right
         return false;
     }
 }
