@@ -47,12 +47,12 @@ class InfoTypeController extends Controller
 
         // Cache results for 5 minutes with a cache key that includes query parameters
         $cacheKey = "info_types.{$perPage}.{$search}.{$sort}.{$direction}." . $request->input('page', 1);
-        $infoTypes = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($query, $perPage) {
+        $types = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($query, $perPage) {
             return $query->paginate($perPage)->withQueryString();
         });
 
         return Inertia::render('Info/Types/Index', [
-            'infoTypes' => $infoTypes,
+            'types' => $types,
             'filters' => [
                 'search' => $search,
                 'sort' => $sort,

@@ -44,14 +44,11 @@ class InfoCategoryController extends Controller
 
         $query->orderBy($sort, $direction);
 
-        // Cache results for 5 minutes with a cache key that includes query parameters
-        $cacheKey = "info_categories.{$perPage}.{$search}.{$sort}.{$direction}." . $request->input('page', 1);
-        $infoCategories = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($query, $perPage) {
-            return $query->paginate($perPage)->withQueryString();
-        });
+        // Get real-time data without caching
+        $categories = $query->paginate($perPage)->withQueryString();
 
         return Inertia::render('Info/Categories/Index', [
-            'infoCategories' => $infoCategories,
+            'categories' => $categories,
             'filters' => [
                 'search' => $search,
                 'sort' => $sort,

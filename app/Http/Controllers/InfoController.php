@@ -64,25 +64,17 @@ class InfoController extends Controller
 
         $query->orderBy($sort, $direction);
 
-        // Cache results for 5 minutes with a cache key that includes query parameters
-        $cacheKey = "infos.{$perPage}.{$search}.{$sort}.{$direction}.{$typeFilter}.{$categoryFilter}." . $request->input('page', 1);
-        $infos = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($query, $perPage) {
-            return $query->paginate($perPage)->withQueryString();
-        });
+        // Get data without caching for real-time results
+        $infos = $query->paginate($perPage)->withQueryString();
 
-        // Get filter options from cache or fetch them
-        $infoTypes = Cache::remember('info_types_for_filter', now()->addHours(1), function () {
-            return InfoType::select('id', 'name')->orderBy('name')->get();
-        });
-
-        $infoCategories = Cache::remember('info_categories_for_filter', now()->addHours(1), function () {
-            return InfoCategory::select('id', 'name')->orderBy('name')->get();
-        });
+        // Get all types and categories for display without caching
+        $types = InfoType::orderBy('name')->get();
+        $categories = InfoCategory::orderBy('name')->get();
 
         return Inertia::render('Info/Index', [
             'infos' => $infos,
-            'infoTypes' => $infoTypes,
-            'infoCategories' => $infoCategories,
+            'types' => $types,
+            'categories' => $categories,
             'filters' => [
                 'search' => $search,
                 'sort' => $sort,
