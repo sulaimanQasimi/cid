@@ -7,7 +7,9 @@ use App\Models\InfoType;
 use App\Models\InfoCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class InfoController extends Controller
@@ -15,12 +17,63 @@ class InfoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $perPage = $request->input('per_page', 10);
+        $search = $request->input('search', '');
+        $sort = $request->input('sort', 'created_at');
+        $direction = $request->input('direction', 'desc');
+        $typeFilter = $request->input('type_id');
+        $categoryFilter = $request->input('category_id');
+
+        // Apply search and filters
+        $query = Info::with(['infoType', 'infoCategory', 'user']);
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('code', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($typeFilter) {
+            $query->where('info_type_id', $typeFilter);
+        }
+
+        if ($categoryFilter) {
+            $query->where('info_category_id', $categoryFilter);
+        }
+
+        $query->orderBy($sort, $direction);
+
+        // Cache results for 5 minutes with a cache key that includes query parameters
+        $cacheKey = "infos.{$perPage}.{$search}.{$sort}.{$direction}.{$typeFilter}.{$categoryFilter}." . $request->input('page', 1);
+        $infos = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($query, $perPage) {
+            return $query->paginate($perPage)->withQueryString();
+        });
+
+        // Get filter options from cache or fetch them
+        $infoTypes = Cache::remember('info_types_for_filter', now()->addHours(1), function () {
+            return InfoType::select('id', 'name')->orderBy('name')->get();
+        });
+
+        $infoCategories = Cache::remember('info_categories_for_filter', now()->addHours(1), function () {
+            return InfoCategory::select('id', 'name')->orderBy('name')->get();
+        });
+
         return Inertia::render('Info/Index', [
-            'infos' => Info::with(['infoType', 'infoCategory', 'user'])
-                ->orderBy('created_at', 'desc')
-                ->paginate(10),
+            'infos' => $infos,
+            'infoTypes' => $infoTypes,
+            'infoCategories' => $infoCategories,
+            'filters' => [
+                'search' => $search,
+                'sort' => $sort,
+                'direction' => $direction,
+                'type_id' => $typeFilter,
+                'category_id' => $categoryFilter,
+                'per_page' => $perPage,
+            ],
         ]);
     }
 
@@ -29,9 +82,21 @@ class InfoController extends Controller
      */
     public function create()
     {
+        // Check authorization
+        Gate::authorize('create', Info::class);
+
+        // Get data for dropdowns from cache or fetch them
+        $infoTypes = Cache::remember('info_types_all', now()->addHours(6), function () {
+            return InfoType::orderBy('name')->get();
+        });
+
+        $infoCategories = Cache::remember('info_categories_all', now()->addHours(6), function () {
+            return InfoCategory::orderBy('name')->get();
+        });
+
         return Inertia::render('Info/Create', [
-            'infoTypes' => InfoType::orderBy('name')->get(),
-            'infoCategories' => InfoCategory::orderBy('name')->get(),
+            'infoTypes' => $infoTypes,
+            'infoCategories' => $infoCategories,
         ]);
     }
 
@@ -40,6 +105,9 @@ class InfoController extends Controller
      */
     public function store(Request $request)
     {
+        // Check authorization
+        Gate::authorize('create', Info::class);
+
         $validated = $request->validate([
             'info_type_id' => 'required|exists:info_types,id',
             'info_category_id' => 'required|exists:info_categories,id',
@@ -51,12 +119,31 @@ class InfoController extends Controller
             'confirmed' => 'boolean',
         ]);
 
+        // Sanitize inputs
+        if (isset($validated['name'])) {
+            $validated['name'] = strip_tags($validated['name']);
+        }
+        if (isset($validated['code'])) {
+            $validated['code'] = strip_tags($validated['code']);
+        }
+        if (isset($validated['description'])) {
+            $validated['description'] = strip_tags($validated['description']);
+        }
+
         // Set the user who created the record
         $validated['created_by'] = Auth::id();
 
-        Info::create($validated);
+        // Create the record within a transaction
+        try {
+            Info::create($validated);
 
-        return Redirect::route('infos.index')->with('success', 'Info created successfully.');
+            // Clear the infos cache
+            $this->clearInfosCache();
+
+            return Redirect::route('infos.index')->with('success', 'Info created successfully.');
+        } catch (\Exception $e) {
+            return Redirect::back()->with('error', 'An error occurred while creating the info: ' . $e->getMessage())->withInput();
+        }
     }
 
     /**
@@ -64,10 +151,13 @@ class InfoController extends Controller
      */
     public function show(Info $info)
     {
-        $info->load(['infoType', 'infoCategory', 'user', 'creator', 'confirmer']);
+        // Check if we have a cached version
+        $cachedInfo = Cache::remember("info_{$info->id}", now()->addHour(), function () use ($info) {
+            return $info->load(['infoType', 'infoCategory', 'user', 'creator', 'confirmer']);
+        });
 
         return Inertia::render('Info/Show', [
-            'info' => $info,
+            'info' => $cachedInfo,
         ]);
     }
 
@@ -76,10 +166,22 @@ class InfoController extends Controller
      */
     public function edit(Info $info)
     {
+        // Check authorization
+        Gate::authorize('update', $info);
+
+        // Get data for dropdowns from cache or fetch them
+        $infoTypes = Cache::remember('info_types_all', now()->addHours(6), function () {
+            return InfoType::orderBy('name')->get();
+        });
+
+        $infoCategories = Cache::remember('info_categories_all', now()->addHours(6), function () {
+            return InfoCategory::orderBy('name')->get();
+        });
+
         return Inertia::render('Info/Edit', [
             'info' => $info,
-            'infoTypes' => InfoType::orderBy('name')->get(),
-            'infoCategories' => InfoCategory::orderBy('name')->get(),
+            'infoTypes' => $infoTypes,
+            'infoCategories' => $infoCategories,
         ]);
     }
 
@@ -88,6 +190,9 @@ class InfoController extends Controller
      */
     public function update(Request $request, Info $info)
     {
+        // Check authorization
+        Gate::authorize('update', $info);
+
         $validated = $request->validate([
             'info_type_id' => 'required|exists:info_types,id',
             'info_category_id' => 'required|exists:info_categories,id',
@@ -99,14 +204,34 @@ class InfoController extends Controller
             'confirmed' => 'boolean',
         ]);
 
+        // Sanitize inputs
+        if (isset($validated['name'])) {
+            $validated['name'] = strip_tags($validated['name']);
+        }
+        if (isset($validated['code'])) {
+            $validated['code'] = strip_tags($validated['code']);
+        }
+        if (isset($validated['description'])) {
+            $validated['description'] = strip_tags($validated['description']);
+        }
+
         // If confirming for the first time, set the confirmer
         if (!$info->confirmed && $request->confirmed) {
             $validated['confirmed_by'] = Auth::id();
         }
 
-        $info->update($validated);
+        // Update the record within a transaction
+        try {
+            $info->update($validated);
 
-        return Redirect::route('infos.index')->with('success', 'Info updated successfully.');
+            // Clear the infos cache
+            $this->clearInfosCache();
+            Cache::forget("info_{$info->id}");
+
+            return Redirect::route('infos.index')->with('success', 'Info updated successfully.');
+        } catch (\Exception $e) {
+            return Redirect::back()->with('error', 'An error occurred while updating the info: ' . $e->getMessage())->withInput();
+        }
     }
 
     /**
@@ -114,8 +239,35 @@ class InfoController extends Controller
      */
     public function destroy(Info $info)
     {
-        $info->delete();
+        // Check authorization
+        Gate::authorize('delete', $info);
 
-        return Redirect::route('infos.index')->with('success', 'Info deleted successfully.');
+        try {
+            $info->delete();
+
+            // Clear the infos cache
+            $this->clearInfosCache();
+            Cache::forget("info_{$info->id}");
+
+            return Redirect::route('infos.index')->with('success', 'Info deleted successfully.');
+        } catch (\Exception $e) {
+            return Redirect::back()->with('error', 'An error occurred while deleting the info: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Clear all infos-related cache keys
+     */
+    private function clearInfosCache()
+    {
+        // Clear all cache keys starting with 'infos.'
+        $keys = Cache::get('cache_keys_infos', []);
+        foreach ($keys as $key) {
+            Cache::forget($key);
+        }
+
+        // Clear list cache keys
+        Cache::forget('info_types_for_filter');
+        Cache::forget('info_categories_for_filter');
     }
 }
