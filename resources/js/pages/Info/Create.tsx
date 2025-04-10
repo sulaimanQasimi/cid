@@ -7,6 +7,8 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { type InfoType, type InfoCategory } from '@/types/info';
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -23,16 +25,30 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ];
 
-export default function InfoCreate() {
+interface Props {
+  infoTypes?: InfoType[];
+  infoCategories?: InfoCategory[];
+}
+
+export default function InfoCreate({ infoTypes = [], infoCategories = [] }: Props) {
   const { data, setData, post, processing, errors } = useForm({
-    title: '',
+    name: '',
+    code: '',
     description: '',
-    content: '',
+    info_type_id: '',
+    info_category_id: '',
+    value: {
+      content: ''
+    }
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    post(route('infos.store'));
+    post(route('infos.store'), {
+      onSuccess: () => {
+        // Redirect happens automatically from the controller
+      }
+    });
   };
 
   return (
@@ -46,15 +62,78 @@ export default function InfoCreate() {
             </CardHeader>
             <form onSubmit={handleSubmit}>
               <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="info_type_id">Type <span className="text-red-500">*</span></Label>
+                    <Select
+                      value={data.info_type_id}
+                      onValueChange={(value) => setData('info_type_id', value)}
+                      required
+                    >
+                      <SelectTrigger id="info_type_id">
+                        <SelectValue placeholder="Select a type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {infoTypes.length > 0 ? (
+                          infoTypes.map((type) => (
+                            <SelectItem key={type.id} value={type.id.toString()}>
+                              {type.name}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <div className="p-2 text-sm text-gray-500">No types available</div>
+                        )}
+                      </SelectContent>
+                    </Select>
+                    {errors.info_type_id && <p className="text-sm text-red-500">{errors.info_type_id}</p>}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="info_category_id">Category <span className="text-red-500">*</span></Label>
+                    <Select
+                      value={data.info_category_id}
+                      onValueChange={(value) => setData('info_category_id', value)}
+                      required
+                    >
+                      <SelectTrigger id="info_category_id">
+                        <SelectValue placeholder="Select a category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {infoCategories.length > 0 ? (
+                          infoCategories.map((category) => (
+                            <SelectItem key={category.id} value={category.id.toString()}>
+                              {category.name}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <div className="p-2 text-sm text-gray-500">No categories available</div>
+                        )}
+                      </SelectContent>
+                    </Select>
+                    {errors.info_category_id && <p className="text-sm text-red-500">{errors.info_category_id}</p>}
+                  </div>
+                </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="title">Title</Label>
+                  <Label htmlFor="name">Name</Label>
                   <Input
-                    id="title"
-                    value={data.title}
-                    onChange={(e) => setData('title', e.target.value)}
-                    required
+                    id="name"
+                    value={data.name}
+                    onChange={(e) => setData('name', e.target.value)}
                   />
-                  {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
+                  {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="code">Code</Label>
+                  <Input
+                    id="code"
+                    value={data.code}
+                    onChange={(e) => setData('code', e.target.value)}
+                    placeholder="Unique identifier (optional)"
+                  />
+                  {errors.code && <p className="text-sm text-red-500">{errors.code}</p>}
+                  <p className="text-sm text-gray-500">A unique identifier for this record. Can contain letters, numbers, underscores, and hyphens.</p>
                 </div>
 
                 <div className="space-y-2">
@@ -72,12 +151,11 @@ export default function InfoCreate() {
                   <Label htmlFor="content">Content</Label>
                   <Textarea
                     id="content"
-                    value={data.content}
-                    onChange={(e) => setData('content', e.target.value)}
+                    value={data.value.content}
+                    onChange={(e) => setData('value', { ...data.value, content: e.target.value })}
                     rows={5}
-                    required
                   />
-                  {errors.content && <p className="text-sm text-red-500">{errors.content}</p>}
+                  {errors.value && <p className="text-sm text-red-500">{errors.value}</p>}
                 </div>
               </CardContent>
 
