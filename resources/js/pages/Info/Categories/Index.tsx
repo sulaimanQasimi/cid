@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash, Search, ArrowUpDown, FilterX, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Pencil, Trash, Search, ArrowUpDown, FilterX, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -16,6 +16,16 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface InfoCategory {
   id: number;
@@ -87,6 +97,8 @@ const perPageOptions = [
 
 export default function InfoCategoriesIndex({ categories, filters }: Props) {
   const [searchQuery, setSearchQuery] = useState(filters.search);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<InfoCategory | null>(null);
 
   // Handle search form submission
   const handleSearch = (e: React.FormEvent) => {
@@ -136,6 +148,24 @@ export default function InfoCategoriesIndex({ categories, filters }: Props) {
       per_page: 10,
       page: 1
     });
+  };
+
+  // Open delete confirmation dialog
+  const openDeleteDialog = (category: InfoCategory) => {
+    setCategoryToDelete(category);
+    setIsDeleteDialogOpen(true);
+  };
+
+  // Handle delete confirmation
+  const confirmDelete = () => {
+    if (categoryToDelete) {
+      router.delete(route('info-categories.destroy', categoryToDelete.id), {
+        onSuccess: () => {
+          setCategoryToDelete(null);
+          setIsDeleteDialogOpen(false);
+        },
+      });
+    }
   };
 
   return (
@@ -270,11 +300,20 @@ export default function InfoCategoriesIndex({ categories, filters }: Props) {
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
                             <Button size="sm" variant="outline" asChild>
+                              <Link href={route('info-categories.show', category.id)}>
+                                <Eye className="h-4 w-4" />
+                              </Link>
+                            </Button>
+                            <Button size="sm" variant="outline" asChild>
                               <Link href={route('info-categories.edit', category.id)}>
                                 <Pencil className="h-4 w-4" />
                               </Link>
                             </Button>
-                            <Button size="sm" variant="destructive">
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => openDeleteDialog(category)}
+                            >
                               <Trash className="h-4 w-4" />
                             </Button>
                           </div>
@@ -334,6 +373,26 @@ export default function InfoCategoriesIndex({ categories, filters }: Props) {
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the category "{categoryToDelete?.name}".
+              <br />
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setCategoryToDelete(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-500 hover:bg-red-600">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppLayout>
   );
 }
