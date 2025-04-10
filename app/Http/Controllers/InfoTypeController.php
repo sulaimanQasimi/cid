@@ -106,10 +106,6 @@ class InfoTypeController extends Controller
 
         try {
             InfoType::create($validated);
-
-            // Clear the cache for info types
-            Cache::forget('info_types_all');
-
             return Redirect::route('info-types.index')->with('success', 'Info type created successfully.');
         } catch (\Exception $e) {
             return Redirect::back()
@@ -182,11 +178,6 @@ class InfoTypeController extends Controller
 
         try {
             $infoType->update($validated);
-
-            // Clear relevant caches
-            Cache::forget('info_types_all');
-            Cache::forget("info_type_{$infoType->id}");
-
             return Redirect::route('info-types.index')->with('success', 'Info type updated successfully.');
         } catch (\Exception $e) {
             return Redirect::back()
@@ -210,11 +201,6 @@ class InfoTypeController extends Controller
 
         try {
             $infoType->delete();
-
-            // Clear relevant caches
-            Cache::forget('info_types_all');
-            Cache::forget("info_type_{$infoType->id}");
-
             return Redirect::route('info-types.index')->with('success', 'Info type deleted successfully.');
         } catch (\Exception $e) {
             return Redirect::back()->with('error', 'Failed to delete info type: ' . $e->getMessage());

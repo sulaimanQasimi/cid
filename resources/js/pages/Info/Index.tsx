@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -64,11 +64,37 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function InfoIndex({ infos = [], categories = [], types = [] }: Props) {
+  // Debug log to see what data we're receiving
+  useEffect(() => {
+    console.log('Main Index Page Data:', {
+      infos,
+      categories,
+      types,
+      categoriesCount: categories?.length
+    });
+  }, [infos, categories, types]);
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Info Records" />
       <div className="py-12">
         <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+          {/* Debug info */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle>Debug Information</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="p-4 bg-yellow-50 border border-yellow-300 rounded-md">
+                <h2 className="font-bold">Categories Data:</h2>
+                <pre className="text-xs mt-2 overflow-auto max-h-40">
+                  {JSON.stringify({ receivedCategories: categories }, null, 2)}
+                </pre>
+                <p className="mt-2 text-sm">Expected categories from database: 2 records</p>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Info Records Section */}
           <Card>
             <CardHeader className="pb-3">
@@ -95,7 +121,7 @@ export default function InfoIndex({ infos = [], categories = [], types = [] }: P
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {infos.length > 0 ? (
+                  {infos && infos.length > 0 ? (
                     infos.map((info) => (
                       <TableRow key={info.id}>
                         <TableCell>{info.id}</TableCell>
@@ -159,7 +185,7 @@ export default function InfoIndex({ infos = [], categories = [], types = [] }: P
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {types.length > 0 ? (
+                  {types && types.length > 0 ? (
                     types.map((type) => (
                       <TableRow key={type.id}>
                         <TableCell>{type.id}</TableCell>
@@ -217,7 +243,7 @@ export default function InfoIndex({ infos = [], categories = [], types = [] }: P
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {categories.length > 0 ? (
+                  {categories && categories.length > 0 ? (
                     categories.map((category) => (
                       <TableRow key={category.id}>
                         <TableCell>{category.id}</TableCell>

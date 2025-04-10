@@ -44,7 +44,7 @@ class InfoCategoryController extends Controller
 
         $query->orderBy($sort, $direction);
 
-        // Get real-time data without caching
+        // Get paginated data
         $categories = $query->paginate($perPage)->withQueryString();
 
         return Inertia::render('Info/Categories/Index', [
@@ -105,10 +105,6 @@ class InfoCategoryController extends Controller
 
         try {
             InfoCategory::create($validated);
-
-            // Clear the cache for info categories
-            Cache::forget('info_categories_all');
-
             return Redirect::route('info-categories.index')->with('success', 'Info category created successfully.');
         } catch (\Exception $e) {
             return Redirect::back()
@@ -182,10 +178,6 @@ class InfoCategoryController extends Controller
         try {
             $infoCategory->update($validated);
 
-            // Clear relevant caches
-            Cache::forget('info_categories_all');
-            Cache::forget("info_category_{$infoCategory->id}");
-
             return Redirect::route('info-categories.index')->with('success', 'Info category updated successfully.');
         } catch (\Exception $e) {
             return Redirect::back()
@@ -209,10 +201,6 @@ class InfoCategoryController extends Controller
 
         try {
             $infoCategory->delete();
-
-            // Clear relevant caches
-            Cache::forget('info_categories_all');
-            Cache::forget("info_category_{$infoCategory->id}");
 
             return Redirect::route('info-categories.index')->with('success', 'Info category deleted successfully.');
         } catch (\Exception $e) {
