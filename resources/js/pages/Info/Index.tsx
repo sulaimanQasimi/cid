@@ -178,13 +178,13 @@ export default function InfoIndex({
   // Handle type filter change
   const handleTypeChange = (value: string) => {
     setSelectedType(value);
-    applyFilters({ type_id: value || undefined });
+    applyFilters({ type_id: value === "_all" ? undefined : value });
   };
 
   // Handle category filter change
   const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);
-    applyFilters({ category_id: value || undefined });
+    applyFilters({ category_id: value === "_all" ? undefined : value });
   };
 
   // Navigate to page
@@ -360,7 +360,7 @@ export default function InfoIndex({
                           <SelectValue placeholder="Filter by Type" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">All Types</SelectItem>
+                          <SelectItem value="_all">All Types</SelectItem>
                           {types.map(type => (
                             <SelectItem key={type.id} value={type.id.toString()}>
                               {type.name}
@@ -378,7 +378,7 @@ export default function InfoIndex({
                           <SelectValue placeholder="Filter by Category" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">All Categories</SelectItem>
+                          <SelectItem value="_all">All Categories</SelectItem>
                           {categories.map(category => (
                             <SelectItem key={category.id} value={category.id.toString()}>
                               {category.name}
