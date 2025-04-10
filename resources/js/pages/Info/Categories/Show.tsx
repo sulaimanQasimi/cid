@@ -17,7 +17,7 @@ interface Info {
   updated_at: string;
 }
 
-interface InfoType {
+interface InfoCategory {
   id: number;
   name: string;
   description: string | null;
@@ -27,7 +27,7 @@ interface InfoType {
 }
 
 interface Props {
-  infoType: InfoType;
+  infoCategory: InfoCategory;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -36,20 +36,20 @@ const breadcrumbs: BreadcrumbItem[] = [
     href: '#',
   },
   {
-    title: 'Info Types',
-    href: route('info-types.index'),
+    title: 'Info Categories',
+    href: route('info-categories.index'),
   },
   {
-    title: 'View Type',
+    title: 'View Category',
     href: '#',
   },
 ];
 
-export default function ShowInfoType({ infoType }: Props) {
+export default function ShowInfoCategory({ infoCategory }: Props) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
 
   const handleDelete = () => {
-    router.delete(route('info-types.destroy', infoType.id), {
+    router.delete(route('info-categories.destroy', infoCategory.id), {
       onSuccess: () => {
         setIsDeleteDialogOpen(false);
       },
@@ -58,22 +58,22 @@ export default function ShowInfoType({ infoType }: Props) {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title={`View Type: ${infoType.name}`} />
+      <Head title={`View Category: ${infoCategory.name}`} />
       <div className="py-12">
         <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
           <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div className="p-6 text-gray-900">
               <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">Type Details</h1>
+                <h1 className="text-2xl font-bold">Category Details</h1>
                 <div className="flex items-center gap-2">
                   <Button variant="outline" asChild>
-                    <Link href={route('info-types.index')}>
+                    <Link href={route('info-categories.index')}>
                       <ArrowLeft className="mr-2 h-4 w-4" />
-                      Back to Types
+                      Back to Categories
                     </Link>
                   </Button>
                   <Button variant="outline" asChild>
-                    <Link href={route('info-types.edit', infoType.id)}>
+                    <Link href={route('info-categories.edit', infoCategory.id)}>
                       <Pencil className="mr-2 h-4 w-4" />
                       Edit
                     </Link>
@@ -87,20 +87,20 @@ export default function ShowInfoType({ infoType }: Props) {
 
               <Card className="mb-6">
                 <CardHeader className="pb-3">
-                  <h2 className="text-lg font-semibold">{infoType.name}</h2>
+                  <h2 className="text-lg font-semibold">{infoCategory.name}</h2>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <h3 className="text-sm font-medium text-gray-500">Description</h3>
-                      <p className="mt-1 text-sm text-gray-900">{infoType.description || 'No description provided'}</p>
+                      <p className="mt-1 text-sm text-gray-900">{infoCategory.description || 'No description provided'}</p>
                     </div>
                     <div>
                       <h3 className="text-sm font-medium text-gray-500">Created At</h3>
-                      <p className="mt-1 text-sm text-gray-900">{new Date(infoType.created_at).toLocaleString()}</p>
+                      <p className="mt-1 text-sm text-gray-900">{new Date(infoCategory.created_at).toLocaleString()}</p>
 
                       <h3 className="text-sm font-medium text-gray-500 mt-4">Updated At</h3>
-                      <p className="mt-1 text-sm text-gray-900">{new Date(infoType.updated_at).toLocaleString()}</p>
+                      <p className="mt-1 text-sm text-gray-900">{new Date(infoCategory.updated_at).toLocaleString()}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -111,13 +111,13 @@ export default function ShowInfoType({ infoType }: Props) {
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl font-semibold">Associated Info Records</h2>
                   <Button asChild>
-                    <Link href={route('infos.create', { type_id: infoType.id })}>
+                    <Link href={route('infos.create', { category_id: infoCategory.id })}>
                       Create New Info
                     </Link>
                   </Button>
                 </div>
 
-                {infoType.infos && infoType.infos.length > 0 ? (
+                {infoCategory.infos && infoCategory.infos.length > 0 ? (
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -129,7 +129,7 @@ export default function ShowInfoType({ infoType }: Props) {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {infoType.infos.map((info) => (
+                      {infoCategory.infos.map((info) => (
                         <TableRow key={info.id}>
                           <TableCell>{info.id}</TableCell>
                           <TableCell className="font-medium">{info.title}</TableCell>
@@ -162,9 +162,9 @@ export default function ShowInfoType({ infoType }: Props) {
                   <Card>
                     <CardContent className="flex items-center justify-center p-6">
                       <div className="text-center">
-                        <p className="text-gray-500 mb-4">No info records found for this type.</p>
+                        <p className="text-gray-500 mb-4">No info records found for this category.</p>
                         <Button asChild>
-                          <Link href={route('infos.create', { type_id: infoType.id })}>
+                          <Link href={route('infos.create', { category_id: infoCategory.id })}>
                             Create First Info Record
                           </Link>
                         </Button>
@@ -184,7 +184,7 @@ export default function ShowInfoType({ infoType }: Props) {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the type "{infoType.name}".
+              This will permanently delete the category "{infoCategory.name}".
               <br />
               This action cannot be undone.
             </AlertDialogDescription>
