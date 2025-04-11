@@ -129,7 +129,7 @@ class MeetingController extends Controller
      */
     public function show($id)
     {
-        $meeting = Meeting::with(['creator', 'participants.user'])
+        $meeting = Meeting::with(['creator', 'participants'])
             ->findOrFail($id);
 
         $this->authorize('view', $meeting);
@@ -258,7 +258,7 @@ class MeetingController extends Controller
         }
 
         return Inertia::render('Meeting/Room', [
-            'meeting' => $meeting->load('participants.user'),
+            'meeting' => $meeting->load('participants'),
             'user' => Auth::user(),
             'isOfflineEnabled' => $meeting->offline_enabled,
         ]);

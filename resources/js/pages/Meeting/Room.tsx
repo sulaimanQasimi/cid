@@ -20,11 +20,14 @@ interface User {
 
 interface Participant {
   id: number;
-  user: User;
-  role: string;
-  status: string;
-  joined_at: string;
-  left_at: string;
+  name: string;
+  email: string;
+  pivot: {
+    role: string;
+    status: string;
+    joined_at: string;
+    left_at: string;
+  }
 }
 
 interface Meeting {
