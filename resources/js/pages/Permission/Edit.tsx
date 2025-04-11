@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Button } from '@/Components/ui/button';
-import { Switch } from '@/Components/ui/switch';
-import { Label } from '@/Components/ui/label';
-import { Checkbox } from '@/Components/ui/checkbox';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface User {
   id: number;
