@@ -4,7 +4,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 
 type PaginationProps = {
-  links: Array<{
+  links?: Array<{
     url: string | null;
     label: string;
     active: boolean;
@@ -12,13 +12,17 @@ type PaginationProps = {
   prevPageUrl?: string | null;
   nextPageUrl?: string | null;
   onPageChange?: (url: string) => void;
+  currentPage?: number;
+  totalPages?: number;
 };
 
-const Pagination: React.FC<PaginationProps> = ({
+export const Pagination: React.FC<PaginationProps> = ({
   links,
   prevPageUrl,
   nextPageUrl,
   onPageChange,
+  currentPage,
+  totalPages,
 }) => {
   const handleClick = (url: string) => {
     if (onPageChange) {
@@ -26,91 +30,189 @@ const Pagination: React.FC<PaginationProps> = ({
     }
   };
 
-  return (
-    <div className="flex items-center justify-between px-2 py-3 sm:px-6">
-      <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-        <div>
-          <p className="text-sm text-gray-700">
-            Showing page{' '}
-            <span className="font-medium">
-              {links.findIndex((link) => link.active) !== -1
-                ? links.findIndex((link) => link.active)
-                : 1}
-            </span>{' '}
-            of <span className="font-medium">{links.length - 2}</span> pages
-          </p>
-        </div>
-        <div>
-          <nav
-            className="isolate inline-flex -space-x-px rounded-md shadow-sm"
-            aria-label="Pagination"
-          >
-            {/* Previous Page */}
-            {prevPageUrl ? (
-              <Link
-                href={prevPageUrl}
-                className="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
-                onClick={() => prevPageUrl && handleClick(prevPageUrl)}
+  // If we have currentPage and totalPages, generate numbered pagination
+  if (currentPage !== undefined && totalPages !== undefined) {
+    const pages = [];
+    const maxPages = Math.min(totalPages, 7); // Show max 7 page links
+
+    let startPage = 1;
+    let endPage = maxPages;
+
+    if (totalPages > 7) {
+      // Complex pagination logic when we have many pages
+      if (currentPage > 4) {
+        startPage = currentPage - 3;
+        endPage = currentPage + 3;
+
+        if (endPage > totalPages) {
+          endPage = totalPages;
+          startPage = totalPages - 6;
+        }
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return (
+      <div className="flex items-center justify-between px-2 py-3 sm:px-6">
+        <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm text-gray-700">
+              Showing page{' '}
+              <span className="font-medium">{currentPage}</span>{' '}
+              of <span className="font-medium">{totalPages}</span> pages
+            </p>
+          </div>
+          <div>
+            <nav
+              className="isolate inline-flex -space-x-px rounded-md shadow-sm"
+              aria-label="Pagination"
+            >
+              {/* Previous Page */}
+              <button
+                onClick={() => currentPage > 1 && onPageChange && onPageChange(`?page=${currentPage - 1}`)}
+                disabled={currentPage <= 1}
+                className={cn(
+                  "relative inline-flex items-center rounded-l-md px-2 py-2 text-sm font-medium",
+                  currentPage <= 1
+                    ? "border border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 focus:z-20"
+                )}
               >
                 <span className="sr-only">Previous</span>
                 <ChevronLeft className="h-5 w-5" aria-hidden="true" />
-              </Link>
-            ) : (
-              <span className="relative inline-flex items-center rounded-l-md border border-gray-300 bg-gray-100 px-2 py-2 text-sm font-medium text-gray-400 cursor-not-allowed">
-                <span className="sr-only">Previous</span>
-                <ChevronLeft className="h-5 w-5" aria-hidden="true" />
-              </span>
-            )}
+              </button>
 
-            {/* Page Numbers */}
-            {links
-              .filter((link) => !link.label.includes('Previous') && !link.label.includes('Next'))
-              .map((link, index) => {
-                const label = link.label.replace('&laquo;', '').replace('&raquo;', '');
-                return (
-                  <React.Fragment key={index}>
-                    {link.url ? (
-                      <Link
-                        href={link.url}
-                        className={cn(
-                          link.active
-                            ? 'relative z-10 inline-flex items-center border border-indigo-500 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-600 focus:z-20'
-                            : 'relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20',
-                        )}
-                        onClick={() => link.url && handleClick(link.url)}
-                      >
-                        {label}
-                      </Link>
-                    ) : (
-                      <span className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700">
-                        {label}
-                      </span>
-                    )}
-                  </React.Fragment>
-                );
-              })}
+              {/* Page Numbers */}
+              {pages.map(page => (
+                <button
+                  key={page}
+                  onClick={() => onPageChange && onPageChange(`?page=${page}`)}
+                  className={cn(
+                    "relative inline-flex items-center border px-4 py-2 text-sm font-medium",
+                    page === currentPage
+                      ? "z-10 border-indigo-500 bg-indigo-50 text-indigo-600 focus:z-20"
+                      : "border-gray-300 bg-white text-gray-500 hover:bg-gray-50 focus:z-20"
+                  )}
+                >
+                  {page}
+                </button>
+              ))}
 
-            {/* Next Page */}
-            {nextPageUrl ? (
-              <Link
-                href={nextPageUrl}
-                className="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
-                onClick={() => nextPageUrl && handleClick(nextPageUrl)}
+              {/* Next Page */}
+              <button
+                onClick={() => currentPage < totalPages && onPageChange && onPageChange(`?page=${currentPage + 1}`)}
+                disabled={currentPage >= totalPages}
+                className={cn(
+                  "relative inline-flex items-center rounded-r-md px-2 py-2 text-sm font-medium",
+                  currentPage >= totalPages
+                    ? "border border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 focus:z-20"
+                )}
               >
                 <span className="sr-only">Next</span>
                 <ChevronRight className="h-5 w-5" aria-hidden="true" />
-              </Link>
-            ) : (
-              <span className="relative inline-flex items-center rounded-r-md border border-gray-300 bg-gray-100 px-2 py-2 text-sm font-medium text-gray-400 cursor-not-allowed">
-                <span className="sr-only">Next</span>
-                <ChevronRight className="h-5 w-5" aria-hidden="true" />
-              </span>
-            )}
-          </nav>
+              </button>
+            </nav>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  // Original code for Laravel paginated links
+  if (links) {
+    return (
+      <div className="flex items-center justify-between px-2 py-3 sm:px-6">
+        <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm text-gray-700">
+              Showing page{' '}
+              <span className="font-medium">
+                {links.findIndex((link) => link.active) !== -1
+                  ? links.findIndex((link) => link.active)
+                  : 1}
+              </span>{' '}
+              of <span className="font-medium">{links.length - 2}</span> pages
+            </p>
+          </div>
+          <div>
+            <nav
+              className="isolate inline-flex -space-x-px rounded-md shadow-sm"
+              aria-label="Pagination"
+            >
+              {/* Previous Page */}
+              {prevPageUrl ? (
+                <Link
+                  href={prevPageUrl}
+                  className="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
+                  onClick={() => prevPageUrl && handleClick(prevPageUrl)}
+                >
+                  <span className="sr-only">Previous</span>
+                  <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+                </Link>
+              ) : (
+                <span className="relative inline-flex items-center rounded-l-md border border-gray-300 bg-gray-100 px-2 py-2 text-sm font-medium text-gray-400 cursor-not-allowed">
+                  <span className="sr-only">Previous</span>
+                  <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+                </span>
+              )}
+
+              {/* Page Numbers */}
+              {links
+                .filter((link) => !link.label.includes('Previous') && !link.label.includes('Next'))
+                .map((link, index) => {
+                  const label = link.label.replace('&laquo;', '').replace('&raquo;', '');
+                  return (
+                    <React.Fragment key={index}>
+                      {link.url ? (
+                        <Link
+                          href={link.url}
+                          className={cn(
+                            link.active
+                              ? 'relative z-10 inline-flex items-center border border-indigo-500 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-600 focus:z-20'
+                              : 'relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20',
+                          )}
+                          onClick={() => link.url && handleClick(link.url)}
+                        >
+                          {label}
+                        </Link>
+                      ) : (
+                        <span className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700">
+                          {label}
+                        </span>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+
+              {/* Next Page */}
+              {nextPageUrl ? (
+                <Link
+                  href={nextPageUrl}
+                  className="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
+                  onClick={() => nextPageUrl && handleClick(nextPageUrl)}
+                >
+                  <span className="sr-only">Next</span>
+                  <ChevronRight className="h-5 w-5" aria-hidden="true" />
+                </Link>
+              ) : (
+                <span className="relative inline-flex items-center rounded-r-md border border-gray-300 bg-gray-100 px-2 py-2 text-sm font-medium text-gray-400 cursor-not-allowed">
+                  <span className="sr-only">Next</span>
+                  <ChevronRight className="h-5 w-5" aria-hidden="true" />
+                </span>
+              )}
+            </nav>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Default empty state
+  return null;
 };
 
 export default Pagination;
