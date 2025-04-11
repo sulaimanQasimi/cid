@@ -11,13 +11,42 @@ interface LocationSelectorProps {
   onChange: (location: { lat: number; lng: number } | null) => void;
 }
 
-// Create a fixed mapping of some provinces to coordinates (approximated)
+// Create a fixed mapping of all Afghanistan provinces to coordinates (approximated)
 const PROVINCE_COORDINATES = {
-  "Kabul": { lat: 34.5553, lng: 69.2075 },
-  "Herat": { lat: 34.3530, lng: 62.2090 },
-  "Kandahar": { lat: 31.6133, lng: 65.7100 },
+  "Badakhshan": { lat: 36.7347, lng: 70.8119 },
+  "Badghis": { lat: 35.1671, lng: 63.7695 },
+  "Baghlan": { lat: 35.9462, lng: 68.7100 },
   "Balkh": { lat: 36.7581, lng: 67.1015 },
-  "Nangarhar": { lat: 34.1718, lng: 70.6217 }
+  "Bamyan": { lat: 34.8100, lng: 67.8218 },
+  "Daykundi": { lat: 33.7370, lng: 66.0461 },
+  "Farah": { lat: 32.3747, lng: 62.1413 },
+  "Faryab": { lat: 36.0799, lng: 64.9036 },
+  "Ghazni": { lat: 33.5453, lng: 68.4215 },
+  "Ghor": { lat: 34.0998, lng: 65.2478 },
+  "Helmand": { lat: 31.5797, lng: 64.3700 },
+  "Herat": { lat: 34.3530, lng: 62.2090 },
+  "Jowzjan": { lat: 36.8969, lng: 65.9042 },
+  "Kabul": { lat: 34.5553, lng: 69.2075 },
+  "Kandahar": { lat: 31.6133, lng: 65.7100 },
+  "Kapisa": { lat: 34.9809, lng: 69.6210 },
+  "Khost": { lat: 33.3395, lng: 69.9348 },
+  "Kunar": { lat: 34.8461, lng: 71.0973 },
+  "Kunduz": { lat: 36.7290, lng: 68.8685 },
+  "Laghman": { lat: 34.6898, lng: 70.1456 },
+  "Logar": { lat: 34.0144, lng: 69.1933 },
+  "Nangarhar": { lat: 34.1718, lng: 70.6217 },
+  "Nimruz": { lat: 31.0255, lng: 62.4553 },
+  "Nuristan": { lat: 35.3252, lng: 70.9072 },
+  "Paktia": { lat: 33.7062, lng: 69.3851 },
+  "Paktika": { lat: 32.2648, lng: 68.5249 },
+  "Panjshir": { lat: 35.3125, lng: 69.9372 },
+  "Parwan": { lat: 35.0095, lng: 69.1424 },
+  "Samangan": { lat: 36.3120, lng: 67.9649 },
+  "Sar-e Pol": { lat: 36.2151, lng: 65.9328 },
+  "Takhar": { lat: 36.6701, lng: 69.4787 },
+  "Uruzgan": { lat: 32.9275, lng: 66.0345 },
+  "Wardak": { lat: 34.3800, lng: 68.2512 },
+  "Zabul": { lat: 32.2730, lng: 67.2590 }
 };
 
 // Default to center of Afghanistan if province not found
@@ -31,6 +60,7 @@ export default function LocationSelector({ value, onChange }: LocationSelectorPr
   // State to track the selected position
   const [position, setPosition] = useState<{ lat: number; lng: number } | null>(value || null);
   const [isMapReady, setIsMapReady] = useState(false);
+  const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
 
   // Initialize chart on component mount
   useEffect(() => {
@@ -83,6 +113,11 @@ export default function LocationSelector({ value, onChange }: LocationSelectorPr
           fill: am5.color(0x4A89DC)
         });
 
+        // Create state for selected province
+        provinceSeries.mapPolygons.template.states.create("selected", {
+          fill: am5.color(0xFF5733)
+        });
+
         // Add click events on provinces using any to bypass TypeScript strictness
         provinceSeries.mapPolygons.template.events.on("click", function(ev) {
           // Use any to bypass TypeScript strict typing
@@ -92,6 +127,17 @@ export default function LocationSelector({ value, onChange }: LocationSelectorPr
           if (dataItem && dataItem.dataContext) {
             // Try to get province name
             const provinceName = dataItem.dataContext.name;
+
+            // Reset all provinces to default state
+            provinceSeries.mapPolygons.each(function(polygon) {
+              polygon.states.applyAnimate("default");
+            });
+
+            // Set this province to selected state
+            target.states.applyAnimate("selected");
+
+            // Update selected province
+            setSelectedProvince(provinceName);
 
             // Pick a coordinate based on the province or use the default
             let coordinates = DEFAULT_COORDINATE;
@@ -115,6 +161,17 @@ export default function LocationSelector({ value, onChange }: LocationSelectorPr
           pointSeries.data.push({
             geometry: { type: "Point", coordinates: [position.lng, position.lat] }
           });
+
+          // Try to highlight the corresponding province if this is an initial position
+          if (value) {
+            // Find the province by matching coordinates
+            for (const [provinceName, coords] of Object.entries(PROVINCE_COORDINATES)) {
+              if (Math.abs(coords.lat - value.lat) < 0.01 && Math.abs(coords.lng - value.lng) < 0.01) {
+                setSelectedProvince(provinceName);
+                break;
+              }
+            }
+          }
         }
 
         // Configure the marker appearance
@@ -210,7 +267,22 @@ export default function LocationSelector({ value, onChange }: LocationSelectorPr
   // Handle clear button click
   const handleClear = () => {
     setPosition(null);
+    setSelectedProvince(null);
     onChange(null);
+
+    // Clear selected province state if chart exists
+    if (chartRef.current && isMapReady) {
+      const chart = chartRef.current.container.children.getIndex(0) as am5map.MapChart;
+      const provinceSeries = chart.series.values.find(
+        series => series instanceof am5map.MapPolygonSeries
+      ) as am5map.MapPolygonSeries;
+
+      if (provinceSeries) {
+        provinceSeries.mapPolygons.each(function(polygon) {
+          polygon.states.applyAnimate("default");
+        });
+      }
+    }
   };
 
   return (
@@ -239,6 +311,7 @@ export default function LocationSelector({ value, onChange }: LocationSelectorPr
         <div className="text-sm">
           {position ? (
             <span className="font-mono">
+              {selectedProvince ? `${selectedProvince} Province: ` : ''}
               Lat: {position.lat.toFixed(6)}, Lng: {position.lng.toFixed(6)}
             </span>
           ) : (
