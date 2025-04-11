@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\MeetingController;
-use App\Http\Controllers\WebRTCController;
+use App\Http\Controllers\WebRTCControllerNew;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -23,12 +23,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // WebRTC related routes
     Route::prefix('webrtc')->group(function () {
-        Route::post('session/meeting/{meetingId}', [WebRTCController::class, 'initSession'])->name('webrtc.init-session');
-        Route::post('session/{sessionId}/ice-candidates', [WebRTCController::class, 'saveIceCandidates'])->name('webrtc.ice-candidates');
-        Route::post('signal', [WebRTCController::class, 'signal'])->name('webrtc.signal');
-        Route::post('session/{sessionId}/end', [WebRTCController::class, 'endSession'])->name('webrtc.end-session');
-        Route::post('meeting/{meetingId}/message', [WebRTCController::class, 'sendMessage'])->name('webrtc.send-message');
-        Route::get('meeting/{meetingId}/messages', [WebRTCController::class, 'getMessages'])->name('webrtc.get-messages');
-        Route::post('session/{sessionId}/sync-offline', [WebRTCController::class, 'syncOfflineData'])->name('webrtc.sync-offline');
+        Route::post('session/meeting/{meetingId}', [WebRTCControllerNew::class, 'initSession'])->name('webrtc.init-session');
+        Route::post('session/{sessionId}/ice-candidates', [WebRTCControllerNew::class, 'saveIceCandidates'])->name('webrtc.ice-candidates');
+        Route::post('signal', [WebRTCControllerNew::class, 'signal'])->name('webrtc.signal');
+        Route::post('session/{sessionId}/end', [WebRTCControllerNew::class, 'endSession'])->name('webrtc.end-session');
+        Route::post('meeting/{meetingId}/message', [WebRTCControllerNew::class, 'sendMessage'])->name('webrtc.send-message');
+        Route::get('meeting/{meetingId}/messages', [WebRTCControllerNew::class, 'getMessages'])->name('webrtc.get-messages');
+        Route::post('session/{sessionId}/sync-offline', [WebRTCControllerNew::class, 'syncOfflineData'])->name('webrtc.sync-offline');
     });
 });

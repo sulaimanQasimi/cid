@@ -1,0 +1,52 @@
+import React from 'react';
+import { Head } from '@inertiajs/react';
+import AppLayout from '@/layouts/app-layout';
+
+interface MeetingIndexProps {
+  auth: {
+    user: {
+      id: number;
+      name: string;
+      email: string;
+    };
+  };
+  meetings: {
+    data: any[];
+  };
+  filters: {
+    search: string;
+    status: string;
+    sort: string;
+    direction: string;
+  };
+}
+
+const breadcrumbs = [
+  {
+    title: 'Meetings',
+    href: route('meetings.index'),
+  },
+];
+
+export default function Index({ auth, meetings, filters }: MeetingIndexProps) {
+  return (
+    <AppLayout breadcrumbs={breadcrumbs}>
+      <Head title="Meetings" />
+      <div className="py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h1 className="text-2xl font-bold">Meetings</h1>
+
+          <div className="mt-6">
+            {meetings.data.length === 0 ? (
+              <p>No meetings found.</p>
+            ) : (
+              <div>
+                <p>You have {meetings.data.length} meetings.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </AppLayout>
+  );
+}
