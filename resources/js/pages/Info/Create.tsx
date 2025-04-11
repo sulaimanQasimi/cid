@@ -1,4 +1,4 @@
-import React, { useState, lazy, Suspense } from 'react';
+import React, { useState, lazy, Suspense, useEffect } from 'react';
 import { Head, useForm } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -12,8 +12,8 @@ import { type InfoType, type InfoCategory } from '@/types/info';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MapPin } from 'lucide-react';
 
-// Lazy load the LocationSelector component to avoid SSR issues with Leaflet
-const LocationSelector = lazy(() => import('@/components/LocationSelector'));
+// Import the LocationSelector component directly to avoid issues with lazy loading
+import LocationSelector from '@/components/LocationSelector';
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -39,6 +39,9 @@ export default function InfoCreate({ infoTypes = [], infoCategories = [] }: Prop
   // Content tabs state
   const [activeTab, setActiveTab] = useState<string>('basic');
 
+  // Flag to track map mounting
+  const [isMapTabMounted, setIsMapTabMounted] = useState(false);
+
   // Location data state
   const [location, setLocation] = useState<{ lat: number, lng: number } | null>(null);
 
@@ -53,6 +56,14 @@ export default function InfoCreate({ infoTypes = [], infoCategories = [] }: Prop
       location: null as { lat: number, lng: number } | null
     }
   });
+
+  // Handle tab change
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    if (value === 'location') {
+      setIsMapTabMounted(true);
+    }
+  };
 
   // Handle location change
   const handleLocationChange = (newLocation: { lat: number, lng: number } | null) => {
@@ -71,6 +82,13 @@ export default function InfoCreate({ infoTypes = [], infoCategories = [] }: Prop
       }
     });
   };
+
+  // Load map component when needed
+  useEffect(() => {
+    if (activeTab === 'location') {
+      setIsMapTabMounted(true);
+    }
+  }, [activeTab]);
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -172,7 +190,7 @@ export default function InfoCreate({ infoTypes = [], infoCategories = [] }: Prop
                 <div className="space-y-2">
                   <Label>Content</Label>
 
-                  <Tabs defaultValue="basic" value={activeTab} onValueChange={setActiveTab}>
+                  <Tabs defaultValue="basic" value={activeTab} onValueChange={handleTabChange}>
                     <TabsList className="grid w-full grid-cols-2">
                       <TabsTrigger value="basic">Basic Content</TabsTrigger>
                       <TabsTrigger value="location" className="flex items-center gap-1">
@@ -194,12 +212,17 @@ export default function InfoCreate({ infoTypes = [], infoCategories = [] }: Prop
                     <TabsContent value="location" className="pt-4">
                       <div className="space-y-2">
                         <p className="text-sm text-gray-500">Click on the map to select a location in Afghanistan.</p>
-                        <Suspense fallback={<div className="h-[400px] flex items-center justify-center bg-gray-100 rounded-md">Loading map...</div>}>
+                        {isMapTabMounted && (
                           <LocationSelector
                             value={location}
                             onChange={handleLocationChange}
                           />
-                        </Suspense>
+                        )}
+                        {!isMapTabMounted && (
+                          <div className="h-[400px] flex items-center justify-center bg-gray-100 rounded-md">
+                            Loading map...
+                          </div>
+                        )}
                       </div>
                     </TabsContent>
                   </Tabs>
