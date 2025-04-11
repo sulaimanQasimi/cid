@@ -5,6 +5,7 @@ import * as am5 from '@amcharts/amcharts5';
 import * as am5map from '@amcharts/amcharts5/map';
 import am5geodata_afghanistanLow from '@amcharts/amcharts5-geodata/afghanistanLow';
 import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
+import am5themes_Dark from '@amcharts/amcharts5/themes/Dark';
 
 interface LocationSelectorProps {
   value?: { lat: number; lng: number } | null;
@@ -52,6 +53,12 @@ const PROVINCE_COORDINATES = {
 // Default to center of Afghanistan if province not found
 const DEFAULT_COORDINATE = { lat: 33.9391, lng: 67.7100 };
 
+// Colors
+const PROVINCE_COLOR = 0x86ADCF;
+const PROVINCE_HOVER_COLOR = 0x4A89DC;
+const PROVINCE_SELECTED_COLOR = 0xF05E3B;
+const MARKER_COLOR = 0xF05E3B;
+
 export default function LocationSelector({ value, onChange }: LocationSelectorProps) {
   // Create refs for chart
   const chartRef = useRef<am5.Root | null>(null);
@@ -74,7 +81,9 @@ export default function LocationSelector({ value, onChange }: LocationSelectorPr
         const root = am5.Root.new(chartDivRef.current!);
 
         // Set themes
-        root.setThemes([am5themes_Animated.new(root)]);
+        root.setThemes([
+          am5themes_Animated.new(root),
+        ]);
 
         // Create the map chart
         const chart = root.container.children.push(
@@ -86,36 +95,82 @@ export default function LocationSelector({ value, onChange }: LocationSelectorPr
             paddingTop: 20,
             paddingLeft: 20,
             paddingRight: 20,
-            maxZoomLevel: 64
+            maxZoomLevel: 64,
+            wheelY: "zoom",
+            wheelX: "zoom"
           })
         );
+
+        // Add a background
+        chart.set("background", am5.Rectangle.new(root, {
+          fill: am5.color(0xF8F9FA),
+          fillOpacity: 1
+        }));
+
+        // Add grid lines
+        const graticule = chart.series.push(
+          am5map.GraticuleSeries.new(root, {
+            step: 2
+          })
+        );
+
+        graticule.mapLines.template.setAll({
+          stroke: am5.color(0xDDDDDD),
+          strokeOpacity: 0.2
+        });
 
         // Create polygon series for Afghanistan provinces
         const provinceSeries = chart.series.push(
           am5map.MapPolygonSeries.new(root, {
             geoJSON: am5geodata_afghanistanLow,
-            fill: am5.color(0x67B7DC),
-            stroke: am5.color(0xFFFFFF)
+            fill: am5.color(PROVINCE_COLOR),
+            stroke: am5.color(0xFFFFFF),
+            valueField: "value"
           })
         );
+
+        // Add a gradient to make the map more 3D-like
+        provinceSeries.mapPolygons.template.set("fillGradient", am5.LinearGradient.new(root, {
+          stops: [
+            { color: am5.color(PROVINCE_COLOR) },
+            { color: am5.color(am5.Color.lighten(am5.color(PROVINCE_COLOR), 0.2)) }
+          ],
+          rotation: 90
+        }));
 
         // Make provinces interactive
         provinceSeries.mapPolygons.template.setAll({
           tooltipText: "{name}",
           interactive: true,
-          fill: am5.color(0x67B7DC),
+          fill: am5.color(PROVINCE_COLOR),
           stroke: am5.color(0xFFFFFF),
-          strokeWidth: 1
+          strokeWidth: 1,
+          shadowColor: am5.color(0x000000),
+          shadowBlur: 3,
+          shadowOffsetX: 1,
+          shadowOffsetY: 1,
+          shadowOpacity: 0.1,
+          cursorOverStyle: "pointer"
         });
 
-        // Change fill color on hover
+        // Change fill color on hover with animation
         provinceSeries.mapPolygons.template.states.create("hover", {
-          fill: am5.color(0x4A89DC)
+          fill: am5.color(PROVINCE_HOVER_COLOR),
+          strokeWidth: 2,
+          shadowBlur: 10,
+          shadowOpacity: 0.2,
+          scale: 1.02,
+          stateAnimationDuration: 300
         });
 
         // Create state for selected province
         provinceSeries.mapPolygons.template.states.create("selected", {
-          fill: am5.color(0xFF5733)
+          fill: am5.color(PROVINCE_SELECTED_COLOR),
+          strokeWidth: 2,
+          shadowBlur: 10,
+          shadowOpacity: 0.3,
+          scale: 1.03,
+          stateAnimationDuration: 400
         });
 
         // Add click events on provinces using any to bypass TypeScript strictness
@@ -148,6 +203,15 @@ export default function LocationSelector({ value, onChange }: LocationSelectorPr
 
             // Update position
             handlePositionChange(coordinates);
+
+            // Add pulse animation to the selected province
+            target.animate({
+              key: "scale",
+              from: 1.05,
+              to: 1.03,
+              duration: 400,
+              loops: 1
+            });
           }
         });
 
@@ -168,6 +232,15 @@ export default function LocationSelector({ value, onChange }: LocationSelectorPr
             for (const [provinceName, coords] of Object.entries(PROVINCE_COORDINATES)) {
               if (Math.abs(coords.lat - value.lat) < 0.01 && Math.abs(coords.lng - value.lng) < 0.01) {
                 setSelectedProvince(provinceName);
+
+                // Highlight the province polygon
+                provinceSeries.mapPolygons.each(function(polygon: any) {
+                  const dataItem = polygon.dataItem;
+                  if (dataItem && dataItem.dataContext && dataItem.dataContext.name === provinceName) {
+                    polygon.states.applyAnimate("selected");
+                  }
+                });
+
                 break;
               }
             }
@@ -176,18 +249,66 @@ export default function LocationSelector({ value, onChange }: LocationSelectorPr
 
         // Configure the marker appearance
         pointSeries.bullets.push(function() {
-          const circle = am5.Circle.new(root, {
-            radius: 7,
+          // Create pin marker with a pulsing effect
+          const pin = am5.Circle.new(root, {
+            radius: 8,
             tooltipText: "Selected Location",
-            fill: am5.color(0xFF5733),
+            fill: am5.color(MARKER_COLOR),
             stroke: am5.color(0xFFFFFF),
-            strokeWidth: 2
+            strokeWidth: 3,
+            fillOpacity: 0.9
           });
 
+          // Add an animated glow effect
+          const pulsingCircle = am5.Circle.new(root, {
+            radius: 0,
+            fill: am5.color(MARKER_COLOR),
+            fillOpacity: 0.3
+          });
+
+          // Create a group to hold both circles
+          const container = am5.Container.new(root, {});
+          container.children.push(pulsingCircle);
+          container.children.push(pin);
+
+          // Create the pulsing animation
+          pulsingCircle.animate({
+            key: "radius",
+            from: 5,
+            to: 15,
+            duration: 1500,
+            loops: Infinity,
+            easing: am5.ease.out(am5.ease.cubic)
+          });
+
+          pulsingCircle.animate({
+            key: "fillOpacity",
+            from: 0.5,
+            to: 0,
+            duration: 1500,
+            loops: Infinity,
+            easing: am5.ease.out(am5.ease.cubic)
+          });
+
+          // Add a drop shadow to the pin
+          pin.set("shadowColor", am5.color(0x000000));
+          pin.set("shadowBlur", 8);
+          pin.set("shadowOffsetX", 0);
+          pin.set("shadowOffsetY", 2);
+          pin.set("shadowOpacity", 0.2);
+
           return am5.Bullet.new(root, {
-            sprite: circle
+            sprite: container
           });
         });
+
+        // Add zoom controls
+        chart.set("zoomControl", am5map.ZoomControl.new(root, {
+          x: am5.p100,
+          y: 0,
+          centerX: am5.p100,
+          centerY: 0
+        }));
 
         // Zoom to marker if location is provided, otherwise fit to map bounds
         if (position) {
@@ -196,6 +317,9 @@ export default function LocationSelector({ value, onChange }: LocationSelectorPr
           // Zoom to Afghanistan boundaries
           chart.zoomToGeoPoint({ longitude: 67.709953, latitude: 33.93911 }, 3);
         }
+
+        // Add a subtle fade-in animation to the entire chart
+        chart.appear(1000, 100);
 
         // Set chart reference
         chartRef.current = root;
@@ -245,14 +369,14 @@ export default function LocationSelector({ value, onChange }: LocationSelectorPr
             geometry: { type: "Point", coordinates: [position.lng, position.lat] }
           }]);
 
-          // Zoom to point
-          chart.zoomToGeoPoint({ longitude: position.lng, latitude: position.lat }, 4);
+          // Zoom to point with animation
+          chart.zoomToGeoPoint({ longitude: position.lng, latitude: position.lat }, 4, true, 800);
         } else {
           // Clear markers
           pointSeries.data.setAll([]);
 
           // Reset zoom to Afghanistan
-          chart.zoomToGeoPoint({ longitude: 67.709953, latitude: 33.93911 }, 3);
+          chart.zoomToGeoPoint({ longitude: 67.709953, latitude: 33.93911 }, 3, true, 800);
         }
       }
     }
@@ -288,12 +412,15 @@ export default function LocationSelector({ value, onChange }: LocationSelectorPr
   return (
     <div className="w-full">
       <div
-        className="rounded-md overflow-hidden border border-gray-300 h-[400px] mb-2"
-        style={{ background: "#f5f5f5" }}
+        className="rounded-md overflow-hidden border border-gray-300 h-[400px] mb-2 shadow-md transition-all duration-300 hover:shadow-lg"
+        style={{ background: "#F8F9FA" }}
       >
         {!isMapReady && (
-          <div className="flex items-center justify-center h-full w-full">
-            <p>Loading map of Afghanistan...</p>
+          <div className="flex items-center justify-center h-full w-full bg-gray-50">
+            <div className="text-center">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-2"></div>
+              <p className="text-gray-700">Loading map of Afghanistan...</p>
+            </div>
           </div>
         )}
         <div
@@ -307,12 +434,16 @@ export default function LocationSelector({ value, onChange }: LocationSelectorPr
         />
       </div>
 
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center bg-white p-2 rounded-md shadow-sm">
         <div className="text-sm">
           {position ? (
             <span className="font-mono">
-              {selectedProvince ? `${selectedProvince} Province: ` : ''}
-              Lat: {position.lat.toFixed(6)}, Lng: {position.lng.toFixed(6)}
+              {selectedProvince ? (
+                <span>
+                  <span className="text-blue-600 font-medium">{selectedProvince}</span> Province:
+                </span>
+              ) : ''}
+              <span className="ml-1">Lat: {position.lat.toFixed(6)}, Lng: {position.lng.toFixed(6)}</span>
             </span>
           ) : (
             <span className="text-gray-500">Click on a province to select location</span>
@@ -323,7 +454,7 @@ export default function LocationSelector({ value, onChange }: LocationSelectorPr
           <button
             type="button"
             onClick={handleClear}
-            className="px-2 py-1 text-xs text-red-500 hover:text-red-700 hover:underline"
+            className="px-3 py-1 text-xs bg-red-50 text-red-500 rounded-md hover:bg-red-100 hover:text-red-700 transition-colors duration-200"
           >
             Clear Selection
           </button>
