@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { Head, useForm } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -9,6 +9,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { type InfoType, type InfoCategory } from '@/types/info';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { MapPin } from 'lucide-react';
+
+// Lazy load the LocationSelector component to avoid SSR issues with Leaflet
+const LocationSelector = lazy(() => import('@/components/LocationSelector'));
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -31,6 +36,12 @@ interface Props {
 }
 
 export default function InfoCreate({ infoTypes = [], infoCategories = [] }: Props) {
+  // Content tabs state
+  const [activeTab, setActiveTab] = useState<string>('basic');
+
+  // Location data state
+  const [location, setLocation] = useState<{ lat: number, lng: number } | null>(null);
+
   const { data, setData, post, processing, errors } = useForm({
     name: '',
     code: '',
@@ -38,9 +49,19 @@ export default function InfoCreate({ infoTypes = [], infoCategories = [] }: Prop
     info_type_id: '',
     info_category_id: '',
     value: {
-      content: ''
+      content: '',
+      location: null as { lat: number, lng: number } | null
     }
   });
+
+  // Handle location change
+  const handleLocationChange = (newLocation: { lat: number, lng: number } | null) => {
+    setLocation(newLocation);
+    setData('value', {
+      ...data.value,
+      location: newLocation
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,14 +168,42 @@ export default function InfoCreate({ infoTypes = [], infoCategories = [] }: Prop
                   {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
                 </div>
 
+                {/* Content section with tabs */}
                 <div className="space-y-2">
-                  <Label htmlFor="content">Content</Label>
-                  <Textarea
-                    id="content"
-                    value={data.value.content}
-                    onChange={(e) => setData('value', { ...data.value, content: e.target.value })}
-                    rows={5}
-                  />
+                  <Label>Content</Label>
+
+                  <Tabs defaultValue="basic" value={activeTab} onValueChange={setActiveTab}>
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="basic">Basic Content</TabsTrigger>
+                      <TabsTrigger value="location" className="flex items-center gap-1">
+                        <MapPin className="h-4 w-4" />
+                        Location
+                      </TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="basic" className="pt-4">
+                      <Textarea
+                        id="content"
+                        value={data.value.content}
+                        onChange={(e) => setData('value', { ...data.value, content: e.target.value })}
+                        rows={5}
+                        placeholder="Enter content here..."
+                      />
+                    </TabsContent>
+
+                    <TabsContent value="location" className="pt-4">
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-500">Click on the map to select a location in Afghanistan.</p>
+                        <Suspense fallback={<div className="h-[400px] flex items-center justify-center bg-gray-100 rounded-md">Loading map...</div>}>
+                          <LocationSelector
+                            value={location}
+                            onChange={handleLocationChange}
+                          />
+                        </Suspense>
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+
                   {errors.value && <p className="text-sm text-red-500">{errors.value}</p>}
                 </div>
               </CardContent>

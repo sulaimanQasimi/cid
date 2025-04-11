@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Pencil, Trash, Check, X, BadgeInfo } from 'lucide-react';
+import { ArrowLeft, Pencil, Trash, Check, X, BadgeInfo, MapPin } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import {
   AlertDialog,
@@ -17,6 +17,10 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Info, InfoType, InfoCategory, User } from '@/types/info';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+// Lazy load the LocationDisplay component
+const LocationDisplay = lazy(() => import('@/components/LocationDisplay'));
 
 interface Props {
   info: Info & {
@@ -59,7 +63,22 @@ export default function ShowInfo({ info }: Props) {
     if (!value) return 'No content';
 
     if (typeof value === 'object') {
+      // If it's an object with content property, return the content
       if (value.content) return value.content;
+
+      // If it's an object with location property, filter it out to avoid cluttering the view
+      const { location, ...rest } = value;
+
+      // If there are other properties, show them
+      if (Object.keys(rest).length > 0) {
+        return JSON.stringify(rest, null, 2);
+      }
+
+      // If only location was present, indicate that
+      if (location) {
+        return "Location data available in the Location tab.";
+      }
+
       return JSON.stringify(value, null, 2);
     }
 
@@ -184,9 +203,31 @@ export default function ShowInfo({ info }: Props) {
                   <h2 className="text-lg font-semibold">Content</h2>
                 </CardHeader>
                 <CardContent>
-                  <div className="bg-gray-50 p-4 rounded-md whitespace-pre-wrap font-mono text-sm">
-                    {formatValue(info.value)}
-                  </div>
+                  <Tabs defaultValue="basic">
+                    <TabsList className="mb-4">
+                      <TabsTrigger value="basic">Basic Content</TabsTrigger>
+                      {info.value && info.value.location && (
+                        <TabsTrigger value="location" className="flex items-center gap-1">
+                          <MapPin className="h-4 w-4" />
+                          Location
+                        </TabsTrigger>
+                      )}
+                    </TabsList>
+
+                    <TabsContent value="basic">
+                      <div className="bg-gray-50 p-4 rounded-md whitespace-pre-wrap font-mono text-sm">
+                        {formatValue(info.value?.content || info.value)}
+                      </div>
+                    </TabsContent>
+
+                    {info.value && info.value.location && (
+                      <TabsContent value="location">
+                        <Suspense fallback={<div className="h-[400px] flex items-center justify-center bg-gray-100 rounded-md">Loading map...</div>}>
+                          <LocationDisplay location={info.value.location} />
+                        </Suspense>
+                      </TabsContent>
+                    )}
+                  </Tabs>
                 </CardContent>
               </Card>
 
