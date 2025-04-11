@@ -97,6 +97,12 @@ export default function LocationDisplay({ location }: LocationDisplayProps) {
           })
         );
 
+        // Add a background
+        chart.set("background", am5.Rectangle.new(root, {
+          fill: am5.color(0xFEEBEB), // Very light red background
+          fillOpacity: 1
+        }));
+
         // Create polygon series for provinces
         const provinceSeries = chart.series.push(
           am5map.MapPolygonSeries.new(root, {
@@ -108,14 +114,14 @@ export default function LocationDisplay({ location }: LocationDisplayProps) {
         provinceSeries.mapPolygons.template.setAll({
           tooltipText: "{name}",
           interactive: true,
-          fill: am5.color(0x67B7DC),
+          fill: am5.color(0xE57373),
           stroke: am5.color(0xFFFFFF),
           strokeWidth: 1
         });
 
         // Create state for selected province
         provinceSeries.mapPolygons.template.states.create("selected", {
-          fill: am5.color(0xFF5733)
+          fill: am5.color(0xD32F2F)
         });
 
         // Create point series for marker
@@ -152,7 +158,7 @@ export default function LocationDisplay({ location }: LocationDisplayProps) {
           const circle = am5.Circle.new(root, {
             radius: 7,
             tooltipText: "Location",
-            fill: am5.color(0xFF5733),
+            fill: am5.color(0xB71C1C),
             stroke: am5.color(0xFFFFFF),
             strokeWidth: 2
           });
@@ -247,11 +253,14 @@ export default function LocationDisplay({ location }: LocationDisplayProps) {
     <div className="w-full">
       <div
         className="rounded-md overflow-hidden border border-gray-300 h-[400px]"
-        style={{ background: "#f5f5f5" }}
+        style={{ background: "#FEEBEB" }}
       >
         {!isMapReady && (
           <div className="flex items-center justify-center h-full w-full">
-            <p>Loading map of Afghanistan...</p>
+            <div className="text-center">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mb-2"></div>
+              <p className="text-gray-700">Loading map of Afghanistan...</p>
+            </div>
           </div>
         )}
         <div

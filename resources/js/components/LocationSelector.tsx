@@ -54,10 +54,10 @@ const PROVINCE_COORDINATES = {
 const DEFAULT_COORDINATE = { lat: 33.9391, lng: 67.7100 };
 
 // Colors
-const PROVINCE_COLOR = 0x86ADCF;
-const PROVINCE_HOVER_COLOR = 0x4A89DC;
-const PROVINCE_SELECTED_COLOR = 0xF05E3B;
-const MARKER_COLOR = 0xF05E3B;
+const PROVINCE_COLOR = 0xE57373;
+const PROVINCE_HOVER_COLOR = 0xEF5350;
+const PROVINCE_SELECTED_COLOR = 0xD32F2F;
+const MARKER_COLOR = 0xB71C1C;
 
 export default function LocationSelector({ value, onChange }: LocationSelectorProps) {
   // Create refs for chart
@@ -103,7 +103,7 @@ export default function LocationSelector({ value, onChange }: LocationSelectorPr
 
         // Add a background
         chart.set("background", am5.Rectangle.new(root, {
-          fill: am5.color(0xF8F9FA),
+          fill: am5.color(0xFEEBEB),
           fillOpacity: 1
         }));
 
@@ -133,7 +133,7 @@ export default function LocationSelector({ value, onChange }: LocationSelectorPr
         provinceSeries.mapPolygons.template.set("fillGradient", am5.LinearGradient.new(root, {
           stops: [
             { color: am5.color(PROVINCE_COLOR) },
-            { color: am5.color(PROVINCE_COLOR + 0x333333) }
+            { color: am5.color(PROVINCE_COLOR + 0x222222) }
           ],
           rotation: 90
         }));
@@ -411,54 +411,51 @@ export default function LocationSelector({ value, onChange }: LocationSelectorPr
 
   return (
     <div className="w-full">
-      <div
-        className="rounded-md overflow-hidden border border-gray-300 h-[400px] mb-2 shadow-md transition-all duration-300 hover:shadow-lg"
-        style={{ background: "#F8F9FA" }}
-      >
-        {!isMapReady && (
-          <div className="flex items-center justify-center h-full w-full bg-gray-50">
-            <div className="text-center">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-2"></div>
-              <p className="text-gray-700">Loading map of Afghanistan...</p>
-            </div>
-          </div>
-        )}
+      <div className="flex flex-col gap-2">
         <div
           ref={chartDivRef}
-          className="h-full w-full"
+          className="h-[400px] w-full rounded-md overflow-hidden"
           style={{
-            height: '100%',
-            width: '100%',
-            display: 'block'
+            border: "1px solid rgba(211, 47, 47, 0.3)",
+            boxShadow: "0 4px 6px rgba(211, 47, 47, 0.1)"
           }}
-        />
-      </div>
-
-      <div className="flex justify-between items-center bg-white p-2 rounded-md shadow-sm">
-        <div className="text-sm">
-          {position ? (
-            <span className="font-mono">
-              {selectedProvince ? (
-                <span>
-                  <span className="text-blue-600 font-medium">{selectedProvince}</span> Province:
-                </span>
-              ) : ''}
-              <span className="ml-1">Lat: {position.lat.toFixed(6)}, Lng: {position.lng.toFixed(6)}</span>
-            </span>
-          ) : (
-            <span className="text-gray-500">Click on a province to select location</span>
+        >
+          {!isMapReady && (
+            <div className="flex items-center justify-center h-full w-full" style={{ background: "#FEEBEB" }}>
+              <div className="text-center">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mb-2"></div>
+                <p className="text-gray-700">Loading map of Afghanistan...</p>
+              </div>
+            </div>
           )}
         </div>
 
-        {position && (
-          <button
-            type="button"
-            onClick={handleClear}
-            className="px-3 py-1 text-xs bg-red-50 text-red-500 rounded-md hover:bg-red-100 hover:text-red-700 transition-colors duration-200"
-          >
-            Clear Selection
-          </button>
-        )}
+        <div className="flex justify-between items-center bg-white p-2 rounded-md shadow-sm">
+          <div className="text-sm">
+            {position ? (
+              <span className="font-mono">
+                {selectedProvince ? (
+                  <span>
+                    <span className="text-blue-600 font-medium">{selectedProvince}</span> Province:
+                  </span>
+                ) : ''}
+                <span className="ml-1">Lat: {position.lat.toFixed(6)}, Lng: {position.lng.toFixed(6)}</span>
+              </span>
+            ) : (
+              <span className="text-gray-500">Click on a province to select location</span>
+            )}
+          </div>
+
+          {position && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="px-3 py-1 text-xs bg-red-50 text-red-500 rounded-md hover:bg-red-100 hover:text-red-700 transition-colors duration-200"
+            >
+              Clear Selection
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
