@@ -125,7 +125,11 @@ class InfoController extends Controller
             ],
             'description' => 'nullable|string|max:1000',
             'value' => 'nullable|array',
-            'value.*' => 'nullable|string|max:255',
+            'value.content' => 'nullable|string',
+            'value.location' => 'nullable|array',
+            'value.location.lat' => 'nullable|numeric',
+            'value.location.lng' => 'nullable|numeric',
+            'value.location.province' => 'nullable|string|max:255',
             'user_id' => 'nullable|integer|exists:users,id',
             'confirmed' => 'boolean',
         ], [
@@ -134,7 +138,9 @@ class InfoController extends Controller
             'name.min' => 'The name must be at least 2 characters.',
             'code.regex' => 'The code may only contain letters, numbers, dashes, underscores, and periods.',
             'code.unique' => 'This code is already in use.',
-            'value.*.max' => 'Each value item cannot exceed 255 characters.',
+            'value.location.lat.numeric' => 'The latitude must be a valid number.',
+            'value.location.lng.numeric' => 'The longitude must be a valid number.',
+            'value.location.province.max' => 'The province name cannot exceed 255 characters.',
         ]);
 
         // Sanitize inputs
@@ -153,6 +159,13 @@ class InfoController extends Controller
             foreach ($validated['value'] as $key => $val) {
                 if (is_string($val)) {
                     $validated['value'][$key] = strip_tags($val);
+                }
+
+                // Handle nested location array
+                if ($key === 'location' && is_array($val)) {
+                    if (isset($val['province']) && is_string($val['province'])) {
+                        $validated['value']['location']['province'] = strip_tags($val['province']);
+                    }
                 }
             }
         }
@@ -229,7 +242,11 @@ class InfoController extends Controller
             ],
             'description' => 'nullable|string|max:1000',
             'value' => 'nullable|array',
-            'value.*' => 'nullable|string|max:255',
+            'value.content' => 'nullable|string',
+            'value.location' => 'nullable|array',
+            'value.location.lat' => 'nullable|numeric',
+            'value.location.lng' => 'nullable|numeric',
+            'value.location.province' => 'nullable|string|max:255',
             'user_id' => 'nullable|integer|exists:users,id',
             'confirmed' => 'boolean',
         ], [
@@ -238,7 +255,9 @@ class InfoController extends Controller
             'name.min' => 'The name must be at least 2 characters.',
             'code.regex' => 'The code may only contain letters, numbers, dashes, underscores, and periods.',
             'code.unique' => 'This code is already in use.',
-            'value.*.max' => 'Each value item cannot exceed 255 characters.',
+            'value.location.lat.numeric' => 'The latitude must be a valid number.',
+            'value.location.lng.numeric' => 'The longitude must be a valid number.',
+            'value.location.province.max' => 'The province name cannot exceed 255 characters.',
         ]);
 
         // Sanitize inputs
@@ -257,6 +276,13 @@ class InfoController extends Controller
             foreach ($validated['value'] as $key => $val) {
                 if (is_string($val)) {
                     $validated['value'][$key] = strip_tags($val);
+                }
+
+                // Handle nested location array
+                if ($key === 'location' && is_array($val)) {
+                    if (isset($val['province']) && is_string($val['province'])) {
+                        $validated['value']['location']['province'] = strip_tags($val['province']);
+                    }
                 }
             }
         }

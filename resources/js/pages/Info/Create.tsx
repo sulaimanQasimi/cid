@@ -43,7 +43,7 @@ export default function InfoCreate({ infoTypes = [], infoCategories = [] }: Prop
   const [isMapTabMounted, setIsMapTabMounted] = useState(false);
 
   // Location data state
-  const [location, setLocation] = useState<{ lat: number, lng: number } | null>(null);
+  const [location, setLocation] = useState<{ lat: number, lng: number, province?: string } | null>(null);
 
   const { data, setData, post, processing, errors } = useForm({
     name: '',
@@ -53,7 +53,7 @@ export default function InfoCreate({ infoTypes = [], infoCategories = [] }: Prop
     info_category_id: '',
     value: {
       content: '',
-      location: null as { lat: number, lng: number } | null
+      location: null as { lat: number, lng: number, province?: string } | null
     }
   });
 
@@ -66,7 +66,7 @@ export default function InfoCreate({ infoTypes = [], infoCategories = [] }: Prop
   };
 
   // Handle location change
-  const handleLocationChange = (newLocation: { lat: number, lng: number } | null) => {
+  const handleLocationChange = (newLocation: { lat: number, lng: number, province: string } | null) => {
     setLocation(newLocation);
     setData('value', {
       ...data.value,

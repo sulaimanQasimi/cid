@@ -7,7 +7,7 @@ import am5geodata_afghanistanLow from '@amcharts/amcharts5-geodata/afghanistanLo
 import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
 
 interface LocationDisplayProps {
-  location: { lat: number; lng: number };
+  location: { lat: number; lng: number; province?: string };
 }
 
 // Create a fixed mapping of all Afghanistan provinces to coordinates (approximated)
@@ -53,11 +53,11 @@ export default function LocationDisplay({ location }: LocationDisplayProps) {
   const chartRef = useRef<am5.Root | null>(null);
   const chartDivRef = useRef<HTMLDivElement>(null);
   const [isMapReady, setIsMapReady] = useState(false);
-  const [provinceName, setProvinceName] = useState<string | null>(null);
+  const [provinceName, setProvinceName] = useState<string | null>(location.province || null);
 
-  // Get province name from coordinates
+  // Get province name from coordinates if not provided
   useEffect(() => {
-    if (location) {
+    if (location && !location.province) {
       // Find the province by matching coordinates
       for (const [name, coords] of Object.entries(PROVINCE_COORDINATES)) {
         if (Math.abs(coords.lat - location.lat) < 0.01 && Math.abs(coords.lng - location.lng) < 0.01) {

@@ -8,8 +8,8 @@ import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
 import am5themes_Dark from '@amcharts/amcharts5/themes/Dark';
 
 interface LocationSelectorProps {
-  value?: { lat: number; lng: number } | null;
-  onChange: (location: { lat: number; lng: number } | null) => void;
+  value?: { lat: number; lng: number; province?: string } | null;
+  onChange: (location: { lat: number; lng: number; province: string } | null) => void;
 }
 
 // Create a fixed mapping of all Afghanistan provinces to coordinates (approximated)
@@ -67,7 +67,7 @@ export default function LocationSelector({ value, onChange }: LocationSelectorPr
   // State to track the selected position
   const [position, setPosition] = useState<{ lat: number; lng: number } | null>(value || null);
   const [isMapReady, setIsMapReady] = useState(false);
-  const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
+  const [selectedProvince, setSelectedProvince] = useState<string | null>(value?.province || null);
 
   // Initialize chart on component mount
   useEffect(() => {
@@ -133,7 +133,7 @@ export default function LocationSelector({ value, onChange }: LocationSelectorPr
         provinceSeries.mapPolygons.template.set("fillGradient", am5.LinearGradient.new(root, {
           stops: [
             { color: am5.color(PROVINCE_COLOR) },
-            { color: am5.color(am5.Color.lighten(am5.color(PROVINCE_COLOR), 0.2)) }
+            { color: am5.color(PROVINCE_COLOR + 0x333333) }
           ],
           rotation: 90
         }));
@@ -201,8 +201,8 @@ export default function LocationSelector({ value, onChange }: LocationSelectorPr
               coordinates = PROVINCE_COORDINATES[provinceName as keyof typeof PROVINCE_COORDINATES];
             }
 
-            // Update position
-            handlePositionChange(coordinates);
+            // Update position with province name
+            handlePositionChange(coordinates, provinceName);
 
             // Add pulse animation to the selected province
             target.animate({
@@ -383,9 +383,9 @@ export default function LocationSelector({ value, onChange }: LocationSelectorPr
   }, [position, isMapReady]);
 
   // Handle position change
-  const handlePositionChange = (newPosition: { lat: number; lng: number }) => {
+  const handlePositionChange = (newPosition: { lat: number; lng: number }, provinceName?: string) => {
     setPosition(newPosition);
-    onChange(newPosition);
+    onChange(provinceName ? { ...newPosition, province: provinceName } : null);
   };
 
   // Handle clear button click
