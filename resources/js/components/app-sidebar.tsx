@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Database, Folder, LayoutGrid, List, Tag, Users, Shield, UserCog } from 'lucide-react';
+import { BookOpen, Database, Folder, LayoutGrid, List, Tag, Users, Shield, UserCog, Video, Calendar } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -32,6 +32,23 @@ const mainNavItems: NavItem[] = [
                 title: 'Info Categories',
                 href: route('info-categories.index'),
                 icon: Folder,
+            },
+        ],
+    },
+    {
+        title: 'Meetings',
+        href: '#meetings',
+        icon: Video,
+        items: [
+            {
+                title: 'All Meetings',
+                href: route('meetings.index'),
+                icon: Calendar,
+            },
+            {
+                title: 'Create Meeting',
+                href: route('meetings.create'),
+                icon: Video,
             },
         ],
     },

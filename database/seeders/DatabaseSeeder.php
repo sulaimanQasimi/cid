@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
         // Run the permission seeder
         $this->call([
             PermissionSeeder::class,
+            MeetingPermissionsSeeder::class,
         ]);
     }
 }
