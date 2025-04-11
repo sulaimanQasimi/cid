@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Database, Folder, LayoutGrid, List, Tag, Users } from 'lucide-react';
+import { BookOpen, Database, Folder, LayoutGrid, List, Tag, Users, Shield } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -37,8 +37,20 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'User Management',
-        href: route('users.index'),
+        href: '#users',
         icon: Users,
+        items: [
+            {
+                title: 'Users',
+                href: route('users.index'),
+                icon: Users,
+            },
+            {
+                title: 'Permissions',
+                href: route('permissions.index'),
+                icon: Shield,
+            }
+        ],
     },
 ];
 
