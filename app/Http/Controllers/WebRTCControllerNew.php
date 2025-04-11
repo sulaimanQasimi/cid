@@ -107,6 +107,7 @@ class WebRTCControllerNew extends Controller
             'meeting_id' => 'required|exists:meetings,id',
             'type' => 'required|string|in:offer,answer,candidate',
             'payload' => 'required',
+            'is_offline' => 'boolean',
         ]);
 
         $senderSession = MeetingSession::where('peer_id', $validated['sender_peer_id'])
@@ -119,7 +120,7 @@ class WebRTCControllerNew extends Controller
 
         // If we're in offline mode and the receiver is not available,
         // store the signal for later processing
-        if (!$receiverSession && $request->input('is_offline', false)) {
+        if (!$receiverSession && ($request->input('is_offline', false) === true)) {
             // Store the signal in the sender's session for offline use
             $offlineData = json_decode($senderSession->offline_data ?? '{}', true);
             $offlineData['pending_signals'] = $offlineData['pending_signals'] ?? [];

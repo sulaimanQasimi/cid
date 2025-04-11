@@ -418,7 +418,8 @@ export default function Room({ auth, meeting, isOfflineEnabled }: RoomProps) {
       receiver_peer_id: receiverPeerId,
       meeting_id: meeting.id,
       type,
-      payload
+      payload,
+      is_offline: false
     }).catch(err => {
       console.error('Error sending signal:', err);
       // If sending fails, we might be going offline
