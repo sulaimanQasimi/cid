@@ -101,14 +101,17 @@ class MeetingController extends Controller
 
         $meeting = Meeting::create($validated);
 
-        // Add participants
-        if (isset($validated['participants'])) {
-            foreach ($validated['participants'] as $participantId) {
-                $meeting->participants()->attach($participantId, [
-                    'role' => 'participant',
-                    'status' => 'invited',
-                ]);
-            }
+        // Filter out the creator from participants array to avoid duplicate entries
+        $participantIds = isset($validated['participants'])
+            ? array_filter($validated['participants'], fn($id) => $id != $request->user()->id)
+            : [];
+
+        // Add participants (excluding creator)
+        foreach ($participantIds as $participantId) {
+            $meeting->participants()->attach($participantId, [
+                'role' => 'participant',
+                'status' => 'invited',
+            ]);
         }
 
         // Add the creator as a host
