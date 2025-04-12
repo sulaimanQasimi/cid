@@ -226,7 +226,13 @@ class CriminalController extends Controller
      */
     public function print(Criminal $criminal)
     {
-        $criminal->load(['department', 'creator']);
+        $criminal->load(['department', 'creator', 'reports' => function($query) {
+            $query->latest()->first();
+        }]);
+
+        // Get the latest report if any
+        $report = $criminal->reports->first();
+        $criminal->report = $report;
 
         return Inertia::render('Criminal/Print', [
             'criminal' => $criminal,

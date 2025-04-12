@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { UserRound, Printer, FileText } from 'lucide-react';
+import { router } from '@inertiajs/react';
 
 interface Criminal {
   id: number;
@@ -34,6 +35,12 @@ interface Criminal {
     id: number;
     name: string;
   };
+  report?: {
+    id: number;
+    code: string;
+    properties: any;
+    created_at: string;
+  } | null;
 }
 
 interface Props {
@@ -42,6 +49,11 @@ interface Props {
 
 export default function CriminalPrint({ criminal }: Props) {
   useEffect(() => {
+    // Create a report record when the component is mounted
+    if (!criminal.report) {
+      createReport();
+    }
+
     // Auto-print when the component is mounted
     setTimeout(() => {
       window.print();
@@ -57,6 +69,34 @@ export default function CriminalPrint({ criminal }: Props) {
       return '';
     }
   };
+
+  // Create a report for this criminal
+  const createReport = () => {
+    const reportData = {
+      properties: {
+        date: new Date().toISOString(),
+        criminal_data: {
+          name: criminal.name,
+          father_name: criminal.father_name,
+          grandfather_name: criminal.grandfather_name,
+          id_card_number: criminal.id_card_number,
+          phone_number: criminal.phone_number,
+          original_residence: criminal.original_residence,
+          current_residence: criminal.current_residence,
+          crime_type: criminal.crime_type,
+          arrest_location: criminal.arrest_location,
+          arrest_date: criminal.arrest_date,
+          final_verdict: criminal.final_verdict,
+          notes: criminal.notes,
+        }
+      }
+    };
+
+    router.post(route('reports.store', { reportable_type: 'App\\Models\\Criminal', reportable_id: criminal.id }), reportData);
+  };
+
+  // The report code to display
+  const reportCode = criminal.report?.code || '------';
 
   return (
     <>
@@ -165,7 +205,7 @@ export default function CriminalPrint({ criminal }: Props) {
               <div className="mt-2 text-center">
                 <div className="text-xs font-semibold text-neutral-700 bg-gray-100 py-1 px-2 rounded-full inline-flex items-center">
                   <FileText size={12} className="mr-1" />
-                  <span>شمارهٔ ثبت: {criminal.number || '------'}</span>
+                  <span>شمارهٔ ثبت: {reportCode}</span>
                 </div>
               </div>
             </div>
