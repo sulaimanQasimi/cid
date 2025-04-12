@@ -232,14 +232,14 @@ export default function CriminalIndex({
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Criminal Records" />
 
-      <div className="container px-0 py-4">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="container px-0 py-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
           <div>
-            <h2 className="text-2xl font-bold">Criminal Records</h2>
-            <p className="text-sm text-neutral-500">Manage and track criminal records</p>
+            <h2 className="text-3xl font-bold tracking-tight">Criminal Records</h2>
+            <p className="text-muted-foreground mt-1">Manage and track criminal records</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button asChild size="sm">
+            <Button asChild size="default" className="shadow-sm">
               <Link href={route('criminals.create')}>
                 <Plus className="mr-2 h-4 w-4" />
                 Add Criminal
@@ -248,7 +248,7 @@ export default function CriminalIndex({
           </div>
         </div>
 
-        <Card className="mt-6">
+        <Card className="shadow-sm">
           <CardHeader className="py-4">
             <CardTitle className="text-base font-medium">Search and Filters</CardTitle>
           </CardHeader>
@@ -263,7 +263,7 @@ export default function CriminalIndex({
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full"
                   />
-                  <Button type="submit" variant="outline" size="sm">
+                  <Button type="submit" variant="outline" size="sm" className="shadow-sm">
                     <Search className="h-4 w-4" />
                   </Button>
                 </form>
@@ -272,7 +272,7 @@ export default function CriminalIndex({
               {/* Department Filter */}
               <div className="w-full md:w-56">
                 <Select value={selectedDepartment} onValueChange={handleDepartmentChange}>
-                  <SelectTrigger>
+                  <SelectTrigger className="shadow-sm">
                     <SelectValue placeholder="Filter by Department" />
                   </SelectTrigger>
                   <SelectContent>
@@ -289,7 +289,7 @@ export default function CriminalIndex({
               {/* Sort Options */}
               <div className="w-full md:w-44">
                 <Select value={filters.sort} onValueChange={handleSortChange}>
-                  <SelectTrigger>
+                  <SelectTrigger className="shadow-sm">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
                   <SelectContent>
@@ -309,6 +309,7 @@ export default function CriminalIndex({
                   size="icon"
                   onClick={handleDirectionChange}
                   title={`Sort ${filters.direction === 'asc' ? 'Descending' : 'Ascending'}`}
+                  className="shadow-sm"
                 >
                   <ArrowUpDown className={`h-4 w-4 ${filters.direction === 'desc' ? 'rotate-180' : ''}`} />
                 </Button>
@@ -317,7 +318,7 @@ export default function CriminalIndex({
               {/* Per Page Options */}
               <div className="w-full md:w-40">
                 <Select value={filters.per_page.toString()} onValueChange={handlePerPageChange}>
-                  <SelectTrigger>
+                  <SelectTrigger className="shadow-sm">
                     <SelectValue placeholder="Items per page" />
                   </SelectTrigger>
                   <SelectContent>
@@ -337,6 +338,7 @@ export default function CriminalIndex({
                   size="icon"
                   onClick={resetFilters}
                   title="Reset all filters"
+                  className="shadow-sm"
                 >
                   <FilterX className="h-4 w-4" />
                 </Button>
@@ -347,11 +349,11 @@ export default function CriminalIndex({
 
         {/* Results Table */}
         <div className="mt-6">
-          <Card>
+          <Card className="shadow-sm overflow-hidden">
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow>
+                  <TableRow className="bg-muted/50">
                     <TableHead>Name</TableHead>
                     <TableHead>Number</TableHead>
                     <TableHead>Crime Type</TableHead>
@@ -363,13 +365,13 @@ export default function CriminalIndex({
                 <TableBody>
                   {criminals.data && criminals.data.length > 0 ? (
                     criminals.data.map((criminal) => (
-                      <TableRow key={criminal.id}>
+                      <TableRow key={criminal.id} className="hover:bg-muted/30">
                         <TableCell className="font-medium">{criminal.name}</TableCell>
                         <TableCell>{criminal.number || 'N/A'}</TableCell>
                         <TableCell>{criminal.crime_type || 'N/A'}</TableCell>
                         <TableCell>
                           {criminal.department ? (
-                            <Badge variant="outline">{criminal.department.name}</Badge>
+                            <Badge variant="outline" className="bg-background">{criminal.department.name}</Badge>
                           ) : (
                             'N/A'
                           )}
@@ -382,12 +384,13 @@ export default function CriminalIndex({
                           )}
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1">
                             <Button
                               variant="ghost"
                               size="icon"
                               asChild
                               title="View"
+                              className="h-8 w-8 rounded-full"
                             >
                               <Link href={route('criminals.show', criminal.id)}>
                                 <Eye className="h-4 w-4" />
@@ -398,6 +401,7 @@ export default function CriminalIndex({
                               size="icon"
                               asChild
                               title="Edit"
+                              className="h-8 w-8 rounded-full"
                             >
                               <Link href={route('criminals.edit', criminal.id)}>
                                 <Pencil className="h-4 w-4" />
@@ -408,6 +412,7 @@ export default function CriminalIndex({
                               size="icon"
                               onClick={() => openDeleteDialog(criminal)}
                               title="Delete"
+                              className="h-8 w-8 rounded-full text-destructive hover:text-destructive hover:bg-destructive/10"
                             >
                               <Trash className="h-4 w-4" />
                             </Button>
@@ -417,7 +422,7 @@ export default function CriminalIndex({
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={6} className="h-24 text-center">
+                      <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
                         No criminal records found.
                       </TableCell>
                     </TableRow>
@@ -430,13 +435,14 @@ export default function CriminalIndex({
 
         {/* Pagination */}
         {criminals.meta && criminals.meta.last_page > 1 && (
-          <div className="mt-4 flex justify-center">
+          <div className="mt-6 flex justify-center">
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => goToPage(1)}
                 disabled={criminals.meta.current_page === 1}
+                className="shadow-sm h-8 w-8"
               >
                 <ChevronLeft className="h-4 w-4" />
                 <ChevronLeft className="h-4 w-4 -ml-2" />
@@ -446,10 +452,11 @@ export default function CriminalIndex({
                 size="icon"
                 onClick={() => goToPage(criminals.meta.current_page - 1)}
                 disabled={criminals.meta.current_page === 1}
+                className="shadow-sm h-8 w-8"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <span className="px-2 text-sm text-muted-foreground">
+              <span className="px-2 text-sm">
                 Page {criminals.meta.current_page} of {criminals.meta.last_page}
               </span>
               <Button
@@ -457,6 +464,7 @@ export default function CriminalIndex({
                 size="icon"
                 onClick={() => goToPage(criminals.meta.current_page + 1)}
                 disabled={criminals.meta.current_page === criminals.meta.last_page}
+                className="shadow-sm h-8 w-8"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -465,6 +473,7 @@ export default function CriminalIndex({
                 size="icon"
                 onClick={() => goToPage(criminals.meta.last_page)}
                 disabled={criminals.meta.current_page === criminals.meta.last_page}
+                className="shadow-sm h-8 w-8"
               >
                 <ChevronRight className="h-4 w-4" />
                 <ChevronRight className="h-4 w-4 -ml-2" />
@@ -476,17 +485,17 @@ export default function CriminalIndex({
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-xl">Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription className="mt-2">
               This will permanently delete the criminal record for{' '}
-              <strong>{criminalToDelete?.name}</strong>. This action cannot be undone.
+              <span className="font-semibold">{criminalToDelete?.name}</span>. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground">
+          <AlertDialogFooter className="mt-6">
+            <AlertDialogCancel className="shadow-sm">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground shadow-sm">
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
