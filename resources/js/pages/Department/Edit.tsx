@@ -1,9 +1,12 @@
 import React from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { PageProps } from '@/types';
-import { Button, Form, Input, Card } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
-import AppLayout from '@/layouts/AppLayout';
+import { ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import AppLayout from '@/layouts/app-layout';
+import { Label } from '@/components/ui/label';
 
 interface Department {
   id: number;
@@ -15,73 +18,75 @@ interface Props extends PageProps {
   department: Department;
 }
 
-const DepartmentEdit: React.FC<Props> = ({ department }) => {
+export default function DepartmentEdit({ department }: Props) {
   const { data, setData, put, processing, errors } = useForm({
     name: department.name,
     code: department.code,
   });
 
-  const handleSubmit = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     put(route('departments.update', department.id));
-  };
-
-  const formItemLayout = {
-    labelCol: { span: 6 },
-    wrapperCol: { span: 18 },
   };
 
   return (
     <AppLayout>
       <Head title={`Edit Department: ${department.name}`} />
-      <div className="container mx-auto py-6">
+      <div className="container p-6">
         <div className="mb-6">
           <Link href={route('departments.index')}>
-            <Button icon={<ArrowLeftOutlined />}>Back to Departments</Button>
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Departments
+            </Button>
           </Link>
         </div>
-        <Card title={`Edit Department: ${department.name}`}>
-          <Form
-            {...formItemLayout}
-            layout="horizontal"
-            onFinish={handleSubmit}
-            initialValues={data}
-          >
-            <Form.Item
-              label="Name"
-              validateStatus={errors.name ? 'error' : ''}
-              help={errors.name}
-              required
-            >
-              <Input
-                value={data.name}
-                onChange={(e) => setData('name', e.target.value)}
-                placeholder="Enter department name"
-              />
-            </Form.Item>
 
-            <Form.Item
-              label="Code"
-              validateStatus={errors.code ? 'error' : ''}
-              help={errors.code}
-              required
-            >
-              <Input
-                value={data.code}
-                onChange={(e) => setData('code', e.target.value)}
-                placeholder="Enter department code"
-              />
-            </Form.Item>
+        <Card className="max-w-2xl mx-auto">
+          <CardHeader>
+            <CardTitle>Edit Department: {department.name}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  value={data.name}
+                  onChange={(e) => setData('name', e.target.value)}
+                  placeholder="Enter department name"
+                  className={errors.name ? 'border-red-500' : ''}
+                />
+                {errors.name && (
+                  <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                )}
+              </div>
 
-            <Form.Item wrapperCol={{ offset: 6, span: 18 }}>
-              <Button type="primary" htmlType="submit" loading={processing}>
+              <div className="space-y-2">
+                <Label htmlFor="code">Code</Label>
+                <Input
+                  id="code"
+                  value={data.code}
+                  onChange={(e) => setData('code', e.target.value)}
+                  placeholder="Enter department code"
+                  className={errors.code ? 'border-red-500' : ''}
+                />
+                {errors.code && (
+                  <p className="text-red-500 text-sm mt-1">{errors.code}</p>
+                )}
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={processing}
+              >
                 Update Department
               </Button>
-            </Form.Item>
-          </Form>
+            </form>
+          </CardContent>
         </Card>
       </div>
     </AppLayout>
   );
-};
-
-export default DepartmentEdit;
+}
