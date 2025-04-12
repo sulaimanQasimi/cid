@@ -40,9 +40,11 @@ class ReportCreated implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
+        $reportableType = str_replace('\\', '.', $this->report->reportable_type);
+
         return [
             new PrivateChannel('reports'),
-            new PrivateChannel('reports.' . $this->report->reportable_type . '.' . $this->report->reportable_id),
+            new PrivateChannel("reports.{$reportableType}.{$this->report->reportable_id}"),
         ];
     }
 

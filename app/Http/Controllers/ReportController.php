@@ -26,12 +26,20 @@ class ReportController extends Controller
         $report = new Report();
         $report->reportable_type = $request->reportable_type;
         $report->reportable_id = $request->reportable_id;
-        $report->created_by = Auth::id() ?? $request->user_id ?? 1;
+
+        // Use Auth::check() to handle guest users
+        if (Auth::check()) {
+            $report->created_by = Auth::id();
+        } else {
+            $report->created_by = $request->user_id ?? null;
+        }
+
         $report->properties = $request->properties;
         $report->save();
 
-        // Broadcast report created event
-        broadcast(new ReportCreated($report))->toOthers();
+        // Broadcasting can cause issues with backslashes in channel names
+        // Uncomment this when WebSocket setup is working properly
+        // broadcast(new ReportCreated($report))->toOthers();
 
         return response()->json([
             'success' => true,

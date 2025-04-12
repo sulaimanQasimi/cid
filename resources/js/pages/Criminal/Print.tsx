@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Head } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { UserRound, Printer, FileText } from 'lucide-react';
@@ -49,11 +49,12 @@ interface Props {
 }
 
 export default function CriminalPrint({ criminal }: Props) {
+  // State to track the report code
+  const [reportCode, setReportCode] = useState<string>('------');
+
   useEffect(() => {
-    // Create a report record when the component is mounted
-    if (!criminal.report) {
-      createReport();
-    }
+    // Create a report record immediately when the component is mounted
+    createReport();
 
     // Auto-print when the component is mounted
     setTimeout(() => {
@@ -100,16 +101,14 @@ export default function CriminalPrint({ criminal }: Props) {
     axios.post('/reports', reportData)
       .then(response => {
         if (response.data && response.data.report) {
-          criminal.report = response.data.report;
+          // Update local state instead of reloading the page
+          setReportCode(response.data.report.code);
         }
       })
       .catch(error => {
         console.error('Error creating report:', error);
       });
   };
-
-  // The report code to display
-  const reportCode = criminal.report?.code || '------';
 
   return (
     <>
