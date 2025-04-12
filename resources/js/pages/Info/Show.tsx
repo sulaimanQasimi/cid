@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Pencil, Trash, Check, X, BadgeInfo, MapPin } from 'lucide-react';
+import { ArrowLeft, Pencil, Trash, Check, X, BadgeInfo, MapPin, Building } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import {
   AlertDialog,
@@ -22,10 +22,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 // Lazy load the LocationDisplay component
 const LocationDisplay = lazy(() => import('@/components/LocationDisplay'));
 
+interface Department {
+  id: number;
+  name: string;
+  code: string;
+}
+
 interface Props {
   info: Info & {
     infoType?: InfoType;
     infoCategory?: InfoCategory;
+    department?: Department | null;
     user?: User;
     creator?: User;
     confirmer?: User;
@@ -167,6 +174,23 @@ export default function ShowInfo({ info }: Props) {
                             </Link>
                           ) : (
                             <span>Not specified</span>
+                          )}
+                        </p>
+                      </div>
+
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-500">Department</h3>
+                        <p className="mt-1 text-sm text-gray-900">
+                          {info.department ? (
+                            <Link
+                              href={route('departments.show', info.department.id)}
+                              className="text-blue-600 hover:underline flex items-center"
+                            >
+                              <Building className="h-3 w-3 mr-1" />
+                              {info.department.name}
+                            </Link>
+                          ) : (
+                            <span>Not assigned</span>
                           )}
                         </p>
                       </div>

@@ -30,19 +30,27 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ];
 
+interface Department {
+  id: number;
+  name: string;
+  code: string;
+}
+
 interface Props {
   info: Info & {
     infoType?: InfoType;
     infoCategory?: InfoCategory;
+    department?: Department | null;
     user?: User;
     creator?: User;
     confirmer?: User;
   };
   infoTypes?: InfoType[];
   infoCategories?: InfoCategory[];
+  departments?: Department[];
 }
 
-export default function InfoEdit({ info, infoTypes = [], infoCategories = [] }: Props) {
+export default function InfoEdit({ info, infoTypes = [], infoCategories = [], departments = [] }: Props) {
   // Content tabs state
   const [activeTab, setActiveTab] = useState<string>('basic');
 
@@ -66,6 +74,7 @@ export default function InfoEdit({ info, infoTypes = [], infoCategories = [] }: 
     description: info.description || '',
     info_type_id: info.info_type_id ? info.info_type_id.toString() : '',
     info_category_id: info.info_category_id ? info.info_category_id.toString() : '',
+    department_id: info.department?.id ? info.department.id.toString() : 'none',
     value: {
       content: info.value && typeof info.value === 'object' && info.value.content ? info.value.content : '',
       location: extractLocation()
@@ -117,7 +126,7 @@ export default function InfoEdit({ info, infoTypes = [], infoCategories = [] }: 
             </CardHeader>
             <form onSubmit={handleSubmit}>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="info_type_id">Type <span className="text-red-500">*</span></Label>
                     <Select
@@ -166,6 +175,31 @@ export default function InfoEdit({ info, infoTypes = [], infoCategories = [] }: 
                       </SelectContent>
                     </Select>
                     {errors.info_category_id && <p className="text-sm text-red-500">{errors.info_category_id}</p>}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="department_id">Department</Label>
+                    <Select
+                      value={data.department_id}
+                      onValueChange={(value) => setData('department_id', value)}
+                    >
+                      <SelectTrigger id="department_id">
+                        <SelectValue placeholder="Select a department (optional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">None</SelectItem>
+                        {departments.length > 0 ? (
+                          departments.map((department) => (
+                            <SelectItem key={department.id} value={department.id.toString()}>
+                              {department.name}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <div className="p-2 text-sm text-gray-500">No departments available</div>
+                        )}
+                      </SelectContent>
+                    </Select>
+                    {errors.department_id && <p className="text-sm text-red-500">{errors.department_id}</p>}
                   </div>
                 </div>
 

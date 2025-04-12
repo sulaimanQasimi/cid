@@ -34,6 +34,7 @@ interface InfoRecord {
   description: string | null;
   info_type_id: number;
   info_category_id: number;
+  department_id: number | null;
   created_at: string;
   updated_at: string;
   infoType?: {
@@ -44,6 +45,11 @@ interface InfoRecord {
     id: number;
     name: string;
   };
+  department?: {
+    id: number;
+    name: string;
+    code: string;
+  } | null;
 }
 
 interface InfoCategory {
@@ -60,6 +66,12 @@ interface InfoType {
   description: string | null;
   created_at: string;
   updated_at: string;
+}
+
+interface Department {
+  id: number;
+  name: string;
+  code: string;
 }
 
 interface PaginationLinks {
@@ -92,6 +104,7 @@ interface Props {
   };
   types: InfoType[];
   categories: InfoCategory[];
+  departments: Department[];
   filters: {
     search: string;
     sort: string;
@@ -99,6 +112,7 @@ interface Props {
     per_page: number;
     type_id?: string;
     category_id?: string;
+    department_id?: string;
   };
 }
 
@@ -117,6 +131,7 @@ const sortOptions = [
   { value: 'name', label: 'Name' },
   { value: 'info_type_id', label: 'Type' },
   { value: 'info_category_id', label: 'Category' },
+  { value: 'department_id', label: 'Department' },
   { value: 'created_at', label: 'Created Date' },
   { value: 'updated_at', label: 'Updated Date' },
 ];
@@ -145,6 +160,7 @@ export default function InfoIndex({
   },
   types = [],
   categories = [],
+  departments = [],
   filters
 }: Props) {
   const [searchQuery, setSearchQuery] = useState(filters.search);
@@ -152,6 +168,7 @@ export default function InfoIndex({
   const [infoToDelete, setInfoToDelete] = useState<InfoRecord | null>(null);
   const [selectedType, setSelectedType] = useState<string>(filters.type_id || '');
   const [selectedCategory, setSelectedCategory] = useState<string>(filters.category_id || '');
+  const [selectedDepartment, setSelectedDepartment] = useState<string>(filters.department_id || '');
 
   // Handle search form submission
   const handleSearch = (e: React.FormEvent) => {
@@ -187,6 +204,12 @@ export default function InfoIndex({
     applyFilters({ category_id: value === "_all" ? undefined : value });
   };
 
+  // Handle department filter change
+  const handleDepartmentChange = (value: string) => {
+    setSelectedDepartment(value);
+    applyFilters({ department_id: value === "_all" ? undefined : value });
+  };
+
   // Navigate to page
   const goToPage = (page: number) => {
     router.get(route('infos.index'),
@@ -208,6 +231,7 @@ export default function InfoIndex({
     setSearchQuery('');
     setSelectedType('');
     setSelectedCategory('');
+    setSelectedDepartment('');
     router.get(route('infos.index'), {
       search: '',
       sort: 'name',
@@ -215,7 +239,8 @@ export default function InfoIndex({
       per_page: 10,
       page: 1,
       type_id: undefined,
-      category_id: undefined
+      category_id: undefined,
+      department_id: undefined
     });
   };
 
@@ -340,7 +365,7 @@ export default function InfoIndex({
 
                       {/* Reset filters button */}
                       {(filters.search || filters.sort !== 'name' || filters.direction !== 'asc' ||
-                        filters.per_page !== 10 || filters.type_id || filters.category_id) && (
+                        filters.per_page !== 10 || filters.type_id || filters.category_id || filters.department_id) && (
                         <Button variant="ghost" size="sm" onClick={resetFilters} className="ml-2">
                           <FilterX className="h-4 w-4 mr-2" />
                           Reset
@@ -387,6 +412,24 @@ export default function InfoIndex({
                         </SelectContent>
                       </Select>
                     </div>
+                    <div className="flex-1">
+                      <Select
+                        value={selectedDepartment}
+                        onValueChange={handleDepartmentChange}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Filter by Department" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="_all">All Departments</SelectItem>
+                          {departments.map(department => (
+                            <SelectItem key={department.id} value={department.id.toString()}>
+                              {department.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
 
                   {/* Active filters */}
@@ -409,6 +452,12 @@ export default function InfoIndex({
                         <button className="ml-2" onClick={() => handleCategoryChange('')}>×</button>
                       </Badge>
                     )}
+                    {filters.department_id && (
+                      <Badge variant="secondary" className="px-3 py-1">
+                        Department: {departments.find(d => d.id.toString() === filters.department_id)?.name || filters.department_id}
+                        <button className="ml-2" onClick={() => handleDepartmentChange('')}>×</button>
+                      </Badge>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -421,6 +470,7 @@ export default function InfoIndex({
                     <TableHead>Name</TableHead>
                     <TableHead>Type</TableHead>
                     <TableHead>Category</TableHead>
+                    <TableHead>Department</TableHead>
                     <TableHead>Created At</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -433,6 +483,7 @@ export default function InfoIndex({
                         <TableCell className="font-medium">{info.name}</TableCell>
                         <TableCell>{info.infoType?.name || '-'}</TableCell>
                         <TableCell>{info.infoCategory?.name || '-'}</TableCell>
+                        <TableCell>{info.department?.name || '-'}</TableCell>
                         <TableCell>{new Date(info.created_at).toLocaleDateString()}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">

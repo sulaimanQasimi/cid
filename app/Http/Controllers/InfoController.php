@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Info;
 use App\Models\InfoType;
 use App\Models\InfoCategory;
+use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -28,11 +29,12 @@ class InfoController extends Controller
             'sort' => [
                 'nullable',
                 'string',
-                Rule::in(['name', 'code', 'description', 'created_at', 'updated_at', 'info_type_id', 'info_category_id'])
+                Rule::in(['name', 'code', 'description', 'created_at', 'updated_at', 'info_type_id', 'info_category_id', 'department_id'])
             ],
             'direction' => ['nullable', 'string', Rule::in(['asc', 'desc'])],
             'type_id' => 'nullable|integer|exists:info_types,id',
             'category_id' => 'nullable|integer|exists:info_categories,id',
+            'department_id' => 'nullable|integer|exists:departments,id',
             'page' => 'nullable|integer|min:1',
         ]);
 
@@ -42,9 +44,10 @@ class InfoController extends Controller
         $direction = $validated['direction'] ?? 'asc';
         $typeFilter = $validated['type_id'] ?? null;
         $categoryFilter = $validated['category_id'] ?? null;
+        $departmentFilter = $validated['department_id'] ?? null;
 
         // Apply search and filters
-        $query = Info::with(['infoType', 'infoCategory']);
+        $query = Info::with(['infoType', 'infoCategory', 'department']);
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -62,19 +65,25 @@ class InfoController extends Controller
             $query->where('info_category_id', $categoryFilter);
         }
 
+        if ($departmentFilter) {
+            $query->where('department_id', $departmentFilter);
+        }
+
         $query->orderBy($sort, $direction);
 
         // Get paginated results
         $infos = $query->paginate($perPage)->withQueryString();
 
-        // Get all types and categories for filtering
+        // Get all types, categories, and departments for filtering
         $types = InfoType::orderBy('name')->get();
         $categories = InfoCategory::orderBy('name')->get();
+        $departments = Department::orderBy('name')->get();
 
         return Inertia::render('Info/Index', [
             'infos' => $infos,
             'types' => $types,
             'categories' => $categories,
+            'departments' => $departments,
             'filters' => [
                 'search' => $search,
                 'sort' => $sort,
@@ -82,6 +91,7 @@ class InfoController extends Controller
                 'per_page' => $perPage,
                 'type_id' => $typeFilter,
                 'category_id' => $categoryFilter,
+                'department_id' => $departmentFilter,
             ],
         ]);
     }
@@ -97,10 +107,12 @@ class InfoController extends Controller
         // Get data for dropdowns without caching
         $infoTypes = InfoType::orderBy('name')->get();
         $infoCategories = InfoCategory::orderBy('name')->get();
+        $departments = Department::orderBy('name')->get();
 
         return Inertia::render('Info/Create', [
             'infoTypes' => $infoTypes,
             'infoCategories' => $infoCategories,
+            'departments' => $departments,
         ]);
     }
 
@@ -115,6 +127,7 @@ class InfoController extends Controller
         $validated = $request->validate([
             'info_type_id' => 'required|integer|exists:info_types,id',
             'info_category_id' => 'required|integer|exists:info_categories,id',
+            'department_id' => 'nullable|string|exists:departments,id|not_in:none',
             'name' => 'nullable|string|min:2|max:255',
             'code' => [
                 'nullable',
@@ -135,6 +148,8 @@ class InfoController extends Controller
         ], [
             'info_type_id.required' => 'The info type field is required.',
             'info_category_id.required' => 'The info category field is required.',
+            'department_id.exists' => 'The selected department does not exist.',
+            'department_id.not_in' => 'Please select a valid department.',
             'name.min' => 'The name must be at least 2 characters.',
             'code.regex' => 'The code may only contain letters, numbers, dashes, underscores, and periods.',
             'code.unique' => 'This code is already in use.',
@@ -142,6 +157,11 @@ class InfoController extends Controller
             'value.location.lng.numeric' => 'The longitude must be a valid number.',
             'value.location.province.max' => 'The province name cannot exceed 255 characters.',
         ]);
+
+        // Handle 'none' value for department_id
+        if (isset($validated['department_id']) && $validated['department_id'] === 'none') {
+            $validated['department_id'] = null;
+        }
 
         // Sanitize inputs
         if (isset($validated['name'])) {
@@ -195,7 +215,7 @@ class InfoController extends Controller
         Gate::authorize('view', $info);
 
         // Load related data without caching
-        $info->load(['infoType', 'infoCategory', 'user', 'creator', 'confirmer']);
+        $info->load(['infoType', 'infoCategory', 'department', 'user', 'creator', 'confirmer']);
 
         return Inertia::render('Info/Show', [
             'info' => $info,
@@ -210,14 +230,19 @@ class InfoController extends Controller
         // Check authorization
         Gate::authorize('update', $info);
 
-        // Get data for dropdowns without caching
+        // Load data for dropdowns
         $infoTypes = InfoType::orderBy('name')->get();
         $infoCategories = InfoCategory::orderBy('name')->get();
+        $departments = Department::orderBy('name')->get();
+
+        // Load the info with its relationships
+        $info->load(['infoType', 'infoCategory', 'department']);
 
         return Inertia::render('Info/Edit', [
             'info' => $info,
             'infoTypes' => $infoTypes,
             'infoCategories' => $infoCategories,
+            'departments' => $departments,
         ]);
     }
 
@@ -232,6 +257,7 @@ class InfoController extends Controller
         $validated = $request->validate([
             'info_type_id' => 'required|integer|exists:info_types,id',
             'info_category_id' => 'required|integer|exists:info_categories,id',
+            'department_id' => 'nullable|string|exists:departments,id|not_in:none',
             'name' => 'nullable|string|min:2|max:255',
             'code' => [
                 'nullable',
@@ -252,6 +278,8 @@ class InfoController extends Controller
         ], [
             'info_type_id.required' => 'The info type field is required.',
             'info_category_id.required' => 'The info category field is required.',
+            'department_id.exists' => 'The selected department does not exist.',
+            'department_id.not_in' => 'Please select a valid department.',
             'name.min' => 'The name must be at least 2 characters.',
             'code.regex' => 'The code may only contain letters, numbers, dashes, underscores, and periods.',
             'code.unique' => 'This code is already in use.',
@@ -259,6 +287,11 @@ class InfoController extends Controller
             'value.location.lng.numeric' => 'The longitude must be a valid number.',
             'value.location.province.max' => 'The province name cannot exceed 255 characters.',
         ]);
+
+        // Handle 'none' value for department_id
+        if (isset($validated['department_id']) && $validated['department_id'] === 'none') {
+            $validated['department_id'] = null;
+        }
 
         // Sanitize inputs
         if (isset($validated['name'])) {
