@@ -18,6 +18,7 @@ class Info extends Model
     protected $fillable = [
         'info_type_id',
         'info_category_id',
+        'department_id',
         'name',
         'code',
         'description',
@@ -52,6 +53,14 @@ class Info extends Model
     public function infoCategory(): BelongsTo
     {
         return $this->belongsTo(InfoCategory::class);
+    }
+
+    /**
+     * Get the department that owns the info.
+     */
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class);
     }
 
     /**

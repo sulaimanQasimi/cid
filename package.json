@@ -52,18 +52,18 @@
         "concurrently": "^9.0.1",
         "date-fns": "^2.30.0",
         "globals": "^15.14.0",
+        "laravel-echo": "^1.19.0",
         "laravel-vite-plugin": "^1.0",
         "lucide-react": "^0.475.0",
+        "pusher-js": "^8.4.0",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
+        "simple-peer": "^9.11.1",
         "tailwind-merge": "^3.0.1",
         "tailwindcss": "^4.0.0",
         "tailwindcss-animate": "^1.0.7",
         "typescript": "^5.7.2",
-        "vite": "^6.0",
-        "laravel-echo": "^1.15.3",
-        "pusher-js": "^8.4.0-rc2",
-        "simple-peer": "^9.11.1"
+        "vite": "^6.0"
     },
     "optionalDependencies": {
         "@rollup/rollup-linux-x64-gnu": "4.9.5",

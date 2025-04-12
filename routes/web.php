@@ -24,3 +24,4 @@ require __DIR__.'/users.php';
 require __DIR__.'/permissions.php';
 require __DIR__.'/roles.php';
 require __DIR__.'/meetings.php';
+require __DIR__.'/departments.php';
