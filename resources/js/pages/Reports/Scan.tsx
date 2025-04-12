@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
 import { FileText, Search, QrCode } from 'lucide-react';
-import { useRouter } from '@inertiajs/react';
 
 interface ScanProps {}
 
@@ -10,7 +9,6 @@ export default function ReportScan({}: ScanProps) {
   const [code, setCode] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,8 +23,8 @@ export default function ReportScan({}: ScanProps) {
     try {
       const response = await axios.get(`/api/reports/code/${code.trim()}`);
       if (response.data && response.data.success) {
-        // Redirect to report view page
-        router.visit(`/reports/${code.trim()}`);
+        // Navigate to the report view page by code
+        router.visit(route('reports.view_by_code', { code: code.trim() }));
       } else {
         setError('Report not found');
       }

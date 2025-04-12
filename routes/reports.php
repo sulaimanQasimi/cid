@@ -18,6 +18,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('Reports/Scan');
     })->name('reports.scan');
 
+    // View report by code
+    Route::get('reports/code/{code}', function ($code) {
+        return Inertia::render('Reports/View', [
+            'code' => $code
+        ]);
+    })->name('reports.view_by_code');
+
     // Show report by ID
     Route::get('reports/{report}', [ReportController::class, 'show'])->name('reports.show');
 });
