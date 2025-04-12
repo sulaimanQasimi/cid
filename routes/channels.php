@@ -3,6 +3,7 @@
 use App\Models\Meeting;
 use App\Models\MeetingSession;
 use App\Models\User;
+use App\Models\Report;
 use Illuminate\Support\Facades\Broadcast;
 
 /*
@@ -38,4 +39,17 @@ Broadcast::channel('peer.{peerId}', function (User $user, string $peerId) {
         ->first();
 
     return $session !== null;
+});
+
+// General reports channel
+Broadcast::channel('reports', function (User $user) {
+    // Allow authenticated users to listen to all reports
+    return true;
+});
+
+// Specific report channel
+Broadcast::channel('reports.{type}.{id}', function (User $user, $type, $id) {
+    // Allow authenticated users to listen to specific report types
+    // In a real app, you would add more specific permission checks here
+    return true;
 });

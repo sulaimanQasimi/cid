@@ -3,6 +3,7 @@ import { Head } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { UserRound, Printer, FileText } from 'lucide-react';
 import { router } from '@inertiajs/react';
+import axios from 'axios';
 
 interface Criminal {
   id: number;
@@ -73,6 +74,9 @@ export default function CriminalPrint({ criminal }: Props) {
   // Create a report for this criminal
   const createReport = () => {
     const reportData = {
+      reportable_type: 'App\\Models\\Criminal',
+      reportable_id: criminal.id,
+      user_id: criminal.created_by,
       properties: {
         date: new Date().toISOString(),
         criminal_data: {
@@ -92,7 +96,16 @@ export default function CriminalPrint({ criminal }: Props) {
       }
     };
 
-    router.post(route('reports.store', { reportable_type: 'App\\Models\\Criminal', reportable_id: criminal.id }), reportData);
+    // Use POST method directly with axios
+    axios.post('/reports', reportData)
+      .then(response => {
+        if (response.data && response.data.report) {
+          criminal.report = response.data.report;
+        }
+      })
+      .catch(error => {
+        console.error('Error creating report:', error);
+      });
   };
 
   // The report code to display
