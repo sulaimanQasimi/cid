@@ -6,4 +6,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth'])->group(function () {
     // Criminal routes
     Route::resource('criminals', CriminalController::class);
+
+    // Print criminal record
+    Route::get('criminals/{criminal}/print', [CriminalController::class, 'print'])
+        ->name('criminals.print');
 });

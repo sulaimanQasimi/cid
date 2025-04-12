@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Pencil, Trash, UserRound, MapPin, FileText, Calendar, Building, Phone, CreditCard } from 'lucide-react';
+import { ArrowLeft, Pencil, Trash, UserRound, MapPin, FileText, Calendar, Building, Phone, CreditCard, Printer } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import {
   AlertDialog,
@@ -101,6 +101,12 @@ export default function CriminalShow({ criminal }: Props) {
               <Link href={route('criminals.edit', criminal.id)}>
                 <Pencil className="mr-2 h-4 w-4" />
                 Edit Record
+              </Link>
+            </Button>
+            <Button variant="outline" asChild className="rounded-full shadow-sm">
+              <Link href={route('criminals.print', criminal.id)} target="_blank">
+                <Printer className="mr-2 h-4 w-4" />
+                Print
               </Link>
             </Button>
             <Button

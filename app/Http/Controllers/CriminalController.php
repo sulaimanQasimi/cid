@@ -220,4 +220,16 @@ class CriminalController extends Controller
         return Redirect::route('criminals.index')
             ->with('success', 'Criminal record deleted successfully.');
     }
+
+    /**
+     * Display a printable version of the specified resource.
+     */
+    public function print(Criminal $criminal)
+    {
+        $criminal->load(['department', 'creator']);
+
+        return Inertia::render('Criminal/Print', [
+            'criminal' => $criminal,
+        ]);
+    }
 }
