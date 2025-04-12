@@ -60,4 +60,27 @@ class ReportController extends Controller
             'report' => $report,
         ]);
     }
+
+    /**
+     * Find a report by its code.
+     *
+     * @param  string  $code
+     * @return \Illuminate\Http\Response
+     */
+    public function findByCode($code)
+    {
+        $report = Report::where('code', $code)->first();
+
+        if (!$report) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Report not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'report' => $report,
+        ]);
+    }
 }

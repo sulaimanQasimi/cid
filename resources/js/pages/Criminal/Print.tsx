@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { UserRound, Printer, FileText } from 'lucide-react';
 import { router } from '@inertiajs/react';
 import axios from 'axios';
+import { QRCodeSVG } from 'qrcode.react';
 
 interface Criminal {
   id: number;
@@ -218,6 +219,20 @@ export default function CriminalPrint({ criminal }: Props) {
                 <div className="text-xs font-semibold text-neutral-700 bg-gray-100 py-1 px-2 rounded-full inline-flex items-center">
                   <FileText size={12} className="mr-1" />
                   <span>شمارهٔ ثبت: {reportCode}</span>
+                </div>
+              </div>
+
+              {/* QR Code for Report */}
+              <div className="mt-2 flex justify-center">
+                <div className="bg-white p-1 border border-gray-200 rounded-md shadow-sm">
+                  <QRCodeSVG
+                    value={reportCode !== '------' ? `https://cid.test/reports/${reportCode}` : ''}
+                    size={80}
+                    bgColor={"#ffffff"}
+                    fgColor={"#000000"}
+                    level={"L"}
+                    includeMargin={false}
+                  />
                 </div>
               </div>
             </div>

@@ -13,16 +13,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create a test user if no users exist
-        if (User::count() === 0) {
-            User::factory()->create([
-                'name' => 'Admin User',
-                'email' => 'admin@example.com',
-            ]);
-        }
-
-        // Run the permission seeder
+        // Create admin user
         $this->call([
+            AdminUserSeeder::class,
             PermissionSeeder::class,
             MeetingPermissionsSeeder::class,
         ]);

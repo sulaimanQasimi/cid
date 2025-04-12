@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Database, Folder, LayoutGrid, List, Tag, Users, Shield, UserCog, Video, Calendar, Building, FileText } from 'lucide-react';
+import { BookOpen, Database, Folder, LayoutGrid, List, Tag, Users, Shield, UserCog, Video, Calendar, Building, FileText, QrCode } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -44,6 +44,11 @@ const mainNavItems: NavItem[] = [
         title: 'Criminals',
         href: route('criminals.index'),
         icon: FileText,
+    },
+    {
+        title: 'Report Scan',
+        href: route('reports.scan'),
+        icon: QrCode,
     },
     {
         title: 'Meetings',
