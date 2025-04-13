@@ -17,6 +17,38 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 });
 
+// Language Management
+Route::group(['middleware' => ['auth']], function () {
+    Route::resource('languages', App\Http\Controllers\Admin\LanguageController::class);
+
+    Route::resource('translations', App\Http\Controllers\Admin\TranslationController::class);
+    Route::post('translations/import', [App\Http\Controllers\Admin\TranslationController::class, 'import'])->name('translations.import');
+    Route::get('translations/export', [App\Http\Controllers\Admin\TranslationController::class, 'export'])->name('translations.export');
+
+    // Language test page
+    Route::get('language-test', function () {
+        return Inertia::render('language-test');
+    })->name('language-test');
+
+    // Temporary API routes until we fix the actual API routes
+    Route::get('api/languages', function () {
+        $languages = App\Models\Language::orderBy('default', 'desc')->orderBy('name')->get();
+        return response()->json(['languages' => $languages]);
+    });
+
+    Route::get('api/translations/lang/{code}', function ($code) {
+        $language = App\Models\Language::where('code', $code)->first();
+        if (!$language) {
+            return response()->json(['message' => 'Language not found'], 404);
+        }
+        $translations = App\Models\Translation::getTranslations($code);
+        return response()->json([
+            'language' => $language,
+            'translations' => $translations,
+        ]);
+    });
+});
+
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
 require __DIR__.'/info.php';

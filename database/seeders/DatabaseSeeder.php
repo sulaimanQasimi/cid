@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             PermissionSeeder::class,
             MeetingPermissionsSeeder::class,
+            LanguageSeeder::class,
         ]);
     }
 }
