@@ -310,7 +310,7 @@ export default function CriminalIndex({
                   variant="outline"
                   size="icon"
                   onClick={handleDirectionChange}
-                  title={`Sort ${filters.direction === 'asc' ? 'Descending' : 'Ascending'}`}
+                  title={t(`criminal.sort_${filters.direction === 'asc' ? 'descending' : 'ascending'}`)}
                   className="shadow-sm"
                 >
                   <ArrowUpDown className={`h-4 w-4 ${filters.direction === 'desc' ? 'rotate-180' : ''}`} />
@@ -321,12 +321,12 @@ export default function CriminalIndex({
               <div className="w-full md:w-40">
                 <Select value={filters.per_page.toString()} onValueChange={handlePerPageChange}>
                   <SelectTrigger className="shadow-sm">
-                    <SelectValue placeholder="Items per page" />
+                    <SelectValue placeholder={t('criminal.items_per_page')} />
                   </SelectTrigger>
                   <SelectContent>
                     {perPageOptions.map((option) => (
                       <SelectItem key={option.value} value={option.value.toString()}>
-                        {option.label}
+                        {t('criminal.per_page_option', { count: option.value.toString() })}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -339,7 +339,7 @@ export default function CriminalIndex({
                   variant="outline"
                   size="icon"
                   onClick={resetFilters}
-                  title="Reset all filters"
+                  title={t('criminal.reset_filters')}
                   className="shadow-sm"
                 >
                   <FilterX className="h-4 w-4" />
@@ -391,7 +391,7 @@ export default function CriminalIndex({
                               variant="ghost"
                               size="icon"
                               asChild
-                              title="View"
+                              title={t('criminal.actions.view')}
                               className="h-8 w-8 rounded-full"
                             >
                               <Link href={route('criminals.show', criminal.id)}>
@@ -402,7 +402,7 @@ export default function CriminalIndex({
                               variant="ghost"
                               size="icon"
                               asChild
-                              title="Edit"
+                              title={t('criminal.actions.edit')}
                               className="h-8 w-8 rounded-full"
                             >
                               <Link href={route('criminals.edit', criminal.id)}>
@@ -413,7 +413,7 @@ export default function CriminalIndex({
                               variant="ghost"
                               size="icon"
                               onClick={() => openDeleteDialog(criminal)}
-                              title="Delete"
+                              title={t('criminal.actions.delete')}
                               className="h-8 w-8 rounded-full text-destructive hover:text-destructive hover:bg-destructive/10"
                             >
                               <Trash className="h-4 w-4" />
