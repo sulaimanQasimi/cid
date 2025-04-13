@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Head } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { UserRound, Printer, FileText } from 'lucide-react';
+import { UserRound, Printer, FileText, Palette, Type, Settings, X, Layout } from 'lucide-react';
 import { router } from '@inertiajs/react';
 import axios from 'axios';
 import { QRCodeSVG } from 'qrcode.react';
@@ -45,6 +45,20 @@ interface Criminal {
   } | null;
 }
 
+interface PrintSettings {
+  headerColor: string;
+  textColor: string;
+  accentColor: string;
+  fontFamily: string;
+  fontSize: number;
+  showLogo: boolean;
+  showFooter: boolean;
+  showDate: boolean;
+  pageSize: 'a4' | 'letter' | 'legal';
+  orientation: 'portrait' | 'landscape';
+  margins: 'normal' | 'narrow' | 'wide';
+}
+
 interface Props {
   criminal: Criminal;
 }
@@ -52,15 +66,46 @@ interface Props {
 export default function CriminalPrint({ criminal }: Props) {
   // State to track the report code
   const [reportCode, setReportCode] = useState<string>('------');
+  const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false);
+  const [printSettings, setPrintSettings] = useState<PrintSettings>({
+    headerColor: '#1f2937',
+    textColor: '#374151',
+    accentColor: '#3b82f6',
+    fontFamily: 'Amiri, Traditional Arabic, Arial, sans-serif',
+    fontSize: 12,
+    showLogo: true,
+    showFooter: true,
+    showDate: true,
+    pageSize: 'a4',
+    orientation: 'portrait',
+    margins: 'normal'
+  });
 
   useEffect(() => {
     // Create a report record immediately when the component is mounted
     createReport();
 
+    // Create dynamic style element
+    let styleElement = document.getElementById('dynamic-print-styles');
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = 'dynamic-print-styles';
+      document.head.appendChild(styleElement);
+    }
+    updateDynamicStyles(styleElement, printSettings);
+
     // Auto-print when the component is mounted
     setTimeout(() => {
       window.print();
     }, 1000);
+
+    // Cleanup
+    return () => {
+      const styleEl = document.getElementById('dynamic-print-styles');
+      if (styleEl) {
+        styleEl.remove();
+      }
+    };
   }, []);
 
   // Format the date (handling null)
@@ -111,22 +156,441 @@ export default function CriminalPrint({ criminal }: Props) {
       });
   };
 
+  const handleSettingsChange = (name: keyof PrintSettings, value: any) => {
+    setPrintSettings(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
+    // Force a re-render of the style tag when settings change
+    const styleElement = document.getElementById('dynamic-print-styles');
+    if (styleElement) {
+      const newSettings = {
+        ...printSettings,
+        [name]: value
+      };
+      updateDynamicStyles(styleElement, newSettings);
+    }
+  };
+
+  // Add a function to update dynamic styles
+  const updateDynamicStyles = (element: HTMLElement, settings: PrintSettings) => {
+    const cssText = `
+      @page {
+        size: ${settings.pageSize} ${settings.orientation};
+        margin: ${getMargins(settings.margins)};
+      }
+      @media print {
+        body {
+          font-family: ${settings.fontFamily};
+          print-color-adjust: exact;
+          -webkit-print-color-adjust: exact;
+          background: none;
+          font-size: ${settings.fontSize}px;
+          color: ${settings.textColor};
+        }
+
+        /* Custom background colors for printing */
+        .print-template .header-bg {
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+          background-color: ${settings.headerColor} !important;
+          color: white !important;
+        }
+
+        /* CSS for primary and accent colors to work in print */
+        .text-primary, h1, h2, h3, .font-bold.text-primary {
+          color: ${settings.accentColor} !important;
+        }
+
+        .border-primary, .border-primary\\/20 {
+          border-color: ${settings.accentColor} !important;
+        }
+
+        .bg-primary {
+          background-color: ${settings.accentColor} !important;
+        }
+      }
+
+      /* Corner decorations */
+      .corner-decoration.top-left {
+        border-top: 2px solid ${settings.accentColor};
+        border-left: 2px solid ${settings.accentColor};
+      }
+
+      .corner-decoration.top-right {
+        border-top: 2px solid ${settings.accentColor};
+        border-right: 2px solid ${settings.accentColor};
+      }
+
+      .corner-decoration.bottom-left {
+        border-bottom: 2px solid ${settings.accentColor};
+        border-left: 2px solid ${settings.accentColor};
+      }
+
+      .corner-decoration.bottom-right {
+        border-bottom: 2px solid ${settings.accentColor};
+        border-right: 2px solid ${settings.accentColor};
+      }
+
+      /* Photo frame corners */
+      .photo-frame-corner.top-left {
+        border-top: 2px solid ${settings.accentColor};
+        border-left: 2px solid ${settings.accentColor};
+      }
+
+      .photo-frame-corner.top-right {
+        border-top: 2px solid ${settings.accentColor};
+        border-right: 2px solid ${settings.accentColor};
+      }
+
+      .photo-frame-corner.bottom-left {
+        border-bottom: 2px solid ${settings.accentColor};
+        border-left: 2px solid ${settings.accentColor};
+      }
+
+      .photo-frame-corner.bottom-right {
+        border-bottom: 2px solid ${settings.accentColor};
+        border-right: 2px solid ${settings.accentColor};
+      }
+
+      /* Investigation corners */
+      .investigation-corner.top-left {
+        border-top: 2px solid ${settings.accentColor};
+        border-left: 2px solid ${settings.accentColor};
+      }
+
+      .investigation-corner.top-right {
+        border-top: 2px solid ${settings.accentColor};
+        border-right: 2px solid ${settings.accentColor};
+      }
+
+      .investigation-corner.bottom-left {
+        border-bottom: 2px solid ${settings.accentColor};
+        border-left: 2px solid ${settings.accentColor};
+      }
+
+      .investigation-corner.bottom-right {
+        border-bottom: 2px solid ${settings.accentColor};
+        border-right: 2px solid ${settings.accentColor};
+      }
+
+      /* Enhanced compact info cells */
+      .info-cell-compact {
+        border-bottom: 1px solid ${settings.accentColor}30;
+      }
+
+      .info-cell-compact:hover {
+        border-color: ${settings.accentColor};
+        background-color: ${settings.accentColor}05;
+      }
+
+      .info-cell-highlight-compact {
+        border: 1px solid ${settings.accentColor}20;
+        border-bottom: 1px solid ${settings.accentColor}30;
+        background-color: ${settings.accentColor}05;
+      }
+
+      .info-cell-highlight-compact:hover {
+        border-color: ${settings.accentColor};
+        background-color: ${settings.accentColor}08;
+      }
+
+      /* Footer cells */
+      .footer-cell-compact {
+        border-top: 1px solid ${settings.accentColor}30;
+      }
+    `;
+    element.innerHTML = cssText;
+  };
+
+  // Modified getMargins to accept a margin setting parameter
+  const getMargins = (margin = printSettings.margins) => {
+    switch (margin) {
+      case 'narrow':
+        return '0.5cm';
+      case 'wide':
+        return '2cm';
+      default:
+        return '1cm';
+    }
+  };
+
   return (
     <>
       <Head title={`Print: ${criminal.name}`} />
 
-      {/* Print Button (visible only on screen) */}
+      {/* Dynamic styles - this will be managed by JavaScript */}
+      <style id="dynamic-print-styles"></style>
+
+      {/* Print Settings Modal */}
+      {showSettingsModal && (
+        <div className="screen-only fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h2 className="text-lg font-semibold flex items-center">
+                <FileText className="mr-2 h-5 w-5" />
+                Print Settings
+              </h2>
+              <button
+                onClick={() => setShowSettingsModal(false)}
+                className="text-gray-500 hover:text-gray-700 focus:outline-none"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Colors Section */}
+              <div className="space-y-4">
+                <div className="flex items-center">
+                  <Palette className="mr-2 h-5 w-5 text-primary" />
+                  <h3 className="text-md font-medium">Colors</h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Header Color
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <div className="relative">
+                        <input
+                          type="color"
+                          id="headerColorPicker"
+                          value={printSettings.headerColor}
+                          onChange={(e) => handleSettingsChange('headerColor', e.target.value)}
+                          className="sr-only"
+                        />
+                        <label
+                          htmlFor="headerColorPicker"
+                          className="block h-10 w-10 rounded border border-gray-300 cursor-pointer"
+                          style={{ backgroundColor: printSettings.headerColor }}
+                        />
+                      </div>
+                      <input
+                        type="text"
+                        value={printSettings.headerColor}
+                        onChange={(e) => handleSettingsChange('headerColor', e.target.value)}
+                        className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Text Color
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <div className="relative">
+                        <input
+                          type="color"
+                          id="textColorPicker"
+                          value={printSettings.textColor}
+                          onChange={(e) => handleSettingsChange('textColor', e.target.value)}
+                          className="sr-only"
+                        />
+                        <label
+                          htmlFor="textColorPicker"
+                          className="block h-10 w-10 rounded border border-gray-300 cursor-pointer"
+                          style={{ backgroundColor: printSettings.textColor }}
+                        />
+                      </div>
+                      <input
+                        type="text"
+                        value={printSettings.textColor}
+                        onChange={(e) => handleSettingsChange('textColor', e.target.value)}
+                        className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Accent Color
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <div className="relative">
+                        <input
+                          type="color"
+                          id="accentColorPicker"
+                          value={printSettings.accentColor}
+                          onChange={(e) => handleSettingsChange('accentColor', e.target.value)}
+                          className="sr-only"
+                        />
+                        <label
+                          htmlFor="accentColorPicker"
+                          className="block h-10 w-10 rounded border border-gray-300 cursor-pointer"
+                          style={{ backgroundColor: printSettings.accentColor }}
+                        />
+                      </div>
+                      <input
+                        type="text"
+                        value={printSettings.accentColor}
+                        onChange={(e) => handleSettingsChange('accentColor', e.target.value)}
+                        className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Typography Section */}
+              <div className="space-y-4">
+                <div className="flex items-center">
+                  <Type className="mr-2 h-5 w-5 text-primary" />
+                  <h3 className="text-md font-medium">Typography</h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Font Family
+                    </label>
+                    <select
+                      value={printSettings.fontFamily}
+                      onChange={(e) => handleSettingsChange('fontFamily', e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                    >
+                      <option value="Amiri, Traditional Arabic, Arial, sans-serif">Amiri (Default)</option>
+                      <option value="Traditional Arabic, Arial, sans-serif">Traditional Arabic</option>
+                      <option value="Arial, sans-serif">Arial</option>
+                      <option value="Calibri, sans-serif">Calibri</option>
+                      <option value="Tahoma, sans-serif">Tahoma</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Font Size
+                    </label>
+                    <div className="flex items-center">
+                      <input
+                        type="range"
+                        min="10"
+                        max="16"
+                        value={printSettings.fontSize}
+                        onChange={(e) => handleSettingsChange('fontSize', parseInt(e.target.value))}
+                        className="flex-1"
+                      />
+                      <span className="ml-2 text-sm w-10 text-center">
+                        {printSettings.fontSize}pt
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Layout Section */}
+              <div className="space-y-4">
+                <div className="flex items-center">
+                  <Layout className="mr-2 h-5 w-5 text-primary" />
+                  <h3 className="text-md font-medium">Layout</h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Page Size
+                    </label>
+                    <select
+                      value={printSettings.pageSize}
+                      onChange={(e) => handleSettingsChange('pageSize', e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                    >
+                      <option value="a4">A4</option>
+                      <option value="letter">Letter</option>
+                      <option value="legal">Legal</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Orientation
+                    </label>
+                    <select
+                      value={printSettings.orientation}
+                      onChange={(e) => handleSettingsChange('orientation', e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                    >
+                      <option value="portrait">Portrait</option>
+                      <option value="landscape">Landscape</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Margins
+                    </label>
+                    <select
+                      value={printSettings.margins}
+                      onChange={(e) => handleSettingsChange('margins', e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                    >
+                      <option value="normal">Normal</option>
+                      <option value="narrow">Narrow</option>
+                      <option value="wide">Wide</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t px-4 py-3 flex justify-end space-x-3">
+              <button
+                onClick={() => setShowSettingsModal(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => setShowSettingsModal(false)}
+                className="px-4 py-2 bg-primary border border-transparent rounded-md text-sm font-medium text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              >
+                Apply
+              </button>
+              <button
+                onClick={() => {
+                  setShowSettingsModal(false);
+                  setTimeout(() => window.print(), 300);
+                }}
+                className="px-4 py-2 bg-primary border border-transparent rounded-md text-sm font-medium text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              >
+                Apply & Print
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Print Buttons (visible only on screen) */}
       <div className="screen-only fixed top-4 right-4 z-50 p-4 bg-white shadow-lg rounded-lg">
-        <button
-          onClick={() => window.print()}
-          className="bg-primary text-white px-6 py-2 rounded-md hover:bg-primary/90 transition-colors flex items-center gap-2"
-        >
-          <Printer size={18} />
-          <span>Print Document</span>
-        </button>
+        <div className="flex space-x-2">
+          <button
+            onClick={() => setShowSettingsModal(true)}
+            className="bg-white text-gray-700 border border-gray-300 px-6 py-2 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2"
+          >
+            <Settings size={18} />
+            <span>Format</span>
+          </button>
+          <button
+            onClick={() => window.print()}
+            className="bg-primary text-white px-6 py-2 rounded-md hover:bg-primary/90 transition-colors flex items-center gap-2"
+          >
+            <Printer size={18} />
+            <span>Print Document</span>
+          </button>
+        </div>
       </div>
 
-      <div className="print-container max-w-4xl mx-auto my-4 p-6 bg-white shadow-md print:shadow-none print:p-0 print:m-0 rounded-lg border border-gray-200">
+      <div
+        className="print-container max-w-4xl mx-auto my-4 p-6 bg-white shadow-md print:shadow-none print:p-0 print:m-0 rounded-lg border border-gray-200"
+        style={{
+          color: printSettings.textColor,
+          fontFamily: printSettings.fontFamily,
+          fontSize: `${printSettings.fontSize}px`,
+        }}
+      >
         {/* Decorative background pattern - only visible on screen */}
         <div className="screen-only absolute inset-0 overflow-hidden opacity-5 pointer-events-none z-0">
           <div className="pattern-bg"></div>
@@ -140,18 +604,20 @@ export default function CriminalPrint({ criminal }: Props) {
 
         {/* Page Header */}
         <div className="text-center mb-4 relative z-10">
-          <div className="mb-2 border-b border-primary/20 pb-2">
+          <div className="mb-2 border-b pb-2" style={{ borderColor: `${printSettings.accentColor}20` }}>
             <div className="flex justify-between items-center">
               <div className="w-24 text-center">
                 {criminal.department?.code && (
-                  <div className="text-xs font-semibold text-neutral-500 border border-primary/20 rounded-md py-1 px-2">
+                  <div className="text-xs font-semibold text-neutral-500 border rounded-md py-1 px-2"
+                       style={{ borderColor: `${printSettings.accentColor}20` }}>
                     {criminal.department.code}
                   </div>
                 )}
               </div>
-              <h1 className="text-2xl font-bold text-primary">د مجرمينو د تحقيق راپور</h1>
+              <h1 className="text-2xl font-bold" style={{ color: printSettings.accentColor }}>د مجرمينو د تحقيق راپور</h1>
               <div className="w-24 text-center">
-                <div className="text-xs font-semibold text-neutral-500 border border-primary/20 rounded-md py-1 px-2">
+                <div className="text-xs font-semibold text-neutral-500 border rounded-md py-1 px-2"
+                     style={{ borderColor: `${printSettings.accentColor}20` }}>
                   {formatDate(criminal.created_at)}
                 </div>
               </div>
@@ -332,8 +798,9 @@ export default function CriminalPrint({ criminal }: Props) {
         </div>
       </div>
 
-      {/* Print-only styles */}
-      <style>{`
+      {/* Print-only styles - just keep the basic styles that don't change with settings */}
+      <style>
+        {`
         /* Screen-only styles */
         @media screen {
           .print-container {
@@ -354,29 +821,7 @@ export default function CriminalPrint({ criminal }: Props) {
           }
         }
 
-        /* Print styles */
         @media print {
-          @page {
-            size: A4;
-            margin: 0.8cm;
-          }
-
-          body {
-            font-family: 'Amiri', 'Traditional Arabic', 'Calibri', 'Arial', sans-serif;
-            print-color-adjust: exact;
-            -webkit-print-color-adjust: exact;
-            background: none;
-            font-size: 12px;
-          }
-
-          .print-container {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            background: none;
-          }
-
           /* Hide screen-only elements when printing */
           .screen-only {
             display: none !important;
@@ -395,7 +840,6 @@ export default function CriminalPrint({ criminal }: Props) {
 
         /* Custom styles for better typography */
         .print-container {
-          font-family: 'Amiri', 'Traditional Arabic', 'Arial', sans-serif;
           position: relative;
         }
 
@@ -407,67 +851,11 @@ export default function CriminalPrint({ criminal }: Props) {
           z-index: 1;
         }
 
-        .corner-decoration.top-left {
-          top: 10px;
-          left: 10px;
-          border-top: 2px solid var(--primary-color, #3b82f6);
-          border-left: 2px solid var(--primary-color, #3b82f6);
-        }
-
-        .corner-decoration.top-right {
-          top: 10px;
-          right: 10px;
-          border-top: 2px solid var(--primary-color, #3b82f6);
-          border-right: 2px solid var(--primary-color, #3b82f6);
-        }
-
-        .corner-decoration.bottom-left {
-          bottom: 10px;
-          left: 10px;
-          border-bottom: 2px solid var(--primary-color, #3b82f6);
-          border-left: 2px solid var(--primary-color, #3b82f6);
-        }
-
-        .corner-decoration.bottom-right {
-          bottom: 10px;
-          right: 10px;
-          border-bottom: 2px solid var(--primary-color, #3b82f6);
-          border-right: 2px solid var(--primary-color, #3b82f6);
-        }
-
         /* Photo frame corners */
         .photo-frame-corner {
           position: absolute;
           width: 8px;
           height: 8px;
-        }
-
-        .photo-frame-corner.top-left {
-          top: -2px;
-          left: -2px;
-          border-top: 2px solid var(--primary-color, #3b82f6);
-          border-left: 2px solid var(--primary-color, #3b82f6);
-        }
-
-        .photo-frame-corner.top-right {
-          top: -2px;
-          right: -2px;
-          border-top: 2px solid var(--primary-color, #3b82f6);
-          border-right: 2px solid var(--primary-color, #3b82f6);
-        }
-
-        .photo-frame-corner.bottom-left {
-          bottom: -2px;
-          left: -2px;
-          border-bottom: 2px solid var(--primary-color, #3b82f6);
-          border-left: 2px solid var(--primary-color, #3b82f6);
-        }
-
-        .photo-frame-corner.bottom-right {
-          bottom: -2px;
-          right: -2px;
-          border-bottom: 2px solid var(--primary-color, #3b82f6);
-          border-right: 2px solid var(--primary-color, #3b82f6);
         }
 
         /* Investigation corners */
@@ -476,68 +864,8 @@ export default function CriminalPrint({ criminal }: Props) {
           width: 10px;
           height: 10px;
         }
-
-        .investigation-corner.top-left {
-          top: -2px;
-          left: -2px;
-          border-top: 2px solid var(--primary-color, #3b82f6);
-          border-left: 2px solid var(--primary-color, #3b82f6);
-        }
-
-        .investigation-corner.top-right {
-          top: -2px;
-          right: -2px;
-          border-top: 2px solid var(--primary-color, #3b82f6);
-          border-right: 2px solid var(--primary-color, #3b82f6);
-        }
-
-        .investigation-corner.bottom-left {
-          bottom: -2px;
-          left: -2px;
-          border-bottom: 2px solid var(--primary-color, #3b82f6);
-          border-left: 2px solid var(--primary-color, #3b82f6);
-        }
-
-        .investigation-corner.bottom-right {
-          bottom: -2px;
-          right: -2px;
-          border-bottom: 2px solid var(--primary-color, #3b82f6);
-          border-right: 2px solid var(--primary-color, #3b82f6);
-        }
-
-        /* Enhanced compact info cells */
-        .info-cell-compact {
-          border-bottom: 1px solid rgba(59, 130, 246, 0.2);
-          padding-bottom: 0.4rem;
-          transition: all 0.2s ease;
-        }
-
-        .info-cell-compact:hover {
-          border-color: var(--primary-color, #3b82f6);
-          background-color: rgba(59, 130, 246, 0.03);
-        }
-
-        .info-cell-highlight-compact {
-          border: 1px solid rgba(59, 130, 246, 0.2);
-          border-bottom: 1px solid rgba(59, 130, 246, 0.3);
-          border-radius: 0.375rem;
-          padding: 0.4rem;
-          background-color: rgba(59, 130, 246, 0.05);
-          transition: all 0.2s ease;
-        }
-
-        .info-cell-highlight-compact:hover {
-          border-color: var(--primary-color, #3b82f6);
-          background-color: rgba(59, 130, 246, 0.08);
-        }
-
-        /* Footer cells */
-        .footer-cell-compact {
-          border-top: 1px solid rgba(59, 130, 246, 0.3);
-          padding-top: 0.4rem;
-          text-align: center;
-        }
-      `}</style>
+        `}
+      </style>
     </>
   );
 }
