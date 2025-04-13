@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Head } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { UserRound, Printer, FileText, Palette, Type, Settings, X, Layout } from 'lucide-react';
+import { UserRound, Printer, FileText, Palette, Type, Settings, X, Layout, Tag, TabletSmartphone } from 'lucide-react';
 import { router } from '@inertiajs/react';
 import axios from 'axios';
 import { QRCodeSVG } from 'qrcode.react';
@@ -116,6 +116,9 @@ export default function CriminalPrint({ criminal }: Props) {
       directorSignature: 'د تحقيق د مدير امضاء'
     }
   });
+
+  // Add state for active tab in the settings modal
+  const [activeTab, setActiveTab] = useState<'colors' | 'typography' | 'layout' | 'labels'>('colors');
 
   useEffect(() => {
     // Create a report record immediately when the component is mounted
@@ -377,199 +380,477 @@ export default function CriminalPrint({ criminal }: Props) {
             </div>
 
             <div className="p-6 space-y-6">
-              {/* Colors Section */}
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <Palette className="mr-2 h-5 w-5 text-primary" />
-                  <h3 className="text-md font-medium">Colors</h3>
-                </div>
+              {/* Tabs for settings categories */}
+              <div className="flex border-b">
+                <button
+                  onClick={() => setActiveTab('colors')}
+                  className={`px-4 py-2 border-b-2 font-medium text-sm ${activeTab === 'colors'
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+                >
+                  <div className="flex items-center">
+                    <Palette className="mr-2 h-4 w-4" />
+                    Colors
+                  </div>
+                </button>
+                <button
+                  onClick={() => setActiveTab('typography')}
+                  className={`px-4 py-2 border-b-2 font-medium text-sm ${activeTab === 'typography'
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+                >
+                  <div className="flex items-center">
+                    <Type className="mr-2 h-4 w-4" />
+                    Typography
+                  </div>
+                </button>
+                <button
+                  onClick={() => setActiveTab('layout')}
+                  className={`px-4 py-2 border-b-2 font-medium text-sm ${activeTab === 'layout'
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+                >
+                  <div className="flex items-center">
+                    <Layout className="mr-2 h-4 w-4" />
+                    Layout
+                  </div>
+                </button>
+                <button
+                  onClick={() => setActiveTab('labels')}
+                  className={`px-4 py-2 border-b-2 font-medium text-sm ${activeTab === 'labels'
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+                >
+                  <div className="flex items-center">
+                    <Tag className="mr-2 h-4 w-4" />
+                    Labels
+                  </div>
+                </button>
+              </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Header Color
-                    </label>
-                    <div className="flex items-center space-x-2">
-                      <div className="relative">
+              {/* Colors Tab */}
+              {activeTab === 'colors' && (
+                <div className="space-y-4">
+                  <div className="flex items-center">
+                    <Palette className="mr-2 h-5 w-5 text-primary" />
+                    <h3 className="text-md font-medium">Colors</h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Header Color
+                      </label>
+                      <div className="flex items-center space-x-2">
+                        <div className="relative">
+                          <input
+                            type="color"
+                            id="headerColorPicker"
+                            value={printSettings.headerColor}
+                            onChange={(e) => handleSettingsChange('headerColor', e.target.value)}
+                            className="sr-only"
+                          />
+                          <label
+                            htmlFor="headerColorPicker"
+                            className="block h-10 w-10 rounded border border-gray-300 cursor-pointer"
+                            style={{ backgroundColor: printSettings.headerColor }}
+                          />
+                        </div>
                         <input
-                          type="color"
-                          id="headerColorPicker"
+                          type="text"
                           value={printSettings.headerColor}
                           onChange={(e) => handleSettingsChange('headerColor', e.target.value)}
-                          className="sr-only"
-                        />
-                        <label
-                          htmlFor="headerColorPicker"
-                          className="block h-10 w-10 rounded border border-gray-300 cursor-pointer"
-                          style={{ backgroundColor: printSettings.headerColor }}
+                          className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm"
                         />
                       </div>
-                      <input
-                        type="text"
-                        value={printSettings.headerColor}
-                        onChange={(e) => handleSettingsChange('headerColor', e.target.value)}
-                        className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm"
-                      />
                     </div>
-                  </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Text Color
-                    </label>
-                    <div className="flex items-center space-x-2">
-                      <div className="relative">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Text Color
+                      </label>
+                      <div className="flex items-center space-x-2">
+                        <div className="relative">
+                          <input
+                            type="color"
+                            id="textColorPicker"
+                            value={printSettings.textColor}
+                            onChange={(e) => handleSettingsChange('textColor', e.target.value)}
+                            className="sr-only"
+                          />
+                          <label
+                            htmlFor="textColorPicker"
+                            className="block h-10 w-10 rounded border border-gray-300 cursor-pointer"
+                            style={{ backgroundColor: printSettings.textColor }}
+                          />
+                        </div>
                         <input
-                          type="color"
-                          id="textColorPicker"
+                          type="text"
                           value={printSettings.textColor}
                           onChange={(e) => handleSettingsChange('textColor', e.target.value)}
-                          className="sr-only"
-                        />
-                        <label
-                          htmlFor="textColorPicker"
-                          className="block h-10 w-10 rounded border border-gray-300 cursor-pointer"
-                          style={{ backgroundColor: printSettings.textColor }}
+                          className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm"
                         />
                       </div>
-                      <input
-                        type="text"
-                        value={printSettings.textColor}
-                        onChange={(e) => handleSettingsChange('textColor', e.target.value)}
-                        className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm"
-                      />
                     </div>
-                  </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Accent Color
-                    </label>
-                    <div className="flex items-center space-x-2">
-                      <div className="relative">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Accent Color
+                      </label>
+                      <div className="flex items-center space-x-2">
+                        <div className="relative">
+                          <input
+                            type="color"
+                            id="accentColorPicker"
+                            value={printSettings.accentColor}
+                            onChange={(e) => handleSettingsChange('accentColor', e.target.value)}
+                            className="sr-only"
+                          />
+                          <label
+                            htmlFor="accentColorPicker"
+                            className="block h-10 w-10 rounded border border-gray-300 cursor-pointer"
+                            style={{ backgroundColor: printSettings.accentColor }}
+                          />
+                        </div>
                         <input
-                          type="color"
-                          id="accentColorPicker"
+                          type="text"
                           value={printSettings.accentColor}
                           onChange={(e) => handleSettingsChange('accentColor', e.target.value)}
-                          className="sr-only"
-                        />
-                        <label
-                          htmlFor="accentColorPicker"
-                          className="block h-10 w-10 rounded border border-gray-300 cursor-pointer"
-                          style={{ backgroundColor: printSettings.accentColor }}
+                          className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm"
                         />
                       </div>
-                      <input
-                        type="text"
-                        value={printSettings.accentColor}
-                        onChange={(e) => handleSettingsChange('accentColor', e.target.value)}
-                        className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm"
-                      />
                     </div>
                   </div>
                 </div>
-              </div>
+              )}
 
-              {/* Typography Section */}
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <Type className="mr-2 h-5 w-5 text-primary" />
-                  <h3 className="text-md font-medium">Typography</h3>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Font Family
-                    </label>
-                    <select
-                      value={printSettings.fontFamily}
-                      onChange={(e) => handleSettingsChange('fontFamily', e.target.value)}
-                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                    >
-                      <option value="Amiri, Traditional Arabic, Arial, sans-serif">Amiri (Default)</option>
-                      <option value="Traditional Arabic, Arial, sans-serif">Traditional Arabic</option>
-                      <option value="Arial, sans-serif">Arial</option>
-                      <option value="Calibri, sans-serif">Calibri</option>
-                      <option value="Tahoma, sans-serif">Tahoma</option>
-                    </select>
+              {/* Typography Tab */}
+              {activeTab === 'typography' && (
+                <div className="space-y-4">
+                  <div className="flex items-center">
+                    <Type className="mr-2 h-5 w-5 text-primary" />
+                    <h3 className="text-md font-medium">Typography</h3>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Font Size
-                    </label>
-                    <div className="flex items-center">
-                      <input
-                        type="range"
-                        min="10"
-                        max="16"
-                        value={printSettings.fontSize}
-                        onChange={(e) => handleSettingsChange('fontSize', parseInt(e.target.value))}
-                        className="flex-1"
-                      />
-                      <span className="ml-2 text-sm w-10 text-center">
-                        {printSettings.fontSize}pt
-                      </span>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Font Family
+                      </label>
+                      <select
+                        value={printSettings.fontFamily}
+                        onChange={(e) => handleSettingsChange('fontFamily', e.target.value)}
+                        className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                      >
+                        <option value="Amiri, Traditional Arabic, Arial, sans-serif">Amiri (Default)</option>
+                        <option value="Traditional Arabic, Arial, sans-serif">Traditional Arabic</option>
+                        <option value="Arial, sans-serif">Arial</option>
+                        <option value="Calibri, sans-serif">Calibri</option>
+                        <option value="Tahoma, sans-serif">Tahoma</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Font Size
+                      </label>
+                      <div className="flex items-center">
+                        <input
+                          type="range"
+                          min="10"
+                          max="16"
+                          value={printSettings.fontSize}
+                          onChange={(e) => handleSettingsChange('fontSize', parseInt(e.target.value))}
+                          className="flex-1"
+                        />
+                        <span className="ml-2 text-sm w-10 text-center">
+                          {printSettings.fontSize}pt
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              )}
 
-              {/* Layout Section */}
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <Layout className="mr-2 h-5 w-5 text-primary" />
-                  <h3 className="text-md font-medium">Layout</h3>
+              {/* Layout Tab */}
+              {activeTab === 'layout' && (
+                <div className="space-y-4">
+                  <div className="flex items-center">
+                    <Layout className="mr-2 h-5 w-5 text-primary" />
+                    <h3 className="text-md font-medium">Layout</h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Page Size
+                      </label>
+                      <select
+                        value={printSettings.pageSize}
+                        onChange={(e) => handleSettingsChange('pageSize', e.target.value)}
+                        className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                      >
+                        <option value="a4">A4</option>
+                        <option value="letter">Letter</option>
+                        <option value="legal">Legal</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Orientation
+                      </label>
+                      <select
+                        value={printSettings.orientation}
+                        onChange={(e) => handleSettingsChange('orientation', e.target.value)}
+                        className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                      >
+                        <option value="portrait">Portrait</option>
+                        <option value="landscape">Landscape</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Margins
+                      </label>
+                      <select
+                        value={printSettings.margins}
+                        onChange={(e) => handleSettingsChange('margins', e.target.value)}
+                        className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                      >
+                        <option value="normal">Normal</option>
+                        <option value="narrow">Narrow</option>
+                        <option value="wide">Wide</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
+              )}
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Page Size
-                    </label>
-                    <select
-                      value={printSettings.pageSize}
-                      onChange={(e) => handleSettingsChange('pageSize', e.target.value)}
-                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                    >
-                      <option value="a4">A4</option>
-                      <option value="letter">Letter</option>
-                      <option value="legal">Legal</option>
-                    </select>
+              {/* Labels Tab */}
+              {activeTab === 'labels' && (
+                <div className="space-y-4">
+                  <div className="flex items-center">
+                    <Tag className="mr-2 h-5 w-5 text-primary" />
+                    <h3 className="text-md font-medium">Labels</h3>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Orientation
-                    </label>
-                    <select
-                      value={printSettings.orientation}
-                      onChange={(e) => handleSettingsChange('orientation', e.target.value)}
-                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                    >
-                      <option value="portrait">Portrait</option>
-                      <option value="landscape">Landscape</option>
-                    </select>
-                  </div>
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="border rounded-lg p-4 bg-gray-50">
+                      <h4 className="font-medium text-gray-700 mb-2">Report Header</h4>
+                      <div className="grid grid-cols-1 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Report Title
+                          </label>
+                          <input
+                            type="text"
+                            value={printSettings.labels.reportTitle}
+                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, reportTitle: e.target.value})}
+                            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                          />
+                        </div>
+                      </div>
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Margins
-                    </label>
-                    <select
-                      value={printSettings.margins}
-                      onChange={(e) => handleSettingsChange('margins', e.target.value)}
-                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                    >
-                      <option value="normal">Normal</option>
-                      <option value="narrow">Narrow</option>
-                      <option value="wide">Wide</option>
-                    </select>
+                    <div className="border rounded-lg p-4 bg-gray-50">
+                      <h4 className="font-medium text-gray-700 mb-2">Personal Information</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Name Label
+                          </label>
+                          <input
+                            type="text"
+                            value={printSettings.labels.name}
+                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, name: e.target.value})}
+                            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Father's Name
+                          </label>
+                          <input
+                            type="text"
+                            value={printSettings.labels.fatherName}
+                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, fatherName: e.target.value})}
+                            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Grandfather's Name
+                          </label>
+                          <input
+                            type="text"
+                            value={printSettings.labels.grandfatherName}
+                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, grandfatherName: e.target.value})}
+                            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            ID Card Number
+                          </label>
+                          <input
+                            type="text"
+                            value={printSettings.labels.idCard}
+                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, idCard: e.target.value})}
+                            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Phone Number
+                          </label>
+                          <input
+                            type="text"
+                            value={printSettings.labels.phoneNumber}
+                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, phoneNumber: e.target.value})}
+                            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="border rounded-lg p-4 bg-gray-50">
+                      <h4 className="font-medium text-gray-700 mb-2">Residence Information</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Original Residence
+                          </label>
+                          <input
+                            type="text"
+                            value={printSettings.labels.originalResidence}
+                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, originalResidence: e.target.value})}
+                            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Current Residence
+                          </label>
+                          <input
+                            type="text"
+                            value={printSettings.labels.currentResidence}
+                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, currentResidence: e.target.value})}
+                            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="border rounded-lg p-4 bg-gray-50">
+                      <h4 className="font-medium text-gray-700 mb-2">Crime Information</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Crime Type
+                          </label>
+                          <input
+                            type="text"
+                            value={printSettings.labels.crimeType}
+                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, crimeType: e.target.value})}
+                            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Arrest Date
+                          </label>
+                          <input
+                            type="text"
+                            value={printSettings.labels.arrestDate}
+                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, arrestDate: e.target.value})}
+                            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Arrest Location
+                          </label>
+                          <input
+                            type="text"
+                            value={printSettings.labels.arrestLocation}
+                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, arrestLocation: e.target.value})}
+                            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="border rounded-lg p-4 bg-gray-50">
+                      <h4 className="font-medium text-gray-700 mb-2">Investigation Details</h4>
+                      <div className="grid grid-cols-1 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Investigation Title
+                          </label>
+                          <input
+                            type="text"
+                            value={printSettings.labels.investigationTitle}
+                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, investigationTitle: e.target.value})}
+                            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Final Verdict
+                          </label>
+                          <input
+                            type="text"
+                            value={printSettings.labels.finalVerdict}
+                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, finalVerdict: e.target.value})}
+                            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Notes Label
+                          </label>
+                          <input
+                            type="text"
+                            value={printSettings.labels.notes}
+                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, notes: e.target.value})}
+                            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="border rounded-lg p-4 bg-gray-50">
+                      <h4 className="font-medium text-gray-700 mb-2">Footer Information</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Investigator Name
+                          </label>
+                          <input
+                            type="text"
+                            value={printSettings.labels.investigator}
+                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, investigator: e.target.value})}
+                            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Director Signature
+                          </label>
+                          <input
+                            type="text"
+                            value={printSettings.labels.directorSignature}
+                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, directorSignature: e.target.value})}
+                            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <div className="border-t px-4 py-3 flex justify-end space-x-3">
