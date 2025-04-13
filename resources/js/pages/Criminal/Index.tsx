@@ -27,6 +27,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { format } from 'date-fns';
+import { useTranslation } from '@/lib/i18n/translate';
 
 interface Criminal {
   id: number;
@@ -147,6 +148,7 @@ export default function CriminalIndex({
   departments = [],
   filters
 }: Props) {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState(filters.search);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [criminalToDelete, setCriminalToDelete] = useState<Criminal | null>(null);
@@ -230,19 +232,19 @@ export default function CriminalIndex({
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title="Criminal Records" />
+      <Head title={t('criminal.page_title')} />
 
       <div className="container px-0 py-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">Criminal Records</h2>
-            <p className="text-muted-foreground mt-1">Manage and track criminal records</p>
+            <h2 className="text-3xl font-bold tracking-tight">{t('criminal.page_title')}</h2>
+            <p className="text-muted-foreground mt-1">{t('criminal.page_description')}</p>
           </div>
           <div className="flex items-center gap-2">
             <Button asChild size="default" className="shadow-sm">
               <Link href={route('criminals.create')}>
                 <Plus className="mr-2 h-4 w-4" />
-                Add Criminal
+                {t('criminal.add_button')}
               </Link>
             </Button>
           </div>
@@ -250,7 +252,7 @@ export default function CriminalIndex({
 
         <Card className="shadow-sm">
           <CardHeader className="py-4">
-            <CardTitle className="text-base font-medium">Search and Filters</CardTitle>
+            <CardTitle className="text-base font-medium">{t('criminal.search_filters')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col gap-4 md:flex-row">
@@ -258,7 +260,7 @@ export default function CriminalIndex({
               <div className="flex-1">
                 <form onSubmit={handleSearch} className="flex items-center gap-2">
                   <Input
-                    placeholder="Search by name, number, crime type..."
+                    placeholder={t('criminal.search_placeholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full"
@@ -273,10 +275,10 @@ export default function CriminalIndex({
               <div className="w-full md:w-56">
                 <Select value={selectedDepartment} onValueChange={handleDepartmentChange}>
                   <SelectTrigger className="shadow-sm">
-                    <SelectValue placeholder="Filter by Department" />
+                    <SelectValue placeholder={t('criminal.filter_by_department')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="_all">All Departments</SelectItem>
+                    <SelectItem value="_all">{t('criminal.all_departments')}</SelectItem>
                     {departments.map((department) => (
                       <SelectItem key={department.id} value={department.id.toString()}>
                         {department.name}
@@ -290,12 +292,12 @@ export default function CriminalIndex({
               <div className="w-full md:w-44">
                 <Select value={filters.sort} onValueChange={handleSortChange}>
                   <SelectTrigger className="shadow-sm">
-                    <SelectValue placeholder="Sort by" />
+                    <SelectValue placeholder={t('criminal.sort_by')} />
                   </SelectTrigger>
                   <SelectContent>
                     {sortOptions.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
-                        {option.label}
+                        {t(`criminal.sort_options.${option.value}`)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -354,12 +356,12 @@ export default function CriminalIndex({
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/50">
-                    <TableHead>Name</TableHead>
-                    <TableHead>Number</TableHead>
-                    <TableHead>Crime Type</TableHead>
-                    <TableHead>Department</TableHead>
-                    <TableHead>Arrest Date</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead>{t('criminal.table.name')}</TableHead>
+                    <TableHead>{t('criminal.table.number')}</TableHead>
+                    <TableHead>{t('criminal.table.crime_type')}</TableHead>
+                    <TableHead>{t('criminal.table.department')}</TableHead>
+                    <TableHead>{t('criminal.table.arrest_date')}</TableHead>
+                    <TableHead>{t('criminal.table.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -367,13 +369,13 @@ export default function CriminalIndex({
                     criminals.data.map((criminal) => (
                       <TableRow key={criminal.id} className="hover:bg-muted/30">
                         <TableCell className="font-medium">{criminal.name}</TableCell>
-                        <TableCell>{criminal.number || 'N/A'}</TableCell>
-                        <TableCell>{criminal.crime_type || 'N/A'}</TableCell>
+                        <TableCell>{criminal.number || t('criminal.na')}</TableCell>
+                        <TableCell>{criminal.crime_type || t('criminal.na')}</TableCell>
                         <TableCell>
                           {criminal.department ? (
                             <Badge variant="outline" className="bg-background">{criminal.department.name}</Badge>
                           ) : (
-                            'N/A'
+                            t('criminal.na')
                           )}
                         </TableCell>
                         <TableCell>
@@ -423,7 +425,7 @@ export default function CriminalIndex({
                   ) : (
                     <TableRow>
                       <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
-                        No criminal records found.
+                        {t('criminal.no_records')}
                       </TableCell>
                     </TableRow>
                   )}
@@ -440,8 +442,8 @@ export default function CriminalIndex({
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => goToPage(1)}
-                disabled={criminals.meta.current_page === 1}
+                onClick={() => criminals.meta && goToPage(1)}
+                disabled={!criminals.meta || criminals.meta.current_page === 1}
                 className="shadow-sm h-8 w-8"
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -450,20 +452,23 @@ export default function CriminalIndex({
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => goToPage(criminals.meta.current_page - 1)}
-                disabled={criminals.meta.current_page === 1}
+                onClick={() => criminals.meta && goToPage(criminals.meta.current_page - 1)}
+                disabled={!criminals.meta || criminals.meta.current_page === 1}
                 className="shadow-sm h-8 w-8"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               <span className="px-2 text-sm">
-                Page {criminals.meta.current_page} of {criminals.meta.last_page}
+                {t('criminal.pagination', {
+                  current: criminals.meta?.current_page.toString() || '1',
+                  total: criminals.meta?.last_page.toString() || '1'
+                })}
               </span>
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => goToPage(criminals.meta.current_page + 1)}
-                disabled={criminals.meta.current_page === criminals.meta.last_page}
+                onClick={() => criminals.meta && goToPage(criminals.meta.current_page + 1)}
+                disabled={!criminals.meta || criminals.meta.current_page === criminals.meta.last_page}
                 className="shadow-sm h-8 w-8"
               >
                 <ChevronRight className="h-4 w-4" />
@@ -471,8 +476,8 @@ export default function CriminalIndex({
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => goToPage(criminals.meta.last_page)}
-                disabled={criminals.meta.current_page === criminals.meta.last_page}
+                onClick={() => criminals.meta && goToPage(criminals.meta.last_page)}
+                disabled={!criminals.meta || criminals.meta.current_page === criminals.meta.last_page}
                 className="shadow-sm h-8 w-8"
               >
                 <ChevronRight className="h-4 w-4" />
@@ -487,16 +492,15 @@ export default function CriminalIndex({
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent className="max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl">Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle className="text-xl">{t('criminal.delete_dialog.title')}</AlertDialogTitle>
             <AlertDialogDescription className="mt-2">
-              This will permanently delete the criminal record for{' '}
-              <span className="font-semibold">{criminalToDelete?.name}</span>. This action cannot be undone.
+              {t('criminal.delete_dialog.description', { name: criminalToDelete?.name || '' })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-6">
-            <AlertDialogCancel className="shadow-sm">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="shadow-sm">{t('criminal.delete_dialog.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground shadow-sm">
-              Delete
+              {t('criminal.delete_dialog.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
