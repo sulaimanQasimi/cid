@@ -100,6 +100,12 @@ export default function TranslationsIndex({
                 Export
               </Link>
             </Button>
+            <Button variant="outline" asChild>
+              <Link href={route('translations.export-json')}>
+                <Upload className="mr-2 h-4 w-4" />
+                Export to JSON
+              </Link>
+            </Button>
             <Button asChild>
               <Link href={route('translations.create')}>
                 <Plus className="mr-2 h-4 w-4" />

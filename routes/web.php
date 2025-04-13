@@ -25,6 +25,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('translations/import', [App\Http\Controllers\Admin\TranslationController::class, 'import'])->name('translations.import');
     Route::get('translations/export', [App\Http\Controllers\Admin\TranslationController::class, 'export'])->name('translations.export');
 
+    // Add route for exporting translations to JSON files
+    Route::get('translations/export-json', [App\Http\Controllers\Admin\TranslationController::class, 'exportToJson'])->name('translations.export-json');
+
     // Language test page
     Route::get('language-test', function () {
         return Inertia::render('language-test');

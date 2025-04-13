@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Language;
 use App\Models\Translation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class TranslationController extends Controller
@@ -80,6 +81,47 @@ class TranslationController extends Controller
     }
 
     /**
+     * Export translations to JSON files for frontend use
+     *
+     * @param string|null $languageCode
+     * @return bool
+     */
+    protected function exportToJsonFiles(?string $languageCode = null): bool
+    {
+        try {
+            // Get languages to export
+            $query = Language::where('active', true);
+            if ($languageCode) {
+                $query->where('code', $languageCode);
+            }
+            $languages = $query->get();
+
+            foreach ($languages as $language) {
+                // Get all translations for this language
+                $translations = Translation::getTranslations($language->code);
+
+                // Ensure the directory exists
+                $dir = resource_path('js/lib/i18n/translations');
+                if (!file_exists($dir)) {
+                    mkdir($dir, 0755, true);
+                }
+
+                // Write the JSON file
+                $filePath = $dir . '/' . $language->code . '.json';
+                file_put_contents(
+                    $filePath,
+                    json_encode($translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+                );
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to export translations: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Store a newly created translation in storage.
      */
     public function store(Request $request)
@@ -102,15 +144,21 @@ class TranslationController extends Controller
                 ->with('error', 'Translation key already exists in this language and group.');
         }
 
-        Translation::create([
+        $translation = Translation::create([
             'language_id' => $request->input('language_id'),
             'key' => $request->input('key'),
             'value' => $request->input('value'),
             'group' => $request->input('group', 'general'),
         ]);
 
+        // Get the language code
+        $language = Language::find($request->input('language_id'));
+
+        // Export translations to JSON files
+        $this->exportToJsonFiles($language->code);
+
         return redirect()->route('translations.index', [
-            'language' => Language::find($request->input('language_id'))->code,
+            'language' => $language->code,
             'group' => $request->input('group', 'general'),
         ])->with('success', 'Translation created successfully.');
     }
@@ -165,6 +213,9 @@ class TranslationController extends Controller
             }
         }
 
+        $oldLanguageId = $translation->language_id;
+        $oldLanguage = Language::find($oldLanguageId);
+
         $translation->update([
             'language_id' => $request->input('language_id'),
             'key' => $request->input('key'),
@@ -172,8 +223,17 @@ class TranslationController extends Controller
             'group' => $request->input('group', 'general'),
         ]);
 
+        // Get the language code
+        $newLanguage = Language::find($request->input('language_id'));
+
+        // Export translations to JSON files - both languages if they differ
+        if ($oldLanguage->code !== $newLanguage->code) {
+            $this->exportToJsonFiles($oldLanguage->code);
+        }
+        $this->exportToJsonFiles($newLanguage->code);
+
         return redirect()->route('translations.index', [
-            'language' => Language::find($request->input('language_id'))->code,
+            'language' => $newLanguage->code,
             'group' => $request->input('group', 'general'),
         ])->with('success', 'Translation updated successfully.');
     }
@@ -187,6 +247,9 @@ class TranslationController extends Controller
         $group = $translation->group;
 
         $translation->delete();
+
+        // Export translations to JSON files
+        $this->exportToJsonFiles($language->code);
 
         return redirect()->route('translations.index', [
             'language' => $language->code,
@@ -269,5 +332,35 @@ class TranslationController extends Controller
         return response()->json($translations)
             ->header('Content-Disposition', "attachment; filename=$filename")
             ->header('Content-Type', 'application/json');
+    }
+
+    /**
+     * Manually export translations to JSON files for frontend use
+     */
+    public function exportToJson(Request $request)
+    {
+        $languages = Language::where('active', true)->get();
+        $count = 0;
+
+        foreach ($languages as $language) {
+            // Get all translations for this language
+            $translations = Translation::getTranslations($language->code);
+
+            // Ensure the directory exists
+            $dir = resource_path('js/lib/i18n/translations');
+            if (!file_exists($dir)) {
+                mkdir($dir, 0755, true);
+            }
+
+            // Write the JSON file
+            $filePath = $dir . '/' . $language->code . '.json';
+            file_put_contents(
+                $filePath,
+                json_encode($translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+            );
+            $count++;
+        }
+
+        return redirect()->back()->with('success', "Exported translations for {$count} languages to JSON files.");
     }
 }
