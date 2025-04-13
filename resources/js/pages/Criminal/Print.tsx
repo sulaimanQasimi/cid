@@ -57,6 +57,24 @@ interface PrintSettings {
   pageSize: 'a4' | 'letter' | 'legal';
   orientation: 'portrait' | 'landscape';
   margins: 'normal' | 'narrow' | 'wide';
+  labels: {
+    reportTitle: string;
+    name: string;
+    fatherName: string;
+    grandfatherName: string;
+    idCard: string;
+    phoneNumber: string;
+    originalResidence: string;
+    currentResidence: string;
+    crimeType: string;
+    arrestDate: string;
+    arrestLocation: string;
+    investigationTitle: string;
+    finalVerdict: string;
+    notes: string;
+    investigator: string;
+    directorSignature: string;
+  };
 }
 
 interface Props {
@@ -78,7 +96,25 @@ export default function CriminalPrint({ criminal }: Props) {
     showDate: true,
     pageSize: 'a4',
     orientation: 'portrait',
-    margins: 'normal'
+    margins: 'normal',
+    labels: {
+      reportTitle: 'د تحقيق راپور',
+      name: 'د مجرم پېژندنه: نوم',
+      fatherName: 'د پلار نوم:',
+      grandfatherName: 'د نيکه نوم:',
+      idCard: 'د تذکرې شماره:',
+      phoneNumber: 'د تليفون شماره:',
+      originalResidence: 'اصلي سكونت: ولایت، ولسوالى، كلى',
+      currentResidence: 'فعلي سكونت: ولایت، ولسوالى، كلى',
+      crimeType: 'د جرم نوعيت:',
+      arrestDate: 'د نيولو نېټه:',
+      arrestLocation: 'د نيولو ځاى:',
+      investigationTitle: 'د تحقيق موضوع او لنډيز:',
+      finalVerdict: 'د نهايي حكم',
+      notes: 'يادداشتونه',
+      investigator: 'د تحقيق كوونكي كس نوم:',
+      directorSignature: 'د تحقيق د مدير امضاء'
+    }
   });
 
   useEffect(() => {
@@ -614,7 +650,7 @@ export default function CriminalPrint({ criminal }: Props) {
                   </div>
                 )}
               </div>
-              <h1 className="text-2xl font-bold" style={{ color: printSettings.accentColor }}>د مجرمينو د تحقيق راپور</h1>
+              <h1 className="text-2xl font-bold" style={{ color: printSettings.accentColor }}>{printSettings.labels.reportTitle}</h1>
               <div className="w-24 text-center">
                 <div className="text-xs font-semibold text-neutral-500 border rounded-md py-1 px-2"
                      style={{ borderColor: `${printSettings.accentColor}20` }}>
@@ -634,19 +670,19 @@ export default function CriminalPrint({ criminal }: Props) {
               {/* Personal Info Headers */}
               <div className="grid grid-cols-4 gap-2 mb-3 text-right">
                 <div className="info-cell-compact">
-                  <span className="font-bold text-neutral-700 block mb-1 text-sm">د مجرم پېژندنه: نوم</span>
+                  <span className="font-bold text-neutral-700 block mb-1 text-sm">{printSettings.labels.name}</span>
                   <div className="font-semibold">{criminal.name || ''}</div>
                 </div>
                 <div className="info-cell-compact">
-                  <span className="font-bold text-neutral-700 block mb-1 text-sm">د پلار نوم:</span>
+                  <span className="font-bold text-neutral-700 block mb-1 text-sm">{printSettings.labels.fatherName}</span>
                   <div>{criminal.father_name || ''}</div>
                 </div>
                 <div className="info-cell-compact">
-                  <span className="font-bold text-neutral-700 block mb-1 text-sm">د نيکه نوم:</span>
+                  <span className="font-bold text-neutral-700 block mb-1 text-sm">{printSettings.labels.grandfatherName}</span>
                   <div>{criminal.grandfather_name || ''}</div>
                 </div>
                 <div className="info-cell-compact">
-                  <span className="font-bold text-neutral-700 block mb-1 text-sm">د تذکرې شماره:</span>
+                  <span className="font-bold text-neutral-700 block mb-1 text-sm">{printSettings.labels.idCard}</span>
                   <div className="font-mono">{criminal.id_card_number || ''}</div>
                 </div>
               </div>
@@ -654,7 +690,7 @@ export default function CriminalPrint({ criminal }: Props) {
               {/* Phone Number */}
               <div className="grid grid-cols-1 gap-2 mb-3 text-right">
                 <div className="info-cell-compact">
-                  <span className="font-bold text-neutral-700 block mb-1 text-sm">د تليفون شماره:</span>
+                  <span className="font-bold text-neutral-700 block mb-1 text-sm">{printSettings.labels.phoneNumber}</span>
                   <div className="font-mono">{criminal.phone_number || ''}</div>
                 </div>
               </div>
@@ -707,7 +743,7 @@ export default function CriminalPrint({ criminal }: Props) {
           {/* Second Row - Original Residence */}
           <div className="grid grid-cols-1 gap-2 mb-3 text-right">
             <div className="info-cell-compact">
-              <span className="font-bold text-neutral-700 block mb-1 text-sm">اصلي سكونت: ولایت، ولسوالى، كلى</span>
+              <span className="font-bold text-neutral-700 block mb-1 text-sm">{printSettings.labels.originalResidence}</span>
               <div>{criminal.original_residence || ''}</div>
             </div>
           </div>
@@ -715,7 +751,7 @@ export default function CriminalPrint({ criminal }: Props) {
           {/* Third Row - Current Residence */}
           <div className="grid grid-cols-1 gap-2 mb-3 text-right">
             <div className="info-cell-compact">
-              <span className="font-bold text-neutral-700 block mb-1 text-sm">فعلي سكونت: ولایت، ولسوالى، كلى</span>
+              <span className="font-bold text-neutral-700 block mb-1 text-sm">{printSettings.labels.currentResidence}</span>
               <div>{criminal.current_residence || ''}</div>
             </div>
           </div>
@@ -723,23 +759,23 @@ export default function CriminalPrint({ criminal }: Props) {
           {/* Fourth Row - Crime Type and Locations */}
           <div className="grid grid-cols-3 gap-3 mb-4 text-right">
             <div className="info-cell-highlight-compact">
-              <span className="font-bold text-neutral-700 block mb-1 text-sm">د نيولو نېټه:</span>
+              <span className="font-bold text-neutral-700 block mb-1 text-sm">{printSettings.labels.crimeType}</span>
+              <div>{criminal.crime_type || ''}</div>
+            </div>
+            <div className="info-cell-highlight-compact">
+              <span className="font-bold text-neutral-700 block mb-1 text-sm">{printSettings.labels.arrestDate}</span>
               <div>{formatDate(criminal.arrest_date)}</div>
             </div>
             <div className="info-cell-highlight-compact">
-              <span className="font-bold text-neutral-700 block mb-1 text-sm">د نيولو ځاى:</span>
+              <span className="font-bold text-neutral-700 block mb-1 text-sm">{printSettings.labels.arrestLocation}</span>
               <div>{criminal.arrest_location || ''}</div>
-            </div>
-            <div className="info-cell-highlight-compact">
-              <span className="font-bold text-neutral-700 block mb-1 text-sm">د جرم نوعيت:</span>
-              <div>{criminal.crime_type || ''}</div>
             </div>
           </div>
 
           {/* Investigation Section */}
           <div className="mb-4">
             <div className="text-right mb-2 flex items-center gap-2 justify-end">
-              <span className="font-bold text-base text-primary">د تحقيق موضوع او لنډيز:</span>
+              <span className="font-bold text-base text-primary">{printSettings.labels.investigationTitle}</span>
               <div className="w-1/4 h-px bg-primary/30"></div>
             </div>
 
@@ -754,28 +790,28 @@ export default function CriminalPrint({ criminal }: Props) {
               </div>
 
               <div className="text-right mb-3">
-                <span className="font-bold text-neutral-700 text-sm">نېټه: {formatDate(criminal.arrest_date) || '   /   /   '}</span>
+                <span className="font-bold text-neutral-700 text-sm">{printSettings.labels.arrestDate}: {formatDate(criminal.arrest_date) || '   /   /   '}</span>
               </div>
 
               {/* Content Area for Investigation */}
               <div className="flex-grow">
                 {criminal.final_verdict && (
                   <div className="text-right mb-3">
-                    <h3 className="font-bold text-base mb-1 text-primary">نهايي حكم</h3>
+                    <h3 className="font-bold text-base mb-1 text-primary">{printSettings.labels.finalVerdict}</h3>
                     <p className="whitespace-pre-wrap text-neutral-800 leading-normal text-sm">{criminal.final_verdict}</p>
                   </div>
                 )}
 
                 {criminal.notes && (
                   <div className="text-right mt-3">
-                    <h3 className="font-bold text-base mb-1 text-primary">يادداشتونه</h3>
+                    <h3 className="font-bold text-base mb-1 text-primary">{printSettings.labels.notes}</h3>
                     <p className="whitespace-pre-wrap text-neutral-800 leading-normal text-sm">{criminal.notes}</p>
                   </div>
                 )}
 
                 {!criminal.final_verdict && !criminal.notes && (
                   <div className="h-28 border-dashed border-2 border-gray-200 rounded-lg p-2 flex items-center justify-center text-gray-400">
-                    <p className="text-sm">د معلوماتو لپاره ځای</p>
+                    <p className="text-sm">{printSettings.labels.notes}</p>
                   </div>
                 )}
               </div>
@@ -785,11 +821,11 @@ export default function CriminalPrint({ criminal }: Props) {
           {/* Footer Section */}
           <div className="grid grid-cols-2 gap-4 mt-4">
             <div className="footer-cell-compact">
-              <span className="font-bold text-neutral-700 block mb-1 text-sm">د تحقيق كوونكي كس نوم:</span>
+              <span className="font-bold text-neutral-700 block mb-1 text-sm">{printSettings.labels.investigator}</span>
               <span>{criminal.creator?.name || ''}</span>
             </div>
             <div className="footer-cell-compact">
-              <span className="font-bold text-neutral-700 block mb-1 text-sm">د تحقيق د مدير امضاء</span>
+              <span className="font-bold text-neutral-700 block mb-1 text-sm">{printSettings.labels.directorSignature}</span>
               <div className="h-10 border-dashed border-2 border-gray-200 rounded-lg mt-1 flex items-center justify-center text-gray-400 text-xs">
                 د امضاء ځای
               </div>
