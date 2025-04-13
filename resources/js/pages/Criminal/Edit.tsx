@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Camera, Calendar, UserRound, FileText, BookText } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/lib/i18n/translate';
 
 interface Criminal {
   id: number;
@@ -58,6 +59,7 @@ interface Props {
 }
 
 export default function CriminalEdit({ criminal, departments = [] }: Props) {
+  const { t } = useTranslation();
   // Content tabs state
   const [activeTab, setActiveTab] = useState<string>('personal');
   const [photoPreview, setPhotoPreview] = useState<string | null>(
@@ -88,7 +90,7 @@ export default function CriminalEdit({ criminal, departments = [] }: Props) {
   // Generate breadcrumbs
   const breadcrumbs: BreadcrumbItem[] = [
     {
-      title: 'Criminal Records',
+      title: t('criminal.page_title'),
       href: route('criminals.index'),
     },
     {
@@ -96,7 +98,7 @@ export default function CriminalEdit({ criminal, departments = [] }: Props) {
       href: route('criminals.show', criminal.id),
     },
     {
-      title: 'Edit',
+      title: t('criminal.edit.breadcrumb'),
       href: route('criminals.edit', criminal.id),
     },
   ];
@@ -137,19 +139,19 @@ export default function CriminalEdit({ criminal, departments = [] }: Props) {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title={`Edit Criminal Record: ${criminal.name}`} />
+      <Head title={t('criminal.edit.page_title', { name: criminal.name })} />
       <div className="container px-0 py-6">
         <div className="flex items-center gap-4 mb-8">
           <Button variant="outline" size="sm" asChild className="rounded-full shadow-sm">
             <a href={route('criminals.show', criminal.id)}>
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Details
+              {t('criminal.edit.back_button')}
             </a>
           </Button>
           <div>
-            <h2 className="text-2xl font-bold tracking-tight">Edit Criminal Record</h2>
+            <h2 className="text-2xl font-bold tracking-tight">{t('criminal.edit.title')}</h2>
             <p className="text-sm text-neutral-500">
-              Record created on {formattedCreatedAt}
+              {t('criminal.edit.created_on', { date: formattedCreatedAt })}
             </p>
           </div>
         </div>
@@ -161,10 +163,10 @@ export default function CriminalEdit({ criminal, departments = [] }: Props) {
               <CardHeader className="bg-neutral-50 dark:bg-neutral-900 border-b pb-4">
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Camera className="h-5 w-5 text-neutral-500" />
-                  Photo Identification
+                  {t('criminal.edit.photo.title')}
                 </CardTitle>
                 <CardDescription>
-                  Update or replace the individual's photo
+                  {t('criminal.edit.photo.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6 space-y-6">
@@ -178,14 +180,14 @@ export default function CriminalEdit({ criminal, departments = [] }: Props) {
                     {photoPreview ? (
                       <img
                         src={photoPreview}
-                        alt="Photo preview"
+                        alt={t('criminal.edit.photo.preview_alt')}
                         className="h-full w-full object-cover"
                       />
                     ) : (
                       <div className="flex h-full w-full flex-col items-center justify-center p-6">
                         <Camera className="mb-3 h-12 w-12 text-neutral-400" />
-                        <p className="text-sm text-neutral-500 font-medium">No photo selected</p>
-                        <p className="text-xs text-neutral-400 mt-1">Click the button below to upload</p>
+                        <p className="text-sm text-neutral-500 font-medium">{t('criminal.edit.photo.no_photo')}</p>
+                        <p className="text-xs text-neutral-400 mt-1">{t('criminal.edit.photo.click_to_upload')}</p>
                       </div>
                     )}
                   </div>
@@ -196,7 +198,7 @@ export default function CriminalEdit({ criminal, departments = [] }: Props) {
                       "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
                     )}
                   >
-                    Change Photo
+                    {t('criminal.edit.photo.change_button')}
                   </Label>
                   <Input
                     id="photo"

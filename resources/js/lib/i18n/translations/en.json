@@ -20,6 +20,8 @@
     "common.success": "Success",
     "common.update": "Update",
     "common.yes": "Yes",
+    "criminal.page_title": "Criminals Page",
+    "criminal.table.name": "Name",
     "languages.actions": "Actions",
     "languages.active": "Active",
     "languages.active_description": "Enable this language for users to select",
