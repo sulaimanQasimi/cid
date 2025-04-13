@@ -20,7 +20,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // View report by code
     Route::get('reports/code/{code}', function ($code) {
-        return Inertia::render('Reports/View', [
+        return Inertia::render('Reports/ReportView', [
             'code' => $code
         ]);
     })->name('reports.view_by_code');
