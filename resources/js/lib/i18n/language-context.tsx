@@ -65,6 +65,38 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
       document.documentElement.dir = newLanguage.direction;
       document.documentElement.lang = code;
 
+      // Apply RTL-specific global styles when needed
+      if (newLanguage.direction === 'rtl') {
+        // Add global RTL fixes for the sidebar if not already present
+        if (!document.getElementById('global-rtl-fixes')) {
+          const style = document.createElement('style');
+          style.id = 'global-rtl-fixes';
+          style.textContent = `
+            /* Global RTL fixes */
+            body[dir="rtl"] .group-data-\\[side\\=left\\]\\:-right-4 {
+              right: auto !important;
+              left: -1rem !important;
+            }
+
+            body[dir="rtl"] [data-slot="sidebar"] {
+              right: 0 !important;
+              left: auto !important;
+            }
+
+            body[dir="rtl"] [data-side="right"] {
+              right: 0 !important;
+              left: auto !important;
+            }
+
+            body[dir="rtl"] .peer-data-\\[variant\\=inset\\]\\:ml-0 {
+              margin-left: auto !important;
+              margin-right: 0 !important;
+            }
+          `;
+          document.head.appendChild(style);
+        }
+      }
+
       // Optional: You can reload translations for the new language here
       loadTranslations(code);
     }

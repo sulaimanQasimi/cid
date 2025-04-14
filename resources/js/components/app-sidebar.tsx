@@ -7,6 +7,8 @@ import { Link } from '@inertiajs/react';
 import { BookOpen, Database, Folder, LayoutGrid, List, Tag, Users, Shield, UserCog, Video, Calendar, Building, FileText, QrCode, Globe, TabletSmartphone } from 'lucide-react';
 import AppLogo from './app-logo';
 import { LanguageSwitcher } from './language-switcher';
+import { useLanguage } from '@/lib/i18n/language-context';
+import React from 'react';
 
 const mainNavItems: NavItem[] = [
     {
@@ -128,8 +130,53 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    const { direction } = useLanguage();
+    // Determine sidebar side based on current language direction
+    const sidebarSide = direction === 'rtl' ? 'right' : 'left';
+
+    // Apply RTL-specific styles to force the sidebar positioning
+    React.useEffect(() => {
+        // Force the sidebar position based on direction
+        if (direction === 'rtl') {
+            // Add RTL-specific styles to override default positioning
+            const style = document.createElement('style');
+            style.id = 'rtl-sidebar-styles';
+            style.textContent = `
+                /* RTL Sidebar Positioning */
+                [data-sidebar="sidebar"] {
+                    right: 0 !important;
+                    left: auto !important;
+                }
+                [data-slot="sidebar-inset"] {
+                    margin-right: 0 !important;
+                    margin-left: 0.5rem !important;
+                }
+                .fixed.md\\:flex {
+                    right: 0 !important;
+                    left: auto !important;
+                }
+                [data-side="right"] {
+                    right: 0 !important;
+                    left: auto !important;
+                }
+                .group-data-\\[side\\=left\\]\\:-right-4 {
+                    left: -1rem !important;
+                    right: auto !important;
+                }
+            `;
+            document.head.appendChild(style);
+
+            return () => {
+                const existingStyle = document.getElementById('rtl-sidebar-styles');
+                if (existingStyle) {
+                    existingStyle.remove();
+                }
+            };
+        }
+    }, [direction]);
+
     return (
-        <Sidebar collapsible="icon" variant="inset">
+        <Sidebar collapsible="icon" variant="inset" side={sidebarSide}>
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
