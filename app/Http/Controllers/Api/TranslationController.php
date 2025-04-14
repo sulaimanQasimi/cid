@@ -140,11 +140,14 @@ class TranslationController extends Controller
 
     /**
      * Get all translations for a language
+     *
+     * @param string $languageCode The language code (can be 'code' or 'languageCode' from route)
+     * @return JsonResponse
      */
-    public function getLanguageTranslations(string $code): JsonResponse
+    public function getLanguageTranslations(string $languageCode): JsonResponse
     {
         // Ensure the language exists and is active
-        $language = Language::where('code', $code)
+        $language = Language::where('code', $languageCode)
             ->where('active', true)
             ->first();
 
@@ -155,6 +158,7 @@ class TranslationController extends Controller
             if (!$language) {
                 return response()->json([
                     'message' => 'No active language found',
+                    'translations' => [],
                 ], 404);
             }
         }

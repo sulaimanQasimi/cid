@@ -28,7 +28,7 @@ Route::put('languages/{id}', [LanguageController::class, 'update']);
 Route::delete('languages/{id}', [LanguageController::class, 'destroy']);
 
 // Translation management
-Route::get('translations/lang/{code}', [TranslationController::class, 'getLanguageTranslations']);
+Route::get('translations/lang/{languageCode}', [TranslationController::class, 'getLanguageTranslations']);
 Route::post('translations/import', [TranslationController::class, 'import']);
 Route::post('translations/export', [TranslationController::class, 'export']);
 

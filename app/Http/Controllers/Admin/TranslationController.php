@@ -363,4 +363,31 @@ class TranslationController extends Controller
 
         return redirect()->back()->with('success', "Exported translations for {$count} languages to JSON files.");
     }
+
+    /**
+     * Display a listing of all translations for a specific language.
+     *
+     * @param string $languageCode
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function show(string $languageCode)
+    {
+        // Get the language
+        $language = Language::where('code', $languageCode)->first();
+
+        if (!$language) {
+            return response()->json([
+                'error' => 'Language not found',
+                'translations' => [],
+            ], 404);
+        }
+
+        // Get all translations for this language
+        $translations = Translation::getTranslations($languageCode);
+
+        return response()->json([
+            'language' => $language,
+            'translations' => $translations,
+        ]);
+    }
 }
