@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Pagination } from '@/components/pagination';
 import { PageHeader } from '@/components/page-header';
-import { Plus, Edit, Eye, Trash, MapPin } from 'lucide-react';
+import { Plus, Edit, Eye, Trash, MapPin, Loader2 } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import {
@@ -81,7 +81,7 @@ export default function Index({ districts, provinces }: IndexProps) {
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [districtToDelete, setDistrictToDelete] = useState<DistrictData | null>(null);
-  const [selectedProvinceId, setSelectedProvinceId] = useState<string>('');
+  const [selectedProvinceId, setSelectedProvinceId] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -117,7 +117,7 @@ export default function Index({ districts, provinces }: IndexProps) {
       district.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       district.code.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesProvince = selectedProvinceId === '' ||
+    const matchesProvince = selectedProvinceId === 'all' ||
       district.province_id.toString() === selectedProvinceId;
 
     return matchesSearch && matchesProvince;
@@ -168,7 +168,7 @@ export default function Index({ districts, provinces }: IndexProps) {
                     <SelectValue placeholder="All Provinces" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Provinces</SelectItem>
+                    <SelectItem value="all">All Provinces</SelectItem>
                     {provinces.map(province => (
                       <SelectItem key={province.id} value={province.id.toString()}>
                         {province.name}
@@ -307,13 +307,20 @@ export default function Index({ districts, provinces }: IndexProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               disabled={processing || isDeleting}
             >
-              Delete
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                'Delete'
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
