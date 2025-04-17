@@ -64,4 +64,12 @@ class IncidentReport extends Model
     {
         return $this->belongsTo(User::class, 'approved_by');
     }
+
+    /**
+     * Get the statistical data for this report.
+     */
+    public function reportStats(): HasMany
+    {
+        return $this->hasMany(ReportStat::class);
+    }
 }

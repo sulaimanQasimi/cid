@@ -58,6 +58,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('stat-category-items', \App\Http\Controllers\Admin\StatCategoryItemController::class);
     Route::post('stat-category-items/reorder', [\App\Http\Controllers\Admin\StatCategoryItemController::class, 'reorder'])
         ->name('stat-category-items.reorder');
+
+    // Report Statistics routes
+    Route::resource('report-stats', \App\Http\Controllers\ReportStatController::class)->only(['store', 'update', 'destroy']);
+    Route::post('incident-reports/{incidentReport}/stats', [\App\Http\Controllers\ReportStatController::class, 'batchUpdate'])
+        ->name('incident-reports.stats.batch-update');
 });
 
 require __DIR__.'/settings.php';
