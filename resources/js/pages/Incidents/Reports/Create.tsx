@@ -14,6 +14,14 @@ import InputError from '@/components/input-error';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useState } from 'react';
 
+interface StatCategory {
+  id: number;
+  name: string;
+  label: string;
+  color: string;
+  status: string;
+}
+
 interface StatCategoryItem {
   id: number;
   name: string;
@@ -23,12 +31,14 @@ interface StatCategoryItem {
     id: number;
     name: string;
     label: string;
+    color: string;
   };
 }
 
 interface CreateProps {
   securityLevels: string[];
   statItems: StatCategoryItem[];
+  statCategories: StatCategory[];
 }
 
 type ReportFormData = {
@@ -62,7 +72,7 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ];
 
-export default function Create({ securityLevels, statItems }: CreateProps) {
+export default function Create({ securityLevels, statItems, statCategories }: CreateProps) {
   const { data, setData, post, processing, errors } = useForm<ReportFormData>({
     report_date: new Date().toISOString().split('T')[0],
     security_level: 'normal',
@@ -78,6 +88,9 @@ export default function Create({ securityLevels, statItems }: CreateProps) {
   const [statsData, setStatsData] = useState<{
     [key: number]: { value: string; notes: string | null };
   }>({});
+
+  // Add state for category filter
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -108,6 +121,12 @@ export default function Create({ securityLevels, statItems }: CreateProps) {
     }
     itemsByCategory[item.category.label].push(item);
   });
+
+  // Get filtered categories and items
+  const filteredCategories = selectedCategory
+    ? Object.entries(itemsByCategory).filter(([_, items]) =>
+        items.some(item => item.category.id === selectedCategory))
+    : Object.entries(itemsByCategory);
 
   // Handle stat input change
   function handleStatChange(itemId: number, value: string) {
@@ -267,9 +286,42 @@ export default function Create({ securityLevels, statItems }: CreateProps) {
                   </div>
                 ) : (
                   <div className="space-y-6">
-                    {Object.entries(itemsByCategory).map(([categoryLabel, items]) => (
+                    {statCategories.length > 1 && (
+                      <div className="mb-4">
+                        <Label htmlFor="category-filter">Filter by Category</Label>
+                        <Select
+                          onValueChange={(value) => setSelectedCategory(value === "all" ? null : parseInt(value))}
+                          defaultValue="all"
+                        >
+                          <SelectTrigger id="category-filter">
+                            <SelectValue placeholder="Select a category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Categories</SelectItem>
+                            {statCategories.map((category) => (
+                              <SelectItem key={category.id} value={category.id.toString()}>
+                                <div className="flex items-center">
+                                  <div className="h-3 w-3 rounded-full mr-2" style={{ backgroundColor: category.color }}></div>
+                                  {category.label}
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+
+                    {filteredCategories.map(([categoryLabel, items]) => (
                       <div key={categoryLabel} className="space-y-3">
-                        <h3 className="text-lg font-medium">{categoryLabel}</h3>
+                        <h3 className="text-lg font-medium">
+                          <div className="flex items-center">
+                            <div
+                              className="h-3 w-3 rounded-full mr-2"
+                              style={{ backgroundColor: items[0].category.color }}
+                            ></div>
+                            {categoryLabel}
+                          </div>
+                        </h3>
                         <Table>
                           <TableHeader>
                             <TableRow>
@@ -283,7 +335,7 @@ export default function Create({ securityLevels, statItems }: CreateProps) {
                               <TableRow key={item.id}>
                                 <TableCell>
                                   <div className="flex items-center space-x-2">
-                                    <div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color }}></div>
+                                    <div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color || item.category.color }}></div>
                                     <span>{item.label}</span>
                                   </div>
                                 </TableCell>

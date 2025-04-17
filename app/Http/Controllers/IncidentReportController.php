@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Models\StatCategoryItem;
+use App\Models\StatCategory;
 use App\Models\ReportStat;
 
 class IncidentReportController extends Controller
@@ -32,6 +33,12 @@ class IncidentReportController extends Controller
      */
     public function create()
     {
+        // Get active statistical categories
+        $statCategories = StatCategory::where('status', 'active')
+            ->orderBy('label')
+            ->get();
+
+        // Get active statistical category items
         $statItems = StatCategoryItem::with('category')
             ->whereHas('category', function ($query) {
                 $query->where('status', 'active');
@@ -42,6 +49,7 @@ class IncidentReportController extends Controller
 
         return Inertia::render('Incidents/Reports/Create', [
             'statItems' => $statItems,
+            'statCategories' => $statCategories,
         ]);
     }
 
@@ -104,6 +112,12 @@ class IncidentReportController extends Controller
             ->orderBy('incident_date', 'desc')
             ->paginate(5);
 
+        // Get all active stat categories
+        $statCategories = StatCategory::where('status', 'active')
+            ->orderBy('label')
+            ->get();
+
+        // Load report stats with their related items and categories
         $reportStats = $incidentReport->reportStats()
             ->with(['statCategoryItem.category'])
             ->get();
@@ -112,6 +126,7 @@ class IncidentReportController extends Controller
             'report' => $incidentReport,
             'incidents' => $incidents,
             'reportStats' => $reportStats,
+            'statCategories' => $statCategories,
         ]);
     }
 
@@ -120,6 +135,12 @@ class IncidentReportController extends Controller
      */
     public function edit(IncidentReport $incidentReport)
     {
+        // Get active statistical categories
+        $statCategories = StatCategory::where('status', 'active')
+            ->orderBy('label')
+            ->get();
+
+        // Get active statistical category items
         $statItems = StatCategoryItem::with('category')
             ->whereHas('category', function ($query) {
                 $query->where('status', 'active');
@@ -128,6 +149,7 @@ class IncidentReportController extends Controller
             ->orderBy('order')
             ->get();
 
+        // Load report stats with their related items and categories
         $reportStats = $incidentReport->reportStats()
             ->with(['statCategoryItem.category'])
             ->get();
@@ -136,6 +158,7 @@ class IncidentReportController extends Controller
             'report' => $incidentReport,
             'statItems' => $statItems,
             'reportStats' => $reportStats,
+            'statCategories' => $statCategories,
         ]);
     }
 

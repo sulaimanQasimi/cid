@@ -17,6 +17,14 @@ import { useState } from 'react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import axios from 'axios';
 
+interface StatCategory {
+  id: number;
+  name: string;
+  label: string;
+  color: string;
+  status: string;
+}
+
 interface StatCategoryItem {
   id: number;
   name: string;
@@ -26,6 +34,7 @@ interface StatCategoryItem {
     id: number;
     name: string;
     label: string;
+    color: string;
   };
 }
 
@@ -57,9 +66,10 @@ interface EditProps {
   };
   statItems: StatCategoryItem[];
   reportStats: ReportStat[];
+  statCategories: StatCategory[];
 }
 
-export default function Edit({ report, statItems, reportStats }: EditProps) {
+export default function Edit({ report, statItems, reportStats, statCategories }: EditProps) {
   const { data, setData, put, processing, errors } = useForm({
     report_number: report.report_number,
     report_date: report.report_date,
@@ -85,6 +95,7 @@ export default function Edit({ report, statItems, reportStats }: EditProps) {
   });
 
   const [statToDelete, setStatToDelete] = useState<number | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -151,6 +162,12 @@ export default function Edit({ report, statItems, reportStats }: EditProps) {
     }
     itemsByCategory[item.category.label].push(item);
   });
+
+  // Get filtered categories and items
+  const filteredCategories = selectedCategory
+    ? Object.entries(itemsByCategory).filter(([_, items]) =>
+        items.some(item => item.category.id === selectedCategory))
+    : Object.entries(itemsByCategory);
 
   // Handle stat input change - even empty values should be tracked to potentially clear existing values
   function handleStatChange(itemId: number, value: string) {
@@ -358,9 +375,42 @@ export default function Edit({ report, statItems, reportStats }: EditProps) {
                   </div>
                 ) : (
                   <div className="space-y-6">
-                    {Object.entries(itemsByCategory).map(([categoryLabel, items]) => (
+                    {statCategories.length > 1 && (
+                      <div className="mb-4">
+                        <Label htmlFor="category-filter">Filter by Category</Label>
+                        <Select
+                          onValueChange={(value) => setSelectedCategory(value === "all" ? null : parseInt(value))}
+                          defaultValue="all"
+                        >
+                          <SelectTrigger id="category-filter">
+                            <SelectValue placeholder="Select a category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Categories</SelectItem>
+                            {statCategories.map((category) => (
+                              <SelectItem key={category.id} value={category.id.toString()}>
+                                <div className="flex items-center">
+                                  <div className="h-3 w-3 rounded-full mr-2" style={{ backgroundColor: category.color }}></div>
+                                  {category.label}
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+
+                    {filteredCategories.map(([categoryLabel, items]) => (
                       <div key={categoryLabel} className="space-y-3">
-                        <h3 className="text-lg font-medium">{categoryLabel}</h3>
+                        <h3 className="text-lg font-medium">
+                          <div className="flex items-center">
+                            <div
+                              className="h-3 w-3 rounded-full mr-2"
+                              style={{ backgroundColor: items[0].category.color }}
+                            ></div>
+                            {categoryLabel}
+                          </div>
+                        </h3>
                         <Table>
                           <TableHeader>
                             <TableRow>
@@ -375,7 +425,7 @@ export default function Edit({ report, statItems, reportStats }: EditProps) {
                               <TableRow key={item.id}>
                                 <TableCell>
                                   <div className="flex items-center space-x-2">
-                                    <div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color }}></div>
+                                    <div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color || item.category.color }}></div>
                                     <span>{item.label}</span>
                                   </div>
                                 </TableCell>

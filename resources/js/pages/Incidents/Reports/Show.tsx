@@ -10,6 +10,17 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState } from 'react';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+interface StatCategory {
+  id: number;
+  name: string;
+  label: string;
+  color: string;
+  status: string;
+}
 
 interface StatCategoryItem {
   id: number;
@@ -20,6 +31,7 @@ interface StatCategoryItem {
     id: number;
     name: string;
     label: string;
+    color: string;
   };
 }
 
@@ -81,9 +93,10 @@ interface ShowProps {
     }>;
   };
   reportStats: ReportStat[];
+  statCategories: StatCategory[];
 }
 
-export default function Show({ report, incidents, reportStats }: ShowProps) {
+export default function Show({ report, incidents, reportStats, statCategories }: ShowProps) {
   const breadcrumbs: BreadcrumbItem[] = [
     {
       title: 'Dashboard',
@@ -98,6 +111,8 @@ export default function Show({ report, incidents, reportStats }: ShowProps) {
       href: route('incident-reports.show', report.id),
     },
   ];
+
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
   function getStatusBadge(status: string) {
     switch (status) {
@@ -114,11 +129,19 @@ export default function Show({ report, incidents, reportStats }: ShowProps) {
   const statsByCategory: Record<string, ReportStat[]> = {};
   reportStats.forEach(stat => {
     const categoryName = stat.stat_category_item.category.label;
+    const categoryId = stat.stat_category_item.category.id;
+
     if (!statsByCategory[categoryName]) {
       statsByCategory[categoryName] = [];
     }
     statsByCategory[categoryName].push(stat);
   });
+
+  // Filter stats by selected category
+  const filteredStatsByCategory = selectedCategory
+    ? Object.entries(statsByCategory).filter(([_, stats]) =>
+        stats.some(stat => stat.stat_category_item.category.id === selectedCategory))
+    : Object.entries(statsByCategory);
 
   // Get value from report stat
   function getStatValue(stat: ReportStat): string {
@@ -365,9 +388,49 @@ export default function Show({ report, incidents, reportStats }: ShowProps) {
                   </div>
                 ) : (
                   <div className="space-y-6">
-                    {Object.entries(statsByCategory).map(([categoryName, stats]) => (
+                    {statCategories.length > 1 && reportStats.length > 0 && (
+                      <div className="mb-4">
+                        <Label htmlFor="category-filter">Filter by Category</Label>
+                        <Select
+                          onValueChange={(value) => setSelectedCategory(value === "all" ? null : parseInt(value))}
+                          defaultValue="all"
+                        >
+                          <SelectTrigger id="category-filter">
+                            <SelectValue placeholder="Select a category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Categories</SelectItem>
+                            {statCategories
+                              .filter(category =>
+                                Object.entries(statsByCategory).some(([categoryLabel]) =>
+                                  statsByCategory[categoryLabel][0].stat_category_item.category.id === category.id
+                                )
+                              )
+                              .map((category) => (
+                                <SelectItem key={category.id} value={category.id.toString()}>
+                                  <div className="flex items-center">
+                                    <div className="h-3 w-3 rounded-full mr-2" style={{ backgroundColor: category.color }}></div>
+                                    {category.label}
+                                  </div>
+                                </SelectItem>
+                              ))
+                            }
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+
+                    {filteredStatsByCategory.map(([categoryName, stats]) => (
                       <div key={categoryName} className="space-y-3">
-                        <h3 className="text-lg font-medium">{categoryName}</h3>
+                        <h3 className="text-lg font-medium">
+                          <div className="flex items-center">
+                            <div
+                              className="h-3 w-3 rounded-full mr-2"
+                              style={{ backgroundColor: stats[0].stat_category_item.category.color }}
+                            ></div>
+                            {categoryName}
+                          </div>
+                        </h3>
                         <Table>
                           <TableHeader>
                             <TableRow>
