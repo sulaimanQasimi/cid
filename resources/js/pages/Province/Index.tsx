@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Pagination } from '@/components/pagination';
 import { PageHeader } from '@/components/page-header';
-import { Plus, Edit, Eye, Trash, MapPin } from 'lucide-react';
+import { Plus, Edit, Eye, Trash, MapPin, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -19,7 +19,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useState } from 'react';
-import { useForm } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
+import { toast } from 'sonner';
 
 interface ProvinceData {
   id: number;
@@ -64,8 +65,7 @@ export default function Index({ provinces }: IndexProps) {
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [provinceToDelete, setProvinceToDelete] = useState<ProvinceData | null>(null);
-
-  const { delete: destroy, processing } = useForm();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   function confirmDelete(province: ProvinceData) {
     setProvinceToDelete(province);
@@ -73,10 +73,23 @@ export default function Index({ provinces }: IndexProps) {
   }
 
   function handleDelete() {
-    if (provinceToDelete) {
-      destroy(route('provinces.destroy', provinceToDelete.id));
-    }
-    setIsDeleteDialogOpen(false);
+    if (!provinceToDelete) return;
+
+    setIsDeleting(true);
+
+    router.delete(route('provinces.destroy', provinceToDelete.id), {
+      preserveScroll: true,
+      onSuccess: () => {
+        setIsDeleteDialogOpen(false);
+        setIsDeleting(false);
+        toast.success(`Province "${provinceToDelete.name}" deleted successfully`);
+      },
+      onError: (errors) => {
+        setIsDeleting(false);
+        toast.error('Failed to delete province');
+        console.error(errors);
+      }
+    });
   }
 
   return (
@@ -223,13 +236,20 @@ export default function Index({ provinces }: IndexProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              disabled={processing}
+              disabled={isDeleting}
             >
-              Delete
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                'Delete'
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

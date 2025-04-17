@@ -1,4 +1,4 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
 
 interface DistrictData {
   id: number;
@@ -82,6 +83,7 @@ export default function Index({ districts, provinces }: IndexProps) {
   const [districtToDelete, setDistrictToDelete] = useState<DistrictData | null>(null);
   const [selectedProvinceId, setSelectedProvinceId] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const { delete: destroy, processing } = useForm();
 
@@ -91,10 +93,23 @@ export default function Index({ districts, provinces }: IndexProps) {
   }
 
   function handleDelete() {
-    if (districtToDelete) {
-      destroy(route('districts.destroy', districtToDelete.id));
-    }
-    setIsDeleteDialogOpen(false);
+    if (!districtToDelete) return;
+
+    setIsDeleting(true);
+
+    router.delete(route('districts.destroy', districtToDelete.id), {
+      preserveScroll: true,
+      onSuccess: () => {
+        setIsDeleteDialogOpen(false);
+        setIsDeleting(false);
+        toast.success(`District "${districtToDelete.name}" deleted successfully`);
+      },
+      onError: (errors) => {
+        setIsDeleting(false);
+        toast.error('Failed to delete district');
+        console.error(errors);
+      }
+    });
   }
 
   const filteredDistricts = districts.data.filter(district => {
@@ -296,7 +311,7 @@ export default function Index({ districts, provinces }: IndexProps) {
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              disabled={processing}
+              disabled={processing || isDeleting}
             >
               Delete
             </AlertDialogAction>
