@@ -18,6 +18,44 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
+// AM Map Province codes for Afghanistan
+const amMapProvinceCodes = [
+  { id: 'AF-BAL', name: 'Balkh' },
+  { id: 'AF-BAM', name: 'Bamyan' },
+  { id: 'AF-BDG', name: 'Badghis' },
+  { id: 'AF-BDS', name: 'Badakhshan' },
+  { id: 'AF-BGL', name: 'Baghlan' },
+  { id: 'AF-DAY', name: 'Daykundi' },
+  { id: 'AF-FRA', name: 'Farah' },
+  { id: 'AF-FYB', name: 'Faryab' },
+  { id: 'AF-GHA', name: 'Ghazni' },
+  { id: 'AF-GHO', name: 'Ghor' },
+  { id: 'AF-HEL', name: 'Helmand' },
+  { id: 'AF-HER', name: 'Herat' },
+  { id: 'AF-JOW', name: 'Jowzjan' },
+  { id: 'AF-KAB', name: 'Kabul' },
+  { id: 'AF-KAN', name: 'Kandahar' },
+  { id: 'AF-KAP', name: 'Kapisa' },
+  { id: 'AF-KDZ', name: 'Kunduz' },
+  { id: 'AF-KHO', name: 'Khost' },
+  { id: 'AF-KNR', name: 'Kunar' },
+  { id: 'AF-LAG', name: 'Laghman' },
+  { id: 'AF-LOG', name: 'Logar' },
+  { id: 'AF-NAN', name: 'Nangarhar' },
+  { id: 'AF-NIM', name: 'Nimruz' },
+  { id: 'AF-NUR', name: 'Nuristan' },
+  { id: 'AF-PAN', name: 'Panjshir' },
+  { id: 'AF-PAR', name: 'Parwan' },
+  { id: 'AF-PIA', name: 'Paktia' },
+  { id: 'AF-PKA', name: 'Paktika' },
+  { id: 'AF-SAM', name: 'Samangan' },
+  { id: 'AF-SAR', name: 'Sar-e Pol' },
+  { id: 'AF-TAK', name: 'Takhar' },
+  { id: 'AF-URU', name: 'Uruzgan' },
+  { id: 'AF-WAR', name: 'Wardak' },
+  { id: 'AF-ZAB', name: 'Zabul' },
+];
+
 export default function Create() {
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -42,6 +80,15 @@ export default function Create() {
     capital: '',
     status: 'active',
   });
+
+  const handleProvinceCodeChange = (code: string) => {
+    setData('code', code);
+    // Optionally auto-fill the name field with the province name
+    const selectedProvince = amMapProvinceCodes.find(province => province.id === code);
+    if (selectedProvince && !data.name) {
+      setData('name', selectedProvince.name);
+    }
+  };
 
   const submit: FormEventHandler = (e) => {
     e.preventDefault();
@@ -85,14 +132,23 @@ export default function Create() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="code">Code <span className="text-destructive">*</span></Label>
-                  <Input
-                    id="code"
+                  <Label htmlFor="code">AM Map Province Code <span className="text-destructive">*</span></Label>
+                  <Select
                     value={data.code}
-                    onChange={(e) => setData('code', e.target.value)}
-                    placeholder="e.g. KBL"
+                    onValueChange={handleProvinceCodeChange}
                     required
-                  />
+                  >
+                    <SelectTrigger id="code">
+                      <SelectValue placeholder="Select province code" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {amMapProvinceCodes.map((province) => (
+                        <SelectItem key={province.id} value={province.id}>
+                          {province.id} - {province.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <InputError message={errors.code} />
                 </div>
               </div>
@@ -155,9 +211,11 @@ export default function Create() {
               <Button
                 variant="outline"
                 type="button"
-                onClick={() => window.history.back()}
+                asChild
               >
-                Cancel
+                <Link href={route('provinces.index')}>
+                  Cancel
+                </Link>
               </Button>
               <Button type="submit" disabled={processing}>
                 <Save className="mr-2 h-4 w-4" />
