@@ -69,7 +69,7 @@ export default function Edit({ incident, districts, categories, reports }: EditI
     incident_time: incident.incident_time || '',
     district_id: incident.district_id?.toString() || '',
     incident_category_id: incident.incident_category_id?.toString() || '',
-    incident_report_id: incident.incident_report_id?.toString() || '',
+    incident_report_id: incident.incident_report_id?.toString() || 'none',
     location: incident.location || '',
     coordinates: incident.coordinates || '',
     casualties: incident.casualties?.toString() || '0',
@@ -80,7 +80,19 @@ export default function Edit({ incident, districts, categories, reports }: EditI
 
   const submit: FormEventHandler = (e) => {
     e.preventDefault();
-    put(route('incidents.update', incident.id));
+
+    // Create a copy of the data to modify
+    const formData = { ...data };
+
+    // Convert "none" to null for the incident_report_id
+    if (formData.incident_report_id === 'none') {
+      formData.incident_report_id = null;
+    }
+
+    put(route('incidents.update', incident.id), {
+      ...formData,
+      _method: 'put',
+    });
   };
 
   return (
@@ -310,7 +322,7 @@ export default function Edit({ incident, districts, categories, reports }: EditI
                   <SelectValue placeholder="Select a report (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   {reports.map(report => (
                     <SelectItem key={report.id} value={report.id.toString()}>
                       {report.report_number}

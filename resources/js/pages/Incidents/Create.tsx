@@ -53,7 +53,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
     incident_time: '',
     district_id: '',
     incident_category_id: '',
-    incident_report_id: '',
+    incident_report_id: 'none',
     location: '',
     coordinates: '',
     casualties: '0',
@@ -64,7 +64,20 @@ export default function Create({ districts, categories, reports }: CreateInciden
 
   const submit: FormEventHandler = (e) => {
     e.preventDefault();
-    post(route('incidents.store'));
+
+    // Create a copy of the data to modify
+    const formData = { ...data };
+
+    // Convert "none" to null for the incident_report_id
+    if (formData.incident_report_id === 'none') {
+      formData.incident_report_id = null;
+    }
+
+    post(route('incidents.store'), {
+      onSuccess: () => {
+        // handle success if needed
+      },
+    });
   };
 
   return (
@@ -294,7 +307,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
                   <SelectValue placeholder="Select a report (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   {reports.map(report => (
                     <SelectItem key={report.id} value={report.id.toString()}>
                       {report.report_number}

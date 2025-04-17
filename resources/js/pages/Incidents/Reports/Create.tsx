@@ -19,6 +19,11 @@ type ReportFormData = {
   report_date: string;
   security_level: string;
   details: string;
+  report_number?: string;
+  action_taken?: string;
+  recommendation?: string;
+  report_status: string;
+  source?: string;
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -39,13 +44,27 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Create({ securityLevels }: CreateProps) {
   const { data, setData, post, processing, errors } = useForm<ReportFormData>({
     report_date: new Date().toISOString().split('T')[0],
-    security_level: 'standard',
+    security_level: 'normal',
     details: '',
+    report_status: 'submitted',
+    report_number: '',
+    action_taken: '',
+    recommendation: '',
+    source: '',
   });
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    post(route('incident-reports.store'));
+    console.log('Submitting form with data:', data);
+
+    post(route('incident-reports.store'), {
+      onSuccess: () => {
+        console.log('Form submitted successfully');
+      },
+      onError: (errors) => {
+        console.error('Form submission error:', errors);
+      }
+    });
   }
 
   return (
@@ -70,6 +89,17 @@ export default function Create({ securityLevels }: CreateProps) {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid gap-3">
+                <Label htmlFor="report_number">Report Number (Optional)</Label>
+                <Input
+                  id="report_number"
+                  value={data.report_number}
+                  onChange={(e) => setData('report_number', e.target.value)}
+                  placeholder="Will be auto-generated if left empty"
+                />
+                <InputError message={errors.report_number} />
+              </div>
+
+              <div className="grid gap-3">
                 <Label htmlFor="report_date">Report Date</Label>
                 <Input
                   id="report_date"
@@ -91,19 +121,9 @@ export default function Create({ securityLevels }: CreateProps) {
                     <SelectValue placeholder="Select security level" />
                   </SelectTrigger>
                   <SelectContent>
-                    {securityLevels ? (
-                      securityLevels.map((level) => (
-                        <SelectItem key={level} value={level}>
-                          {level}
-                        </SelectItem>
-                      ))
-                    ) : (
-                      <>
-                        <SelectItem value="standard">Standard</SelectItem>
-                        <SelectItem value="restricted">Restricted</SelectItem>
-                        <SelectItem value="classified">Classified</SelectItem>
-                      </>
-                    )}
+                    <SelectItem value="normal">Normal</SelectItem>
+                    <SelectItem value="restricted">Restricted</SelectItem>
+                    <SelectItem value="classified">Classified</SelectItem>
                   </SelectContent>
                 </Select>
                 <InputError message={errors.security_level} />
@@ -121,6 +141,43 @@ export default function Create({ securityLevels }: CreateProps) {
                 />
                 <InputError message={errors.details} />
               </div>
+
+              <div className="grid gap-3">
+                <Label htmlFor="action_taken">Action Taken (Optional)</Label>
+                <Textarea
+                  id="action_taken"
+                  rows={3}
+                  value={data.action_taken}
+                  onChange={(e) => setData('action_taken', e.target.value)}
+                  placeholder="Describe any actions taken..."
+                />
+                <InputError message={errors.action_taken} />
+              </div>
+
+              <div className="grid gap-3">
+                <Label htmlFor="recommendation">Recommendation (Optional)</Label>
+                <Textarea
+                  id="recommendation"
+                  rows={3}
+                  value={data.recommendation}
+                  onChange={(e) => setData('recommendation', e.target.value)}
+                  placeholder="Enter any recommendations..."
+                />
+                <InputError message={errors.recommendation} />
+              </div>
+
+              <div className="grid gap-3">
+                <Label htmlFor="source">Source (Optional)</Label>
+                <Input
+                  id="source"
+                  value={data.source}
+                  onChange={(e) => setData('source', e.target.value)}
+                  placeholder="Information source"
+                />
+                <InputError message={errors.source} />
+              </div>
+
+              <input type="hidden" name="report_status" value="submitted" />
             </CardContent>
             <CardFooter className="flex justify-end space-x-2">
               <Button
