@@ -153,6 +153,23 @@ const mainNavItems: NavItem[] = [
             },
         ],
     },
+    {
+        title: 'Settings',
+        href: '#settings',
+        icon: UserCog,
+        items: [
+            {
+                title: 'Stat Categories',
+                href: route('stat-categories.index'),
+                icon: Database,
+            },
+            {
+                title: 'Stat Items',
+                href: route('stat-category-items.index'),
+                icon: Tag,
+            },
+        ],
+    },
 ];
 
 const footerNavItems: NavItem[] = [

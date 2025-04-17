@@ -50,6 +50,14 @@ Route::group(['middleware' => ['auth']], function () {
             'translations' => $translations,
         ]);
     });
+
+    // Add the following routes for StatCategory and StatCategoryItem management
+    Route::resource('stat-categories', \App\Http\Controllers\Admin\StatCategoryController::class);
+
+    // Stat Category Item routes
+    Route::resource('stat-category-items', \App\Http\Controllers\Admin\StatCategoryItemController::class);
+    Route::post('stat-category-items/reorder', [\App\Http\Controllers\Admin\StatCategoryItemController::class, 'reorder'])
+        ->name('stat-category-items.reorder');
 });
 
 require __DIR__.'/settings.php';
