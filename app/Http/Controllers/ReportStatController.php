@@ -127,6 +127,9 @@ class ReportStatController extends Controller
             'stats.*.notes' => 'nullable|string|max:1000',
         ]);
 
+        $updatedStats = [];
+        $newStats = [];
+
         foreach ($validated['stats'] as $stat) {
             // Find or create the stat
             $reportStat = ReportStat::firstOrNew([
@@ -134,20 +137,35 @@ class ReportStatController extends Controller
                 'stat_category_item_id' => $stat['stat_category_item_id'],
             ]);
 
+            $isNew = !$reportStat->exists;
+
             // Set the values
             $reportStat->setValue($stat['value']);
             $reportStat->notes = $stat['notes'] ?? null;
 
             // Set user tracking fields
-            if (!$reportStat->exists) {
+            if ($isNew) {
                 $reportStat->created_by = Auth::id();
+                $newStats[] = $stat['stat_category_item_id'];
             } else {
                 $reportStat->updated_by = Auth::id();
+                $updatedStats[] = $stat['stat_category_item_id'];
             }
 
             $reportStat->save();
         }
 
+        // If the request is expecting JSON (AJAX request), return JSON response
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Statistical data updated successfully.',
+                'new_stats' => $newStats,
+                'updated_stats' => $updatedStats
+            ]);
+        }
+
+        // For regular form submissions, redirect with a flash message
         return redirect()
             ->route('incident-reports.show', $incidentReport)
             ->with('success', 'Statistical data updated successfully.');

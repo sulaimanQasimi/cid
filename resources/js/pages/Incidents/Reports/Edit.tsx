@@ -6,13 +6,16 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PageHeader } from '@/components/page-header';
-import { ArrowLeft, PlusCircle } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Save, Trash2 } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import InputError from '@/components/input-error';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import axios from 'axios';
 
 interface StatCategoryItem {
   id: number;
@@ -26,78 +29,118 @@ interface StatCategoryItem {
   };
 }
 
-interface CreateProps {
-  securityLevels: string[];
-  statItems: StatCategoryItem[];
+interface ReportStat {
+  id: number;
+  incident_report_id: number;
+  stat_category_item_id: number;
+  integer_value: number | null;
+  string_value: string | null;
+  notes: string | null;
+  stat_category_item: StatCategoryItem;
 }
 
-type ReportFormData = {
-  report_date: string;
-  security_level: string;
-  details: string;
-  report_number?: string;
-  action_taken?: string;
-  recommendation?: string;
-  report_status: string;
-  source?: string;
-  stats?: Array<{
-    stat_category_item_id: number;
-    value: string;
-    notes?: string;
-  }>;
-};
+interface EditProps {
+  report: {
+    id: number;
+    report_number: string;
+    report_date: string;
+    report_status: string;
+    security_level: string;
+    details: string;
+    action_taken?: string;
+    recommendation?: string;
+    source?: string;
+    submitted_by: number;
+    approved_by?: number;
+    created_at: string;
+    updated_at: string;
+  };
+  statItems: StatCategoryItem[];
+  reportStats: ReportStat[];
+}
 
-const breadcrumbs: BreadcrumbItem[] = [
-  {
-    title: 'Dashboard',
-    href: '/dashboard',
-  },
-  {
-    title: 'Incident Reports',
-    href: route('incident-reports.index'),
-  },
-  {
-    title: 'Create',
-    href: route('incident-reports.create'),
-  },
-];
-
-export default function Create({ securityLevels, statItems }: CreateProps) {
-  const { data, setData, post, processing, errors } = useForm<ReportFormData>({
-    report_date: new Date().toISOString().split('T')[0],
-    security_level: 'normal',
-    details: '',
-    report_status: 'submitted',
-    report_number: '',
-    action_taken: '',
-    recommendation: '',
-    source: '',
+export default function Edit({ report, statItems, reportStats }: EditProps) {
+  const { data, setData, put, processing, errors } = useForm({
+    report_number: report.report_number,
+    report_date: report.report_date,
+    security_level: report.security_level,
+    details: report.details,
+    action_taken: report.action_taken || '',
+    recommendation: report.recommendation || '',
+    report_status: report.report_status,
+    source: report.source || '',
   });
 
-  // State for managing statistical data
   const [statsData, setStatsData] = useState<{
     [key: number]: { value: string; notes: string | null };
-  }>({});
+  }>(() => {
+    const initialStats: { [key: number]: { value: string; notes: string | null } } = {};
+    reportStats.forEach((stat) => {
+      initialStats[stat.stat_category_item_id] = {
+        value: stat.integer_value !== null ? String(stat.integer_value) : (stat.string_value || ''),
+        notes: stat.notes
+      };
+    });
+    return initialStats;
+  });
+
+  const [statToDelete, setStatToDelete] = useState<number | null>(null);
+
+  const breadcrumbs: BreadcrumbItem[] = [
+    {
+      title: 'Dashboard',
+      href: '/dashboard',
+    },
+    {
+      title: 'Incident Reports',
+      href: route('incident-reports.index'),
+    },
+    {
+      title: report.report_number,
+      href: route('incident-reports.show', report.id),
+    },
+    {
+      title: 'Edit',
+      href: route('incident-reports.edit', report.id),
+    },
+  ];
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    // Prepare stats data for submission
-    const stats = Object.entries(statsData)
-      .filter(([_, { value }]) => value.trim() !== '')
-      .map(([itemId, { value, notes }]) => ({
-        stat_category_item_id: parseInt(itemId),
-        value,
-        notes: notes || undefined,
-      }));
+    // Prepare stats data for batch update
+    const statsForUpdate = Object.entries(statsData).map(([itemId, { value, notes }]) => ({
+      stat_category_item_id: parseInt(itemId),
+      value,
+      notes
+    }));
 
-    // Add stats to form data
-    if (stats.length > 0) {
-      setData('stats', stats);
-    }
-
-    // Submit the form
-    post(route('incident-reports.store'));
+    // First update the report itself
+    put(route('incident-reports.update', report.id), {
+      onSuccess: () => {
+        // After successful update of the report, update the stats
+        if (statsForUpdate.length > 0) {
+          // Use axios to submit the stats data
+          axios.post(route('incident-reports.stats.batch-update', report.id), {
+            stats: statsForUpdate
+          }, {
+            headers: {
+              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            }
+          }).then(() => {
+            // Redirect to show page after both updates are complete
+            window.location.href = route('incident-reports.show', report.id);
+          }).catch((error: unknown) => {
+            console.error('Error updating stats:', error);
+          });
+        } else {
+          // If no stats to update, just redirect to show page
+          window.location.href = route('incident-reports.show', report.id);
+        }
+      }
+    });
   }
 
   // Group stat items by category
@@ -109,7 +152,7 @@ export default function Create({ securityLevels, statItems }: CreateProps) {
     itemsByCategory[item.category.label].push(item);
   });
 
-  // Handle stat input change
+  // Handle stat input change - even empty values should be tracked to potentially clear existing values
   function handleStatChange(itemId: number, value: string) {
     setStatsData(prev => ({
       ...prev,
@@ -125,18 +168,50 @@ export default function Create({ securityLevels, statItems }: CreateProps) {
     }));
   }
 
+  // Delete a stat
+  function deleteStat(itemId: number) {
+    // Find the existing stat
+    const existingStat = reportStats.find(s => s.stat_category_item_id === itemId);
+
+    if (existingStat) {
+      // If it exists in the database, send a delete request
+      fetch(route('report-stats.destroy', existingStat.id), {
+        method: 'DELETE',
+        headers: {
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+        }
+      }).then(() => {
+        // Remove from local state
+        const newStatsData = { ...statsData };
+        delete newStatsData[itemId];
+        setStatsData(newStatsData);
+      });
+    } else {
+      // If it's only in local state, just remove it
+      const newStatsData = { ...statsData };
+      delete newStatsData[itemId];
+      setStatsData(newStatsData);
+    }
+
+    setStatToDelete(null);
+  }
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title="Create Incident Report" />
+      <Head title={`Edit Report - ${report.report_number}`} />
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
         <PageHeader
-          title="Create Incident Report"
-          description="Add a new incident report to the system"
+          title={`Edit Report ${report.report_number}`}
+          description="Modify this incident report"
           actions={
-            <Button variant="outline" onClick={() => window.history.back()}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
-            </Button>
+            <div className="flex space-x-2">
+              <Button variant="outline" asChild>
+                <Link href={route('incident-reports.show', report.id)}>
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back to Report
+                </Link>
+              </Button>
+            </div>
           }
         />
 
@@ -145,16 +220,16 @@ export default function Create({ securityLevels, statItems }: CreateProps) {
             <Card>
               <CardHeader>
                 <CardTitle>Report Information</CardTitle>
-                <CardDescription>Enter the basic report information</CardDescription>
+                <CardDescription>Update the basic report information</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid gap-3">
-                  <Label htmlFor="report_number">Report Number (Optional)</Label>
+                  <Label htmlFor="report_number">Report Number</Label>
                   <Input
                     id="report_number"
                     value={data.report_number}
                     onChange={(e) => setData('report_number', e.target.value)}
-                    placeholder="Will be auto-generated if left empty"
+                    disabled
                   />
                   <InputError message={errors.report_number} />
                 </div>
@@ -190,6 +265,24 @@ export default function Create({ securityLevels, statItems }: CreateProps) {
                 </div>
 
                 <div className="grid gap-3">
+                  <Label htmlFor="report_status">Status</Label>
+                  <Select
+                    value={data.report_status}
+                    onValueChange={(value) => setData('report_status', value)}
+                  >
+                    <SelectTrigger id="report_status">
+                      <SelectValue placeholder="Select report status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="submitted">Submitted</SelectItem>
+                      <SelectItem value="reviewed">Reviewed</SelectItem>
+                      <SelectItem value="approved">Approved</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <InputError message={errors.report_status} />
+                </div>
+
+                <div className="grid gap-3">
                   <Label htmlFor="source">Source (Optional)</Label>
                   <Input
                     id="source"
@@ -205,7 +298,7 @@ export default function Create({ securityLevels, statItems }: CreateProps) {
             <Card>
               <CardHeader>
                 <CardTitle>Report Details</CardTitle>
-                <CardDescription>Enter the detailed information for this report</CardDescription>
+                <CardDescription>Update the detailed information for this report</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid gap-3">
@@ -244,15 +337,13 @@ export default function Create({ securityLevels, statItems }: CreateProps) {
                   />
                   <InputError message={errors.recommendation} />
                 </div>
-
-                <input type="hidden" name="report_status" value="submitted" />
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
                 <CardTitle>Statistical Data</CardTitle>
-                <CardDescription>Add statistical information for this report</CardDescription>
+                <CardDescription>Add or edit statistical information for this report</CardDescription>
               </CardHeader>
               <CardContent>
                 {Object.keys(itemsByCategory).length === 0 ? (
@@ -276,6 +367,7 @@ export default function Create({ securityLevels, statItems }: CreateProps) {
                               <TableHead>Item</TableHead>
                               <TableHead>Value</TableHead>
                               <TableHead>Notes</TableHead>
+                              <TableHead className="w-[100px]">Actions</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -301,6 +393,38 @@ export default function Create({ securityLevels, statItems }: CreateProps) {
                                     placeholder="Optional notes"
                                   />
                                 </TableCell>
+                                <TableCell>
+                                  {statsData[item.id] && (
+                                    <AlertDialog>
+                                      <AlertDialogTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() => setStatToDelete(item.id)}
+                                        >
+                                          <Trash2 className="h-4 w-4 text-destructive" />
+                                        </Button>
+                                      </AlertDialogTrigger>
+                                      <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                          <AlertDialogTitle>Remove Statistical Data</AlertDialogTitle>
+                                          <AlertDialogDescription>
+                                            Are you sure you want to remove this statistical data? This action cannot be undone.
+                                          </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                          <AlertDialogAction
+                                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                            onClick={() => deleteStat(item.id)}
+                                          >
+                                            Remove
+                                          </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                      </AlertDialogContent>
+                                    </AlertDialog>
+                                  )}
+                                </TableCell>
                               </TableRow>
                             ))}
                           </TableBody>
@@ -316,13 +440,16 @@ export default function Create({ securityLevels, statItems }: CreateProps) {
               <CardFooter className="flex justify-end space-x-2 pt-6">
                 <Button
                   variant="outline"
-                  onClick={() => window.history.back()}
+                  asChild
                   type="button"
                 >
-                  Cancel
+                  <Link href={route('incident-reports.show', report.id)}>
+                    Cancel
+                  </Link>
                 </Button>
                 <Button type="submit" disabled={processing}>
-                  {processing ? 'Creating...' : 'Create Report'}
+                  <Save className="mr-2 h-4 w-4" />
+                  {processing ? 'Saving...' : 'Save Changes'}
                 </Button>
               </CardFooter>
             </Card>

@@ -7,6 +7,8 @@ use App\Models\Incident;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use App\Models\StatCategoryItem;
+use App\Models\ReportStat;
 
 class IncidentReportController extends Controller
 {
@@ -30,7 +32,17 @@ class IncidentReportController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Incidents/Reports/Create');
+        $statItems = StatCategoryItem::with('category')
+            ->whereHas('category', function ($query) {
+                $query->where('status', 'active');
+            })
+            ->where('status', 'active')
+            ->orderBy('order')
+            ->get();
+
+        return Inertia::render('Incidents/Reports/Create', [
+            'statItems' => $statItems,
+        ]);
     }
 
     /**
@@ -48,6 +60,10 @@ class IncidentReportController extends Controller
             'report_status' => 'required|string|in:submitted,reviewed,approved',
             'source' => 'nullable|string',
             'attachments' => 'nullable|array',
+            'stats' => 'nullable|array',
+            'stats.*.stat_category_item_id' => 'required|exists:stat_category_items,id',
+            'stats.*.value' => 'required',
+            'stats.*.notes' => 'nullable|string|max:1000',
         ]);
 
         $validated['submitted_by'] = Auth::id();
@@ -59,6 +75,19 @@ class IncidentReportController extends Controller
 
         $report = IncidentReport::create($validated);
 
+        // Create report stats if provided
+        if (!empty($validated['stats'])) {
+            foreach ($validated['stats'] as $stat) {
+                $reportStat = new ReportStat();
+                $reportStat->incident_report_id = $report->id;
+                $reportStat->stat_category_item_id = $stat['stat_category_item_id'];
+                $reportStat->setValue($stat['value']);
+                $reportStat->notes = $stat['notes'] ?? null;
+                $reportStat->created_by = Auth::id();
+                $reportStat->save();
+            }
+        }
+
         return redirect()->route('incident-reports.show', $report)
             ->with('success', 'Incident report created successfully.');
     }
@@ -69,14 +98,20 @@ class IncidentReportController extends Controller
     public function show(IncidentReport $incidentReport)
     {
         $incidentReport->load(['submitter:id,name', 'approver:id,name']);
+
         $incidents = $incidentReport->incidents()
             ->with(['district:id,name', 'category:id,name,color'])
             ->orderBy('incident_date', 'desc')
             ->paginate(5);
 
+        $reportStats = $incidentReport->reportStats()
+            ->with(['statCategoryItem.category'])
+            ->get();
+
         return Inertia::render('Incidents/Reports/Show', [
             'report' => $incidentReport,
             'incidents' => $incidents,
+            'reportStats' => $reportStats,
         ]);
     }
 
@@ -85,8 +120,22 @@ class IncidentReportController extends Controller
      */
     public function edit(IncidentReport $incidentReport)
     {
+        $statItems = StatCategoryItem::with('category')
+            ->whereHas('category', function ($query) {
+                $query->where('status', 'active');
+            })
+            ->where('status', 'active')
+            ->orderBy('order')
+            ->get();
+
+        $reportStats = $incidentReport->reportStats()
+            ->with(['statCategoryItem.category'])
+            ->get();
+
         return Inertia::render('Incidents/Reports/Edit', [
             'report' => $incidentReport,
+            'statItems' => $statItems,
+            'reportStats' => $reportStats,
         ]);
     }
 
