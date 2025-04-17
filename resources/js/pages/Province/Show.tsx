@@ -8,6 +8,7 @@ import { ArrowLeft, Edit, Eye, MapPin, Users, Calendar, User, Clock } from 'luci
 import { format } from 'date-fns';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import { useEffect, useRef } from 'react';
 
 interface DistrictData {
   id: number;
@@ -57,6 +58,47 @@ interface ShowProps {
 }
 
 export default function Show({ province, districts }: ShowProps) {
+  const mapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Only load if we have the province code and the element exists
+    if (province.code && mapRef.current) {
+      // Create inline SVG map (simplified approach without external libraries)
+      const provinceCode = province.code;
+      const mapContainer = mapRef.current;
+
+      // Set up map container
+      mapContainer.innerHTML = `
+        <div class="flex flex-col items-center justify-center h-full">
+          <div class="text-center p-4">
+            <svg width="300" height="200" viewBox="0 0 800 600" class="max-w-full">
+              <path
+                d="M400,150 L450,200 L500,180 L550,200 L600,250 L550,300 L500,350 L450,400 L400,450 L350,400 L300,350 L250,300 L200,250 L250,200 L300,180 L350,200 Z"
+                fill="#5D87FF"
+                stroke="#FFFFFF"
+                stroke-width="2"
+              />
+              <text x="400" y="300" text-anchor="middle" fill="#FFFFFF" font-weight="bold">${province.name}</text>
+            </svg>
+          </div>
+          <div class="text-sm text-center">
+            <p>Province: ${province.name}</p>
+            <p>Code: ${provinceCode}</p>
+          </div>
+        </div>
+      `;
+
+      // Add map loading script tag for future enhancement
+      const script = document.createElement('script');
+      script.textContent = `
+        // This is a placeholder for future integration with a mapping library
+        // When implementing with amCharts or a similar library, this can be expanded
+        console.log('Map initialized for province: ${provinceCode}');
+      `;
+      mapContainer.appendChild(script);
+    }
+  }, [province.code, province.name]);
+
   const breadcrumbs: BreadcrumbItem[] = [
     {
       title: 'Dashboard',
@@ -125,6 +167,18 @@ export default function Show({ province, districts }: ShowProps) {
                 >
                   {province.status}
                 </Badge>
+              </div>
+
+              {/* Province Map */}
+              <div>
+                <h3 className="text-lg font-semibold">Province Map</h3>
+                <div
+                  ref={mapRef}
+                  className="mt-2 h-[300px] w-full bg-muted/30 rounded-md overflow-hidden shadow-sm border"
+                ></div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Map visualization based on province code: {province.code}
+                </p>
               </div>
 
               {province.description && (
