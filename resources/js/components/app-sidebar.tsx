@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Database, Folder, LayoutGrid, List, Tag, Users, Shield, UserCog, Video, Calendar, Building, FileText, QrCode, Globe, TabletSmartphone } from 'lucide-react';
+import { BookOpen, Database, Folder, LayoutGrid, List, Tag, Users, Shield, UserCog, Video, Calendar, Building, FileText, QrCode, Globe, TabletSmartphone, AlertTriangle, AlertCircle, FileBarChart } from 'lucide-react';
 import AppLogo from './app-logo';
 import { LanguageSwitcher } from './language-switcher';
 import { useLanguage } from '@/lib/i18n/language-context';
@@ -47,6 +47,28 @@ const mainNavItems: NavItem[] = [
         title: 'Criminals',
         href: route('criminals.index'),
         icon: FileText,
+    },
+    {
+        title: 'Incident Management',
+        href: '#incidents',
+        icon: AlertTriangle,
+        items: [
+            {
+                title: 'Incidents',
+                href: route('incidents.index'),
+                icon: AlertCircle,
+            },
+            {
+                title: 'Incident Reports',
+                href: route('incident-reports.index'),
+                icon: FileBarChart,
+            },
+            {
+                title: 'Incident Categories',
+                href: route('incident-categories.index'),
+                icon: Tag,
+            },
+        ],
     },
     {
         title: 'Report Scan',
