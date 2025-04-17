@@ -63,3 +63,4 @@ require __DIR__.'/departments.php';
 require __DIR__.'/criminals.php';
 require __DIR__.'/reports.php';
 require __DIR__.'/incidents.php';
+require __DIR__.'/locations.php';

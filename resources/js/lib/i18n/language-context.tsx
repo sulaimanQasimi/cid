@@ -56,12 +56,12 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
 
   // Function to change the current language
   const setLanguage = (code: LanguageCode) => {
+    console.log('Setting language to:', code);
     const newLanguage = languages.find(lang => lang.code === code);
     if (newLanguage) {
       localStorage.setItem('appLanguage', code);
-      setCurrentLanguage(newLanguage);
 
-      // Set document direction
+      // First update the document direction and language
       document.documentElement.dir = newLanguage.direction;
       document.documentElement.lang = code;
 
@@ -97,8 +97,12 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
         }
       }
 
-      // Optional: You can reload translations for the new language here
-      loadTranslations(code);
+      // Then update the language state
+      setTimeout(() => {
+        setCurrentLanguage(newLanguage);
+        // Immediately load translations for the new language
+        loadTranslations(code);
+      }, 0);
     }
   };
 

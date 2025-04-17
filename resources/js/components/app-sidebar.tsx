@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Database, Folder, LayoutGrid, List, Tag, Users, Shield, UserCog, Video, Calendar, Building, FileText, QrCode, Globe, TabletSmartphone, AlertTriangle, AlertCircle, FileBarChart } from 'lucide-react';
+import { BookOpen, Database, Folder, LayoutGrid, List, Tag, Users, Shield, UserCog, Video, Calendar, Building, FileText, QrCode, Globe, TabletSmartphone, AlertTriangle, AlertCircle, FileBarChart, Map, MapPin } from 'lucide-react';
 import AppLogo from './app-logo';
 import { LanguageSwitcher } from './language-switcher';
 import { useLanguage } from '@/lib/i18n/language-context';
@@ -133,6 +133,23 @@ const mainNavItems: NavItem[] = [
                 title: 'Language Test',
                 href: route('language-test'),
                 icon: TabletSmartphone,
+            },
+        ],
+    },
+    {
+        title: 'Location Management',
+        href: '#locations',
+        icon: Map,
+        items: [
+            {
+                title: 'Provinces',
+                href: route('provinces.index'),
+                icon: Map,
+            },
+            {
+                title: 'Districts',
+                href: route('districts.index'),
+                icon: MapPin,
             },
         ],
     },
