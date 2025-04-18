@@ -23,6 +23,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
 
 interface CreateIncidentProps {
   districts: Array<{
@@ -44,6 +46,17 @@ interface CreateIncidentProps {
     report_date: string;
   }>;
 }
+
+const breadcrumbs: BreadcrumbItem[] = [
+  {
+    title: 'Incidents',
+    href: route('incidents.index'),
+  },
+  {
+    title: 'Create',
+    href: route('incidents.create'),
+  },
+];
 
 export default function Create({ districts, categories, reports }: CreateIncidentProps) {
   const { data, setData, post, processing, errors, reset } = useForm({
@@ -70,7 +83,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
 
     // Convert "none" to null for the incident_report_id
     if (formData.incident_report_id === 'none') {
-      formData.incident_report_id = null;
+      formData.incident_report_id = null as unknown as string;
     }
 
     post(route('incidents.store'), {
@@ -81,7 +94,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
   };
 
   return (
-    <>
+    <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Create New Incident" />
       <PageHeader
         title="Create New Incident"
@@ -330,6 +343,6 @@ export default function Create({ districts, categories, reports }: CreateInciden
           </CardFooter>
         </Card>
       </form>
-    </>
+    </AppLayout>
   );
 }
