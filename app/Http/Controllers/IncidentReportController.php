@@ -16,15 +16,65 @@ class IncidentReportController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $reports = IncidentReport::with(['submitter:id,name'])
-            ->withCount('incidents')
-            ->orderBy('report_date', 'desc')
-            ->paginate(10);
+        $query = IncidentReport::with(['submitter:id,name'])
+            ->withCount('incidents');
+
+        // Apply search filter
+        if ($request->has('search') && !empty($request->search)) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('report_number', 'like', "%{$searchTerm}%")
+                  ->orWhere('details', 'like', "%{$searchTerm}%")
+                  ->orWhere('source', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        // Apply status filter
+        if ($request->has('status') && !empty($request->status)) {
+            $query->where('report_status', $request->status);
+        }
+
+        // Apply security level filter
+        if ($request->has('security_level') && !empty($request->security_level)) {
+            $query->where('security_level', $request->security_level);
+        }
+
+        // Apply sorting
+        $sortField = $request->input('sort_field', 'report_date');
+        $sortDirection = $request->input('sort_direction', 'desc');
+
+        // Ensure valid sort field to prevent SQL injection
+        $allowedSortFields = [
+            'report_number',
+            'report_date',
+            'report_status',
+            'security_level'
+        ];
+
+        // Handle special case for incidents_count which requires a subquery
+        if ($sortField === 'incidents_count') {
+            $query->withCount('incidents');
+            $query->orderBy('incidents_count', $sortDirection);
+        } else {
+            // Default sorting for other fields
+            if (!in_array($sortField, $allowedSortFields)) {
+                $sortField = 'report_date';
+            }
+
+            // Ensure valid sort direction
+            $sortDirection = strtolower($sortDirection) === 'asc' ? 'asc' : 'desc';
+
+            $query->orderBy($sortField, $sortDirection);
+        }
+
+        $reports = $query->paginate(10)
+                        ->withQueryString(); // Preserve the query parameters in pagination links
 
         return Inertia::render('Incidents/Reports/Index', [
             'reports' => $reports,
+            'filters' => $request->only(['search', 'status', 'security_level', 'sort_field', 'sort_direction']),
         ]);
     }
 

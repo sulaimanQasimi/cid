@@ -57,7 +57,17 @@ export default function Index({ categories }: CategoriesProps) {
 
   const handleDelete = () => {
     if (categoryToDelete) {
-      router.delete(route('incident-categories.destroy', categoryToDelete));
+      try {
+        const routeUrl = route('incident-categories.destroy', categoryToDelete);
+
+        // Using setTimeout to avoid version errors
+        setTimeout(() => {
+          router.delete(routeUrl);
+        }, 0);
+      } catch (error) {
+        console.error('Error deleting category:', error);
+        setCategoryToDelete(null);
+      }
     }
   };
 
@@ -128,7 +138,11 @@ export default function Index({ categories }: CategoriesProps) {
                       >
                         <td className="p-4 align-middle">
                           <div className="font-medium">{category.name}</div>
-                          <div className="text-xs text-muted-foreground">{category.description?.substring(0, 50)}{category.description && category.description.length > 50 ? '...' : ''}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {category.description && category.description.length > 0
+                              ? category.description
+                              : "-"}
+                          </div>
                         </td>
                         <td className="p-4 align-middle">
                           {category.code || '-'}
@@ -145,11 +159,12 @@ export default function Index({ categories }: CategoriesProps) {
                           )}
                         </td>
                         <td className="p-4 align-middle">
-                          <Badge variant={
-                            category.severity_level > 4 ? 'destructive' :
-                            category.severity_level > 3 ? 'default' :
-                            category.severity_level > 1 ? 'default' : 'outline'
-                          }>
+                          <Badge
+                            variant={
+                              category.severity_level > 4 ? 'destructive' :
+                              category.severity_level > 2 ? 'default' : 'outline'
+                            }
+                          >
                             Level {category.severity_level}
                           </Badge>
                         </td>

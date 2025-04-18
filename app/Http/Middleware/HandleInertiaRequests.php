@@ -23,9 +23,13 @@ class HandleInertiaRequests extends Middleware
      *
      * @see https://inertiajs.com/asset-versioning
      */
-    public function version(Request $request): ?string
+    public function version(Request $request): string
     {
-        return parent::version($request);
+        if (file_exists(public_path('build/manifest.json'))) {
+            return md5_file(public_path('build/manifest.json')) ?: '1.0.0';
+        }
+
+        return '1.0.0';
     }
 
     /**

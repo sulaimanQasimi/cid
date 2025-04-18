@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -26,6 +26,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { useDebounce } from '@/hooks/use-debounce';
 
 interface InfoCategory {
   id: number;
@@ -96,75 +97,107 @@ const perPageOptions = [
 ];
 
 export default function InfoCategoriesIndex({ categories, filters }: Props) {
-  const [searchQuery, setSearchQuery] = useState(filters.search);
+  // Use local state for all filter values
+  const [searchQuery, setSearchQuery] = useState(filters.search || '');
+  const [sortField, setSortField] = useState(filters.sort || 'name');
+  const [sortDirection, setSortDirection] = useState(filters.direction || 'asc');
+  const [perPage, setPerPage] = useState(filters.per_page || 10);
+  const [currentPage, setCurrentPage] = useState(categories.meta?.current_page || 1);
+
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<InfoCategory | null>(null);
+
+  // Create debounced versions of filters for search to avoid too many requests
+  const debouncedSearch = useDebounce(searchQuery, 300);
+
+  // Apply filters when debounced values change
+  useEffect(() => {
+    if (debouncedSearch !== filters.search ||
+        sortField !== filters.sort ||
+        sortDirection !== filters.direction ||
+        perPage !== filters.per_page) {
+      applyFilters();
+    }
+  }, [debouncedSearch, sortField, sortDirection, perPage]);
+
+  // Function to safely navigate with filters
+  const applyFilters = () => {
+    try {
+      const params = {
+        search: debouncedSearch,
+        sort: sortField,
+        direction: sortDirection,
+        per_page: perPage,
+        page: 1  // Reset to first page when filters change
+      };
+
+      router.get(route('info-categories.index'), params, {
+        preserveState: true,
+        preserveScroll: false,
+        replace: true
+      });
+    } catch (error) {
+      console.error('Error applying filters:', error);
+    }
+  };
+
+  // Handle pagination separately
+  const goToPage = (page: number) => {
+    if (page === currentPage) return;
+
+    setCurrentPage(page);
+    try {
+      router.get(route('info-categories.index'), {
+        search: debouncedSearch,
+        sort: sortField,
+        direction: sortDirection,
+        per_page: perPage,
+        page
+      }, {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true
+      });
+    } catch (error) {
+      console.error('Error navigating to page:', error);
+    }
+  };
 
   // Handle search form submission
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    applyFilters({ search: searchQuery });
+    // The useEffect will handle the actual navigation
   };
 
-  // Handle sort change
-  const handleSortChange = (value: string) => {
-    applyFilters({ sort: value });
-  };
-
-  // Handle direction change
+  // Toggle sort direction
   const handleDirectionChange = () => {
-    const newDirection = filters.direction === 'asc' ? 'desc' : 'asc';
-    applyFilters({ direction: newDirection });
-  };
-
-  // Handle per page change
-  const handlePerPageChange = (value: string) => {
-    applyFilters({ per_page: parseInt(value) });
-  };
-
-  // Navigate to page
-  const goToPage = (page: number) => {
-    router.get(route('info-categories.index'),
-      { ...filters, page },
-      { preserveState: true, preserveScroll: true }
-    );
-  };
-
-  // Apply filters to the URL
-  const applyFilters = (newFilters: Partial<Props['filters']>) => {
-    router.get(route('info-categories.index'),
-      { ...filters, ...newFilters, page: 1 },
-      { preserveState: true, preserveScroll: true }
-    );
+    setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
   };
 
   // Reset all filters
   const resetFilters = () => {
     setSearchQuery('');
-    router.get(route('info-categories.index'), {
-      search: '',
-      sort: 'name',
-      direction: 'asc',
-      per_page: 10,
-      page: 1
-    });
-  };
-
-  // Open delete confirmation dialog
-  const openDeleteDialog = (category: InfoCategory) => {
-    setCategoryToDelete(category);
-    setIsDeleteDialogOpen(true);
+    setSortField('name');
+    setSortDirection('asc');
+    setPerPage(10);
   };
 
   // Handle delete confirmation
   const confirmDelete = () => {
     if (categoryToDelete) {
-      router.delete(route('info-categories.destroy', categoryToDelete.id), {
-        onSuccess: () => {
-          setCategoryToDelete(null);
-          setIsDeleteDialogOpen(false);
-        },
-      });
+      try {
+        router.delete(route('info-categories.destroy', categoryToDelete.id), {
+          onSuccess: () => {
+            setCategoryToDelete(null);
+            setIsDeleteDialogOpen(false);
+          },
+          preserveScroll: true
+        });
+      } catch (error) {
+        console.error('Error deleting category:', error);
+        setCategoryToDelete(null);
+        setIsDeleteDialogOpen(false);
+      }
     }
   };
 
@@ -208,8 +241,8 @@ export default function InfoCategoriesIndex({ categories, filters }: Props) {
                     <div className="flex flex-wrap items-center gap-2">
                       <div className="flex items-center gap-2">
                         <Select
-                          value={filters.sort}
-                          onValueChange={handleSortChange}
+                          value={sortField}
+                          onValueChange={setSortField}
                         >
                           <SelectTrigger className="w-[130px]">
                             <SelectValue placeholder="Sort by" />
@@ -227,15 +260,15 @@ export default function InfoCategoriesIndex({ categories, filters }: Props) {
                           variant="outline"
                           size="icon"
                           onClick={handleDirectionChange}
-                          title={filters.direction === 'asc' ? 'Ascending' : 'Descending'}
+                          title={sortDirection === 'asc' ? 'Ascending' : 'Descending'}
                         >
-                          <ArrowUpDown className={`h-4 w-4 ${filters.direction === 'asc' ? '' : 'transform rotate-180'}`} />
+                          <ArrowUpDown className={`h-4 w-4 ${sortDirection === 'asc' ? '' : 'transform rotate-180'}`} />
                         </Button>
                       </div>
 
                       <Select
-                        value={filters.per_page.toString()}
-                        onValueChange={handlePerPageChange}
+                        value={perPage.toString()}
+                        onValueChange={(value) => setPerPage(parseInt(value))}
                       >
                         <SelectTrigger className="w-[130px]">
                           <SelectValue placeholder="Items per page" />
@@ -250,7 +283,7 @@ export default function InfoCategoriesIndex({ categories, filters }: Props) {
                       </Select>
 
                       {/* Reset filters button */}
-                      {(filters.search || filters.sort !== 'name' || filters.direction !== 'asc' || filters.per_page !== 10) && (
+                      {(searchQuery || sortField !== 'name' || sortDirection !== 'asc' || perPage !== 10) && (
                         <Button variant="ghost" size="sm" onClick={resetFilters} className="ml-2">
                           <FilterX className="h-4 w-4 mr-2" />
                           Reset
@@ -260,19 +293,19 @@ export default function InfoCategoriesIndex({ categories, filters }: Props) {
                   </div>
 
                   {/* Active filters */}
-                  {(filters.search || filters.sort !== 'name' || filters.direction !== 'asc' || filters.per_page !== 10) && (
+                  {(searchQuery || sortField !== 'name' || sortDirection !== 'asc' || perPage !== 10) && (
                     <div className="mt-4 flex flex-wrap items-center gap-2">
                       <span className="text-sm text-gray-500">Active filters:</span>
-                      {filters.search && (
+                      {searchQuery && (
                         <Badge variant="secondary" className="text-xs">
-                          Search: {filters.search}
+                          Search: {searchQuery}
                         </Badge>
                       )}
                       <Badge variant="secondary" className="text-xs">
-                        Sort: {sortOptions.find(o => o.value === filters.sort)?.label || filters.sort} ({filters.direction === 'asc' ? 'Ascending' : 'Descending'})
+                        Sort: {sortOptions.find(o => o.value === sortField)?.label || sortField} ({sortDirection === 'asc' ? 'Ascending' : 'Descending'})
                       </Badge>
                       <Badge variant="secondary" className="text-xs">
-                        Per page: {filters.per_page}
+                        Per page: {perPage}
                       </Badge>
                     </div>
                   )}
@@ -312,7 +345,10 @@ export default function InfoCategoriesIndex({ categories, filters }: Props) {
                             <Button
                               size="sm"
                               variant="destructive"
-                              onClick={() => openDeleteDialog(category)}
+                              onClick={() => {
+                                setCategoryToDelete(category);
+                                setIsDeleteDialogOpen(true);
+                              }}
                             >
                               <Trash className="h-4 w-4" />
                             </Button>
@@ -323,7 +359,7 @@ export default function InfoCategoriesIndex({ categories, filters }: Props) {
                   ) : (
                     <TableRow>
                       <TableCell colSpan={5} className="text-center py-4">
-                        No categories found. {filters.search ? 'Try clearing your search filters.' : 'Create your first one!'}
+                        No categories found. {searchQuery ? 'Try clearing your search filters.' : 'Create your first one!'}
                       </TableCell>
                     </TableRow>
                   )}

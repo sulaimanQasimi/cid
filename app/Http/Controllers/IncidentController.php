@@ -16,19 +16,64 @@ class IncidentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $incidents = Incident::with([
+        $query = Incident::with([
             'district:id,name',
             'district.province:id,name',
             'category:id,name,color',
             'report:id,report_number',
-        ])
-        ->orderBy('incident_date', 'desc')
-        ->paginate(10);
+        ]);
+
+        // Apply search filter
+        if ($request->has('search') && !empty($request->search)) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'like', "%{$searchTerm}%")
+                  ->orWhere('description', 'like', "%{$searchTerm}%")
+                  ->orWhere('incident_type', 'like', "%{$searchTerm}%")
+                  ->orWhere('location', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        // Apply status filter
+        if ($request->has('status') && !empty($request->status)) {
+            $query->where('status', $request->status);
+        }
+
+        // Apply category filter
+        if ($request->has('category_id') && !empty($request->category_id)) {
+            $query->where('incident_category_id', $request->category_id);
+        }
+
+        // Apply sorting
+        $sortField = $request->input('sort_field', 'incident_date');
+        $sortDirection = $request->input('sort_direction', 'desc');
+
+        // Ensure valid sort field to prevent SQL injection
+        $allowedSortFields = ['title', 'incident_date', 'status', 'incident_type'];
+        if (!in_array($sortField, $allowedSortFields)) {
+            $sortField = 'incident_date';
+        }
+
+        // Ensure valid sort direction
+        $sortDirection = strtolower($sortDirection) === 'asc' ? 'asc' : 'desc';
+
+        $query->orderBy($sortField, $sortDirection);
+
+        $incidents = $query->paginate(10)
+                         ->withQueryString(); // Preserve the query parameters in pagination links
+
+        // Get categories for filter dropdown
+        $categories = IncidentCategory::where('status', 'active')
+            ->select('id', 'name', 'color')
+            ->orderBy('name')
+            ->get();
 
         return Inertia::render('Incidents/Index', [
             'incidents' => $incidents,
+            'categories' => $categories,
+            'filters' => $request->only(['search', 'status', 'category_id', 'sort_field', 'sort_direction']),
         ]);
     }
 
