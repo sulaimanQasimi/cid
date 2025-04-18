@@ -6,7 +6,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { FormEventHandler, useEffect } from 'react';
+import { FormEventHandler, useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import InputError from '@/components/input-error';
@@ -62,8 +62,10 @@ export default function Create({ categories, preselected_category_id, parentItem
     color: '',
     status: 'active',
     order: 0,
-    redirect_to_category: false,
   });
+
+  // Use a separate state for the checkbox
+  const [redirectToCategory, setRedirectToCategory] = useState(false);
 
   // If a category is selected, find its color for reference
   const selectedCategory = categories.find(c => c.id.toString() === data.stat_category_id);
@@ -104,7 +106,13 @@ export default function Create({ categories, preselected_category_id, parentItem
 
   const submit: FormEventHandler = (e) => {
     e.preventDefault();
-    post(route('stat-category-items.store'));
+
+    const url = new URL(route('stat-category-items.store'));
+    if (redirectToCategory) {
+      url.searchParams.append('redirect_to_category', 'true');
+    }
+
+    post(url.toString());
   };
 
   return (
@@ -299,11 +307,9 @@ export default function Create({ categories, preselected_category_id, parentItem
               <div className="flex items-center space-x-2 pt-4">
                 <Checkbox
                   id="redirect_to_category"
-                  checked={data.redirect_to_category}
+                  checked={redirectToCategory}
                   onCheckedChange={(value) => {
-                    if (typeof value === 'boolean') {
-                      setData('redirect_to_category', value);
-                    }
+                    setRedirectToCategory(value === true);
                   }}
                 />
                 <Label

@@ -6,7 +6,7 @@ import { ArrowLeft, Eye } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import InputError from '@/components/input-error';
@@ -80,8 +80,10 @@ export default function Edit({ item, categories, parentItems = [], hasChildren }
     color: item.color || '',
     status: item.status,
     order: item.order,
-    redirect_to_category: false,
   });
+
+  // Use a separate state for the checkbox
+  const [redirectToCategory, setRedirectToCategory] = useState(false);
 
   // If a category is selected, find its color for reference
   const selectedCategory = categories.find(c => c.id.toString() === data.stat_category_id);
@@ -115,7 +117,19 @@ export default function Edit({ item, categories, parentItems = [], hasChildren }
 
   const submit: FormEventHandler = (e) => {
     e.preventDefault();
-    put(route('stat-category-items.update', item.id));
+
+    // Create a URL with the route
+    const baseUrl = route('stat-category-items.update', item.id);
+    // Convert to URL object to manipulate search params
+    const url = new URL(baseUrl, window.location.origin);
+
+    // Add the redirect param if needed
+    if (redirectToCategory) {
+      url.searchParams.append('redirect_to_category', 'true');
+    }
+
+    // Use the full URL string for the put request
+    put(url.toString());
   };
 
   return (
@@ -336,11 +350,9 @@ export default function Edit({ item, categories, parentItems = [], hasChildren }
               <div className="flex items-center space-x-2 pt-4">
                 <Checkbox
                   id="redirect_to_category"
-                  checked={data.redirect_to_category}
+                  checked={redirectToCategory}
                   onCheckedChange={(value) => {
-                    if (typeof value === 'boolean') {
-                      setData('redirect_to_category', value);
-                    }
+                    setRedirectToCategory(value === true);
                   }}
                 />
                 <Label

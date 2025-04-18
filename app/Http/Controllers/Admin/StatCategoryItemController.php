@@ -112,7 +112,10 @@ class StatCategoryItemController extends Controller
 
         $item = StatCategoryItem::create($validated);
 
-        if ($request->has('redirect_to_category') && $request->redirect_to_category) {
+        // Check redirect preference from query parameters
+        $redirectToCategory = $request->query('redirect_to_category') === 'true';
+
+        if ($redirectToCategory) {
             return redirect()->route('stat-categories.show', $item->stat_category_id)
                 ->with('success', 'Item created successfully.');
         }
@@ -220,7 +223,10 @@ class StatCategoryItemController extends Controller
 
         $statCategoryItem->update($validated);
 
-        if ($request->has('redirect_to_category') && $request->redirect_to_category) {
+        // Check redirect preference from query parameters
+        $redirectToCategory = $request->query('redirect_to_category') === 'true';
+
+        if ($redirectToCategory) {
             return redirect()->route('stat-categories.show', $statCategoryItem->stat_category_id)
                 ->with('success', 'Item updated successfully.');
         }
