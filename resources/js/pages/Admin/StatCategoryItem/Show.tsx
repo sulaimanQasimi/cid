@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PageHeader } from '@/components/page-header';
-import { ArrowLeft, Edit, Trash, Tag, Database, Calendar, User, Clock, Loader2 } from 'lucide-react';
+import { ArrowLeft, Edit, Trash, Tag, Database, Calendar, User, Clock, Loader2, AlertTriangle, Layers } from 'lucide-react';
 import { format } from 'date-fns';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -24,6 +24,7 @@ import {
 interface ItemData {
   id: number;
   stat_category_id: number;
+  parent_id: number | null;
   name: string;
   label: string;
   color: string | null;
@@ -43,13 +44,24 @@ interface ItemData {
     label: string;
     color: string;
   };
+  parent?: {
+    id: number;
+    name: string;
+    label: string;
+  } | null;
+  children?: {
+    id: number;
+    name: string;
+    label: string;
+  }[];
 }
 
 interface ShowProps {
   item: ItemData;
+  hasChildren: boolean;
 }
 
-export default function Show({ item }: ShowProps) {
+export default function Show({ item, hasChildren }: ShowProps) {
   const breadcrumbs: BreadcrumbItem[] = [
     {
       title: 'Dashboard',
@@ -132,6 +144,24 @@ export default function Show({ item }: ShowProps) {
           }
         />
 
+        {hasChildren && (
+          <Card className="bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800 mb-2">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-2">
+                <div className="text-amber-600 dark:text-amber-400">
+                  <AlertTriangle className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-amber-800 dark:text-amber-300">This item has child items</h3>
+                  <p className="text-sm text-amber-700 dark:text-amber-400">
+                    Values cannot be assigned to this item because it has children. Values can only be assigned to leaf items without children.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <div className="grid gap-4 md:grid-cols-3">
           <Card className="md:col-span-2">
             <CardHeader>
@@ -183,6 +213,51 @@ export default function Show({ item }: ShowProps) {
                       {item.category?.label}
                     </Link>
                   </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold">Hierarchy Information</h3>
+                <div className="mt-2 space-y-3 text-sm">
+                  {item.parent && (
+                    <div>
+                      <div className="font-medium text-muted-foreground mb-1">Parent Item:</div>
+                      <div className="flex items-center">
+                        <Layers className="mr-2 h-4 w-4 text-muted-foreground" />
+                        <Link
+                          href={route('stat-category-items.show', item.parent.id)}
+                          className="text-primary hover:underline"
+                        >
+                          {item.parent.label}
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+
+                  {hasChildren && item.children && item.children.length > 0 && (
+                    <div>
+                      <div className="font-medium text-muted-foreground mb-1">Child Items:</div>
+                      <div className="space-y-1 ml-6">
+                        {item.children.map(child => (
+                          <div key={child.id} className="flex items-center">
+                            <Layers className="mr-2 h-4 w-4 text-muted-foreground" />
+                            <Link
+                              href={route('stat-category-items.show', child.id)}
+                              className="text-primary hover:underline"
+                            >
+                              {child.label}
+                            </Link>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {!item.parent && (!item.children || item.children.length === 0) && (
+                    <div className="text-muted-foreground">
+                      This is a standalone item with no parent or children.
+                    </div>
+                  )}
                 </div>
               </div>
             </CardContent>

@@ -19,6 +19,7 @@ class StatCategoryItem extends Model
      */
     protected $fillable = [
         'stat_category_id',
+        'parent_id',
         'name',
         'label',
         'color',
@@ -60,5 +61,29 @@ class StatCategoryItem extends Model
     public function reportStats(): HasMany
     {
         return $this->hasMany(ReportStat::class);
+    }
+
+    /**
+     * Get the parent item.
+     */
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(StatCategoryItem::class, 'parent_id');
+    }
+
+    /**
+     * Get the child items.
+     */
+    public function children(): HasMany
+    {
+        return $this->hasMany(StatCategoryItem::class, 'parent_id');
+    }
+
+    /**
+     * Check if this item has any children.
+     */
+    public function hasChildren(): bool
+    {
+        return $this->children()->count() > 0;
     }
 }

@@ -41,6 +41,12 @@ interface CategoryData {
   color: string;
 }
 
+interface ParentItemData {
+  id: number;
+  name: string;
+  label: string;
+}
+
 interface ItemData {
   id: number;
   stat_category_id: number;
@@ -49,6 +55,7 @@ interface ItemData {
   color: string | null;
   status: string;
   order: number;
+  parent_id?: number | null;
   category?: {
     id: number;
     name: string;
@@ -60,11 +67,14 @@ interface ItemData {
 interface EditProps {
   item: ItemData;
   categories: CategoryData[];
+  parentItems?: ParentItemData[];
+  hasChildren: boolean;
 }
 
-export default function Edit({ item, categories }: EditProps) {
+export default function Edit({ item, categories, parentItems = [], hasChildren }: EditProps) {
   const { data, setData, put, processing, errors } = useForm({
     stat_category_id: item.stat_category_id.toString(),
+    parent_id: item.parent_id ? item.parent_id.toString() : '',
     name: item.name,
     label: item.label,
     color: item.color || '',
@@ -133,6 +143,28 @@ export default function Edit({ item, categories }: EditProps) {
           }
         />
 
+        {hasChildren && (
+          <Card className="bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-2">
+                <div className="text-amber-600 dark:text-amber-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-alert-triangle">
+                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                    <path d="M12 9v4"></path>
+                    <path d="M12 17h.01"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-medium text-amber-800 dark:text-amber-300">This item has child items</h3>
+                  <p className="text-sm text-amber-700 dark:text-amber-400">
+                    Values cannot be assigned to this item because it has children. Values can only be assigned to leaf items without children.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <form onSubmit={submit}>
           <Card>
             <CardHeader>
@@ -164,6 +196,30 @@ export default function Edit({ item, categories }: EditProps) {
                   </SelectContent>
                 </Select>
                 <InputError message={errors.stat_category_id} />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="parent_id">Parent Item (Optional)</Label>
+                <Select
+                  value={data.parent_id}
+                  onValueChange={(value) => setData('parent_id', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="No parent (top level)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">No parent (top level)</SelectItem>
+                    {parentItems.map((item) => (
+                      <SelectItem key={item.id} value={item.id.toString()}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Select a parent item or leave empty for a top-level item.
+                </p>
+                <InputError message={errors.parent_id} />
               </div>
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

@@ -41,14 +41,22 @@ interface CategoryData {
   color: string;
 }
 
+interface ParentItemData {
+  id: number;
+  name: string;
+  label: string;
+}
+
 interface CreateProps {
   categories: CategoryData[];
   preselected_category_id?: string;
+  parentItems?: ParentItemData[];
 }
 
-export default function Create({ categories, preselected_category_id }: CreateProps) {
+export default function Create({ categories, preselected_category_id, parentItems = [] }: CreateProps) {
   const { data, setData, post, processing, errors } = useForm({
     stat_category_id: preselected_category_id || '',
+    parent_id: '',
     name: '',
     label: '',
     color: '',
@@ -59,6 +67,15 @@ export default function Create({ categories, preselected_category_id }: CreatePr
 
   // If a category is selected, find its color for reference
   const selectedCategory = categories.find(c => c.id.toString() === data.stat_category_id);
+
+  // Handle category change
+  const handleCategoryChange = (value: string) => {
+    setData({
+      ...data,
+      stat_category_id: value,
+      parent_id: '',  // Reset parent_id when category changes
+    });
+  };
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -121,7 +138,7 @@ export default function Create({ categories, preselected_category_id }: CreatePr
                 <Label htmlFor="category">Category</Label>
                 <Select
                   value={data.stat_category_id}
-                  onValueChange={(value) => setData('stat_category_id', value)}
+                  onValueChange={handleCategoryChange}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select a category" />
@@ -141,6 +158,31 @@ export default function Create({ categories, preselected_category_id }: CreatePr
                   </SelectContent>
                 </Select>
                 <InputError message={errors.stat_category_id} />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="parent_id">Parent Item (Optional)</Label>
+                <Select
+                  value={data.parent_id}
+                  onValueChange={(value) => setData('parent_id', value)}
+                  disabled={!data.stat_category_id || parentItems.length === 0}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="No parent (top level)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">No parent (top level)</SelectItem>
+                    {parentItems.map((item) => (
+                      <SelectItem key={item.id} value={item.id.toString()}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Select a parent item or leave empty for a top-level item.
+                </p>
+                <InputError message={errors.parent_id} />
               </div>
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
