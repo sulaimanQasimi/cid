@@ -56,7 +56,7 @@ interface CreateProps {
 export default function Create({ categories, preselected_category_id, parentItems = [] }: CreateProps) {
   const { data, setData, post, processing, errors } = useForm({
     stat_category_id: preselected_category_id || '',
-    parent_id: '',
+    parent_id: 'null',
     name: '',
     label: '',
     color: '',
@@ -73,7 +73,7 @@ export default function Create({ categories, preselected_category_id, parentItem
     setData({
       ...data,
       stat_category_id: value,
-      parent_id: '',  // Reset parent_id when category changes
+      parent_id: 'null',  // Reset parent_id when category changes
     });
   };
 
@@ -171,7 +171,7 @@ export default function Create({ categories, preselected_category_id, parentItem
                     <SelectValue placeholder="No parent (top level)" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No parent (top level)</SelectItem>
+                    <SelectItem value="null">No parent (top level)</SelectItem>
                     {parentItems.map((item) => (
                       <SelectItem key={item.id} value={item.id.toString()}>
                         {item.label}
@@ -300,9 +300,11 @@ export default function Create({ categories, preselected_category_id, parentItem
                 <Checkbox
                   id="redirect_to_category"
                   checked={data.redirect_to_category}
-                  onCheckedChange={(checked) =>
-                    setData('redirect_to_category', checked === true)
-                  }
+                  onCheckedChange={(value) => {
+                    if (typeof value === 'boolean') {
+                      setData('redirect_to_category', value);
+                    }
+                  }}
                 />
                 <Label
                   htmlFor="redirect_to_category"

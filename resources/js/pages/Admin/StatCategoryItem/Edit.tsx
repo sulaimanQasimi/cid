@@ -74,7 +74,7 @@ interface EditProps {
 export default function Edit({ item, categories, parentItems = [], hasChildren }: EditProps) {
   const { data, setData, put, processing, errors } = useForm({
     stat_category_id: item.stat_category_id.toString(),
-    parent_id: item.parent_id ? item.parent_id.toString() : '',
+    parent_id: item.parent_id ? item.parent_id.toString() : 'null',
     name: item.name,
     label: item.label,
     color: item.color || '',
@@ -208,7 +208,7 @@ export default function Edit({ item, categories, parentItems = [], hasChildren }
                     <SelectValue placeholder="No parent (top level)" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No parent (top level)</SelectItem>
+                    <SelectItem value="null">No parent (top level)</SelectItem>
                     {parentItems.map((item) => (
                       <SelectItem key={item.id} value={item.id.toString()}>
                         {item.label}
@@ -337,9 +337,11 @@ export default function Edit({ item, categories, parentItems = [], hasChildren }
                 <Checkbox
                   id="redirect_to_category"
                   checked={data.redirect_to_category}
-                  onCheckedChange={(checked) =>
-                    setData('redirect_to_category', checked === true)
-                  }
+                  onCheckedChange={(value) => {
+                    if (typeof value === 'boolean') {
+                      setData('redirect_to_category', value);
+                    }
+                  }}
                 />
                 <Label
                   htmlFor="redirect_to_category"

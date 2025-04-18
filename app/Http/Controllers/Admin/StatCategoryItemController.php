@@ -86,6 +86,11 @@ class StatCategoryItemController extends Controller
             ])->withInput();
         }
 
+        // Handle 'null' string value for parent_id
+        if (isset($validated['parent_id']) && $validated['parent_id'] === 'null') {
+            $validated['parent_id'] = null;
+        }
+
         // If parent_id is provided, ensure parent is in the same category
         if (!empty($validated['parent_id'])) {
             $parent = StatCategoryItem::find($validated['parent_id']);
@@ -181,6 +186,11 @@ class StatCategoryItemController extends Controller
             return back()->withErrors([
                 'name' => 'The name must be unique within the selected category.',
             ])->withInput();
+        }
+
+        // Handle 'null' string value for parent_id
+        if (isset($validated['parent_id']) && $validated['parent_id'] === 'null') {
+            $validated['parent_id'] = null;
         }
 
         // If parent_id is provided, ensure parent is in the same category and not this item itself
