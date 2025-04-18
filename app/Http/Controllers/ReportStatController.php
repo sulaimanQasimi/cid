@@ -45,8 +45,15 @@ class ReportStatController extends Controller
             'notes' => 'nullable|string|max:1000',
         ]);
 
-        // Get the stat category item to check its type
-        $statItem = StatCategoryItem::findOrFail($validated['stat_category_item_id']);
+        // Get the stat category item to check if it has children
+        $statItem = StatCategoryItem::withCount('children')->findOrFail($validated['stat_category_item_id']);
+
+        // Check if the stat category item has children
+        if ($statItem->children_count > 0) {
+            return back()->withErrors([
+                'stat_category_item_id' => 'Cannot assign values to parent items. Values can only be assigned to leaf items without children.'
+            ])->withInput();
+        }
 
         // Create a new report stat
         $reportStat = new ReportStat();
@@ -129,8 +136,24 @@ class ReportStatController extends Controller
 
         $updatedStats = [];
         $newStats = [];
+        $errors = [];
 
-        foreach ($validated['stats'] as $stat) {
+        // Get all stat items with children count to validate
+        $statItemIds = collect($validated['stats'])->pluck('stat_category_item_id')->unique()->toArray();
+        $statItems = StatCategoryItem::withCount('children')
+            ->whereIn('id', $statItemIds)
+            ->get()
+            ->keyBy('id');
+
+        foreach ($validated['stats'] as $index => $stat) {
+            $statItem = $statItems->get($stat['stat_category_item_id']);
+
+            // Skip items with children and collect errors
+            if ($statItem && $statItem->children_count > 0) {
+                $errors["stats.{$index}.stat_category_item_id"] = "Cannot assign values to parent items. Values can only be assigned to leaf items.";
+                continue;
+            }
+
             // Find or create the stat
             $reportStat = ReportStat::firstOrNew([
                 'incident_report_id' => $incidentReport->id,
@@ -157,15 +180,30 @@ class ReportStatController extends Controller
 
         // If the request is expecting JSON (AJAX request), return JSON response
         if ($request->expectsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Statistical data updated successfully.',
+            $response = [
+                'success' => count($errors) === 0,
+                'message' => count($errors) === 0
+                    ? 'Statistical data updated successfully.'
+                    : 'Some statistics could not be updated.',
                 'new_stats' => $newStats,
                 'updated_stats' => $updatedStats
-            ]);
+            ];
+
+            if (count($errors) > 0) {
+                $response['errors'] = $errors;
+            }
+
+            return response()->json($response);
         }
 
-        // For regular form submissions, redirect with a flash message
+        // For regular form submissions, redirect with appropriate flash message
+        if (count($errors) > 0) {
+            return redirect()
+                ->route('incident-reports.show', $incidentReport)
+                ->with('warning', 'Statistical data partially updated. Some items could not be updated because they are parent items.')
+                ->withErrors($errors);
+        }
+
         return redirect()
             ->route('incident-reports.show', $incidentReport)
             ->with('success', 'Statistical data updated successfully.');

@@ -38,14 +38,32 @@ class IncidentReportController extends Controller
             ->orderBy('label')
             ->get();
 
-        // Get active statistical category items
-        $statItems = StatCategoryItem::with('category')
+        // Get active statistical category items with parent-child relationships
+        $statItems = StatCategoryItem::with(['category', 'parent'])
+            ->withCount('children')  // Add count of children
             ->whereHas('category', function ($query) {
                 $query->where('status', 'active');
             })
             ->where('status', 'active')
             ->orderBy('order')
-            ->get();
+            ->get()
+            ->map(function ($item) {
+                // Convert to array and include essential fields for tree view
+                return [
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'label' => $item->label,
+                    'color' => $item->color,
+                    'parent_id' => $item->parent_id,
+                    'children_count' => $item->children_count,
+                    'category' => [
+                        'id' => $item->category->id,
+                        'name' => $item->category->name,
+                        'label' => $item->category->label,
+                        'color' => $item->category->color,
+                    ]
+                ];
+            });
 
         return Inertia::render('Incidents/Reports/Create', [
             'statItems' => $statItems,
@@ -140,14 +158,32 @@ class IncidentReportController extends Controller
             ->orderBy('label')
             ->get();
 
-        // Get active statistical category items
-        $statItems = StatCategoryItem::with('category')
+        // Get active statistical category items with parent-child relationships
+        $statItems = StatCategoryItem::with(['category', 'parent'])
+            ->withCount('children')  // Add count of children
             ->whereHas('category', function ($query) {
                 $query->where('status', 'active');
             })
             ->where('status', 'active')
             ->orderBy('order')
-            ->get();
+            ->get()
+            ->map(function ($item) {
+                // Convert to array and include essential fields for tree view
+                return [
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'label' => $item->label,
+                    'color' => $item->color,
+                    'parent_id' => $item->parent_id,
+                    'children_count' => $item->children_count,
+                    'category' => [
+                        'id' => $item->category->id,
+                        'name' => $item->category->name,
+                        'label' => $item->category->label,
+                        'color' => $item->category->color,
+                    ]
+                ];
+            });
 
         // Load report stats with their related items and categories
         $reportStats = $incidentReport->reportStats()

@@ -13,6 +13,7 @@ import { type BreadcrumbItem } from '@/types';
 import InputError from '@/components/input-error';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useState } from 'react';
+import TreeViewStatSelector from '@/components/reports/TreeViewStatSelector';
 
 interface StatCategory {
   id: number;
@@ -26,7 +27,8 @@ interface StatCategoryItem {
   id: number;
   name: string;
   label: string;
-  color: string;
+  color: string | null;
+  parent_id: number | null;
   category: {
     id: number;
     name: string;
@@ -113,20 +115,17 @@ export default function Create({ securityLevels, statItems, statCategories }: Cr
     post(route('incident-reports.store'));
   }
 
-  // Group stat items by category
-  const itemsByCategory: { [key: string]: StatCategoryItem[] } = {};
-  statItems.forEach(item => {
-    if (!itemsByCategory[item.category.label]) {
-      itemsByCategory[item.category.label] = [];
-    }
-    itemsByCategory[item.category.label].push(item);
-  });
+  // Group stat items by category for the dropdown filter
+  const categoriesForFilter = statCategories.map(category => ({
+    id: category.id,
+    label: category.label,
+    color: category.color
+  }));
 
-  // Get filtered categories and items
-  const filteredCategories = selectedCategory
-    ? Object.entries(itemsByCategory).filter(([_, items]) =>
-        items.some(item => item.category.id === selectedCategory))
-    : Object.entries(itemsByCategory);
+  // Filter stat items by category if one is selected
+  const filteredStatItems = selectedCategory
+    ? statItems.filter(item => item.category.id === selectedCategory)
+    : statItems;
 
   // Handle stat input change
   function handleStatChange(itemId: number, value: string) {
@@ -136,7 +135,7 @@ export default function Create({ securityLevels, statItems, statCategories }: Cr
     }));
   }
 
-  // Handle stat notes change - always track the notes even if empty
+  // Handle stat notes change
   function handleNotesChange(itemId: number, notes: string) {
     setStatsData(prev => ({
       ...prev,
@@ -271,113 +270,54 @@ export default function Create({ securityLevels, statItems, statCategories }: Cr
             <Card>
               <CardHeader>
                 <CardTitle>Statistical Data</CardTitle>
-                <CardDescription>Add statistical information for this report</CardDescription>
+                <CardDescription>
+                  Record statistical information related to this report
+                </CardDescription>
               </CardHeader>
-              <CardContent>
-                {Object.keys(itemsByCategory).length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-8 text-center">
-                    <p className="text-muted-foreground">No statistical categories available.</p>
-                    <Button variant="outline" asChild className="mt-4">
-                      <Link href={route('stat-categories.index')}>
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        Manage Statistical Categories
-                      </Link>
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    {statCategories.length > 1 && (
-                      <div className="mb-4">
-                        <Label htmlFor="category-filter">Filter by Category</Label>
-                        <Select
-                          onValueChange={(value) => setSelectedCategory(value === "all" ? null : parseInt(value))}
-                          defaultValue="all"
-                        >
-                          <SelectTrigger id="category-filter">
-                            <SelectValue placeholder="Select a category" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All Categories</SelectItem>
-                            {statCategories.map((category) => (
-                              <SelectItem key={category.id} value={category.id.toString()}>
-                                <div className="flex items-center">
-                                  <div className="h-3 w-3 rounded-full mr-2" style={{ backgroundColor: category.color }}></div>
-                                  {category.label}
-                                </div>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    )}
-
-                    {filteredCategories.map(([categoryLabel, items]) => (
-                      <div key={categoryLabel} className="space-y-3">
-                        <h3 className="text-lg font-medium">
+              <CardContent className="space-y-6">
+                <div className="mb-6">
+                  <Label htmlFor="category-filter">Filter by Category</Label>
+                  <Select
+                    value={selectedCategory?.toString() || 'all'}
+                    onValueChange={(value) => setSelectedCategory(value !== 'all' ? parseInt(value) : null)}
+                  >
+                    <SelectTrigger id="category-filter">
+                      <SelectValue placeholder="All Categories" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Categories</SelectItem>
+                      {categoriesForFilter.map((category) => (
+                        <SelectItem key={category.id} value={category.id.toString()}>
                           <div className="flex items-center">
                             <div
-                              className="h-3 w-3 rounded-full mr-2"
-                              style={{ backgroundColor: items[0].category.color }}
+                              className="mr-2 h-3 w-3 rounded-full"
+                              style={{ backgroundColor: category.color }}
                             ></div>
-                            {categoryLabel}
+                            {category.label}
                           </div>
-                        </h3>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Item</TableHead>
-                              <TableHead>Value</TableHead>
-                              <TableHead>Notes</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {items.map((item) => (
-                              <TableRow key={item.id}>
-                                <TableCell>
-                                  <div className="flex items-center space-x-2">
-                                    <div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color || item.category.color }}></div>
-                                    <span>{item.label}</span>
-                                  </div>
-                                </TableCell>
-                                <TableCell>
-                                  <Input
-                                    value={statsData[item.id]?.value || ''}
-                                    onChange={(e) => handleStatChange(item.id, e.target.value)}
-                                    placeholder="Value"
-                                  />
-                                </TableCell>
-                                <TableCell>
-                                  <Input
-                                    value={statsData[item.id]?.notes || ''}
-                                    onChange={(e) => handleNotesChange(item.id, e.target.value)}
-                                    placeholder="Optional notes"
-                                  />
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <TreeViewStatSelector
+                  items={filteredStatItems}
+                  statsData={statsData}
+                  onValueChange={handleStatChange}
+                  onNotesChange={handleNotesChange}
+                />
               </CardContent>
             </Card>
 
-            <Card>
-              <CardFooter className="flex justify-end space-x-2 pt-6">
-                <Button
-                  variant="outline"
-                  onClick={() => window.history.back()}
-                  type="button"
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={processing}>
-                  {processing ? 'Creating...' : 'Create Report'}
-                </Button>
-              </CardFooter>
-            </Card>
+            <CardFooter className="bg-background flex p-6 justify-end space-x-2">
+              <Button variant="outline" asChild>
+                <Link href={route('incident-reports.index')}>Cancel</Link>
+              </Button>
+              <Button type="submit" disabled={processing}>
+                {processing ? 'Submitting...' : 'Create Report'}
+              </Button>
+            </CardFooter>
           </div>
         </form>
       </div>
