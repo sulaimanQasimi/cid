@@ -121,49 +121,22 @@ export default function Room({ auth, meeting, isOfflineEnabled }: RoomProps) {
       });
     }
 
-    // Listen for online/offline events
+    // Set up event listeners
     window.addEventListener('online', handleNetworkChange);
     window.addEventListener('offline', handleNetworkChange);
 
-    // Set up Echo listener for WebRTC signals
-    if (window.Echo) {
-      const channel = window.Echo.private(`peer.${newPeerId}`);
-
-      channel.listen('.signal', (data: any) => {
-        console.log('Received signal via Echo:', data);
-        handleIncomingSignal(data);
-      });
-
-      console.log(`Listening on channel peer.${newPeerId}`);
-    } else {
-      console.error('Echo is not available');
-    }
-
     // Cleanup
     return () => {
+      console.log('Cleaning up peer connection');
+      
       if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
-      }
-
-      // Cleanup all peer connections
-      Object.values(peers).forEach(peer => {
-        if (peer.connection) {
-          peer.connection.close();
-        }
-      });
-
-      // Unsubscribe from Echo
-      if (window.Echo) {
-        window.Echo.leave(`peer.${newPeerId}`);
+        localStream.getTracks().forEach(track => {
+          track.stop();
+        });
       }
 
       window.removeEventListener('online', handleNetworkChange);
       window.removeEventListener('offline', handleNetworkChange);
-
-      // End the session if we have one
-      if (sessionId) {
-        endSession();
-      }
     };
   }, []);
 

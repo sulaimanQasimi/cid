@@ -2,10 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Broadcast;
-
-// Add broadcasting auth route for Reverb websockets
-Broadcast::routes(['middleware' => ['web', 'auth']]);
 
 Route::get('/', function () {
     return Inertia::render('welcome');
