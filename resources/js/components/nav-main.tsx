@@ -32,28 +32,28 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                         onClick={() => toggleSubmenu(item.title)}
                         tooltip={{ children: item.title }}
                         isActive={isActive}
-                        className="w-full flex items-center justify-between"
+                        className="w-full flex items-center justify-between hover:bg-primary/5 transition-colors"
                     >
                         <div className="flex items-center">
-                            {item.icon && <item.icon className="mr-2" />}
-                            <span>{item.title}</span>
+                            {item.icon && <item.icon className="mr-2 h-4 w-4" />}
+                            <span className="font-medium">{item.title}</span>
                         </div>
                         <ChevronDown className={`ml-auto h-4 w-4 shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
                     </SidebarMenuButton>
 
                     {isOpen && (
-                        <div className="ml-6 mt-1 space-y-1">
+                        <div className="ml-6 mt-1 space-y-1 border-l border-border/50 pl-2">
                             {item.items?.map((subItem) => (
                                 <SidebarMenuButton
                                     key={subItem.title}
                                     asChild
                                     isActive={subItem.href === page.url}
                                     tooltip={{ children: subItem.title }}
-                                    className="pl-4"
+                                    className="pl-4 hover:bg-primary/5 transition-colors"
                                 >
                                     <Link href={subItem.href || '#'} prefetch>
                                         {subItem.icon && <subItem.icon className="h-4 w-4 mr-2" />}
-                                        <span>{subItem.title}</span>
+                                        <span className="text-sm">{subItem.title}</span>
                                     </Link>
                                 </SidebarMenuButton>
                             ))}
@@ -69,10 +69,11 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                     asChild
                     isActive={isActive}
                     tooltip={{ children: item.title }}
+                    className="hover:bg-primary/5 transition-colors"
                 >
                     <Link href={item.href || '#'} prefetch>
-                        {item.icon && <item.icon />}
-                        <span>{item.title}</span>
+                        {item.icon && <item.icon className="h-4 w-4" />}
+                        <span className="font-medium">{item.title}</span>
                     </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>
@@ -81,7 +82,6 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
 
     return (
         <SidebarGroup className="px-2 py-0">
-            <SidebarGroupLabel>Platform</SidebarGroupLabel>
             <SidebarMenu>
                 {items.map(renderNavItem)}
             </SidebarMenu>

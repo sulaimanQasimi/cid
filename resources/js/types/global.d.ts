@@ -12,3 +12,8 @@ export type PageProps<
         user: User;
     };
 };
+
+// Global route function declaration
+declare global {
+    function route(name: string, params?: any, absolute?: boolean, config?: any): string;
+}
