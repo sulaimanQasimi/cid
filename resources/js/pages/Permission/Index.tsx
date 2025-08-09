@@ -1,8 +1,8 @@
 import React from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Pagination } from '@/components/ui/pagination';
+import { Pagination } from '@/components/pagination';
 import { Button } from '@/components/ui/button';
 
 interface User {
@@ -127,11 +127,7 @@ export default function Index({ auth, users, roles, permissions }: PermissionInd
               </div>
 
               <div className="mt-6">
-                <Pagination
-                  currentPage={users.current_page}
-                  totalPages={users.last_page}
-                  onPageChange={(url) => router.get(url)}
-                />
+                <Pagination links={users.links} />
               </div>
             </div>
           </div>

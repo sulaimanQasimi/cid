@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Pagination } from '@/components/ui/pagination';
+import { Pagination } from '@/components/pagination';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Plus, Search, Trash, Pencil, User as UserIcon } from 'lucide-react';
 import { format } from 'date-fns';
@@ -241,11 +241,7 @@ export default function UserIndex({ users, filters }: Props) {
 
               {users.last_page > 1 && (
                 <div className="mt-4">
-                  <Pagination
-                    currentPage={users.current_page}
-                    totalPages={users.last_page}
-                    onPageChange={(url) => router.get(url)}
-                  />
+                  <Pagination links={users.links} />
                 </div>
               )}
             </CardContent>

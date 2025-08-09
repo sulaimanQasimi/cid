@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Pagination } from '@/components/ui/pagination';
+import { Pagination } from '@/components/pagination';
 import { Button } from '@/components/ui/button';
 import { Plus, Pencil, Trash } from 'lucide-react';
 import {
@@ -155,11 +155,7 @@ export default function Index({ auth, roles, permissions }: RoleIndexProps) {
               </div>
 
               <div className="mt-6">
-                <Pagination
-                  currentPage={roles.current_page}
-                  totalPages={roles.last_page}
-                  onPageChange={(url) => router.get(url)}
-                />
+                <Pagination links={roles.links} />
               </div>
             </div>
           </div>

@@ -1,6 +1,8 @@
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
 
+export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = import('./global').PageProps<T>;
+
 export interface Auth {
     user: User;
 }

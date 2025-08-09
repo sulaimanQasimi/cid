@@ -80,19 +80,11 @@ export default function Edit({ incident, districts, categories, reports }: EditI
 
   const submit: FormEventHandler = (e) => {
     e.preventDefault();
-
-    // Create a copy of the data to modify
-    const formData = { ...data };
-
-    // Convert "none" to null for the incident_report_id
-    if (formData.incident_report_id === 'none') {
-      formData.incident_report_id = null;
+    if (data.incident_report_id === 'none') {
+      setData('incident_report_id', '');
     }
 
-    put(route('incidents.update', incident.id), {
-      ...formData,
-      _method: 'put',
-    });
+    put(route('incidents.update', incident.id));
   };
 
   return (

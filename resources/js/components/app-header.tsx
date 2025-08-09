@@ -11,11 +11,13 @@ import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Menu, Search, type LucideIcon } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 
-const mainNavItems: NavItem[] = [
+type HeaderNavItem = { title: string; href: string; icon?: LucideIcon | null };
+
+const mainNavItems: HeaderNavItem[] = [
     {
         title: 'Dashboard',
         href: '/dashboard',
@@ -23,7 +25,7 @@ const mainNavItems: NavItem[] = [
     },
 ];
 
-const rightNavItems: NavItem[] = [
+const rightNavItems: HeaderNavItem[] = [
     {
         title: 'Repository',
         href: 'https://github.com/laravel/react-starter-kit',

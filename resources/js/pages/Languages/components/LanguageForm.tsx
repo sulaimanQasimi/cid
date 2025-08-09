@@ -15,6 +15,7 @@ interface Language {
   direction: 'ltr' | 'rtl';
   active: boolean;
   default: boolean;
+  [key: string]: any;
 }
 
 interface LanguageFormProps {
