@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from '@/components/ui/label';
 import { useDebounce } from '@/hooks/use-debounce';
+import { useTranslation } from '@/lib/i18n/translate';
 
 type SortDirection = 'asc' | 'desc';
 
@@ -64,6 +65,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Index({ reports, filters = {} }: IncidentReportProps) {
+  const { t } = useTranslation();
   const [search, setSearch] = useState(filters.search || '');
   const [status, setStatus] = useState(filters.status || 'all');
   const [securityLevel, setSecurityLevel] = useState(filters.security_level || 'all');
@@ -136,16 +138,16 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title="Incident Reports" />
+      <Head title={t('incident_reports.page_title')} />
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
         <PageHeader
-          title="Incident Reports"
-          description="Security reports and analysis documents"
+          title={t('incident_reports.page_title')}
+          description={t('incident_reports.page_description')}
           actions={
             <Button asChild>
               <Link href={route('incident-reports.create')}>
                 <Plus className="mr-2 h-4 w-4" />
-                New Report
+                {t('incident_reports.new_report')}
               </Link>
             </Button>
           }
@@ -155,16 +157,16 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
           <CardHeader>
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
-                <CardTitle>All Incident Reports</CardTitle>
+                <CardTitle>{t('incident_reports.all_reports')}</CardTitle>
                 <CardDescription>
-                  A list of all incident reports in the system.
+                  {t('incident_reports.list_description')}
                 </CardDescription>
               </div>
               <div className="flex items-center space-x-2">
                 <div className="relative w-full md:w-auto">
                   <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search reports..."
+                    placeholder={t('incident_reports.search_placeholder')}
                     className="pl-8 pr-4"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -173,7 +175,7 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
                 {(search || status || securityLevel || sortField !== 'report_date' || sortDirection !== 'desc') && (
                   <Button variant="ghost" size="sm" onClick={clearFilters}>
                     <X className="mr-2 h-4 w-4" />
-                    Clear
+                    {t('common.clear')}
                   </Button>
                 )}
               </div>
@@ -182,43 +184,43 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
           <CardContent>
             <div className="mb-4 grid gap-4 md:grid-cols-3">
               <div>
-                <Label htmlFor="status-filter">Status</Label>
+                <Label htmlFor="status-filter">{t('incident_reports.filters.status')}</Label>
                 <Select
                   value={status}
                   onValueChange={setStatus}
                 >
                   <SelectTrigger id="status-filter">
-                    <SelectValue placeholder="All Statuses" />
+                    <SelectValue placeholder={t('incident_reports.filters.all_statuses')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="reviewed">Reviewed</SelectItem>
-                    <SelectItem value="approved">Approved</SelectItem>
-                    <SelectItem value="rejected">Rejected</SelectItem>
+                    <SelectItem value="all">{t('incident_reports.filters.all_statuses')}</SelectItem>
+                    <SelectItem value="pending">{t('incident_reports.status.pending')}</SelectItem>
+                    <SelectItem value="reviewed">{t('incident_reports.status.reviewed')}</SelectItem>
+                    <SelectItem value="approved">{t('incident_reports.status.approved')}</SelectItem>
+                    <SelectItem value="rejected">{t('incident_reports.status.rejected')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label htmlFor="security-level-filter">Security Level</Label>
+                <Label htmlFor="security-level-filter">{t('incident_reports.filters.security_level')}</Label>
                 <Select
                   value={securityLevel}
                   onValueChange={setSecurityLevel}
                 >
                   <SelectTrigger id="security-level-filter">
-                    <SelectValue placeholder="All Security Levels" />
+                    <SelectValue placeholder={t('incident_reports.filters.all_security_levels')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Security Levels</SelectItem>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="critical">Critical</SelectItem>
+                    <SelectItem value="all">{t('incident_reports.filters.all_security_levels')}</SelectItem>
+                    <SelectItem value="low">{t('incident_reports.level.low')}</SelectItem>
+                    <SelectItem value="medium">{t('incident_reports.level.medium')}</SelectItem>
+                    <SelectItem value="high">{t('incident_reports.level.high')}</SelectItem>
+                    <SelectItem value="critical">{t('incident_reports.level.critical')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label htmlFor="sort-by">Sort By</Label>
+                <Label htmlFor="sort-by">{t('incident_reports.filters.sort_by')}</Label>
                 <Select
                   value={`${sortField}:${sortDirection}`}
                   onValueChange={(value) => {
@@ -228,15 +230,15 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
                   }}
                 >
                   <SelectTrigger id="sort-by">
-                    <SelectValue placeholder="Sort by" />
+                    <SelectValue placeholder={t('incident_reports.filters.sort_by')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="report_date:desc">Date (Newest first)</SelectItem>
-                    <SelectItem value="report_date:asc">Date (Oldest first)</SelectItem>
-                    <SelectItem value="report_number:asc">Report Number (A-Z)</SelectItem>
-                    <SelectItem value="report_number:desc">Report Number (Z-A)</SelectItem>
-                    <SelectItem value="incidents_count:desc">Incidents (Most first)</SelectItem>
-                    <SelectItem value="incidents_count:asc">Incidents (Least first)</SelectItem>
+                    <SelectItem value="report_date:desc">{t('incident_reports.sort.date_newest')}</SelectItem>
+                    <SelectItem value="report_date:asc">{t('incident_reports.sort.date_oldest')}</SelectItem>
+                    <SelectItem value="report_number:asc">{t('incident_reports.sort.number_asc')}</SelectItem>
+                    <SelectItem value="report_number:desc">{t('incident_reports.sort.number_desc')}</SelectItem>
+                    <SelectItem value="incidents_count:desc">{t('incident_reports.sort.incidents_most')}</SelectItem>
+                    <SelectItem value="incidents_count:asc">{t('incident_reports.sort.incidents_least')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -250,46 +252,44 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
                       className="h-12 px-4 text-left align-middle font-medium cursor-pointer"
                       onClick={() => handleSort('report_number')}
                     >
-                      Report Number {getSortIcon('report_number')}
+                      {t('incident_reports.table.report_number')} {getSortIcon('report_number')}
                     </th>
                     <th
                       className="h-12 px-4 text-left align-middle font-medium cursor-pointer"
                       onClick={() => handleSort('report_date')}
                     >
-                      Date {getSortIcon('report_date')}
+                      {t('incident_reports.table.date')} {getSortIcon('report_date')}
                     </th>
                     <th
                       className="h-12 px-4 text-left align-middle font-medium cursor-pointer"
                       onClick={() => handleSort('incidents_count')}
                     >
-                      Incidents {getSortIcon('incidents_count')}
+                      {t('incident_reports.table.incidents')} {getSortIcon('incidents_count')}
                     </th>
                     <th
                       className="h-12 px-4 text-left align-middle font-medium cursor-pointer"
                       onClick={() => handleSort('security_level')}
                     >
-                      Security Level {getSortIcon('security_level')}
+                      {t('incident_reports.table.security_level')} {getSortIcon('security_level')}
                     </th>
                     <th className="h-12 px-4 text-left align-middle font-medium">
-                      Submitted By
+                      {t('incident_reports.table.submitted_by')}
                     </th>
                     <th
                       className="h-12 px-4 text-left align-middle font-medium cursor-pointer"
                       onClick={() => handleSort('report_status')}
                     >
-                      Status {getSortIcon('report_status')}
+                      {t('incident_reports.table.status')} {getSortIcon('report_status')}
                     </th>
                     <th className="h-12 px-4 text-left align-middle font-medium">
-                      Actions
+                      {t('common.actions')}
                     </th>
                   </tr>
                 </thead>
                 <tbody className="[&_tr:last-child]:border-0">
                   {reports.data.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="h-12 px-4 text-center align-middle">
-                        No reports found
-                      </td>
+                      <td colSpan={7} className="h-12 px-4 text-center align-middle">{t('incident_reports.no_reports')}</td>
                     </tr>
                   ) : (
                     reports.data.map((report) => (
@@ -310,7 +310,7 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
                         </td>
                         <td className="p-4 align-middle">
                           <Badge variant="outline">
-                            {report.incidents_count} incident{report.incidents_count !== 1 ? 's' : ''}
+                             {t('incident_reports.incidents_count', { count: String(report.incidents_count) })}
                           </Badge>
                         </td>
                         <td className="p-4 align-middle">
@@ -319,11 +319,11 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
                             report.security_level === 'restricted' ? 'destructive' : 'default'
                           }>
                             <Shield className="mr-1 h-3 w-3" />
-                            {report.security_level}
+                             {report.security_level}
                           </Badge>
                         </td>
                         <td className="p-4 align-middle">
-                          {report.submitter?.name || 'Unknown'}
+                           {report.submitter?.name || t('incidents.unknown')}
                         </td>
                         <td className="p-4 align-middle">
                           <Badge variant={
@@ -341,8 +341,8 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
                               asChild
                             >
                               <Link href={route('incident-reports.show', report.id)}>
-                                <FileText className="h-4 w-4 mr-1" />
-                                View
+                                 <FileText className="h-4 w-4 mr-1" />
+                                 {t('incident_reports.view')}
                               </Link>
                             </Button>
 
@@ -352,8 +352,8 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
                               asChild
                             >
                               <Link href={route('incident-reports.incidents', report.id)}>
-                                <AlertCircle className="h-4 w-4 mr-1" />
-                                Incidents
+                                 <AlertCircle className="h-4 w-4 mr-1" />
+                                 {t('incidents.page_title')}
                               </Link>
                             </Button>
                           </div>

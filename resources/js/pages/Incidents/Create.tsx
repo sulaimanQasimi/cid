@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
+import { useTranslation } from '@/lib/i18n/translate';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 
@@ -59,6 +60,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Create({ districts, categories, reports }: CreateIncidentProps) {
+  const { t } = useTranslation();
   const { data, setData, post, processing, errors, reset } = useForm({
     title: '',
     description: '',
@@ -95,15 +97,15 @@ export default function Create({ districts, categories, reports }: CreateInciden
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title="Create New Incident" />
+      <Head title={t('incidents.create_title')} />
       <PageHeader
-        title="Create New Incident"
-        description="Record details of a new security incident"
+        title={t('incidents.create_title')}
+        description={t('incidents.create_description')}
         actions={
           <Button variant="outline" asChild>
             <Link href={route('incidents.index')}>
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Incidents
+              {t('incidents.back_to_list')}
             </Link>
           </Button>
         }
@@ -112,32 +114,30 @@ export default function Create({ districts, categories, reports }: CreateInciden
       <form onSubmit={submit} className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>Basic Information</CardTitle>
-            <CardDescription>
-              incident.label {/* Placeholder label as requested */}
-            </CardDescription>
+            <CardTitle>{t('incidents.basic_info')}</CardTitle>
+            <CardDescription>{t('incidents.basic_info_description')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="title">Title <span className="text-destructive">*</span></Label>
+                <Label htmlFor="title">{t('incidents.form.title')} <span className="text-destructive">*</span></Label>
                 <Input
                   id="title"
                   value={data.title}
                   onChange={e => setData('title', e.target.value)}
-                  placeholder="Enter incident title"
+                  placeholder={t('incidents.form.title_placeholder')}
                   required
                 />
                 <InputError message={errors.title} />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="incident_type">Incident Type <span className="text-destructive">*</span></Label>
+                <Label htmlFor="incident_type">{t('incidents.form.type')} <span className="text-destructive">*</span></Label>
                 <Input
                   id="incident_type"
                   value={data.incident_type}
                   onChange={e => setData('incident_type', e.target.value)}
-                  placeholder="e.g. Theft, Security Breach, Violence"
+                  placeholder={t('incidents.form.type_placeholder')}
                   required
                 />
                 <InputError message={errors.incident_type} />
@@ -145,12 +145,12 @@ export default function Create({ districts, categories, reports }: CreateInciden
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description <span className="text-destructive">*</span></Label>
+              <Label htmlFor="description">{t('incidents.form.description')} <span className="text-destructive">*</span></Label>
               <Textarea
                 id="description"
                 value={data.description}
                 onChange={e => setData('description', e.target.value)}
-                placeholder="Provide a detailed description of the incident"
+                placeholder={t('incidents.form.description_placeholder')}
                 rows={5}
                 required
               />
@@ -159,7 +159,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="incident_date">Date <span className="text-destructive">*</span></Label>
+                <Label htmlFor="incident_date">{t('incidents.form.date')} <span className="text-destructive">*</span></Label>
                 <Input
                   id="incident_date"
                   type="date"
@@ -171,7 +171,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="incident_time">Time</Label>
+                <Label htmlFor="incident_time">{t('incidents.form.time')}</Label>
                 <Input
                   id="incident_time"
                   type="time"
@@ -186,19 +186,19 @@ export default function Create({ districts, categories, reports }: CreateInciden
 
         <Card>
           <CardHeader>
-            <CardTitle>Location & Classification</CardTitle>
+            <CardTitle>{t('incidents.location_classification')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="district_id">District <span className="text-destructive">*</span></Label>
+                <Label htmlFor="district_id">{t('incidents.form.district')} <span className="text-destructive">*</span></Label>
                 <Select
                   value={data.district_id}
                   onValueChange={value => setData('district_id', value)}
                   required
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a district" />
+                    <SelectValue placeholder={t('incidents.form.select_district')} />
                   </SelectTrigger>
                   <SelectContent>
                     {districts.map(district => (
@@ -212,14 +212,14 @@ export default function Create({ districts, categories, reports }: CreateInciden
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="incident_category_id">Category <span className="text-destructive">*</span></Label>
+                <Label htmlFor="incident_category_id">{t('incidents.form.category')} <span className="text-destructive">*</span></Label>
                 <Select
                   value={data.incident_category_id}
                   onValueChange={value => setData('incident_category_id', value)}
                   required
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
+                    <SelectValue placeholder={t('incidents.form.select_category')} />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map(category => (
@@ -234,23 +234,23 @@ export default function Create({ districts, categories, reports }: CreateInciden
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="location">Specific Location</Label>
+              <Label htmlFor="location">{t('incidents.form.location')}</Label>
               <Input
                 id="location"
                 value={data.location}
                 onChange={e => setData('location', e.target.value)}
-                placeholder="e.g. Main Market, North Checkpoint"
+                placeholder={t('incidents.form.location_placeholder')}
               />
               <InputError message={errors.location} />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="coordinates">Coordinates</Label>
+              <Label htmlFor="coordinates">{t('incidents.form.coordinates')}</Label>
               <Input
                 id="coordinates"
                 value={data.coordinates}
                 onChange={e => setData('coordinates', e.target.value)}
-                placeholder="e.g. 34.5553° N, 69.2075° E"
+                placeholder={t('incidents.form.coordinates_placeholder')}
               />
               <InputError message={errors.coordinates} />
             </div>
@@ -259,12 +259,12 @@ export default function Create({ districts, categories, reports }: CreateInciden
 
         <Card>
           <CardHeader>
-            <CardTitle>Impact & Status</CardTitle>
+            <CardTitle>{t('incidents.impact_status')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="casualties">Casualties</Label>
+                <Label htmlFor="casualties">{t('incidents.form.casualties')}</Label>
                 <Input
                   id="casualties"
                   type="number"
@@ -276,7 +276,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="injuries">Injuries</Label>
+                <Label htmlFor="injuries">{t('incidents.form.injuries')}</Label>
                 <Input
                   id="injuries"
                   type="number"
@@ -289,20 +289,20 @@ export default function Create({ districts, categories, reports }: CreateInciden
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="status">Status <span className="text-destructive">*</span></Label>
+              <Label htmlFor="status">{t('incidents.form.status')} <span className="text-destructive">*</span></Label>
               <Select
                 value={data.status}
                 onValueChange={value => setData('status', value)}
                 required
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
+                  <SelectValue placeholder={t('incidents.form.select_status')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="reported">Reported</SelectItem>
-                  <SelectItem value="investigating">Investigating</SelectItem>
-                  <SelectItem value="resolved">Resolved</SelectItem>
-                  <SelectItem value="closed">Closed</SelectItem>
+                  <SelectItem value="reported">{t('incidents.status.reported')}</SelectItem>
+                  <SelectItem value="investigating">{t('incidents.status.investigating')}</SelectItem>
+                  <SelectItem value="resolved">{t('incidents.status.resolved')}</SelectItem>
+                  <SelectItem value="closed">{t('incidents.status.closed')}</SelectItem>
                 </SelectContent>
               </Select>
               <InputError message={errors.status} />
@@ -311,16 +311,16 @@ export default function Create({ districts, categories, reports }: CreateInciden
             <Separator className="my-4" />
 
             <div className="space-y-2">
-              <Label htmlFor="incident_report_id">Assign to Report (Optional)</Label>
+              <Label htmlFor="incident_report_id">{t('incidents.form.assign_report')}</Label>
               <Select
                 value={data.incident_report_id}
                 onValueChange={value => setData('incident_report_id', value)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a report (optional)" />
+                  <SelectValue placeholder={t('incidents.form.select_report_optional')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">None</SelectItem>
+                  <SelectItem value="none">{t('incidents.none')}</SelectItem>
                   {reports.map(report => (
                     <SelectItem key={report.id} value={report.id.toString()}>
                       {report.report_number}
@@ -334,11 +334,11 @@ export default function Create({ districts, categories, reports }: CreateInciden
 
           <CardFooter className="flex justify-end space-x-2">
             <Button variant="outline" onClick={() => reset()}>
-              Reset
+              {t('common.cancel')}
             </Button>
             <Button type="submit" disabled={processing}>
               <Save className="mr-2 h-4 w-4" />
-              Save Incident
+              {t('incidents.save_incident')}
             </Button>
           </CardFooter>
         </Card>

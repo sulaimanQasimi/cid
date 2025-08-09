@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import axios from 'axios';
 import TreeViewStatSelector from '@/components/reports/TreeViewStatSelector';
+import { useTranslation } from '@/lib/i18n/translate';
 
 interface StatCategory {
   id: number;
@@ -73,6 +74,7 @@ interface EditProps {
 }
 
 export default function Edit({ report, statItems, reportStats, statCategories }: EditProps) {
+  const { t } = useTranslation();
   const { data, setData, put, processing, errors } = useForm({
     report_number: report.report_number,
     report_date: report.report_date,
@@ -215,17 +217,17 @@ export default function Edit({ report, statItems, reportStats, statCategories }:
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title={`Edit Report - ${report.report_number}`} />
+      <Head title={t('incident_reports.edit.page_title', { number: report.report_number })} />
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
         <PageHeader
-          title={`Edit Report ${report.report_number}`}
-          description="Modify this incident report"
+          title={t('incident_reports.edit.page_header', { number: report.report_number })}
+          description={t('incident_reports.edit.page_description')}
           actions={
             <div className="flex space-x-2">
               <Button variant="outline" asChild>
                 <Link href={route('incident-reports.show', report.id)}>
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Report
+                  {t('incident_reports.actions.back_to_report')}
                 </Link>
               </Button>
             </div>
@@ -236,12 +238,12 @@ export default function Edit({ report, statItems, reportStats, statCategories }:
           <div className="grid gap-4">
             <Card>
               <CardHeader>
-                <CardTitle>Report Information</CardTitle>
-                <CardDescription>Update the basic report information</CardDescription>
+                <CardTitle>{t('incident_reports.form.info_title')}</CardTitle>
+                <CardDescription>{t('incident_reports.form.info_description')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid gap-3">
-                  <Label htmlFor="report_number">Report Number</Label>
+                  <Label htmlFor="report_number">{t('incident_reports.form.report_number')}</Label>
                   <Input
                     id="report_number"
                     value={data.report_number}
@@ -252,7 +254,7 @@ export default function Edit({ report, statItems, reportStats, statCategories }:
                 </div>
 
                 <div className="grid gap-3">
-                  <Label htmlFor="report_date">Report Date</Label>
+                  <Label htmlFor="report_date">{t('incident_reports.form.report_date')}</Label>
                   <Input
                     id="report_date"
                     type="date"
@@ -264,48 +266,48 @@ export default function Edit({ report, statItems, reportStats, statCategories }:
                 </div>
 
                 <div className="grid gap-3">
-                  <Label htmlFor="security_level">Security Level</Label>
+                  <Label htmlFor="security_level">{t('incident_reports.form.security_level')}</Label>
                   <Select
                     value={data.security_level}
                     onValueChange={(value) => setData('security_level', value)}
                   >
                     <SelectTrigger id="security_level">
-                      <SelectValue placeholder="Select security level" />
+                      <SelectValue placeholder={t('incident_reports.form.security_level_placeholder')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="normal">Normal</SelectItem>
-                      <SelectItem value="restricted">Restricted</SelectItem>
-                      <SelectItem value="classified">Classified</SelectItem>
+                      <SelectItem value="normal">{t('incident_reports.level.normal')}</SelectItem>
+                      <SelectItem value="restricted">{t('incident_reports.level.restricted')}</SelectItem>
+                      <SelectItem value="classified">{t('incident_reports.level.classified')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <InputError message={errors.security_level} />
                 </div>
 
                 <div className="grid gap-3">
-                  <Label htmlFor="report_status">Status</Label>
+                  <Label htmlFor="report_status">{t('incident_reports.form.status')}</Label>
                   <Select
                     value={data.report_status}
                     onValueChange={(value) => setData('report_status', value)}
                   >
                     <SelectTrigger id="report_status">
-                      <SelectValue placeholder="Select report status" />
+                      <SelectValue placeholder={t('incident_reports.form.status_placeholder')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="submitted">Submitted</SelectItem>
-                      <SelectItem value="reviewed">Reviewed</SelectItem>
-                      <SelectItem value="approved">Approved</SelectItem>
+                      <SelectItem value="submitted">{t('incident_reports.status.submitted')}</SelectItem>
+                      <SelectItem value="reviewed">{t('incident_reports.status.reviewed')}</SelectItem>
+                      <SelectItem value="approved">{t('incident_reports.status.approved')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <InputError message={errors.report_status} />
                 </div>
 
                 <div className="grid gap-3">
-                  <Label htmlFor="source">Source (Optional)</Label>
+                  <Label htmlFor="source">{t('incident_reports.form.source_label')}</Label>
                   <Input
                     id="source"
                     value={data.source}
                     onChange={(e) => setData('source', e.target.value)}
-                    placeholder="Information source"
+                    placeholder={t('incident_reports.form.source_placeholder')}
                   />
                   <InputError message={errors.source} />
                 </div>
@@ -314,43 +316,43 @@ export default function Edit({ report, statItems, reportStats, statCategories }:
 
             <Card>
               <CardHeader>
-                <CardTitle>Report Details</CardTitle>
-                <CardDescription>Update the detailed information for this report</CardDescription>
+                <CardTitle>{t('incident_reports.details.title')}</CardTitle>
+                <CardDescription>{t('incident_reports.details.edit_description')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid gap-3">
-                  <Label htmlFor="details">Details</Label>
+                  <Label htmlFor="details">{t('incident_reports.details.details_label')}</Label>
                   <Textarea
                     id="details"
                     rows={5}
                     value={data.details}
                     onChange={(e) => setData('details', e.target.value)}
-                    placeholder="Enter the report details..."
+                    placeholder={t('incident_reports.details.details_placeholder')}
                     required
                   />
                   <InputError message={errors.details} />
                 </div>
 
                 <div className="grid gap-3">
-                  <Label htmlFor="action_taken">Action Taken (Optional)</Label>
+                  <Label htmlFor="action_taken">{t('incident_reports.details.action_taken_label')}</Label>
                   <Textarea
                     id="action_taken"
                     rows={3}
                     value={data.action_taken}
                     onChange={(e) => setData('action_taken', e.target.value)}
-                    placeholder="Describe any actions taken..."
+                    placeholder={t('incident_reports.details.action_taken_placeholder')}
                   />
                   <InputError message={errors.action_taken} />
                 </div>
 
                 <div className="grid gap-3">
-                  <Label htmlFor="recommendation">Recommendation (Optional)</Label>
+                  <Label htmlFor="recommendation">{t('incident_reports.details.recommendation_label')}</Label>
                   <Textarea
                     id="recommendation"
                     rows={3}
                     value={data.recommendation}
                     onChange={(e) => setData('recommendation', e.target.value)}
-                    placeholder="Enter any recommendations..."
+                    placeholder={t('incident_reports.details.recommendation_placeholder')}
                   />
                   <InputError message={errors.recommendation} />
                 </div>
@@ -359,24 +361,24 @@ export default function Edit({ report, statItems, reportStats, statCategories }:
 
             <Card>
               <CardHeader>
-                <CardTitle>Statistical Data</CardTitle>
+                <CardTitle>{t('incident_reports.stats.title')}</CardTitle>
                 <CardDescription>
-                  Record statistical information related to this report
+                  {t('incident_reports.stats.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Category filter dropdown */}
                 <div className="mb-6">
-                  <Label htmlFor="category-filter">Filter by Category</Label>
+                  <Label htmlFor="category-filter">{t('incident_reports.stats.filter_by_category')}</Label>
                   <Select
                     value={selectedCategory?.toString() || 'all'}
                     onValueChange={(value) => setSelectedCategory(value !== 'all' ? parseInt(value) : null)}
                   >
                     <SelectTrigger id="category-filter">
-                      <SelectValue placeholder="All Categories" />
+                      <SelectValue placeholder={t('incidents.filters.all_categories')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Categories</SelectItem>
+                      <SelectItem value="all">{t('incidents.filters.all_categories')}</SelectItem>
                       {categoriesForFilter.map((category) => (
                         <SelectItem key={category.id} value={category.id.toString()}>
                           <div className="flex items-center">
@@ -410,12 +412,12 @@ export default function Edit({ report, statItems, reportStats, statCategories }:
                   type="button"
                 >
                   <Link href={route('incident-reports.show', report.id)}>
-                    Cancel
+                    {t('common.cancel')}
                   </Link>
                 </Button>
                 <Button type="submit" disabled={processing}>
                   <Save className="mr-2 h-4 w-4" />
-                  {processing ? 'Saving...' : 'Save Changes'}
+                  {processing ? t('incident_reports.actions.saving') : t('incident_reports.actions.save_changes')}
                 </Button>
               </CardFooter>
             </Card>

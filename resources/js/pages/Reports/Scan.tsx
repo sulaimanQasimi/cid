@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
 import { FileText, Search, QrCode } from 'lucide-react';
+import { useTranslation } from '@/lib/i18n/translate';
 
 interface ScanProps {}
 
 export default function ReportScan({}: ScanProps) {
+  const { t } = useTranslation();
   const [code, setCode] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -13,7 +15,7 @@ export default function ReportScan({}: ScanProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!code.trim()) {
-      setError('Please enter a report code');
+      setError(t('reports.scan.error_enter_code'));
       return;
     }
 
@@ -26,10 +28,10 @@ export default function ReportScan({}: ScanProps) {
         // Navigate to the report view page by code
         router.visit(route('reports.view_by_code', { code: code.trim() }));
       } else {
-        setError('Report not found');
+        setError(t('reports.view.error_not_found'));
       }
     } catch (err) {
-      setError('Failed to find report. Please check the code and try again.');
+      setError(t('reports.scan.error_failed_find'));
     } finally {
       setLoading(false);
     }
@@ -37,14 +39,14 @@ export default function ReportScan({}: ScanProps) {
 
   return (
     <>
-      <Head title="Scan Report" />
+      <Head title={t('reports.scan.page_title')} />
 
       <div className="py-12">
         <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
           <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h1 className="text-2xl font-semibold text-gray-900">Scan Report</h1>
+                <h1 className="text-2xl font-semibold text-gray-900">{t('reports.scan.page_title')}</h1>
               </div>
 
               <div className="mb-8 p-6 bg-gray-50 rounded-lg">
@@ -52,9 +54,9 @@ export default function ReportScan({}: ScanProps) {
                   <div className="inline-block p-4 bg-primary/10 rounded-full mb-4">
                     <QrCode size={40} className="text-primary" />
                   </div>
-                  <h2 className="text-xl font-bold text-gray-800">Enter Report Code</h2>
+                  <h2 className="text-xl font-bold text-gray-800">{t('reports.scan.enter_code')}</h2>
                   <p className="text-gray-600 mt-2">
-                    Enter the report code to view report details
+                    {t('reports.scan.enter_code_hint')}
                   </p>
                 </div>
 
@@ -71,7 +73,7 @@ export default function ReportScan({}: ScanProps) {
                           value={code}
                           onChange={(e) => setCode(e.target.value)}
                           className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full pl-10 p-2.5"
-                          placeholder="Enter report code (e.g., ABC12345)"
+                          placeholder={t('reports.scan.placeholder')}
                           required
                         />
                       </div>
@@ -97,12 +99,12 @@ export default function ReportScan({}: ScanProps) {
               </div>
 
               <div className="mt-8">
-                <h2 className="text-lg font-semibold text-gray-800 mb-4">Instructions</h2>
+                <h2 className="text-lg font-semibold text-gray-800 mb-4">{t('reports.scan.instructions_title')}</h2>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <ol className="list-decimal list-inside space-y-2 text-gray-700">
-                    <li>Enter the unique report code from the printed document</li>
-                    <li>Click the search button to retrieve the report</li>
-                    <li>If found, you will be redirected to the report details page</li>
+                    <li>{t('reports.scan.instructions.step1')}</li>
+                    <li>{t('reports.scan.instructions.step2')}</li>
+                    <li>{t('reports.scan.instructions.step3')}</li>
                   </ol>
                 </div>
               </div>

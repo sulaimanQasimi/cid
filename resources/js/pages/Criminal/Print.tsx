@@ -5,6 +5,7 @@ import { UserRound, Printer, FileText, Palette, Type, Settings, X, Layout, Tag, 
 import { router } from '@inertiajs/react';
 import axios from 'axios';
 import { QRCodeSVG } from 'qrcode.react';
+import { useTranslation } from '@/lib/i18n/translate';
 
 interface Criminal {
   id: number;
@@ -82,6 +83,7 @@ interface Props {
 }
 
 export default function CriminalPrint({ criminal }: Props) {
+  const { t } = useTranslation();
   // State to track the report code
   const [reportCode, setReportCode] = useState<string>('------');
   const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false);
@@ -357,7 +359,7 @@ export default function CriminalPrint({ criminal }: Props) {
 
   return (
     <>
-      <Head title={`Print: ${criminal.name}`} />
+      <Head title={t('criminal.print.page_title', { name: criminal.name })} />
 
       {/* Dynamic styles - this will be managed by JavaScript */}
       <style id="dynamic-print-styles"></style>
@@ -369,13 +371,13 @@ export default function CriminalPrint({ criminal }: Props) {
             <div className="flex items-center justify-between p-4 border-b">
               <h2 className="text-lg font-semibold flex items-center">
                 <FileText className="mr-2 h-5 w-5" />
-                Print Settings
+                {t('criminal.print.settings.title')}
               </h2>
               <button
                 onClick={() => setShowSettingsModal(false)}
                 className="text-gray-500 hover:text-gray-700 focus:outline-none"
               >
-                <X className="h-5 w-5" />
+                 <X className="h-5 w-5" />
               </button>
             </div>
 
@@ -390,7 +392,7 @@ export default function CriminalPrint({ criminal }: Props) {
                 >
                   <div className="flex items-center">
                     <Palette className="mr-2 h-4 w-4" />
-                    Colors
+                    {t('criminal.print.settings.tabs.colors')}
                   </div>
                 </button>
                 <button
@@ -401,7 +403,7 @@ export default function CriminalPrint({ criminal }: Props) {
                 >
                   <div className="flex items-center">
                     <Type className="mr-2 h-4 w-4" />
-                    Typography
+                    {t('criminal.print.settings.tabs.typography')}
                   </div>
                 </button>
                 <button
@@ -412,7 +414,7 @@ export default function CriminalPrint({ criminal }: Props) {
                 >
                   <div className="flex items-center">
                     <Layout className="mr-2 h-4 w-4" />
-                    Layout
+                    {t('criminal.print.settings.tabs.layout')}
                   </div>
                 </button>
                 <button
@@ -423,7 +425,7 @@ export default function CriminalPrint({ criminal }: Props) {
                 >
                   <div className="flex items-center">
                     <Tag className="mr-2 h-4 w-4" />
-                    Labels
+                    {t('criminal.print.settings.tabs.labels')}
                   </div>
                 </button>
               </div>
@@ -433,13 +435,13 @@ export default function CriminalPrint({ criminal }: Props) {
                 <div className="space-y-4">
                   <div className="flex items-center">
                     <Palette className="mr-2 h-5 w-5 text-primary" />
-                    <h3 className="text-md font-medium">Colors</h3>
+                   <h3 className="text-md font-medium">{t('criminal.print.settings.colors.title')}</h3>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Header Color
+                       {t('criminal.print.settings.colors.header')}
                       </label>
                       <div className="flex items-center space-x-2">
                         <div className="relative">
@@ -467,7 +469,7 @@ export default function CriminalPrint({ criminal }: Props) {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Text Color
+                       {t('criminal.print.settings.colors.text')}
                       </label>
                       <div className="flex items-center space-x-2">
                         <div className="relative">
@@ -495,7 +497,7 @@ export default function CriminalPrint({ criminal }: Props) {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Accent Color
+                       {t('criminal.print.settings.colors.accent')}
                       </label>
                       <div className="flex items-center space-x-2">
                         <div className="relative">
@@ -529,13 +531,13 @@ export default function CriminalPrint({ criminal }: Props) {
                 <div className="space-y-4">
                   <div className="flex items-center">
                     <Type className="mr-2 h-5 w-5 text-primary" />
-                    <h3 className="text-md font-medium">Typography</h3>
+                   <h3 className="text-md font-medium">{t('criminal.print.settings.typography.title')}</h3>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Font Family
+                       {t('criminal.print.settings.typography.font_family')}
                       </label>
                       <select
                         value={printSettings.fontFamily}
@@ -552,7 +554,7 @@ export default function CriminalPrint({ criminal }: Props) {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Font Size
+                       {t('criminal.print.settings.typography.font_size')}
                       </label>
                       <div className="flex items-center">
                         <input
@@ -577,13 +579,13 @@ export default function CriminalPrint({ criminal }: Props) {
                 <div className="space-y-4">
                   <div className="flex items-center">
                     <Layout className="mr-2 h-5 w-5 text-primary" />
-                    <h3 className="text-md font-medium">Layout</h3>
+                   <h3 className="text-md font-medium">{t('criminal.print.settings.layout.title')}</h3>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Page Size
+                       {t('criminal.print.settings.layout.page_size')}
                       </label>
                       <select
                         value={printSettings.pageSize}
@@ -598,7 +600,7 @@ export default function CriminalPrint({ criminal }: Props) {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Orientation
+                       {t('criminal.print.settings.layout.orientation')}
                       </label>
                       <select
                         value={printSettings.orientation}
@@ -612,7 +614,7 @@ export default function CriminalPrint({ criminal }: Props) {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Margins
+                       {t('criminal.print.settings.layout.margins')}
                       </label>
                       <select
                         value={printSettings.margins}
@@ -633,16 +635,16 @@ export default function CriminalPrint({ criminal }: Props) {
                 <div className="space-y-4">
                   <div className="flex items-center">
                     <Tag className="mr-2 h-5 w-5 text-primary" />
-                    <h3 className="text-md font-medium">Labels</h3>
+                   <h3 className="text-md font-medium">{t('criminal.print.settings.labels.title')}</h3>
                   </div>
 
                   <div className="grid grid-cols-1 gap-4">
                     <div className="border rounded-lg p-4 bg-gray-50">
-                      <h4 className="font-medium text-gray-700 mb-2">Report Header</h4>
+                       <h4 className="font-medium text-gray-700 mb-2">{t('criminal.print.settings.labels.report_header')}</h4>
                       <div className="grid grid-cols-1 gap-3">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Report Title
+                             {t('criminal.print.settings.labels.report_title')}
                           </label>
                           <input
                             type="text"
@@ -655,11 +657,11 @@ export default function CriminalPrint({ criminal }: Props) {
                     </div>
 
                     <div className="border rounded-lg p-4 bg-gray-50">
-                      <h4 className="font-medium text-gray-700 mb-2">Personal Information</h4>
+                       <h4 className="font-medium text-gray-700 mb-2">{t('criminal.print.settings.labels.personal_information')}</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Name Label
+                             {t('criminal.print.settings.labels.name')}
                           </label>
                           <input
                             type="text"
@@ -670,7 +672,7 @@ export default function CriminalPrint({ criminal }: Props) {
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Father's Name
+                             {t('criminal.print.settings.labels.father_name')}
                           </label>
                           <input
                             type="text"
@@ -681,7 +683,7 @@ export default function CriminalPrint({ criminal }: Props) {
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Grandfather's Name
+                             {t('criminal.print.settings.labels.grandfather_name')}
                           </label>
                           <input
                             type="text"
@@ -692,7 +694,7 @@ export default function CriminalPrint({ criminal }: Props) {
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            ID Card Number
+                             {t('criminal.print.settings.labels.id_card_number')}
                           </label>
                           <input
                             type="text"
@@ -703,7 +705,7 @@ export default function CriminalPrint({ criminal }: Props) {
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Phone Number
+                             {t('criminal.print.settings.labels.phone_number')}
                           </label>
                           <input
                             type="text"
@@ -716,11 +718,11 @@ export default function CriminalPrint({ criminal }: Props) {
                     </div>
 
                     <div className="border rounded-lg p-4 bg-gray-50">
-                      <h4 className="font-medium text-gray-700 mb-2">Residence Information</h4>
+                       <h4 className="font-medium text-gray-700 mb-2">{t('criminal.print.settings.labels.residence_information')}</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Original Residence
+                             {t('criminal.print.settings.labels.original_residence')}
                           </label>
                           <input
                             type="text"
@@ -731,7 +733,7 @@ export default function CriminalPrint({ criminal }: Props) {
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Current Residence
+                             {t('criminal.print.settings.labels.current_residence')}
                           </label>
                           <input
                             type="text"
@@ -744,11 +746,11 @@ export default function CriminalPrint({ criminal }: Props) {
                     </div>
 
                     <div className="border rounded-lg p-4 bg-gray-50">
-                      <h4 className="font-medium text-gray-700 mb-2">Crime Information</h4>
+                       <h4 className="font-medium text-gray-700 mb-2">{t('criminal.print.settings.labels.crime_information')}</h4>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Crime Type
+                             {t('criminal.print.settings.labels.crime_type')}
                           </label>
                           <input
                             type="text"
@@ -759,7 +761,7 @@ export default function CriminalPrint({ criminal }: Props) {
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Arrest Date
+                             {t('criminal.print.settings.labels.arrest_date')}
                           </label>
                           <input
                             type="text"
@@ -770,7 +772,7 @@ export default function CriminalPrint({ criminal }: Props) {
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Arrest Location
+                             {t('criminal.print.settings.labels.arrest_location')}
                           </label>
                           <input
                             type="text"
@@ -783,11 +785,11 @@ export default function CriminalPrint({ criminal }: Props) {
                     </div>
 
                     <div className="border rounded-lg p-4 bg-gray-50">
-                      <h4 className="font-medium text-gray-700 mb-2">Investigation Details</h4>
+                       <h4 className="font-medium text-gray-700 mb-2">{t('criminal.print.settings.labels.investigation_details')}</h4>
                       <div className="grid grid-cols-1 gap-3">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Investigation Title
+                             {t('criminal.print.settings.labels.investigation_title')}
                           </label>
                           <input
                             type="text"
@@ -798,7 +800,7 @@ export default function CriminalPrint({ criminal }: Props) {
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Final Verdict
+                             {t('criminal.print.settings.labels.final_verdict')}
                           </label>
                           <input
                             type="text"
@@ -809,7 +811,7 @@ export default function CriminalPrint({ criminal }: Props) {
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Notes Label
+                             {t('criminal.print.settings.labels.notes')}
                           </label>
                           <input
                             type="text"
@@ -822,11 +824,11 @@ export default function CriminalPrint({ criminal }: Props) {
                     </div>
 
                     <div className="border rounded-lg p-4 bg-gray-50">
-                      <h4 className="font-medium text-gray-700 mb-2">Footer Information</h4>
+                       <h4 className="font-medium text-gray-700 mb-2">{t('criminal.print.settings.labels.footer_information')}</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Investigator Name
+                             {t('criminal.print.settings.labels.investigator')}
                           </label>
                           <input
                             type="text"
@@ -837,7 +839,7 @@ export default function CriminalPrint({ criminal }: Props) {
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Director Signature
+                             {t('criminal.print.settings.labels.director_signature')}
                           </label>
                           <input
                             type="text"
@@ -858,13 +860,13 @@ export default function CriminalPrint({ criminal }: Props) {
                 onClick={() => setShowSettingsModal(false)}
                 className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 onClick={() => setShowSettingsModal(false)}
                 className="px-4 py-2 bg-primary border border-transparent rounded-md text-sm font-medium text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
               >
-                Apply
+                {t('common.save')}
               </button>
               <button
                 onClick={() => {
@@ -873,7 +875,7 @@ export default function CriminalPrint({ criminal }: Props) {
                 }}
                 className="px-4 py-2 bg-primary border border-transparent rounded-md text-sm font-medium text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
               >
-                Apply & Print
+                {t('criminal.print.settings.apply_and_print')}
               </button>
             </div>
           </div>
@@ -888,14 +890,14 @@ export default function CriminalPrint({ criminal }: Props) {
             className="bg-white text-gray-700 border border-gray-300 px-6 py-2 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2"
           >
             <Settings size={18} />
-            <span>Format</span>
+            <span>{t('reports.view.format')}</span>
           </button>
           <button
             onClick={() => window.print()}
             className="bg-primary text-white px-6 py-2 rounded-md hover:bg-primary/90 transition-colors flex items-center gap-2"
           >
             <Printer size={18} />
-            <span>Print Document</span>
+            <span>{t('reports.view.print')}</span>
           </button>
         </div>
       </div>

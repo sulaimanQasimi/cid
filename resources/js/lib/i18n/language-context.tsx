@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import fa from './translations/fa.json';
+import en from './translations/en.json';
 
 // Types for our language context
 export type Direction = 'ltr' | 'rtl';
@@ -22,10 +24,8 @@ interface LanguageContextType {
 // Create the context with default values
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-// Default languages
+// Force RTL only – single language configuration
 const defaultLanguages: Language[] = [
-  { code: 'en', name: 'English', direction: 'ltr', active: true },
-  { code: 'ps', name: 'پښتو', direction: 'rtl', active: true },
   { code: 'fa', name: 'دری', direction: 'rtl', active: true },
 ];
 
@@ -36,9 +36,12 @@ interface LanguageProviderProps {
   initialLanguage?: LanguageCode;
 }
 
-// Translations storage
+// Static translations (RTL-only app uses fa as primary, en as fallback)
 type TranslationMap = Record<string, Record<string, string>>;
-let translations: TranslationMap = {};
+const translations: TranslationMap = {
+  fa: (fa as unknown as Record<string, string>) || {},
+  en: (en as unknown as Record<string, string>) || {},
+};
 
 export const LanguageProvider: React.FC<LanguageProviderProps> = ({
   children,
@@ -51,146 +54,29 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
   };
 
   const [currentLanguage, setCurrentLanguage] = useState<Language>(getInitialLanguage());
-  const [languages, setLanguages] = useState<Language[]>(defaultLanguages);
-  const [isLoaded, setIsLoaded] = useState<boolean>(false);
+  const [languages] = useState<Language[]>(defaultLanguages);
 
-  // Function to change the current language
-  const setLanguage = (code: LanguageCode) => {
-    console.log('Setting language to:', code);
-    const newLanguage = languages.find(lang => lang.code === code);
-    if (newLanguage) {
-      localStorage.setItem('appLanguage', code);
+  // Function to change the current language (no-op in RTL-only app)
+  const setLanguage = (_code: LanguageCode) => {};
 
-      // First update the document direction and language
-      document.documentElement.dir = newLanguage.direction;
-      document.documentElement.lang = code;
-
-      // Apply RTL-specific global styles when needed
-      if (newLanguage.direction === 'rtl') {
-        // Add global RTL fixes for the sidebar if not already present
-        if (!document.getElementById('global-rtl-fixes')) {
-          const style = document.createElement('style');
-          style.id = 'global-rtl-fixes';
-          style.textContent = `
-            /* Global RTL fixes */
-            body[dir="rtl"] .group-data-\\[side\\=left\\]\\:-right-4 {
-              right: auto !important;
-              left: -1rem !important;
-            }
-
-            body[dir="rtl"] [data-slot="sidebar"] {
-              right: 0 !important;
-              left: auto !important;
-            }
-
-            body[dir="rtl"] [data-side="right"] {
-              right: 0 !important;
-              left: auto !important;
-            }
-
-            body[dir="rtl"] .peer-data-\\[variant\\=inset\\]\\:ml-0 {
-              margin-left: auto !important;
-              margin-right: 0 !important;
-            }
-          `;
-          document.head.appendChild(style);
-        }
-      }
-
-      // Then update the language state
-      setTimeout(() => {
-        setCurrentLanguage(newLanguage);
-        // Immediately load translations for the new language
-        loadTranslations(code);
-      }, 0);
-    }
-  };
-
-  // Translation function
+  // Translation function with params and fallback (fa -> en -> key)
   const t = (key: string, params?: Record<string, string>): string => {
-    // Get translation from the current language or fallback to default
-    const translation =
-      translations[currentLanguage.code]?.[key] ||
-      translations[defaultLanguage.code]?.[key] ||
-      key;
-
-    // Replace parameters if provided
+    let result = translations.fa?.[key] ?? translations.en?.[key] ?? key;
     if (params) {
-      return Object.entries(params).reduce(
-        (acc, [param, value]) => acc.replace(new RegExp(`{{${param}}}`, 'g'), value),
-        translation
+      result = Object.entries(params).reduce(
+        (acc, [param, value]) => acc.replace(new RegExp(`{{${param}}}`, 'g'), String(value)),
+        result,
       );
     }
-
-    return translation;
-  };
-
-  // Load translations for a language
-  const loadTranslations = async (languageCode: string) => {
-    try {
-      // Check if translations for this language are already loaded
-      if (!translations[languageCode]) {
-        // Initialize with empty object in case API call fails
-        translations = {
-          ...translations,
-          [languageCode]: {},
-        };
-
-        // Re-enable API call now that routes are fixed
-        const response = await fetch(`/api/translations/lang/${languageCode}`);
-        if (response.ok) {
-          const data = await response.json();
-          translations = {
-            ...translations,
-            [languageCode]: data.translations || {},
-          };
-        }
-      }
-    } catch (error) {
-      console.error('Failed to load translations:', error);
-    }
-  };
-
-  // Load all active languages from the server
-  const loadLanguages = async () => {
-    try {
-      // Re-enable API call now that routes are fixed
-      const response = await fetch('/api/languages');
-      if (response.ok) {
-        const data = await response.json();
-        if (data.languages && Array.isArray(data.languages)) {
-          setLanguages(data.languages);
-
-          // If current language is not in the new list, use default
-          if (!data.languages.some((lang: Language) => lang.code === currentLanguage.code)) {
-            setCurrentLanguage(data.languages.find((lang: Language) => lang.active) || defaultLanguage);
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Failed to load languages:', error);
-    }
+    return result;
   };
 
   // Initial setup
   useEffect(() => {
-    // Set document direction based on current language
-    document.documentElement.dir = currentLanguage.direction;
-    document.documentElement.lang = currentLanguage.code;
-
-    // Load languages and translations
-    loadLanguages();
-    loadTranslations(currentLanguage.code);
-
-    setIsLoaded(true);
+    // Apply RTL direction and lang
+    document.documentElement.dir = 'rtl';
+    document.documentElement.lang = defaultLanguage.code;
   }, []);
-
-  // Load translations when language changes
-  useEffect(() => {
-    if (isLoaded) {
-      loadTranslations(currentLanguage.code);
-    }
-  }, [currentLanguage, isLoaded]);
 
   return (
     <LanguageContext.Provider

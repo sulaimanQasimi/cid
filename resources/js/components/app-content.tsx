@@ -11,7 +11,7 @@ export function AppContent({ variant = 'header', children, ...props }: AppConten
 
     // Apply RTL-specific layout adjustments
     React.useEffect(() => {
-        if (variant === 'sidebar' && direction === 'rtl') {
+        if (variant === 'sidebar') {
             const style = document.createElement('style');
             style.id = 'rtl-content-styles';
             style.textContent = `
@@ -45,7 +45,7 @@ export function AppContent({ variant = 'header', children, ...props }: AppConten
                 }
             };
         }
-    }, [variant, direction]);
+    }, [variant]);
 
     if (variant === 'sidebar') {
         return <SidebarInset {...props}>{children}</SidebarInset>;

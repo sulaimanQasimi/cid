@@ -13,6 +13,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from '@/lib/i18n/translate';
 
 interface Info {
   id: number;
@@ -44,21 +45,22 @@ interface Props {
 }
 
 export default function DepartmentShow({ department }: Props) {
+  const { t } = useTranslation();
   return (
     <AppLayout>
-      <Head title={`Department: ${department.name}`} />
+      <Head title={t('departments.show_title', { name: department.name })} />
       <div className="container p-6">
         <div className="mb-6 flex justify-between">
           <Link href={route('departments.index')}>
             <Button variant="outline" size="sm">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Departments
+              {t('departments.back_to_list')}
             </Button>
           </Link>
           <Link href={route('departments.edit', department.id)}>
             <Button>
               <Edit className="mr-2 h-4 w-4" />
-              Edit Department
+              {t('departments.edit_button')}
             </Button>
           </Link>
         </div>
@@ -66,32 +68,32 @@ export default function DepartmentShow({ department }: Props) {
         <div className="grid gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>Department Details</CardTitle>
+              <CardTitle>{t('departments.details_title')}</CardTitle>
             </CardHeader>
             <CardContent>
               <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Name</dt>
+                  <dt className="text-sm font-medium text-gray-500">{t('departments.form.name')}</dt>
                   <dd className="mt-1 text-sm text-gray-900">{department.name}</dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Code</dt>
+                  <dt className="text-sm font-medium text-gray-500">{t('departments.form.code')}</dt>
                   <dd className="mt-1 text-sm text-gray-900">{department.code}</dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Created At</dt>
+                  <dt className="text-sm font-medium text-gray-500">{t('departments.created_at')}</dt>
                   <dd className="mt-1 text-sm text-gray-900">
                     {new Date(department.created_at).toLocaleString()}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Updated At</dt>
+                  <dt className="text-sm font-medium text-gray-500">{t('departments.updated_at')}</dt>
                   <dd className="mt-1 text-sm text-gray-900">
                     {new Date(department.updated_at).toLocaleString()}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Total Info Records</dt>
+                  <dt className="text-sm font-medium text-gray-500">{t('departments.total_info')}</dt>
                   <dd className="mt-1">
                     <Badge>{department.infos.length}</Badge>
                   </dd>
@@ -102,17 +104,17 @@ export default function DepartmentShow({ department }: Props) {
 
           <Card>
             <CardHeader>
-              <CardTitle>Associated Information</CardTitle>
+              <CardTitle>{t('departments.associated_info')}</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Code</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>{t('departments.form.name')}</TableHead>
+                    <TableHead>{t('departments.form.code')}</TableHead>
+                    <TableHead>{t('departments.table.type')}</TableHead>
+                    <TableHead>{t('departments.table.category')}</TableHead>
+                    <TableHead className="text-right">{t('common.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -126,7 +128,7 @@ export default function DepartmentShow({ department }: Props) {
                         <TableCell className="text-right">
                           <Link href={route('infos.show', info.id)}>
                             <Button variant="outline" size="sm">
-                              View
+                              {t('common.view', {})}
                             </Button>
                           </Link>
                         </TableCell>
@@ -135,7 +137,7 @@ export default function DepartmentShow({ department }: Props) {
                   ) : (
                     <TableRow>
                       <TableCell colSpan={5} className="text-center py-6 text-gray-500">
-                        No information records found for this department
+                        {t('departments.no_info')}
                       </TableCell>
                     </TableRow>
                   )}

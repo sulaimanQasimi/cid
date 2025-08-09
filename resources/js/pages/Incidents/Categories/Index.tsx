@@ -19,6 +19,7 @@ import {
 import { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import { useTranslation } from '@/lib/i18n/translate';
 
 // Define breadcrumb navigation
 const breadcrumbs: BreadcrumbItem[] = [
@@ -53,6 +54,7 @@ interface CategoriesProps {
 }
 
 export default function Index({ categories }: CategoriesProps) {
+  const { t } = useTranslation();
   const [categoryToDelete, setCategoryToDelete] = useState<number | null>(null);
 
   const handleDelete = () => {
@@ -73,16 +75,16 @@ export default function Index({ categories }: CategoriesProps) {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title="Incident Categories" />
+      <Head title={t('incident_categories.page_title')} />
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
         <PageHeader
-          title="Incident Categories"
-          description="Manage incident categories for classification"
+          title={t('incident_categories.page_title')}
+          description={t('incident_categories.page_description')}
           actions={
             <Button asChild>
               <Link href={route('incident-categories.create')}>
                 <Plus className="mr-2 h-4 w-4" />
-                New Category
+                {t('incident_categories.new_category')}
               </Link>
             </Button>
           }
@@ -90,9 +92,9 @@ export default function Index({ categories }: CategoriesProps) {
 
         <Card>
           <CardHeader>
-            <CardTitle>All Categories</CardTitle>
+            <CardTitle>{t('incident_categories.all_categories')}</CardTitle>
             <CardDescription>
-              A list of all incident categories in the system.
+              {t('incident_categories.list_description')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -100,35 +102,19 @@ export default function Index({ categories }: CategoriesProps) {
               <table className="w-full caption-bottom text-sm">
                 <thead className="[&_tr]:border-b">
                   <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                    <th className="h-12 px-4 text-left align-middle font-medium">
-                      Name
-                    </th>
-                    <th className="h-12 px-4 text-left align-middle font-medium">
-                      Code
-                    </th>
-                    <th className="h-12 px-4 text-left align-middle font-medium">
-                      Color
-                    </th>
-                    <th className="h-12 px-4 text-left align-middle font-medium">
-                      Severity
-                    </th>
-                    <th className="h-12 px-4 text-left align-middle font-medium">
-                      Incidents
-                    </th>
-                    <th className="h-12 px-4 text-left align-middle font-medium">
-                      Status
-                    </th>
-                    <th className="h-12 px-4 text-left align-middle font-medium">
-                      Actions
-                    </th>
+                    <th className="h-12 px-4 text-left align-middle font-medium">{t('incident_categories.table.name')}</th>
+                    <th className="h-12 px-4 text-left align-middle font-medium">{t('incident_categories.table.code')}</th>
+                    <th className="h-12 px-4 text-left align-middle font-medium">{t('incident_categories.table.color')}</th>
+                    <th className="h-12 px-4 text-left align-middle font-medium">{t('incident_categories.table.severity')}</th>
+                    <th className="h-12 px-4 text-left align-middle font-medium">{t('incident_categories.table.incidents')}</th>
+                    <th className="h-12 px-4 text-left align-middle font-medium">{t('incident_categories.table.status')}</th>
+                    <th className="h-12 px-4 text-left align-middle font-medium">{t('common.actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="[&_tr:last-child]:border-0">
                   {categories.data.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="h-12 px-4 text-center align-middle">
-                        No categories found
-                      </td>
+                      <td colSpan={7} className="h-12 px-4 text-center align-middle">{t('incident_categories.no_categories')}</td>
                     </tr>
                   ) : (
                     categories.data.map((category) => (
@@ -207,15 +193,15 @@ export default function Index({ categories }: CategoriesProps) {
                               </AlertDialogTrigger>
                               <AlertDialogContent>
                                 <AlertDialogHeader>
-                                  <AlertDialogTitle>Delete Incident Category</AlertDialogTitle>
+                                  <AlertDialogTitle>{t('incident_categories.delete_title')}</AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Are you sure you want to delete this category? This action cannot be undone.
+                                    {t('incident_categories.delete_description')}
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
                                   <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                                    Delete
+                                    {t('common.delete')}
                                   </AlertDialogAction>
                                 </AlertDialogFooter>
                               </AlertDialogContent>

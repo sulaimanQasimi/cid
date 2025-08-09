@@ -11,6 +11,7 @@ import {
   TableRow
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/lib/i18n/translate';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,6 +47,7 @@ interface Props {
 }
 
 export default function DepartmentIndex({ departments, flash }: Props) {
+  const { t } = useTranslation();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [departmentToDelete, setDepartmentToDelete] = useState<Department | null>(null);
 
@@ -66,14 +68,14 @@ export default function DepartmentIndex({ departments, flash }: Props) {
 
   return (
     <AppLayout>
-      <Head title="Departments" />
+      <Head title={t('departments.page_title')} />
       <div className="container p-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-semibold">Departments</h1>
+          <h1 className="text-2xl font-semibold">{t('departments.page_title')}</h1>
           <Link href={route('departments.create')}>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
-              Create Department
+              {t('departments.create_button')}
             </Button>
           </Link>
         </div>
@@ -87,10 +89,10 @@ export default function DepartmentIndex({ departments, flash }: Props) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Code</TableHead>
-              <TableHead>Info Count</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>{t('departments.table.name')}</TableHead>
+              <TableHead>{t('departments.table.code')}</TableHead>
+              <TableHead>{t('departments.table.info_count')}</TableHead>
+              <TableHead className="text-right">{t('common.actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -104,13 +106,13 @@ export default function DepartmentIndex({ departments, flash }: Props) {
                     <Link href={route('departments.show', department.id)}>
                       <Button variant="outline" size="sm">
                         <Eye className="h-4 w-4" />
-                        <span className="sr-only">View</span>
+                        <span className="sr-only">{t('common.view', {})}</span>
                       </Button>
                     </Link>
                     <Link href={route('departments.edit', department.id)}>
                       <Button variant="outline" size="sm">
                         <Pencil className="h-4 w-4" />
-                        <span className="sr-only">Edit</span>
+                        <span className="sr-only">{t('common.edit')}</span>
                       </Button>
                     </Link>
                     <Button
@@ -119,7 +121,7 @@ export default function DepartmentIndex({ departments, flash }: Props) {
                       onClick={() => openDeleteDialog(department)}
                     >
                       <Trash className="h-4 w-4" />
-                      <span className="sr-only">Delete</span>
+                      <span className="sr-only">{t('common.delete')}</span>
                     </Button>
                   </div>
                 </TableCell>
@@ -130,7 +132,7 @@ export default function DepartmentIndex({ departments, flash }: Props) {
 
         <div className="mt-4 flex items-center justify-between">
           <div className="text-sm text-gray-500">
-            Showing {departments.data.length} of {departments.total} departments
+            {t('departments.showing', { current: String(departments.data.length), total: String(departments.total) })}
           </div>
           <div className="flex gap-2">
             {departments.current_page > 1 && (
@@ -139,7 +141,7 @@ export default function DepartmentIndex({ departments, flash }: Props) {
                 size="sm"
                 onClick={() => router.get(route('departments.index', { page: departments.current_page - 1 }))}
               >
-                Previous
+                {t('departments.prev')}
               </Button>
             )}
             {departments.current_page < departments.last_page && (
@@ -148,7 +150,7 @@ export default function DepartmentIndex({ departments, flash }: Props) {
                 size="sm"
                 onClick={() => router.get(route('departments.index', { page: departments.current_page + 1 }))}
               >
-                Next
+                {t('departments.next')}
               </Button>
             )}
           </div>
@@ -158,15 +160,14 @@ export default function DepartmentIndex({ departments, flash }: Props) {
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>{t('common.confirm')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the department {departmentToDelete?.name}.
-              This action cannot be undone.
+              {t('departments.delete_confirm', { name: departmentToDelete?.name || '' })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>Delete</AlertDialogAction>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>{t('common.delete')}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

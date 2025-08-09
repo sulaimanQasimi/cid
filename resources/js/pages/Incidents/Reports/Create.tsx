@@ -14,6 +14,7 @@ import InputError from '@/components/input-error';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useState } from 'react';
 import TreeViewStatSelector from '@/components/reports/TreeViewStatSelector';
+import { useTranslation } from '@/lib/i18n/translate';
 
 interface StatCategory {
   id: number;
@@ -75,6 +76,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Create({ securityLevels, statItems, statCategories }: CreateProps) {
+  const { t } = useTranslation();
   const { data, setData, post, processing, errors } = useForm<ReportFormData>({
     report_date: new Date().toISOString().split('T')[0],
     security_level: 'normal',
@@ -145,15 +147,15 @@ export default function Create({ securityLevels, statItems, statCategories }: Cr
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title="Create Incident Report" />
+      <Head title={t('incident_reports.create.page_title')} />
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
         <PageHeader
-          title="Create Incident Report"
-          description="Add a new incident report to the system"
+          title={t('incident_reports.create.page_title')}
+          description={t('incident_reports.create.page_description')}
           actions={
             <Button variant="outline" onClick={() => window.history.back()}>
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
+              {t('common.back')}
             </Button>
           }
         />
@@ -162,23 +164,23 @@ export default function Create({ securityLevels, statItems, statCategories }: Cr
           <div className="grid gap-4">
             <Card>
               <CardHeader>
-                <CardTitle>Report Information</CardTitle>
-                <CardDescription>Enter the basic report information</CardDescription>
+                <CardTitle>{t('incident_reports.form.info_title')}</CardTitle>
+                <CardDescription>{t('incident_reports.form.info_description')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid gap-3">
-                  <Label htmlFor="report_number">Report Number (Optional)</Label>
+                  <Label htmlFor="report_number">{t('incident_reports.form.report_number_label')}</Label>
                   <Input
                     id="report_number"
                     value={data.report_number}
                     onChange={(e) => setData('report_number', e.target.value)}
-                    placeholder="Will be auto-generated if left empty"
+                    placeholder={t('incident_reports.form.report_number_placeholder')}
                   />
                   <InputError message={errors.report_number} />
                 </div>
 
                 <div className="grid gap-3">
-                  <Label htmlFor="report_date">Report Date</Label>
+                  <Label htmlFor="report_date">{t('incident_reports.form.report_date')}</Label>
                   <Input
                     id="report_date"
                     type="date"
@@ -190,30 +192,30 @@ export default function Create({ securityLevels, statItems, statCategories }: Cr
                 </div>
 
                 <div className="grid gap-3">
-                  <Label htmlFor="security_level">Security Level</Label>
+                  <Label htmlFor="security_level">{t('incident_reports.form.security_level')}</Label>
                   <Select
                     value={data.security_level}
                     onValueChange={(value) => setData('security_level', value)}
                   >
                     <SelectTrigger id="security_level">
-                      <SelectValue placeholder="Select security level" />
+                      <SelectValue placeholder={t('incident_reports.form.security_level_placeholder')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="normal">Normal</SelectItem>
-                      <SelectItem value="restricted">Restricted</SelectItem>
-                      <SelectItem value="classified">Classified</SelectItem>
+                      <SelectItem value="normal">{t('incident_reports.level.normal')}</SelectItem>
+                      <SelectItem value="restricted">{t('incident_reports.level.restricted')}</SelectItem>
+                      <SelectItem value="classified">{t('incident_reports.level.classified')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <InputError message={errors.security_level} />
                 </div>
 
                 <div className="grid gap-3">
-                  <Label htmlFor="source">Source (Optional)</Label>
+                  <Label htmlFor="source">{t('incident_reports.form.source_label')}</Label>
                   <Input
                     id="source"
                     value={data.source}
                     onChange={(e) => setData('source', e.target.value)}
-                    placeholder="Information source"
+                    placeholder={t('incident_reports.form.source_placeholder')}
                   />
                   <InputError message={errors.source} />
                 </div>
@@ -222,43 +224,43 @@ export default function Create({ securityLevels, statItems, statCategories }: Cr
 
             <Card>
               <CardHeader>
-                <CardTitle>Report Details</CardTitle>
-                <CardDescription>Enter the detailed information for this report</CardDescription>
+                <CardTitle>{t('incident_reports.details.title')}</CardTitle>
+                <CardDescription>{t('incident_reports.details.description')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid gap-3">
-                  <Label htmlFor="details">Details</Label>
+                  <Label htmlFor="details">{t('incident_reports.details.details_label')}</Label>
                   <Textarea
                     id="details"
                     rows={5}
                     value={data.details}
                     onChange={(e) => setData('details', e.target.value)}
-                    placeholder="Enter the report details..."
+                    placeholder={t('incident_reports.details.details_placeholder')}
                     required
                   />
                   <InputError message={errors.details} />
                 </div>
 
                 <div className="grid gap-3">
-                  <Label htmlFor="action_taken">Action Taken (Optional)</Label>
+                  <Label htmlFor="action_taken">{t('incident_reports.details.action_taken_label')}</Label>
                   <Textarea
                     id="action_taken"
                     rows={3}
                     value={data.action_taken}
                     onChange={(e) => setData('action_taken', e.target.value)}
-                    placeholder="Describe any actions taken..."
+                    placeholder={t('incident_reports.details.action_taken_placeholder')}
                   />
                   <InputError message={errors.action_taken} />
                 </div>
 
                 <div className="grid gap-3">
-                  <Label htmlFor="recommendation">Recommendation (Optional)</Label>
+                  <Label htmlFor="recommendation">{t('incident_reports.details.recommendation_label')}</Label>
                   <Textarea
                     id="recommendation"
                     rows={3}
                     value={data.recommendation}
                     onChange={(e) => setData('recommendation', e.target.value)}
-                    placeholder="Enter any recommendations..."
+                    placeholder={t('incident_reports.details.recommendation_placeholder')}
                   />
                   <InputError message={errors.recommendation} />
                 </div>
@@ -269,23 +271,23 @@ export default function Create({ securityLevels, statItems, statCategories }: Cr
 
             <Card>
               <CardHeader>
-                <CardTitle>Statistical Data</CardTitle>
+                <CardTitle>{t('incident_reports.stats.title')}</CardTitle>
                 <CardDescription>
-                  Record statistical information related to this report
+                  {t('incident_reports.stats.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="mb-6">
-                  <Label htmlFor="category-filter">Filter by Category</Label>
+                  <Label htmlFor="category-filter">{t('incident_reports.stats.filter_by_category')}</Label>
                   <Select
                     value={selectedCategory?.toString() || 'all'}
                     onValueChange={(value) => setSelectedCategory(value !== 'all' ? parseInt(value) : null)}
                   >
                     <SelectTrigger id="category-filter">
-                      <SelectValue placeholder="All Categories" />
+                      <SelectValue placeholder={t('incidents.filters.all_categories')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Categories</SelectItem>
+                      <SelectItem value="all">{t('incidents.filters.all_categories')}</SelectItem>
                       {categoriesForFilter.map((category) => (
                         <SelectItem key={category.id} value={category.id.toString()}>
                           <div className="flex items-center">
@@ -312,10 +314,10 @@ export default function Create({ securityLevels, statItems, statCategories }: Cr
 
             <CardFooter className="bg-background flex p-6 justify-end space-x-2">
               <Button variant="outline" asChild>
-                <Link href={route('incident-reports.index')}>Cancel</Link>
+                <Link href={route('incident-reports.index')}>{t('common.cancel')}</Link>
               </Button>
               <Button type="submit" disabled={processing}>
-                {processing ? 'Submitting...' : 'Create Report'}
+                {processing ? t('incident_reports.actions.submitting') : t('incident_reports.actions.create')}
               </Button>
             </CardFooter>
           </div>

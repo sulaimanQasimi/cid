@@ -11,6 +11,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import InputError from '@/components/input-error';
 import { FormEventHandler } from 'react';
+import { useTranslation } from '@/lib/i18n/translate';
 
 // Define breadcrumb navigation
 const breadcrumbs: BreadcrumbItem[] = [
@@ -44,6 +45,7 @@ const colorOptions = [
 ];
 
 export default function Create() {
+  const { t } = useTranslation();
   // Initialize form with useForm hook
   const { data, setData, post, processing, errors } = useForm({
     name: '',
@@ -62,16 +64,16 @@ export default function Create() {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title="Create Incident Category" />
+      <Head title={t('incident_categories.create_title')} />
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
         <PageHeader
-          title="Create Incident Category"
-          description="Add a new incident category to the system"
+          title={t('incident_categories.create_title')}
+          description={t('incident_categories.create_description')}
           actions={
             <Button variant="outline" asChild>
               <Link href={route('incident-categories.index')}>
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Categories
+                {t('incident_categories.back_to_list')}
               </Link>
             </Button>
           }
@@ -80,42 +82,42 @@ export default function Create() {
         <form onSubmit={submit}>
           <Card>
             <CardHeader>
-              <CardTitle>Category Information</CardTitle>
-              <CardDescription>Enter the details for the new incident category</CardDescription>
+              <CardTitle>{t('incident_categories.info_title')}</CardTitle>
+              <CardDescription>{t('incident_categories.info_description_create')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Name <span className="text-destructive">*</span></Label>
+                  <Label htmlFor="name">{t('incident_categories.form.name')} <span className="text-destructive">*</span></Label>
                   <Input
                     id="name"
                     value={data.name}
                     onChange={e => setData('name', e.target.value)}
-                    placeholder="Category name"
+                    placeholder={t('incident_categories.form.name_placeholder')}
                     required
                   />
                   <InputError message={errors.name} />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="code">Code</Label>
+                  <Label htmlFor="code">{t('incident_categories.form.code')}</Label>
                   <Input
                     id="code"
                     value={data.code}
                     onChange={e => setData('code', e.target.value)}
-                    placeholder="e.g. CAT-01"
+                    placeholder={t('incident_categories.form.code_placeholder')}
                   />
                   <InputError message={errors.code} />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">{t('incident_categories.form.description')}</Label>
                 <Textarea
                   id="description"
                   value={data.description}
                   onChange={e => setData('description', e.target.value)}
-                  placeholder="Provide a description of this category"
+                  placeholder={t('incident_categories.form.description_placeholder')}
                   rows={3}
                 />
                 <InputError message={errors.description} />
@@ -123,7 +125,7 @@ export default function Create() {
 
               <div className="grid gap-4 sm:grid-cols-3">
                 <div className="space-y-2">
-                  <Label htmlFor="color">Color</Label>
+                  <Label htmlFor="color">{t('incident_categories.form.color')}</Label>
                   <div className="flex items-center space-x-2">
                     <div
                       className="h-8 w-8 rounded-full border"
@@ -133,7 +135,7 @@ export default function Create() {
                       id="color"
                       value={data.color}
                       onChange={e => setData('color', e.target.value)}
-                      placeholder="Color code"
+                      placeholder={t('incident_categories.form.color_placeholder')}
                     />
                   </div>
                   <div className="mt-2 flex flex-wrap gap-2">
@@ -153,39 +155,39 @@ export default function Create() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="severity_level">Severity Level <span className="text-destructive">*</span></Label>
+                  <Label htmlFor="severity_level">{t('incident_categories.form.severity_level')} <span className="text-destructive">*</span></Label>
                   <Select
                     value={data.severity_level}
                     onValueChange={(value) => setData('severity_level', value)}
                     required
                   >
                     <SelectTrigger id="severity_level">
-                      <SelectValue placeholder="Select level" />
+                      <SelectValue placeholder={t('incident_categories.form.severity_placeholder')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="1">Level 1 (Low)</SelectItem>
-                      <SelectItem value="2">Level 2</SelectItem>
-                      <SelectItem value="3">Level 3 (Medium)</SelectItem>
-                      <SelectItem value="4">Level 4</SelectItem>
-                      <SelectItem value="5">Level 5 (High)</SelectItem>
+                      <SelectItem value="1">{t('incident_categories.form.severity.level1')}</SelectItem>
+                      <SelectItem value="2">{t('incident_categories.form.severity.level2')}</SelectItem>
+                      <SelectItem value="3">{t('incident_categories.form.severity.level3')}</SelectItem>
+                      <SelectItem value="4">{t('incident_categories.form.severity.level4')}</SelectItem>
+                      <SelectItem value="5">{t('incident_categories.form.severity.level5')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <InputError message={errors.severity_level} />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="status">Status <span className="text-destructive">*</span></Label>
+                  <Label htmlFor="status">{t('incident_categories.form.status')} <span className="text-destructive">*</span></Label>
                   <Select
                     value={data.status}
                     onValueChange={(value) => setData('status', value)}
                     required
                   >
                     <SelectTrigger id="status">
-                      <SelectValue placeholder="Select status" />
+                      <SelectValue placeholder={t('incident_categories.form.status_placeholder')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
+                      <SelectItem value="active">{t('incident_categories.form.status.active')}</SelectItem>
+                      <SelectItem value="inactive">{t('incident_categories.form.status.inactive')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <InputError message={errors.status} />
@@ -194,11 +196,11 @@ export default function Create() {
             </CardContent>
             <CardFooter className="flex justify-end space-x-2">
               <Button variant="outline" asChild>
-                <Link href={route('incident-categories.index')}>Cancel</Link>
+                <Link href={route('incident-categories.index')}>{t('common.cancel')}</Link>
               </Button>
               <Button type="submit" disabled={processing}>
                 <Save className="mr-2 h-4 w-4" />
-                {processing ? 'Creating...' : 'Create Category'}
+                {processing ? t('incident_categories.actions.creating') : t('incident_categories.actions.create_category')}
               </Button>
             </CardFooter>
           </Card>

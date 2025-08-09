@@ -1,0 +1,19 @@
+---
+ Cursor Rules for Translation Consistency
+ All React pages under resources/js/pages/** must:
+ - Import useTranslation from '@/lib/i18n/translate'
+ - Use const { t } = useTranslation(); at top of component
+ - Replace all user-facing strings with t('namespace.key')
+ - Prefer namespaced keys per feature (e.g., 'criminal.*', 'incidents.*', 'users.*')
+ - Use param replacement for dynamic content: t('key', { name: value })
+ - Do not import or access translation JSON directly; always use t()
+ - RTL is enforced globally; avoid direction conditionals
+
+ Examples:
+ import { useTranslation } from '@/lib/i18n/translate';
+ const { t } = useTranslation();
+ <Head title={t('criminal.page_title')} />
+ <Button>{t('common.save')}</Button>
+
+ When adding new text, add a translation key to fa.json (and optionally en.json for fallback).
+---

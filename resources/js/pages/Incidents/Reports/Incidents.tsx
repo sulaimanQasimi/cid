@@ -7,6 +7,7 @@ import { ArrowLeft, Plus, FileText, MapPin, Calendar, Shield } from 'lucide-reac
 import { format } from 'date-fns';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import { useTranslation } from '@/lib/i18n/translate';
 
 interface IncidentsProps {
   report: {
@@ -42,13 +43,14 @@ interface IncidentsProps {
 }
 
 export default function Incidents({ report, incidents }: IncidentsProps) {
+  const { t } = useTranslation();
   const breadcrumbs: BreadcrumbItem[] = [
     {
-      title: 'Dashboard',
+      title: t('sidebar.intelligence_dashboard'),
       href: '/dashboard',
     },
     {
-      title: 'Incident Reports',
+      title: t('sidebar.incident_reports'),
       href: route('incident-reports.index'),
     },
     {
@@ -56,7 +58,7 @@ export default function Incidents({ report, incidents }: IncidentsProps) {
       href: route('incident-reports.show', report.id),
     },
     {
-      title: 'Incidents',
+      title: t('incidents.page_title'),
       href: route('incident-reports.incidents', report.id),
     },
   ];
@@ -75,9 +77,9 @@ export default function Incidents({ report, incidents }: IncidentsProps) {
   function getStatusBadge(status: string) {
     switch (status) {
       case 'closed':
-        return <Badge variant="secondary">{status}</Badge>;
+        return <Badge variant="secondary">{t('incidents.status.closed')}</Badge>;
       case 'in_progress':
-        return <Badge variant="default">In Progress</Badge>;
+        return <Badge variant="default">{t('incidents.status.in_progress')}</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -85,23 +87,23 @@ export default function Incidents({ report, incidents }: IncidentsProps) {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title={`Incidents - Report ${report.report_number}`} />
+      <Head title={t('incident_reports.incidents.page_title', { number: report.report_number })} />
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
         <PageHeader
-          title={`Incidents for Report ${report.report_number}`}
-          description={`All incidents associated with this report as of ${format(new Date(report.report_date), 'PPP')}`}
+          title={t('incident_reports.incidents.page_header_title', { number: report.report_number })}
+          description={t('incident_reports.incidents.page_header_desc', { date: format(new Date(report.report_date), 'PPP') })}
           actions={
             <div className="flex space-x-2">
               <Button variant="outline" asChild>
                 <Link href={route('incident-reports.show', report.id)}>
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Report
+                  {t('incident_reports.actions.back_to_report')}
                 </Link>
               </Button>
               <Button asChild>
                 <Link href={route('incidents.create', { report_id: report.id })}>
                   <Plus className="mr-2 h-4 w-4" />
-                  Add Incident
+                  {t('incident_reports.actions.add_incident')}
                 </Link>
               </Button>
             </div>
@@ -112,14 +114,14 @@ export default function Incidents({ report, incidents }: IncidentsProps) {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-10">
               <div className="text-center">
-                <h3 className="text-lg font-medium">No incidents found</h3>
+                <h3 className="text-lg font-medium">{t('incidents.no_incidents')}</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  There are no incidents associated with this report yet.
+                  {t('incident_reports.incidents.empty.description')}
                 </p>
                 <Button className="mt-4" asChild>
                   <Link href={route('incidents.create', { report_id: report.id })}>
                     <Plus className="mr-2 h-4 w-4" />
-                    Add First Incident
+                    {t('incident_reports.incidents.empty.add_first')}
                   </Link>
                 </Button>
               </div>
@@ -150,14 +152,14 @@ export default function Incidents({ report, incidents }: IncidentsProps) {
                         {incident.category.name}
                       </Badge>
                     ) : (
-                      <Badge variant="outline">Uncategorized</Badge>
+                      <Badge variant="outline">{t('incident_reports.incidents.uncategorized')}</Badge>
                     )}
                   </div>
                 </CardHeader>
                 <CardContent className="flex-1 pb-2">
                   <div className="mb-3 flex items-start text-xs text-muted-foreground">
                     <MapPin className="h-3 w-3 mr-1 mt-0.5 flex-shrink-0" />
-                    <span>{incident.location || 'No location specified'}</span>
+                    <span>{incident.location || t('incidents.unspecified_location')}</span>
                   </div>
                   <p className="text-sm line-clamp-3">
                     {incident.description}
@@ -176,7 +178,7 @@ export default function Incidents({ report, incidents }: IncidentsProps) {
                     >
                       <Link href={route('incidents.show', incident.id)}>
                         <FileText className="h-4 w-4 mr-1" />
-                        View
+                        {t('incident_reports.view')}
                       </Link>
                     </Button>
                   </div>

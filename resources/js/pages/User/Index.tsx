@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Pagination } from '@/components/pagination';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Plus, Search, Trash, Pencil, User as UserIcon } from 'lucide-react';
+import { useTranslation } from '@/lib/i18n/translate';
 import { format } from 'date-fns';
 import { useDebounce } from '@/hooks/useDebounce';
 import { Badge } from '@/components/ui/badge';
@@ -68,6 +69,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function UserIndex({ users, filters }: Props) {
+  const { t } = useTranslation();
   const [search, setSearch] = useState(filters.search);
   const [perPage, setPerPage] = useState(filters.per_page.toString());
   const [sort, setSort] = useState(filters.sort);
@@ -114,15 +116,15 @@ export default function UserIndex({ users, filters }: Props) {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title="User Management" />
+      <Head title={t('users.page_title')} />
       <div className="py-12">
         <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">User Management</h1>
+            <h1 className="text-2xl font-bold">{t('users.page_title')}</h1>
             <Button asChild>
               <Link href={route('users.create')}>
                 <Plus className="mr-2 h-4 w-4" />
-                Add User
+                {t('users.add_user')}
               </Link>
             </Button>
           </div>
@@ -133,23 +135,23 @@ export default function UserIndex({ users, filters }: Props) {
                 <div className="relative w-64">
                   <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
                   <Input
-                    placeholder="Search users..."
+                    placeholder={t('users.search_placeholder')}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="pl-8"
                   />
                 </div>
                 <div className="flex space-x-2 items-center">
-                  <span className="text-sm text-gray-500">Show:</span>
+                  <span className="text-sm text-gray-500">{t('users.show')}</span>
                   <select
                     value={perPage}
                     onChange={(e) => setPerPage(e.target.value)}
                     className="border rounded p-1 text-sm"
                   >
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
+                    <option value="5">{t('users.per_page', { count: '5' })}</option>
+                    <option value="10">{t('users.per_page', { count: '10' })}</option>
+                    <option value="25">{t('users.per_page', { count: '25' })}</option>
+                    <option value="50">{t('users.per_page', { count: '50' })}</option>
                   </select>
                 </div>
               </div>
@@ -162,31 +164,31 @@ export default function UserIndex({ users, filters }: Props) {
                       className="cursor-pointer"
                       onClick={() => handleSort('name')}
                     >
-                      Name{getSortIndicator('name')}
+                      {t('users.table.name')}{getSortIndicator('name')}
                     </TableHead>
                     <TableHead
                       className="cursor-pointer"
                       onClick={() => handleSort('email')}
                     >
-                      Email{getSortIndicator('email')}
+                      {t('users.table.email')}{getSortIndicator('email')}
                     </TableHead>
                     <TableHead>
-                      Roles
+                      {t('users.table.roles')}
                     </TableHead>
                     <TableHead
                       className="cursor-pointer"
                       onClick={() => handleSort('created_at')}
                     >
-                      Created{getSortIndicator('created_at')}
+                      {t('users.table.created')}{getSortIndicator('created_at')}
                     </TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="text-right">{t('common.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {users.data.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={5} className="text-center py-8 text-gray-500">
-                        No users found
+                        {t('users.no_users')}
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -208,7 +210,7 @@ export default function UserIndex({ users, filters }: Props) {
                                 </Badge>
                               ))
                             ) : (
-                              <span className="text-xs text-gray-500">None</span>
+                              <span className="text-xs text-gray-500">{t('users.none')}</span>
                             )}
                           </div>
                         </TableCell>
@@ -252,15 +254,14 @@ export default function UserIndex({ users, filters }: Props) {
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>{t('common.confirm')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the user: {userToDelete?.name}.
-              This action cannot be undone.
+              {t('users.delete_confirm', { name: userToDelete?.name || '' })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">Delete</AlertDialogAction>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">{t('common.delete')}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

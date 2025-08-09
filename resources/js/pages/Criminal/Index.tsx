@@ -326,7 +326,7 @@ export default function CriminalIndex({
                   <SelectContent>
                     {perPageOptions.map((option) => (
                       <SelectItem key={option.value} value={option.value.toString()}>
-                        {t('criminal.per_page_option', { count: option.value.toString() })}
+                        {t('criminal.per_page_option', { count: String(option.value) })}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -460,8 +460,8 @@ export default function CriminalIndex({
               </Button>
               <span className="px-2 text-sm">
                 {t('criminal.pagination', {
-                  current: criminals.meta?.current_page.toString() || '1',
-                  total: criminals.meta?.last_page.toString() || '1'
+                  current: String(criminals.meta?.current_page ?? '1'),
+                  total: String(criminals.meta?.last_page ?? '1')
                 })}
               </span>
               <Button

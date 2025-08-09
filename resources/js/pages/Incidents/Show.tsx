@@ -20,6 +20,7 @@ import {
 import { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import { useTranslation } from '@/lib/i18n/translate';
 
 interface IncidentDetailProps {
   incident: {
@@ -59,6 +60,7 @@ interface IncidentDetailProps {
 }
 
 export default function Show({ incident }: IncidentDetailProps) {
+  const { t } = useTranslation();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // Define breadcrumb navigation
@@ -83,43 +85,43 @@ export default function Show({ incident }: IncidentDetailProps) {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title={`Incident - ${incident.title}`} />
+      <Head title={t('incidents.show_title', { name: incident.title })} />
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
         <PageHeader
-          title="Incident Details"
-          description="View detailed information about this incident"
+          title={t('incidents.details_title')}
+          description={t('incidents.details_description')}
           actions={
             <div className="flex space-x-2">
               <Button variant="outline" asChild>
                 <Link href={route('incidents.index')}>
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Incidents
+                  {t('incidents.back_to_list')}
                 </Link>
               </Button>
               <Button asChild>
                 <Link href={route('incidents.edit', incident.id)}>
                   <Edit className="mr-2 h-4 w-4" />
-                  Edit
+                  {t('common.edit')}
                 </Link>
               </Button>
               <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive">
                     <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
+                    {t('common.delete')}
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Delete Incident</AlertDialogTitle>
+                    <AlertDialogTitle>{t('incidents.delete_title')}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Are you sure you want to delete this incident? This action cannot be undone.
+                      {t('incidents.delete_description')}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
                     <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                      Delete
+                      {t('common.delete')}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
@@ -151,23 +153,23 @@ export default function Show({ incident }: IncidentDetailProps) {
               <CardContent>
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-lg font-medium">Description</h3>
+                    <h3 className="text-lg font-medium">{t('incidents.form.description')}</h3>
                     <p className="mt-2 whitespace-pre-line text-muted-foreground">{incident.description}</p>
                   </div>
 
                   <Separator />
 
                   <div>
-                    <h3 className="text-lg font-medium">Impact</h3>
+                    <h3 className="text-lg font-medium">{t('incidents.impact')}</h3>
                     <div className="mt-2 grid gap-4 md:grid-cols-2">
                       <div className="rounded-lg border p-3">
-                        <div className="text-sm font-medium">Casualties</div>
+                        <div className="text-sm font-medium">{t('incidents.form.casualties')}</div>
                         <div className="mt-1 text-2xl font-bold">
                           {incident.casualties}
                         </div>
                       </div>
                       <div className="rounded-lg border p-3">
-                        <div className="text-sm font-medium">Injuries</div>
+                        <div className="text-sm font-medium">{t('incidents.form.injuries')}</div>
                         <div className="mt-1 text-2xl font-bold">
                           {incident.injuries}
                         </div>
@@ -181,9 +183,9 @@ export default function Show({ incident }: IncidentDetailProps) {
             {incident.report && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Associated Report</CardTitle>
+                  <CardTitle>{t('incidents.associated_report')}</CardTitle>
                   <CardDescription>
-                    This incident is part of the following report
+                    {t('incidents.associated_report_description')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -199,7 +201,7 @@ export default function Show({ incident }: IncidentDetailProps) {
                         {incident.report.report_number}
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        View full report details
+                         {t('incidents.view_full_report')}
                       </div>
                     </div>
                   </Link>
@@ -211,16 +213,16 @@ export default function Show({ incident }: IncidentDetailProps) {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Incident Information</CardTitle>
+                <CardTitle>{t('incidents.information')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-start space-x-3">
                   <Calendar className="mt-0.5 h-5 w-5 text-muted-foreground" />
                   <div>
-                    <div className="font-medium">Date & Time</div>
+                    <div className="font-medium">{t('incidents.date_time')}</div>
                     <div className="text-sm text-muted-foreground">
                       {format(new Date(incident.incident_date), 'PPP')}
-                      {incident.incident_time && ` at ${incident.incident_time}`}
+                      {incident.incident_time && ` ${incident.incident_time}`}
                     </div>
                   </div>
                 </div>
@@ -228,13 +230,13 @@ export default function Show({ incident }: IncidentDetailProps) {
                 <div className="flex items-start space-x-3">
                   <Tag className="mt-0.5 h-5 w-5 text-muted-foreground" />
                   <div>
-                    <div className="font-medium">Category & Type</div>
+                    <div className="font-medium">{t('incidents.category_type')}</div>
                     <div className="text-sm text-muted-foreground">
                       <Badge
                         className="mr-2"
                         style={{ backgroundColor: incident.category?.color || '#888888' }}
                       >
-                        {incident.category?.name || 'Unspecified'}
+                        {incident.category?.name || t('incidents.unspecified')}
                       </Badge>
                       {incident.incident_type}
                     </div>
@@ -244,9 +246,9 @@ export default function Show({ incident }: IncidentDetailProps) {
                 <div className="flex items-start space-x-3">
                   <MapPin className="mt-0.5 h-5 w-5 text-muted-foreground" />
                   <div>
-                    <div className="font-medium">Location</div>
+                    <div className="font-medium">{t('incidents.table.location')}</div>
                     <div className="text-sm text-muted-foreground">
-                      {incident.location || 'Unspecified location'}<br />
+                       {incident.location || t('incidents.unspecified_location')}<br />
                       {incident.district?.name}, {incident.district?.province?.name}
                       {incident.coordinates && (
                         <div className="mt-1 text-xs">
@@ -260,9 +262,9 @@ export default function Show({ incident }: IncidentDetailProps) {
                 <div className="flex items-start space-x-3">
                   <User className="mt-0.5 h-5 w-5 text-muted-foreground" />
                   <div>
-                    <div className="font-medium">Reported By</div>
+                    <div className="font-medium">{t('incidents.reported_by')}</div>
                     <div className="text-sm text-muted-foreground">
-                      {incident.reporter?.name || 'Unknown'}
+                     {incident.reporter?.name || t('incidents.unknown')}
                     </div>
                   </div>
                 </div>

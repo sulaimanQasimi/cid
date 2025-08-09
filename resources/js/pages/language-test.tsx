@@ -4,7 +4,7 @@ import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/lib/i18n/translate';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { LanguageSwitcher } from '@/components/language-switcher';
+// Language switcher disabled in RTL-only mode
 
 export default function LanguageTest() {
   const { t, currentLanguage, direction, isRtl } = useTranslation();
@@ -16,7 +16,7 @@ export default function LanguageTest() {
       <div className="container py-6 space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold tracking-tight">Language Test</h1>
-          <LanguageSwitcher />
+          {/* LanguageSwitcher removed */}
         </div>
 
         <Card>

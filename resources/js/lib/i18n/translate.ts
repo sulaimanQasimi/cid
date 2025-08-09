@@ -3,14 +3,7 @@ import { useLanguage } from './language-context';
 // Hook to use translations within components
 export function useTranslation() {
   const { t, direction, currentLanguage } = useLanguage();
-
-  return {
-    t,
-    direction,
-    currentLanguage,
-    isRtl: direction === 'rtl',
-    isLtr: direction === 'ltr'
-  };
+  return { t, direction, currentLanguage, isRtl: true, isLtr: false };
 }
 
 // Helper to create a translation namespace

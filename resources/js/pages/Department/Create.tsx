@@ -6,8 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { Label } from '@/components/ui/label';
+import { useTranslation } from '@/lib/i18n/translate';
 
 export default function DepartmentCreate() {
+  const { t } = useTranslation();
   const { data, setData, post, processing, errors } = useForm({
     name: '',
     code: '',
@@ -20,30 +22,30 @@ export default function DepartmentCreate() {
 
   return (
     <AppLayout>
-      <Head title="Create Department" />
+      <Head title={t('departments.create_title')} />
       <div className="container p-6">
         <div className="mb-6">
           <Link href={route('departments.index')}>
             <Button variant="outline" size="sm">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Departments
+              {t('departments.back_to_list')}
             </Button>
           </Link>
         </div>
 
         <Card className="max-w-2xl mx-auto">
           <CardHeader>
-            <CardTitle>Create New Department</CardTitle>
+            <CardTitle>{t('departments.create_title')}</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="name">{t('departments.form.name')}</Label>
                 <Input
                   id="name"
                   value={data.name}
                   onChange={(e) => setData('name', e.target.value)}
-                  placeholder="Enter department name"
+                  placeholder={t('departments.form.name_placeholder')}
                   className={errors.name ? 'border-red-500' : ''}
                 />
                 {errors.name && (
@@ -52,12 +54,12 @@ export default function DepartmentCreate() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="code">Code</Label>
+                <Label htmlFor="code">{t('departments.form.code')}</Label>
                 <Input
                   id="code"
                   value={data.code}
                   onChange={(e) => setData('code', e.target.value)}
-                  placeholder="Enter department code"
+                  placeholder={t('departments.form.code_placeholder')}
                   className={errors.code ? 'border-red-500' : ''}
                 />
                 {errors.code && (
@@ -70,7 +72,7 @@ export default function DepartmentCreate() {
                 className="w-full"
                 disabled={processing}
               >
-                Create Department
+                {t('departments.create_button')}
               </Button>
             </form>
           </CardContent>

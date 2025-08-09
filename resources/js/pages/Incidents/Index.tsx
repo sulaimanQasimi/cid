@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from '@/components/ui/label';
 import { useDebounce } from '@/hooks/use-debounce';
+import { useTranslation } from '@/lib/i18n/translate';
 
 // Define breadcrumb navigation
 const breadcrumbs: BreadcrumbItem[] = [
@@ -80,6 +81,7 @@ interface IncidentProps {
 }
 
 export default function Index({ incidents, filters = {}, categories }: IncidentProps) {
+  const { t } = useTranslation();
   const [search, setSearch] = useState(filters.search || '');
   const [status, setStatus] = useState(filters.status || '');
   const [categoryId, setCategoryId] = useState(filters.category_id || '');
@@ -153,16 +155,16 @@ export default function Index({ incidents, filters = {}, categories }: IncidentP
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title="Incidents" />
+      <Head title={t('incidents.page_title')} />
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
         <PageHeader
-          title="Incidents"
-          description="Manage and track all security incidents"
+          title={t('incidents.page_title')}
+          description={t('incidents.page_description')}
           actions={
             <Button asChild>
               <Link href={route('incidents.create')}>
                 <Plus className="mr-2 h-4 w-4" />
-                New Incident
+                {t('incidents.new_incident')}
               </Link>
             </Button>
           }
@@ -172,16 +174,16 @@ export default function Index({ incidents, filters = {}, categories }: IncidentP
           <CardHeader>
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
-                <CardTitle>All Incidents</CardTitle>
+                <CardTitle>{t('incidents.all_incidents')}</CardTitle>
                 <CardDescription>
-                  A list of all incidents in the system.
+                  {t('incidents.list_description')}
                 </CardDescription>
               </div>
               <div className="flex items-center space-x-2">
                 <div className="relative w-full md:w-auto">
                   <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search incidents..."
+                    placeholder={t('incidents.search_placeholder')}
                     className="pl-8 pr-4"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -190,7 +192,7 @@ export default function Index({ incidents, filters = {}, categories }: IncidentP
                 {(search || status || categoryId || sortField !== 'incident_date' || sortDirection !== 'desc') && (
                   <Button variant="ghost" size="sm" onClick={clearFilters}>
                     <X className="mr-2 h-4 w-4" />
-                    Clear
+                    {t('common.clear')}
                   </Button>
                 )}
               </div>
@@ -199,34 +201,34 @@ export default function Index({ incidents, filters = {}, categories }: IncidentP
           <CardContent>
             <div className="mb-4 grid gap-4 md:grid-cols-3">
               <div>
-                <Label htmlFor="status-filter">Status</Label>
+                <Label htmlFor="status-filter">{t('incidents.filters.status')}</Label>
                 <Select
                   value={status}
                   onValueChange={setStatus}
                 >
                   <SelectTrigger id="status-filter">
-                    <SelectValue placeholder="All Statuses" />
+                    <SelectValue placeholder={t('incidents.filters.all_statuses')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="reported">Reported</SelectItem>
-                    <SelectItem value="investigating">Investigating</SelectItem>
-                    <SelectItem value="resolved">Resolved</SelectItem>
-                    <SelectItem value="closed">Closed</SelectItem>
+                    <SelectItem value="all">{t('incidents.filters.all_statuses')}</SelectItem>
+                    <SelectItem value="reported">{t('incidents.status.reported')}</SelectItem>
+                    <SelectItem value="investigating">{t('incidents.status.investigating')}</SelectItem>
+                    <SelectItem value="resolved">{t('incidents.status.resolved')}</SelectItem>
+                    <SelectItem value="closed">{t('incidents.status.closed')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label htmlFor="category-filter">Category</Label>
+                <Label htmlFor="category-filter">{t('incidents.filters.category')}</Label>
                 <Select
                   value={categoryId}
                   onValueChange={setCategoryId}
                 >
                   <SelectTrigger id="category-filter">
-                    <SelectValue placeholder="All Categories" />
+                    <SelectValue placeholder={t('incidents.filters.all_categories')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
+                    <SelectItem value="all">{t('incidents.filters.all_categories')}</SelectItem>
                     {categories.map((category) => (
                       <SelectItem key={category.id} value={category.id.toString()}>
                         <div className="flex items-center">
@@ -242,7 +244,7 @@ export default function Index({ incidents, filters = {}, categories }: IncidentP
                 </Select>
               </div>
               <div>
-                <Label htmlFor="sort-by">Sort By</Label>
+                <Label htmlFor="sort-by">{t('incidents.filters.sort_by')}</Label>
                 <Select
                   value={`${sortField}:${sortDirection}`}
                   onValueChange={(value) => {
@@ -252,13 +254,13 @@ export default function Index({ incidents, filters = {}, categories }: IncidentP
                   }}
                 >
                   <SelectTrigger id="sort-by">
-                    <SelectValue placeholder="Sort by" />
+                    <SelectValue placeholder={t('incidents.filters.sort_by')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="incident_date:desc">Date (Newest first)</SelectItem>
-                    <SelectItem value="incident_date:asc">Date (Oldest first)</SelectItem>
-                    <SelectItem value="title:asc">Title (A-Z)</SelectItem>
-                    <SelectItem value="title:desc">Title (Z-A)</SelectItem>
+                    <SelectItem value="incident_date:desc">{t('incidents.sort.date_newest')}</SelectItem>
+                    <SelectItem value="incident_date:asc">{t('incidents.sort.date_oldest')}</SelectItem>
+                    <SelectItem value="title:asc">{t('incidents.sort.title_asc')}</SelectItem>
+                    <SelectItem value="title:desc">{t('incidents.sort.title_desc')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -272,31 +274,31 @@ export default function Index({ incidents, filters = {}, categories }: IncidentP
                       className="h-12 px-4 text-left align-middle font-medium cursor-pointer"
                       onClick={() => handleSort('title')}
                     >
-                      Title {getSortIcon('title')}
+                      {t('incidents.table.title')} {getSortIcon('title')}
                     </th>
                     <th
                       className="h-12 px-4 text-left align-middle font-medium cursor-pointer"
                       onClick={() => handleSort('incident_date')}
                     >
-                      Date {getSortIcon('incident_date')}
+                      {t('incidents.table.date')} {getSortIcon('incident_date')}
                     </th>
                     <th className="h-12 px-4 text-left align-middle font-medium">
-                      Location
+                      {t('incidents.table.location')}
                     </th>
                     <th className="h-12 px-4 text-left align-middle font-medium">
-                      Category
+                      {t('incidents.table.category')}
                     </th>
                     <th className="h-12 px-4 text-left align-middle font-medium">
-                      Report
+                      {t('incidents.table.report')}
                     </th>
                     <th
                       className="h-12 px-4 text-left align-middle font-medium cursor-pointer"
                       onClick={() => handleSort('status')}
                     >
-                      Status {getSortIcon('status')}
+                      {t('incidents.table.status')} {getSortIcon('status')}
                     </th>
                     <th className="h-12 px-4 text-left align-middle font-medium">
-                      Actions
+                      {t('common.actions')}
                     </th>
                   </tr>
                 </thead>
@@ -304,7 +306,7 @@ export default function Index({ incidents, filters = {}, categories }: IncidentP
                   {incidents.data.length === 0 ? (
                     <tr>
                       <td colSpan={7} className="h-12 px-4 text-center align-middle">
-                        No incidents found
+                        {t('incidents.no_incidents')}
                       </td>
                     </tr>
                   ) : (
@@ -329,7 +331,7 @@ export default function Index({ incidents, filters = {}, categories }: IncidentP
                         </td>
                         <td className="p-4 align-middle">
                           <Badge style={{ backgroundColor: incident.category?.color || '#888888' }}>
-                            {incident.category?.name || 'Unspecified'}
+                            {incident.category?.name || t('incidents.unspecified')}
                           </Badge>
                         </td>
                         <td className="p-4 align-middle">
@@ -342,14 +344,14 @@ export default function Index({ incidents, filters = {}, categories }: IncidentP
                               {incident.report.report_number}
                             </Link>
                           ) : (
-                            <span className="text-muted-foreground text-sm">None</span>
+                            <span className="text-muted-foreground text-sm">{t('incidents.none')}</span>
                           )}
                         </td>
                         <td className="p-4 align-middle">
                           <Badge variant={incident.status === 'resolved' ? 'default' :
                                           incident.status === 'investigating' ? 'default' :
                                           incident.status === 'closed' ? 'outline' : 'default'}>
-                            {incident.status}
+                            {t(`incidents.status.${incident.status}`)}
                           </Badge>
                         </td>
                         <td className="p-4 align-middle">
@@ -361,7 +363,7 @@ export default function Index({ incidents, filters = {}, categories }: IncidentP
                             >
                               <Link href={route('incidents.show', incident.id)}>
                                 <AlertCircle className="h-4 w-4 mr-1" />
-                                Details
+                                {t('incidents.details')}
                               </Link>
                             </Button>
                           </div>
