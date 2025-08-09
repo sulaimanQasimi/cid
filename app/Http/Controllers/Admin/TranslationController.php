@@ -12,6 +12,24 @@ use Inertia\Inertia;
 class TranslationController extends Controller
 {
     /**
+     * Read translations from resources/js/lib/i18n/translations/{code}.json
+     */
+    protected function readJsonTranslations(string $languageCode): ?array
+    {
+        $path = resource_path('js/lib/i18n/translations/' . $languageCode . '.json');
+        if (!file_exists($path)) {
+            return null;
+        }
+        $json = json_decode(file_get_contents($path), true);
+        return is_array($json) ? $json : null;
+    }
+
+    protected function extractGroupFromKey(string $key): string
+    {
+        $pos = strpos($key, '.');
+        return $pos !== false ? substr($key, 0, $pos) : 'general';
+    }
+    /**
      * Display a listing of the translations.
      */
     public function index(Request $request)
@@ -29,25 +47,77 @@ class TranslationController extends Controller
 
         $language = Language::where('code', $selectedLanguage)->first();
 
-        $query = Translation::query()
-            ->when($language, function ($query) use ($language) {
-                $query->where('language_id', $language->id);
-            })
-            ->when($selectedGroup, function ($query) use ($selectedGroup) {
-                $query->where('group', $selectedGroup);
+        // Prefer JSON file source for faster reads; fall back to DB
+        $jsonMap = $selectedLanguage ? $this->readJsonTranslations($selectedLanguage) : null;
+
+        if ($jsonMap !== null) {
+            // Build items from JSON
+            $items = [];
+            foreach ($jsonMap as $key => $value) {
+                $group = $this->extractGroupFromKey($key);
+                if ($selectedGroup && $group !== $selectedGroup) {
+                    continue;
+                }
+                $items[] = [
+                    'id' => null,
+                    'language_id' => $language?->id,
+                    'key' => $key,
+                    'value' => is_string($value) ? $value : json_encode($value, JSON_UNESCAPED_UNICODE),
+                    'group' => $group,
+                ];
+            }
+
+            // Sort by group then key
+            usort($items, function ($a, $b) {
+                return [$a['group'], $a['key']] <=> [$b['group'], $b['key']];
             });
 
-        $translations = $query->orderBy('group')
-            ->orderBy('key')
-            ->paginate(50)
-            ->withQueryString();
+            // Manual pagination
+            $perPage = (int)($request->query('per_page', 50));
+            $page = max(1, (int)$request->query('page', 1));
+            $total = count($items);
+            $lastPage = (int)max(1, ceil($total / $perPage));
+            $offset = ($page - 1) * $perPage;
+            $data = array_slice($items, $offset, $perPage);
 
-        $groups = Translation::select('group')
-            ->when($language, function ($query) use ($language) {
-                $query->where('language_id', $language->id);
-            })
-            ->groupBy('group')
-            ->pluck('group');
+            $translations = [
+                'data' => $data,
+                'current_page' => $page,
+                'last_page' => $lastPage,
+                'per_page' => $perPage,
+                'total' => $total,
+            ];
+
+            // Build groups list from JSON keys
+            $groups = collect(array_values(array_unique(array_map(function ($key) {
+                $pos = strpos($key, '.');
+                return $pos !== false ? substr($key, 0, $pos) : 'general';
+            }, array_keys($jsonMap)))))->values();
+
+        } else {
+            // Fallback to DB-backed listing
+            $query = Translation::query()
+                ->when($language, function ($query) use ($language) {
+                    $query->where('language_id', $language->id);
+                })
+                ->when($selectedGroup, function ($query) use ($selectedGroup) {
+                    $query->where('group', $selectedGroup);
+                });
+
+            $paginator = $query->orderBy('group')
+                ->orderBy('key')
+                ->paginate(50)
+                ->withQueryString();
+
+            $translations = $paginator;
+
+            $groups = Translation::select('group')
+                ->when($language, function ($query) use ($language) {
+                    $query->where('language_id', $language->id);
+                })
+                ->groupBy('group')
+                ->pluck('group');
+        }
 
         return Inertia::render('Translations/Index', [
             'languages' => $languages,

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Plus, Search, Edit, Trash, Download, Upload } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/translate';
+import axios from 'axios';
 
 interface Language {
   id: number;
@@ -64,6 +65,9 @@ export default function TranslationsIndex({
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const { auth, csrf_token } = usePage<PageProps>().props;
+  const [editMode, setEditMode] = useState(false);
+  const [editedValues, setEditedValues] = useState<Record<string, string>>({});
+  const [saving, setSaving] = useState(false);
 
   // Ensure we have valid language and group values for the selects
   const currentLanguage = filters.language || (languages[0]?.code || "en");
@@ -86,40 +90,98 @@ export default function TranslationsIndex({
     ) :
     translationsData;
 
+  const hasEdits = useMemo(() => Object.keys(editedValues).length > 0, [editedValues]);
+
+  const handleValueChange = (key: string, value: string) => {
+    setEditedValues(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleRevert = () => setEditedValues({});
+
+  const handleSave = async () => {
+    if (!hasEdits) return;
+    try {
+      setSaving(true);
+      // Group edits by group for efficient import calls
+      const keyToGroup: Record<string, string> = {};
+      translationsData.forEach(tr => {
+        keyToGroup[tr.key] = tr.group || 'general';
+      });
+
+      const grouped: Record<string, Record<string, string>> = {};
+      Object.entries(editedValues).forEach(([key, value]) => {
+        const group = keyToGroup[key] || 'general';
+        if (!grouped[group]) grouped[group] = {};
+        grouped[group][key] = value;
+      });
+
+      // Perform batch import per group via API TranslationController::import
+      const groupEntries = Object.entries(grouped);
+      for (const [group, payload] of groupEntries) {
+        await axios.post('/api/translations/import', {
+          language_code: currentLanguage,
+          translations: payload,
+          group,
+        });
+      }
+
+      setEditedValues({});
+      // Refresh current page
+      window.location.href = route('translations.index', {
+        page: currentPage,
+        language: currentLanguage,
+        group: currentGroup === 'all' ? '' : currentGroup,
+      });
+    } catch (e) {
+      console.error('Failed to save translations', e);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <AppLayout>
-      <Head title="Translations" />
+      <Head title={t('translations.translations')} />
 
       <div className="container py-6 space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold tracking-tight">Translations</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{t('translations.translations')}</h1>
           <div className="flex gap-2">
             <Button variant="outline" asChild>
               <Link href={route('translations.export', { language_id: currentLanguage, group: filters.group === "all" ? "" : filters.group })}>
                 <Download className="mr-2 h-4 w-4" />
-                Export
+                {t('translations.export')}
               </Link>
             </Button>
             <Button variant="outline" asChild>
               <Link href={route('translations.export-json')}>
                 <Upload className="mr-2 h-4 w-4" />
-                Export to JSON
+                {t('translations.export_translations')}
               </Link>
             </Button>
             <Button asChild>
               <Link href={route('translations.create')}>
                 <Plus className="mr-2 h-4 w-4" />
-                Add Translation
+                {t('translations.add_translation')}
               </Link>
+            </Button>
+            <Button variant="outline" onClick={() => setEditMode(v => !v)}>
+              {t('common.edit')}
+            </Button>
+            <Button onClick={handleSave} disabled={!hasEdits || saving}>
+              {t('common.save')}
+            </Button>
+            <Button variant="outline" onClick={handleRevert} disabled={!hasEdits}>
+              {t('common.cancel')}
             </Button>
           </div>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Translations</CardTitle>
+            <CardTitle>{t('translations.translations')}</CardTitle>
             <CardDescription>
-              Manage your application translations
+              {t('translations.description')}
             </CardDescription>
           </CardHeader>
 
@@ -130,8 +192,8 @@ export default function TranslationsIndex({
                   value={currentLanguage}
                   onValueChange={(value) => window.location.href = route('translations.index', { language: value, group: currentGroup === "all" ? "" : currentGroup })}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Language" />
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('translations.select_language')} />
                   </SelectTrigger>
                   <SelectContent>
                     {languages.map((language) => (
@@ -148,11 +210,11 @@ export default function TranslationsIndex({
                   value={currentGroup}
                   onValueChange={(value) => window.location.href = route('translations.index', { language: currentLanguage, group: value === "all" ? "" : value })}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Group" />
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('translations.select_group')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Groups</SelectItem>
+                    <SelectItem value="all">{t('translations.all_groups')}</SelectItem>
                     {safeGroups.map((group) => (
                       <SelectItem key={group} value={group}>
                         {group}
@@ -164,7 +226,7 @@ export default function TranslationsIndex({
 
               <div className="w-full md:w-1/3 relative">
                 <Input
-                  placeholder="Search translations..."
+                  placeholder={t('translations.filter_translations')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pr-8"
@@ -176,17 +238,17 @@ export default function TranslationsIndex({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Key</TableHead>
-                  <TableHead>Value</TableHead>
-                  <TableHead>Group</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>{t('translations.key')}</TableHead>
+                  <TableHead>{t('translations.value')}</TableHead>
+                  <TableHead>{t('translations.group')}</TableHead>
+                  <TableHead className="text-right">{t('common.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredTranslations.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={4} className="text-center py-8">
-                      {searchQuery ? "No translations match your search" : "No translations found"}
+                      {searchQuery ? t('common.no_results') : t('translations.no_translations')}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -195,31 +257,21 @@ export default function TranslationsIndex({
                       <TableCell className="font-medium max-w-[250px] truncate" title={translation.key}>
                         {translation.key}
                       </TableCell>
-                      <TableCell className="max-w-[300px] truncate" title={translation.value}>
-                        {translation.value || <span className="text-muted-foreground italic">Empty</span>}
+                      <TableCell className="max-w-[300px]" title={editedValues[translation.key] ?? translation.value}>
+                        {editMode ? (
+                          <Input
+                            value={editedValues[translation.key] ?? translation.value ?? ''}
+                            onChange={(e) => handleValueChange(translation.key, e.target.value)}
+                          />
+                        ) : (
+                          <span className={!(translation.value) ? 'text-muted-foreground italic' : ''}>
+                            {translation.value || 'Empty'}
+                          </span>
+                        )}
                       </TableCell>
                       <TableCell>{translation.group}</TableCell>
                       <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button variant="outline" size="sm" asChild>
-                            <Link href={route('translations.edit', translation.id)}>
-                              Edit
-                            </Link>
-                          </Button>
-                          <form method="POST" action={route('translations.destroy', translation.id)}
-                                onSubmit={(e) => {
-                                  e.preventDefault();
-                                  if (confirm('Are you sure you want to delete this translation?')) {
-                                    e.currentTarget.submit();
-                                  }
-                                }}>
-                            <input type="hidden" name="_method" value="DELETE" />
-                            <input type="hidden" name="_token" value={csrf_token} />
-                            <Button variant="destructive" size="sm" type="submit">
-                              Delete
-                            </Button>
-                          </form>
-                        </div>
+                       
                       </TableCell>
                     </TableRow>
                   ))
@@ -230,7 +282,7 @@ export default function TranslationsIndex({
             {lastPage > 1 && (
               <div className="mt-4 flex items-center justify-between">
                 <div className="text-sm text-muted-foreground">
-                  Showing {filteredTranslations.length} of {total} translations
+                  {t('languages.total_languages', { count: String(total) })}
                 </div>
 
                 <div className="flex gap-1">
@@ -244,7 +296,7 @@ export default function TranslationsIndex({
                       group: currentGroup === "all" ? "" : currentGroup
                     })}
                   >
-                    Previous
+                    {t('departments.prev')}
                   </Button>
 
                   <Button
@@ -257,7 +309,7 @@ export default function TranslationsIndex({
                       group: currentGroup === "all" ? "" : currentGroup
                     })}
                   >
-                    Next
+                    {t('departments.next')}
                   </Button>
                 </div>
               </div>
@@ -266,12 +318,12 @@ export default function TranslationsIndex({
 
           <CardFooter className="flex justify-between">
             <p className="text-sm text-muted-foreground">
-              Total: {total} translations
+              {t('translations.total_translations', { count: String(total) })}
             </p>
 
             <Button variant="outline" asChild>
               <Link href={route('languages.index')}>
-                Manage Languages
+                {t('languages.manage_languages')}
               </Link>
             </Button>
           </CardFooter>

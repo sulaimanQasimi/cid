@@ -28,47 +28,47 @@ export default function LanguagesIndex({ languages = [] }: Props) {
   const { delete: destroy } = useForm();
 
   const handleDelete = (id: number) => {
-    if (confirm('Are you sure you want to delete this language?')) {
+    if (confirm(t('languages.confirm_delete'))) {
       destroy(route('languages.destroy', id));
     }
   };
 
   return (
     <AppLayout>
-      <Head title="Manage Languages" />
+      <Head title={t('languages.manage_languages')} />
 
       <div className="container py-6 space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold tracking-tight">Manage Languages</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{t('languages.manage_languages')}</h1>
           <Button asChild>
-            <Link href={route('languages.create')}>Add Language</Link>
+            <Link href={route('languages.create')}>{t('languages.add_language')}</Link>
           </Button>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Languages</CardTitle>
+            <CardTitle>{t('languages.languages')}</CardTitle>
             <CardDescription>
-              Manage your application languages
+              {t('languages.manage_languages')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Language</TableHead>
-                  <TableHead>Code</TableHead>
-                  <TableHead>Direction</TableHead>
-                  <TableHead>Active</TableHead>
-                  <TableHead>Default</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>{t('languages.language')}</TableHead>
+                  <TableHead>{t('languages.code')}</TableHead>
+                  <TableHead>{t('languages.direction')}</TableHead>
+                  <TableHead>{t('languages.active')}</TableHead>
+                  <TableHead>{t('languages.default')}</TableHead>
+                  <TableHead className="text-right">{t('languages.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {languages.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-8">
-                      No languages found
+                      {t('languages.no_languages')}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -76,19 +76,16 @@ export default function LanguagesIndex({ languages = [] }: Props) {
                     <TableRow key={language.id}>
                       <TableCell className="font-medium">{language.name}</TableCell>
                       <TableCell>{language.code}</TableCell>
-                      <TableCell>{language.direction}</TableCell>
-                      <TableCell>{language.active ? 'Yes' : 'No'}</TableCell>
-                      <TableCell>{language.default ? 'Yes' : 'No'}</TableCell>
+                      <TableCell>
+                        {language.direction === 'rtl' ? t('languages.right_to_left') : t('languages.left_to_right')}
+                      </TableCell>
+                      <TableCell>{language.active ? t('common.yes') : t('common.no')}</TableCell>
+                      <TableCell>{language.default ? t('common.yes') : t('common.no')}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
                           <Button variant="outline" size="sm" asChild>
                             <Link href={route('translations.index', { language: language.code })}>
-                              Translations
-                            </Link>
-                          </Button>
-                          <Button variant="outline" size="sm" asChild>
-                            <Link href={route('languages.edit', language.id)}>
-                              Edit
+                              {t('translations.translations')}
                             </Link>
                           </Button>
                           {!language.default && (
@@ -97,7 +94,7 @@ export default function LanguagesIndex({ languages = [] }: Props) {
                               size="sm"
                               onClick={() => handleDelete(language.id)}
                             >
-                              Delete
+                              {t('common.delete')}
                             </Button>
                           )}
                         </div>
