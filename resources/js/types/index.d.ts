@@ -5,6 +5,7 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
 
 export interface Auth {
     user: User;
+    permissions: string[];
 }
 
 export interface BreadcrumbItem {

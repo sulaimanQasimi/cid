@@ -28,6 +28,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { format } from 'date-fns';
 import { useTranslation } from '@/lib/i18n/translate';
+import { usePermissions } from '@/hooks/use-permissions';
+import { CanCreate, CanView, CanUpdate, CanDelete } from '@/components/ui/permission-guard';
 
 interface Criminal {
   id: number;
@@ -104,6 +106,9 @@ interface Props {
     per_page: number;
     department_id?: string;
   };
+  auth: {
+    permissions: string[];
+  };
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -146,8 +151,10 @@ export default function CriminalIndex({
     }
   },
   departments = [],
-  filters
+  filters,
+  auth
 }: Props) {
+  const { canCreate, canView, canUpdate, canDelete } = usePermissions();
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState(filters.search);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -241,12 +248,14 @@ export default function CriminalIndex({
             <p className="text-muted-foreground mt-1">{t('criminal.page_description')}</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button asChild size="default" className="shadow-sm">
-              <Link href={route('criminals.create')}>
-                <Plus className="mr-2 h-4 w-4" />
-                {t('criminal.add_button')}
-              </Link>
-            </Button>
+            <CanCreate model="criminal">
+              <Button asChild size="default" className="shadow-sm">
+                <Link href={route('criminals.create')}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  {t('criminal.add_button')}
+                </Link>
+              </Button>
+            </CanCreate>
           </div>
         </div>
 
@@ -387,37 +396,43 @@ export default function CriminalIndex({
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-1">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              asChild
-                              title={t('criminal.actions.view')}
-                              className="h-8 w-8 rounded-full"
-                            >
-                              <Link href={route('criminals.show', criminal.id)}>
-                                <Eye className="h-4 w-4" />
-                              </Link>
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              asChild
-                              title={t('criminal.actions.edit')}
-                              className="h-8 w-8 rounded-full"
-                            >
-                              <Link href={route('criminals.edit', criminal.id)}>
-                                <Pencil className="h-4 w-4" />
-                              </Link>
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => openDeleteDialog(criminal)}
-                              title={t('criminal.actions.delete')}
-                              className="h-8 w-8 rounded-full text-destructive hover:text-destructive hover:bg-destructive/10"
-                            >
-                              <Trash className="h-4 w-4" />
-                            </Button>
+                            <CanView model="criminal">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                asChild
+                                title={t('criminal.actions.view')}
+                                className="h-8 w-8 rounded-full"
+                              >
+                                <Link href={route('criminals.show', criminal.id)}>
+                                  <Eye className="h-4 w-4" />
+                                </Link>
+                              </Button>
+                            </CanView>
+                            <CanUpdate model="criminal">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                asChild
+                                title={t('criminal.actions.edit')}
+                                className="h-8 w-8 rounded-full"
+                              >
+                                <Link href={route('criminals.edit', criminal.id)}>
+                                  <Pencil className="h-4 w-4" />
+                                </Link>
+                              </Button>
+                            </CanUpdate>
+                            <CanDelete model="criminal">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => openDeleteDialog(criminal)}
+                                title={t('criminal.actions.delete')}
+                                className="h-8 w-8 rounded-full text-destructive hover:text-destructive hover:bg-destructive/10"
+                              >
+                                <Trash className="h-4 w-4" />
+                              </Button>
+                            </CanDelete>
                           </div>
                         </TableCell>
                       </TableRow>

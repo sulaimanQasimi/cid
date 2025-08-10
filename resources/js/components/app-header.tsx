@@ -38,7 +38,7 @@ const rightNavItems: HeaderNavItem[] = [
     },
 ];
 
-const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
+const activeItemStyles = 'text-neutral-900';
 
 interface AppHeaderProps {
     breadcrumbs?: BreadcrumbItem[];

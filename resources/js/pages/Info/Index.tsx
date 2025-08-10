@@ -27,6 +27,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useTranslation } from '@/lib/i18n/translate';
+import { usePermissions } from '@/hooks/use-permissions';
+import { CanCreate, CanView, CanUpdate, CanDelete, CanConfirm } from '@/components/ui/permission-guard';
 
 interface InfoRecord {
   id: number;
@@ -164,6 +166,7 @@ export default function InfoIndex({
   departments = [],
   filters
 }: Props) {
+  const { canCreate, canView, canUpdate, canDelete, canConfirm } = usePermissions();
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState(filters.search);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -293,12 +296,14 @@ export default function InfoIndex({
             <p className="text-muted-foreground mt-1">{t('info.page_description')}</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button asChild size="default" className="shadow-sm">
-              <Link href={route('infos.create')}>
-                <Plus className="mr-2 h-4 w-4" />
-                {t('info.add_button')}
-              </Link>
-            </Button>
+            <CanCreate model="info">
+              <Button asChild size="default" className="shadow-sm">
+                <Link href={route('infos.create')}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  {t('info.add_button')}
+                </Link>
+              </Button>
+            </CanCreate>
           </div>
         </div>
 
@@ -491,23 +496,29 @@ export default function InfoIndex({
                   <TableCell>{new Date(info.created_at).toLocaleDateString()}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Button size="sm" variant="outline" asChild>
-                        <Link href={route('infos.show', info.id)}>
-                          <Eye className="h-4 w-4" />
-                        </Link>
-                      </Button>
-                      <Button size="sm" variant="outline" asChild>
-                        <Link href={route('infos.edit', info.id)}>
-                          <Pencil className="h-4 w-4" />
-                        </Link>
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => openDeleteDialog(info)}
-                      >
-                        <Trash className="h-4 w-4" />
-                      </Button>
+                      <CanView model="info">
+                        <Button size="sm" variant="outline" asChild>
+                          <Link href={route('infos.show', info.id)}>
+                            <Eye className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                      </CanView>
+                      <CanUpdate model="info">
+                        <Button size="sm" variant="outline" asChild>
+                          <Link href={route('infos.edit', info.id)}>
+                            <Pencil className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                      </CanUpdate>
+                      <CanDelete model="info">
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => openDeleteDialog(info)}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </CanDelete>
                     </div>
                   </TableCell>
                 </TableRow>

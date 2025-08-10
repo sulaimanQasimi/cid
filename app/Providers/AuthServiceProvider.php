@@ -61,9 +61,7 @@ class AuthServiceProvider extends ServiceProvider
         InfoCategory::class => InfoCategoryPolicy::class,
         InfoType::class => InfoTypePolicy::class,
         Language::class => LanguagePolicy::class,
-        Meeting::class => MeetingPolicy::class,
-        MeetingMessage::class => MeetingMessagePolicy::class,
-        MeetingSession::class => MeetingSessionPolicy::class,
+
         Province::class => ProvincePolicy::class,
         Report::class => ReportPolicy::class,
         ReportStat::class => ReportStatPolicy::class,

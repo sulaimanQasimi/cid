@@ -32,9 +32,12 @@ interface Department {
 
 interface Props {
   departments?: Department[];
+  auth: {
+    permissions: string[];
+  };
 }
 
-export default function CriminalCreate({ departments = [] }: Props) {
+export default function CriminalCreate({ departments = [], auth }: Props) {
   const { t } = useTranslation();
   // Content tabs state
   const [activeTab, setActiveTab] = useState<string>('personal');

@@ -56,9 +56,12 @@ interface Criminal {
 
 interface Props {
   criminal: Criminal;
+  auth: {
+    permissions: string[];
+  };
 }
 
-export default function CriminalShow({ criminal }: Props) {
+export default function CriminalShow({ criminal, auth }: Props) {
   const { t } = useTranslation();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -101,26 +104,32 @@ export default function CriminalShow({ criminal }: Props) {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" asChild className="rounded-full shadow-sm">
-              <Link href={route('criminals.edit', criminal.id)}>
-                <Pencil className="mr-2 h-4 w-4" />
-                {t('criminal.show.edit_button')}
-              </Link>
-            </Button>
-            <Button variant="outline" asChild className="rounded-full shadow-sm">
-              <Link href={route('criminals.print', criminal.id)} target="_blank">
-                <Printer className="mr-2 h-4 w-4" />
-                {t('criminal.show.print_button')}
-              </Link>
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => setIsDeleteDialogOpen(true)}
-              className="rounded-full shadow-sm"
-            >
-              <Trash className="mr-2 h-4 w-4" />
-              {t('criminal.show.delete_button')}
-            </Button>
+            {auth.permissions.includes('criminal.update') && (
+              <Button variant="outline" asChild className="rounded-full shadow-sm">
+                <Link href={route('criminals.edit', criminal.id)}>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  {t('criminal.show.edit_button')}
+                </Link>
+              </Button>
+            )}
+            {auth.permissions.includes('criminal.view') && (
+              <Button variant="outline" asChild className="rounded-full shadow-sm">
+                <Link href={route('criminals.print', criminal.id)} target="_blank">
+                  <Printer className="mr-2 h-4 w-4" />
+                  {t('criminal.show.print_button')}
+                </Link>
+              </Button>
+            )}
+            {auth.permissions.includes('criminal.delete') && (
+              <Button
+                variant="destructive"
+                onClick={() => setIsDeleteDialogOpen(true)}
+                className="rounded-full shadow-sm"
+              >
+                <Trash className="mr-2 h-4 w-4" />
+                {t('criminal.show.delete_button')}
+              </Button>
+            )}
           </div>
         </div>
 

@@ -3,7 +3,7 @@ import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarSeparator } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { 
     BookOpen, 
     Database, 
@@ -40,15 +40,251 @@ import {
 import AppLogo from './app-logo';
 import { useLanguage } from '@/lib/i18n/language-context';
 import { useTranslation } from '@/lib/i18n/translate';
+import { hasPermission, PermissionPatterns } from '@/lib/permissions';
 import React from 'react';
  
 
 const footerNavItems: NavItem[] = [
 ];
 
+function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
+    const navigation: NavItem[] = [];
+    
+    // Dashboard - always visible
+    navigation.push({ 
+        title: t('sidebar.intelligence_dashboard'), 
+        href: '/dashboard', 
+        icon: LayoutGrid 
+    });
+    
+    // Intelligence Operations
+    const intelligenceItems: NavItem[] = [];
+    if (hasPermission(auth, PermissionPatterns.info.viewAny)) {
+        intelligenceItems.push({ 
+            title: t('sidebar.active_cases'), 
+            href: route('infos.index'), 
+            icon: Target 
+        });
+    }
+    if (hasPermission(auth, PermissionPatterns.department.viewAny)) {
+        intelligenceItems.push({ 
+            title: t('sidebar.surveillance'), 
+            href: route('departments.index'), 
+            icon: Eye 
+        });
+    }
+    if (hasPermission(auth, PermissionPatterns.infoType.viewAny)) {
+        intelligenceItems.push({ 
+            title: t('sidebar.intelligence_reports'), 
+            href: route('info-types.index'), 
+            icon: FileBarChart 
+        });
+    }
+    if (hasPermission(auth, PermissionPatterns.infoCategory.viewAny)) {
+        intelligenceItems.push({ 
+            title: t('sidebar.case_categories'), 
+            href: route('info-categories.index'), 
+            icon: Folder 
+        });
+    }
+    
+    if (intelligenceItems.length > 0) {
+        navigation.push({
+            title: t('sidebar.intelligence_operations'),
+            href: '#intelligence',
+            icon: ShieldCheck,
+            items: intelligenceItems
+        });
+    }
+    
+    // Criminal Database
+    const criminalItems: NavItem[] = [];
+    if (hasPermission(auth, PermissionPatterns.criminal.viewAny)) {
+        criminalItems.push({ 
+            title: t('sidebar.criminal_records'), 
+            href: route('criminals.index'), 
+            icon: FileText 
+        });
+    }
+    if (criminalItems.length > 0) {
+        navigation.push({
+            title: t('sidebar.criminal_database'),
+            href: '#criminals',
+            icon: Users,
+            items: criminalItems
+        });
+    }
+    
+    // Incident Management
+    const incidentItems: NavItem[] = [];
+    if (hasPermission(auth, PermissionPatterns.incident.viewAny)) {
+        incidentItems.push({ 
+            title: t('sidebar.active_incidents'), 
+            href: route('incidents.index'), 
+            icon: AlertCircle 
+        });
+    }
+    if (hasPermission(auth, PermissionPatterns.incidentReport.viewAny)) {
+        incidentItems.push({ 
+            title: t('sidebar.incident_reports'), 
+            href: route('incident-reports.index'), 
+            icon: FileBarChart 
+        });
+    }
+    if (hasPermission(auth, PermissionPatterns.incidentCategory.viewAny)) {
+        incidentItems.push({ 
+            title: t('sidebar.incident_categories'), 
+            href: route('incident-categories.index'), 
+            icon: Tag 
+        });
+    }
+    
+    if (incidentItems.length > 0) {
+        navigation.push({
+            title: t('sidebar.incident_management'),
+            href: '#incidents',
+            icon: AlertTriangle,
+            items: incidentItems
+        });
+    }
+    
+    // Analysis Reports
+    const analysisItems: NavItem[] = [];
+    if (hasPermission(auth, PermissionPatterns.report.viewAny)) {
+        analysisItems.push({ 
+            title: t('sidebar.report_scanner'), 
+            href: route('reports.scan'), 
+            icon: QrCode 
+        });
+    }
+    
+    if (analysisItems.length > 0) {
+        navigation.push({
+            title: t('sidebar.analysis_reports'),
+            href: '#analysis',
+            icon: BarChart3,
+            items: analysisItems
+        });
+    }
+    
+    // Geographic Intelligence
+    const geographicItems: NavItem[] = [];
+    if (hasPermission(auth, PermissionPatterns.province.viewAny)) {
+        geographicItems.push({ 
+            title: t('sidebar.provinces'), 
+            href: route('provinces.index'), 
+            icon: Map 
+        });
+    }
+    if (hasPermission(auth, PermissionPatterns.district.viewAny)) {
+        geographicItems.push({ 
+            title: t('sidebar.districts'), 
+            href: route('districts.index'), 
+            icon: MapPin 
+        });
+    }
+    
+    if (geographicItems.length > 0) {
+        navigation.push({
+            title: t('sidebar.geographic_intelligence'),
+            href: '#geographic',
+            icon: Map,
+            items: geographicItems
+        });
+    }
+    
+    // System Administration
+    const adminItems: NavItem[] = [];
+    if (hasPermission(auth, PermissionPatterns.user.viewAny)) {
+        adminItems.push({ 
+            title: t('sidebar.user_management'), 
+            href: route('users.index'), 
+            icon: Users 
+        });
+    }
+    if (hasPermission(auth, 'role.view_any')) {
+        adminItems.push({ 
+            title: t('sidebar.role_management'), 
+            href: route('roles.index'), 
+            icon: UserCog 
+        });
+    }
+    if (hasPermission(auth, 'permission.view_any')) {
+        adminItems.push({ 
+            title: t('sidebar.security_permissions'), 
+            href: route('permissions.index'), 
+            icon: Shield 
+        });
+    }
+    
+    if (adminItems.length > 0) {
+        navigation.push({
+            title: t('sidebar.system_administration'),
+            href: '#admin',
+            icon: Settings,
+            items: adminItems
+        });
+    }
+    
+    // Multilingual Support
+    const languageItems: NavItem[] = [];
+    if (hasPermission(auth, PermissionPatterns.language.viewAny)) {
+        languageItems.push({ 
+            title: t('sidebar.language_management'), 
+            href: route('languages.index'), 
+            icon: Globe 
+        });
+    }
+    if (hasPermission(auth, PermissionPatterns.translation.viewAny)) {
+        languageItems.push({ 
+            title: t('sidebar.translations'), 
+            href: route('translations.index'), 
+            icon: Tag 
+        });
+    }
+    
+    if (languageItems.length > 0) {
+        navigation.push({
+            title: t('sidebar.multilingual_support'),
+            href: '#languages',
+            icon: Globe,
+            items: languageItems
+        });
+    }
+    
+    // Data Configuration
+    const dataItems: NavItem[] = [];
+    if (hasPermission(auth, PermissionPatterns.statCategory.viewAny)) {
+        dataItems.push({ 
+            title: t('sidebar.stat_categories'), 
+            href: route('stat-categories.index'), 
+            icon: Database 
+        });
+    }
+    if (hasPermission(auth, PermissionPatterns.statCategoryItem.viewAny)) {
+        dataItems.push({ 
+            title: t('sidebar.stat_items'), 
+            href: route('stat-category-items.index'), 
+            icon: Tag 
+        });
+    }
+    
+    if (dataItems.length > 0) {
+        navigation.push({
+            title: t('sidebar.data_configuration'),
+            href: '#data',
+            icon: Database,
+            items: dataItems
+        });
+    }
+    
+    return navigation;
+}
+
 export function AppSidebar() {
     const { t } = useTranslation();
     const { direction } = useLanguage();
+    const { auth } = usePage().props as any;
     // Determine sidebar side based on current language direction
     const sidebarSide = direction === 'rtl' ? 'right' : 'left';
 
@@ -115,70 +351,7 @@ export function AppSidebar() {
                     </div>
                 </div>
                 <NavMain
-                    items={[
-                        { title: t('sidebar.intelligence_dashboard'), href: '/dashboard', icon: LayoutGrid },
-                        {
-                            title: t('sidebar.intelligence_operations'), href: '#intelligence', icon: ShieldCheck, items: [
-                                { title: t('sidebar.active_cases'), href: route('infos.index'), icon: Target },
-                                { title: t('sidebar.surveillance'), href: route('departments.index'), icon: Eye },
-                                { title: t('sidebar.intelligence_reports'), href: route('info-types.index'), icon: FileBarChart },
-                                { title: t('sidebar.case_categories'), href: route('info-categories.index'), icon: Folder },
-                            ]
-                        },
-                        {
-                            title: t('sidebar.criminal_database'), href: '#criminals', icon: Users, items: [
-                                { title: t('sidebar.criminal_records'), href: route('criminals.index'), icon: FileText },
-                                { title: t('sidebar.watch_lists'), href: '#watch-lists', icon: AlertTriangle },
-                            ]
-                        },
-                        {
-                            title: t('sidebar.incident_management'), href: '#incidents', icon: AlertTriangle, items: [
-                                { title: t('sidebar.active_incidents'), href: route('incidents.index'), icon: AlertCircle },
-                                { title: t('sidebar.incident_reports'), href: route('incident-reports.index'), icon: FileBarChart },
-                                { title: t('sidebar.incident_categories'), href: route('incident-categories.index'), icon: Tag },
-                            ]
-                        },
-                        {
-                            title: t('sidebar.analysis_reports'), href: '#analysis', icon: BarChart3, items: [
-                                { title: t('sidebar.report_scanner'), href: route('reports.scan'), icon: QrCode },
-                                { title: t('sidebar.analytics'), href: '#analytics', icon: BarChart3 },
-                                { title: t('sidebar.archive'), href: '#archive', icon: Archive },
-                            ]
-                        },
-                        {
-                            title: t('sidebar.secure_communications'), href: '#communications', icon: Lock, items: [
-                                { title: t('sidebar.secure_meetings'), href: route('meetings.index'), icon: Video },
-                                { title: t('sidebar.meeting_schedule'), href: route('meetings.create'), icon: Calendar },
-                            ]
-                        },
-                        {
-                            title: t('sidebar.geographic_intelligence'), href: '#geographic', icon: Map, items: [
-                                { title: t('sidebar.provinces'), href: route('provinces.index'), icon: Map },
-                                { title: t('sidebar.districts'), href: route('districts.index'), icon: MapPin },
-                            ]
-                        },
-                        {
-                            title: t('sidebar.system_administration'), href: '#admin', icon: Settings, items: [
-                                { title: t('sidebar.user_management'), href: route('users.index'), icon: Users },
-                                { title: t('sidebar.role_management'), href: route('roles.index'), icon: UserCog },
-                                { title: t('sidebar.security_permissions'), href: route('permissions.index'), icon: Shield },
-                                { title: t('sidebar.system_settings'), href: '#system-settings', icon: Settings },
-                            ]
-                        },
-                        {
-                            title: t('sidebar.multilingual_support'), href: '#languages', icon: Globe, items: [
-                                { title: t('sidebar.language_management'), href: route('languages.index'), icon: Globe },
-                                { title: t('sidebar.translations'), href: route('translations.index'), icon: Tag },
-                                { title: t('sidebar.language_testing'), href: route('language-test'), icon: TabletSmartphone },
-                            ]
-                        },
-                        {
-                            title: t('sidebar.data_configuration'), href: '#data', icon: Database, items: [
-                                { title: t('sidebar.stat_categories'), href: route('stat-categories.index'), icon: Database },
-                                { title: t('sidebar.stat_items'), href: route('stat-category-items.index'), icon: Tag },
-                            ]
-                        },
-                    ] as NavItem[]}
+                    items={getPermissionBasedNavigation(auth, t)}
                 />
             </SidebarContent>
 

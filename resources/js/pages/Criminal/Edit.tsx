@@ -56,9 +56,12 @@ interface Department {
 interface Props {
   criminal: Criminal;
   departments: Department[];
+  auth: {
+    permissions: string[];
+  };
 }
 
-export default function CriminalEdit({ criminal, departments = [] }: Props) {
+export default function CriminalEdit({ criminal, departments = [], auth }: Props) {
   const { t } = useTranslation();
   // Content tabs state
   const [activeTab, setActiveTab] = useState<string>('personal');
