@@ -14,6 +14,8 @@ class IncidentCategoryController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', IncidentCategory::class);
+        
         $categories = IncidentCategory::orderBy('name')
             ->withCount('incidents')
             ->paginate(10);
@@ -28,6 +30,8 @@ class IncidentCategoryController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', IncidentCategory::class);
+        
         return Inertia::render('Incidents/Categories/Create');
     }
 
@@ -36,6 +40,8 @@ class IncidentCategoryController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', IncidentCategory::class);
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'nullable|string|max:50',
@@ -58,6 +64,8 @@ class IncidentCategoryController extends Controller
      */
     public function show(IncidentCategory $incidentCategory)
     {
+        $this->authorize('view', $incidentCategory);
+        
         $incidentCategory->load(['creator']);
         $incidentCategory->loadCount('incidents');
 
@@ -71,6 +79,8 @@ class IncidentCategoryController extends Controller
      */
     public function edit(IncidentCategory $incidentCategory)
     {
+        $this->authorize('update', $incidentCategory);
+        
         return Inertia::render('Incidents/Categories/Edit', [
             'category' => $incidentCategory,
         ]);
@@ -81,6 +91,8 @@ class IncidentCategoryController extends Controller
      */
     public function update(Request $request, IncidentCategory $incidentCategory)
     {
+        $this->authorize('update', $incidentCategory);
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'nullable|string|max:50',
@@ -101,6 +113,8 @@ class IncidentCategoryController extends Controller
      */
     public function destroy(IncidentCategory $incidentCategory)
     {
+        $this->authorize('delete', $incidentCategory);
+        
         $incidentCategory->delete();
 
         return redirect()->route('incident-categories.index')

@@ -22,6 +22,8 @@ class InfoController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('viewAny', Info::class);
+        
         // Validate query parameters
         $validated = $request->validate([
             'per_page' => 'nullable|integer|min:5|max:100',
@@ -101,8 +103,7 @@ class InfoController extends Controller
      */
     public function create()
     {
-        // Check authorization
-        Gate::authorize('create', Info::class);
+        $this->authorize('create', Info::class);
 
         // Get data for dropdowns without caching
         $infoTypes = InfoType::orderBy('name')->get();
@@ -121,8 +122,7 @@ class InfoController extends Controller
      */
     public function store(Request $request)
     {
-        // Check authorization
-        Gate::authorize('create', Info::class);
+        $this->authorize('create', Info::class);
 
         $validated = $request->validate([
             'info_type_id' => 'required|integer|exists:info_types,id',
@@ -211,8 +211,7 @@ class InfoController extends Controller
      */
     public function show(Info $info)
     {
-        // Check if the user can view this info
-        Gate::authorize('view', $info);
+        $this->authorize('view', $info);
 
         // Load related data without caching
         $info->load(['infoType', 'infoCategory', 'department', 'user', 'creator', 'confirmer']);
@@ -227,8 +226,7 @@ class InfoController extends Controller
      */
     public function edit(Info $info)
     {
-        // Check authorization
-        Gate::authorize('update', $info);
+        $this->authorize('update', $info);
 
         // Load data for dropdowns
         $infoTypes = InfoType::orderBy('name')->get();
@@ -251,8 +249,7 @@ class InfoController extends Controller
      */
     public function update(Request $request, Info $info)
     {
-        // Check authorization
-        Gate::authorize('update', $info);
+        $this->authorize('update', $info);
 
         $validated = $request->validate([
             'info_type_id' => 'required|integer|exists:info_types,id',
@@ -346,8 +343,7 @@ class InfoController extends Controller
      */
     public function destroy(Info $info)
     {
-        // Check authorization
-        Gate::authorize('delete', $info);
+        $this->authorize('delete', $info);
 
         try {
             DB::beginTransaction();

@@ -34,6 +34,8 @@ class TranslationController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('viewAny', Translation::class);
+        
         $languages = Language::orderBy('default', 'desc')
             ->orderBy('name')
             ->get();
@@ -135,6 +137,8 @@ class TranslationController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Translation::class);
+        
         $languages = Language::where('active', true)
             ->orderBy('default', 'desc')
             ->orderBy('name')
@@ -196,6 +200,8 @@ class TranslationController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Translation::class);
+        
         $request->validate([
             'language_id' => 'required|exists:languages,id',
             'key' => 'required|string',
@@ -238,6 +244,8 @@ class TranslationController extends Controller
      */
     public function edit(Translation $translation)
     {
+        $this->authorize('update', $translation);
+        
         $languages = Language::where('active', true)
             ->orderBy('default', 'desc')
             ->orderBy('name')
@@ -259,6 +267,8 @@ class TranslationController extends Controller
      */
     public function update(Request $request, Translation $translation)
     {
+        $this->authorize('update', $translation);
+        
         $request->validate([
             'language_id' => 'required|exists:languages,id',
             'key' => 'required|string',
@@ -313,6 +323,8 @@ class TranslationController extends Controller
      */
     public function destroy(Translation $translation)
     {
+        $this->authorize('delete', $translation);
+        
         $language = $translation->language;
         $group = $translation->group;
 

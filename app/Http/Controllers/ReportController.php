@@ -17,6 +17,8 @@ class ReportController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Report::class);
+        
         $request->validate([
             'reportable_type' => 'required|string',
             'reportable_id' => 'required|integer',
@@ -56,6 +58,8 @@ class ReportController extends Controller
      */
     public function show(Report $report)
     {
+        $this->authorize('view', $report);
+        
         return response()->json([
             'report' => $report,
         ]);
@@ -69,6 +73,8 @@ class ReportController extends Controller
      */
     public function findByCode($code)
     {
+        $this->authorize('viewAny', Report::class);
+        
         $report = Report::where('code', $code)->first();
 
         if (!$report) {

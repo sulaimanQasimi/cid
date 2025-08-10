@@ -16,6 +16,8 @@ class StatCategoryItemController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('viewAny', StatCategoryItem::class);
+        
         $categoryId = $request->query('category_id');
 
         $query = StatCategoryItem::with(['category', 'creator', 'parent', 'children']);
@@ -41,6 +43,8 @@ class StatCategoryItemController extends Controller
      */
     public function create(Request $request)
     {
+        $this->authorize('create', StatCategoryItem::class);
+        
         $categoryId = $request->query('category_id');
         $categories = StatCategory::where('status', 'active')->get(['id', 'name', 'label', 'color']);
 
@@ -65,6 +69,8 @@ class StatCategoryItemController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', StatCategoryItem::class);
+        
         $validated = $request->validate([
             'stat_category_id' => 'required|exists:stat_categories,id',
             'parent_id' => 'nullable|exists:stat_category_items,id',
@@ -129,6 +135,8 @@ class StatCategoryItemController extends Controller
      */
     public function show(StatCategoryItem $statCategoryItem)
     {
+        $this->authorize('view', $statCategoryItem);
+        
         $statCategoryItem->load(['category', 'creator', 'parent', 'children']);
         $hasChildren = $statCategoryItem->children->count() > 0;
 
@@ -143,6 +151,8 @@ class StatCategoryItemController extends Controller
      */
     public function edit(StatCategoryItem $statCategoryItem)
     {
+        $this->authorize('update', $statCategoryItem);
+        
         $categories = StatCategory::where('status', 'active')->get(['id', 'name', 'label', 'color']);
 
         // Get potential parent items (same category, excluding the current item and its children)
@@ -169,6 +179,8 @@ class StatCategoryItemController extends Controller
      */
     public function update(Request $request, StatCategoryItem $statCategoryItem)
     {
+        $this->authorize('update', $statCategoryItem);
+        
         $validated = $request->validate([
             'stat_category_id' => 'required|exists:stat_categories,id',
             'parent_id' => 'nullable|exists:stat_category_items,id',
@@ -240,6 +252,8 @@ class StatCategoryItemController extends Controller
      */
     public function destroy(StatCategoryItem $statCategoryItem)
     {
+        $this->authorize('delete', $statCategoryItem);
+        
         // Check if item has children
         if ($statCategoryItem->children()->count() > 0) {
             return back()->with('error', 'Cannot delete an item that has children.');

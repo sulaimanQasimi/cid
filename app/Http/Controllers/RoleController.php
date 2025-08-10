@@ -14,6 +14,8 @@ class RoleController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', Role::class);
+        
         $roles = Role::with('permissions')->paginate(10);
         $permissions = Permission::all();
 
@@ -28,6 +30,8 @@ class RoleController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Role::class);
+        
         $permissions = Permission::all();
 
         return Inertia::render('Role/Create', [
@@ -40,6 +44,8 @@ class RoleController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Role::class);
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:roles,name',
             'permissions' => 'array',
@@ -60,6 +66,8 @@ class RoleController extends Controller
      */
     public function edit($id)
     {
+        $this->authorize('update', Role::class);
+        
         $role = Role::with('permissions')->findOrFail($id);
         $permissions = Permission::all();
 
@@ -74,6 +82,8 @@ class RoleController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $this->authorize('update', Role::class);
+        
         $role = Role::findOrFail($id);
 
         $validated = $request->validate([
@@ -96,6 +106,8 @@ class RoleController extends Controller
      */
     public function destroy($id)
     {
+        $this->authorize('delete', Role::class);
+        
         $role = Role::findOrFail($id);
 
         // Don't allow deleting the admin role

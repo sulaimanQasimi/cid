@@ -14,6 +14,8 @@ class LanguageController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', Language::class);
+        
         $languages = Language::orderBy('default', 'desc')
             ->orderBy('name')
             ->get();
@@ -28,6 +30,8 @@ class LanguageController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Language::class);
+        
         return Inertia::render('Languages/Create');
     }
 
@@ -36,6 +40,8 @@ class LanguageController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Language::class);
+        
         $request->validate([
             'code' => 'required|string|max:10|unique:languages,code',
             'name' => 'required|string|max:50',
@@ -60,6 +66,8 @@ class LanguageController extends Controller
      */
     public function edit(Language $language)
     {
+        $this->authorize('update', $language);
+        
         return Inertia::render('Languages/Edit', [
             'language' => $language,
         ]);
@@ -70,6 +78,8 @@ class LanguageController extends Controller
      */
     public function update(Request $request, Language $language)
     {
+        $this->authorize('update', $language);
+        
         $request->validate([
             'code' => 'required|string|max:10|unique:languages,code,' . $language->id,
             'name' => 'required|string|max:50',
@@ -96,6 +106,8 @@ class LanguageController extends Controller
      */
     public function destroy(Language $language)
     {
+        $this->authorize('delete', $language);
+        
         // Prevent deleting the default language
         if ($language->default) {
             return redirect()->route('languages.index')

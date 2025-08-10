@@ -32,6 +32,8 @@ class ReportStatController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', ReportStat::class);
+        
         $validated = $request->validate([
             'incident_report_id' => [
                 'required',
@@ -90,6 +92,8 @@ class ReportStatController extends Controller
      */
     public function update(Request $request, ReportStat $reportStat)
     {
+        $this->authorize('update', $reportStat);
+        
         $validated = $request->validate([
             'value' => 'required',
             'notes' => 'nullable|string|max:1000',
@@ -111,6 +115,8 @@ class ReportStatController extends Controller
      */
     public function destroy(ReportStat $reportStat)
     {
+        $this->authorize('delete', $reportStat);
+        
         $reportId = $reportStat->incident_report_id;
         $reportStat->delete();
 

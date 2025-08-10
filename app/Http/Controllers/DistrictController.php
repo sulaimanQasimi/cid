@@ -15,6 +15,8 @@ class DistrictController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', District::class);
+        
         $districts = District::with(['creator:id,name', 'province:id,name'])
             ->orderBy('name', 'asc')
             ->paginate(10);
@@ -34,6 +36,8 @@ class DistrictController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', District::class);
+        
         $provinces = Province::where('status', 'active')
             ->orderBy('name', 'asc')
             ->get(['id', 'name']);
@@ -48,6 +52,8 @@ class DistrictController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', District::class);
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'province_id' => 'required|exists:provinces,id',
@@ -69,6 +75,8 @@ class DistrictController extends Controller
      */
     public function show(District $district)
     {
+        $this->authorize('view', $district);
+        
         $district->load(['creator:id,name', 'province:id,name,code']);
 
         $incidents = $district->incidents()
@@ -88,6 +96,8 @@ class DistrictController extends Controller
      */
     public function edit(District $district)
     {
+        $this->authorize('update', $district);
+        
         $provinces = Province::where('status', 'active')
             ->orderBy('name', 'asc')
             ->get(['id', 'name']);
@@ -103,6 +113,8 @@ class DistrictController extends Controller
      */
     public function update(Request $request, District $district)
     {
+        $this->authorize('update', $district);
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'province_id' => 'required|exists:provinces,id',
@@ -122,6 +134,8 @@ class DistrictController extends Controller
      */
     public function destroy(District $district)
     {
+        $this->authorize('delete', $district);
+        
         // Check if there are related incidents
         if ($district->incidents()->count() > 0) {
             return redirect()->route('districts.index')

@@ -25,11 +25,8 @@ class HandleInertiaRequests extends Middleware
      */
     public function version(Request $request): string
     {
-        if (file_exists(public_path('build/manifest.json'))) {
-            return md5_file(public_path('build/manifest.json')) ?: '1.0.0';
-        }
 
-        return '1.0.0';
+        return '11.0.0';
     }
 
     /**
@@ -49,6 +46,7 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user(),
+                'permissions' => $request->user()?->getPermissionsViaRoles()->pluck('name'),
             ],
             'ziggy' => fn (): array => [
                 ...(new Ziggy)->toArray(),

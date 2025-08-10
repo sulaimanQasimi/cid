@@ -18,6 +18,8 @@ class IncidentReportController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('viewAny', IncidentReport::class);
+        
         $query = IncidentReport::with(['submitter:id,name'])
             ->withCount('incidents');
 
@@ -83,6 +85,8 @@ class IncidentReportController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', IncidentReport::class);
+        
         // Get active statistical categories
         $statCategories = StatCategory::where('status', 'active')
             ->orderBy('label')
@@ -126,6 +130,8 @@ class IncidentReportController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', IncidentReport::class);
+        
         $validated = $request->validate([
             'report_number' => 'nullable|string|max:255',
             'details' => 'required|string',
@@ -173,6 +179,8 @@ class IncidentReportController extends Controller
      */
     public function show(IncidentReport $incidentReport)
     {
+        $this->authorize('view', $incidentReport);
+        
         $incidentReport->load(['submitter:id,name', 'approver:id,name']);
 
         $incidents = $incidentReport->incidents()
@@ -203,6 +211,8 @@ class IncidentReportController extends Controller
      */
     public function edit(IncidentReport $incidentReport)
     {
+        $this->authorize('update', $incidentReport);
+        
         // Get active statistical categories
         $statCategories = StatCategory::where('status', 'active')
             ->orderBy('label')
@@ -253,6 +263,8 @@ class IncidentReportController extends Controller
      */
     public function update(Request $request, IncidentReport $incidentReport)
     {
+        $this->authorize('update', $incidentReport);
+        
         $validated = $request->validate([
             'report_number' => 'nullable|string|max:255',
             'details' => 'required|string',
@@ -282,6 +294,8 @@ class IncidentReportController extends Controller
      */
     public function destroy(IncidentReport $incidentReport)
     {
+        $this->authorize('delete', $incidentReport);
+        
         $incidentReport->delete();
 
         return redirect()->route('incident-reports.index')

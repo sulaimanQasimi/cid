@@ -14,6 +14,8 @@ class ProvinceController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', Province::class);
+        
         $provinces = Province::with('creator:id,name')
             ->orderBy('name', 'asc')
             ->paginate(10);
@@ -28,6 +30,8 @@ class ProvinceController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Province::class);
+        
         return Inertia::render('Province/Create');
     }
 
@@ -36,6 +40,8 @@ class ProvinceController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Province::class);
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:10|unique:provinces',
@@ -58,6 +64,8 @@ class ProvinceController extends Controller
      */
     public function show(Province $province)
     {
+        $this->authorize('view', $province);
+        
         $province->load('creator:id,name');
 
         $districts = $province->districts()
@@ -76,6 +84,8 @@ class ProvinceController extends Controller
      */
     public function edit(Province $province)
     {
+        $this->authorize('update', $province);
+        
         return Inertia::render('Province/Edit', [
             'province' => $province,
         ]);
@@ -86,6 +96,8 @@ class ProvinceController extends Controller
      */
     public function update(Request $request, Province $province)
     {
+        $this->authorize('update', $province);
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:10|unique:provinces,code,' . $province->id,
@@ -106,6 +118,8 @@ class ProvinceController extends Controller
      */
     public function destroy(Province $province)
     {
+        $this->authorize('delete', $province);
+        
         // Check if there are related districts
         if ($province->districts()->count() > 0) {
             return redirect()->route('provinces.index')

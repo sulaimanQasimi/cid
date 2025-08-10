@@ -18,6 +18,8 @@ class IncidentController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('viewAny', Incident::class);
+        
         $query = Incident::with([
             'district:id,name',
             'district.province:id,name',
@@ -82,6 +84,8 @@ class IncidentController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Incident::class);
+        
         $districts = District::with('province:id,name')
             ->orderBy('name')
             ->get();
@@ -106,6 +110,8 @@ class IncidentController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Incident::class);
+        
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -135,6 +141,8 @@ class IncidentController extends Controller
      */
     public function show(Incident $incident)
     {
+        $this->authorize('view', $incident);
+        
         $incident->load([
             'district',
             'district.province',
@@ -153,6 +161,8 @@ class IncidentController extends Controller
      */
     public function edit(Incident $incident)
     {
+        $this->authorize('update', $incident);
+        
         $districts = District::with('province:id,name')
             ->orderBy('name')
             ->get();
@@ -178,6 +188,8 @@ class IncidentController extends Controller
      */
     public function update(Request $request, Incident $incident)
     {
+        $this->authorize('update', $incident);
+        
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -205,6 +217,8 @@ class IncidentController extends Controller
      */
     public function destroy(Incident $incident)
     {
+        $this->authorize('delete', $incident);
+        
         $incident->delete();
 
         return redirect()->route('incidents.index')

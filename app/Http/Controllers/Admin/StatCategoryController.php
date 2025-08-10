@@ -15,6 +15,8 @@ class StatCategoryController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', StatCategory::class);
+        
         $categories = StatCategory::with('creator')
             ->latest()
             ->paginate(10);
@@ -29,6 +31,8 @@ class StatCategoryController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', StatCategory::class);
+        
         return Inertia::render('Admin/StatCategory/Create');
     }
 
@@ -37,6 +41,8 @@ class StatCategoryController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', StatCategory::class);
+        
         $validated = $request->validate([
             'name' => 'required|string|max:50|unique:stat_categories',
             'label' => 'required|string|max:100',
@@ -57,6 +63,8 @@ class StatCategoryController extends Controller
      */
     public function show(StatCategory $statCategory)
     {
+        $this->authorize('view', $statCategory);
+        
         $statCategory->load(['creator', 'items']);
 
         return Inertia::render('Admin/StatCategory/Show', [
@@ -69,6 +77,8 @@ class StatCategoryController extends Controller
      */
     public function edit(StatCategory $statCategory)
     {
+        $this->authorize('update', $statCategory);
+        
         return Inertia::render('Admin/StatCategory/Edit', [
             'category' => $statCategory
         ]);
@@ -79,6 +89,8 @@ class StatCategoryController extends Controller
      */
     public function update(Request $request, StatCategory $statCategory)
     {
+        $this->authorize('update', $statCategory);
+        
         $validated = $request->validate([
             'name' => 'required|string|max:50|unique:stat_categories,name,' . $statCategory->id,
             'label' => 'required|string|max:100',
@@ -97,6 +109,8 @@ class StatCategoryController extends Controller
      */
     public function destroy(StatCategory $statCategory)
     {
+        $this->authorize('delete', $statCategory);
+        
         $statCategory->delete();
 
         return redirect()->route('stat-categories.index')

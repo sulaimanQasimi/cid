@@ -4,16 +4,18 @@ namespace App\Policies;
 
 use App\Models\Info;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class InfoPolicy
 {
+    use HandlesAuthorization;
+
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return true; // All authenticated users can view the list
+        return $user->hasPermissionTo('info.view_any');
     }
 
     /**
@@ -21,15 +23,7 @@ class InfoPolicy
      */
     public function view(User $user, Info $info): bool
     {
-        // Users can view info if:
-        // 1. They created it
-        // 2. They're the associated user
-        // 3. They confirmed it
-        // 4. The info is confirmed (public)
-        return $user->id === $info->created_by ||
-               $user->id === $info->user_id ||
-               $user->id === $info->confirmed_by ||
-               $info->confirmed;
+        return $user->hasPermissionTo('info.view');
     }
 
     /**
@@ -37,8 +31,7 @@ class InfoPolicy
      */
     public function create(User $user): bool
     {
-        // Can implement more sophisticated rules based on user roles
-        return true; // All authenticated users can create
+        return $user->hasPermissionTo('info.create');
     }
 
     /**
@@ -46,12 +39,7 @@ class InfoPolicy
      */
     public function update(User $user, Info $info): bool
     {
-        // Users can update info if:
-        // 1. They created it
-        // 2. They're the associated user (if set)
-        // 3. They have admin privileges (implement admin check if needed)
-        return $user->id === $info->created_by ||
-               ($info->user_id && $user->id === $info->user_id);
+        return $user->hasPermissionTo('info.update');
     }
 
     /**
@@ -59,8 +47,7 @@ class InfoPolicy
      */
     public function delete(User $user, Info $info): bool
     {
-        // Only the creator or admins can delete
-        return $user->id === $info->created_by;
+        return $user->hasPermissionTo('info.delete');
     }
 
     /**
@@ -68,8 +55,7 @@ class InfoPolicy
      */
     public function confirm(User $user, Info $info): bool
     {
-        // Users can't confirm their own entries - implement role-based logic here
-        return $user->id !== $info->created_by;
+        return $user->hasPermissionTo('info.confirm');
     }
 
     /**
@@ -77,8 +63,7 @@ class InfoPolicy
      */
     public function restore(User $user, Info $info): bool
     {
-        // Only admins or the creator can restore
-        return $user->id === $info->created_by;
+        return $user->hasPermissionTo('info.restore');
     }
 
     /**
@@ -86,7 +71,6 @@ class InfoPolicy
      */
     public function forceDelete(User $user, Info $info): bool
     {
-        // Only admins should have this right
-        return false;
+        return $user->hasPermissionTo('info.force_delete');
     }
 }

@@ -18,6 +18,8 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('viewAny', User::class);
+        
         // Validate query parameters
         $validated = $request->validate([
             'per_page' => 'nullable|integer|min:5|max:100',
@@ -67,6 +69,8 @@ class UserController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', User::class);
+        
         $roles = Role::all();
         return Inertia::render('User/Create', [
             'roles' => $roles
@@ -78,6 +82,8 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', User::class);
+        
         $validated = $request->validate([
             'name' => 'required|string|min:2|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -114,6 +120,8 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
+        $this->authorize('view', $user);
+        
         $user->load('roles');
         return Inertia::render('User/Show', [
             'user' => $user,
@@ -125,6 +133,8 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
+        $this->authorize('update', $user);
+        
         $user->load('roles');
         $roles = Role::all();
 
@@ -140,6 +150,8 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
+        $this->authorize('update', $user);
+        
         $validated = $request->validate([
             'name' => 'required|string|min:2|max:255',
             'email' => [
@@ -188,6 +200,8 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+        $this->authorize('delete', $user);
+        
         // Don't allow users to delete themselves
         if (Auth::id() === $user->id) {
             return Redirect::back()->with('error', 'You cannot delete your own account.');

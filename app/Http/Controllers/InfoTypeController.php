@@ -18,6 +18,8 @@ class InfoTypeController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('viewAny', InfoType::class);
+        
         // Validate query parameters
         $validated = $request->validate([
             'per_page' => 'nullable|integer|min:5|max:100',
@@ -64,8 +66,7 @@ class InfoTypeController extends Controller
      */
     public function create()
     {
-        // Check authorization
-        Gate::authorize('create', InfoType::class);
+        $this->authorize('create', InfoType::class);
 
         return Inertia::render('Info/Types/Create');
     }
@@ -75,8 +76,7 @@ class InfoTypeController extends Controller
      */
     public function store(Request $request)
     {
-        // Check authorization
-        Gate::authorize('create', InfoType::class);
+        $this->authorize('create', InfoType::class);
 
         $validated = $request->validate([
             'name' => 'required|string|min:2|max:255',
@@ -119,6 +119,8 @@ class InfoTypeController extends Controller
      */
     public function show(InfoType $infoType)
     {
+        $this->authorize('view', $infoType);
+        
         // Load related data
         $infoType->load(['infos' => function($query) {
             $query->latest()->limit(5);
@@ -134,8 +136,7 @@ class InfoTypeController extends Controller
      */
     public function edit(InfoType $infoType)
     {
-        // Check authorization
-        Gate::authorize('update', $infoType);
+        $this->authorize('update', $infoType);
 
         return Inertia::render('Info/Types/Edit', [
             'infoType' => $infoType,
@@ -147,8 +148,7 @@ class InfoTypeController extends Controller
      */
     public function update(Request $request, InfoType $infoType)
     {
-        // Check authorization
-        Gate::authorize('update', $infoType);
+        $this->authorize('update', $infoType);
 
         $validated = $request->validate([
             'name' => 'required|string|min:2|max:255',
@@ -191,8 +191,7 @@ class InfoTypeController extends Controller
      */
     public function destroy(InfoType $infoType)
     {
-        // Check authorization
-        Gate::authorize('delete', $infoType);
+        $this->authorize('delete', $infoType);
 
         // Check if the info type has associated infos
         if ($infoType->infos()->count() > 0) {

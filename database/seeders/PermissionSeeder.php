@@ -2,82 +2,236 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-use App\Models\User;
 use Illuminate\Support\Str;
 
 class PermissionSeeder extends Seeder
 {
-    // Define models to generate permissions for
-    protected $models = [
-        'User' => 'Users',
-        'Info' => 'Info Records',
-        'InfoType' => 'Info Types',
-        'InfoCategory' => 'Info Categories',
-    ];
-
-    // Define CRUD actions with friendly labels
-    protected $actions = [
-        'view' => 'View',
-        'create' => 'Create',
-        'edit' => 'Edit',
-        'delete' => 'Delete',
-    ];
-
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        // Create admin role if it doesn't exist
-        $adminRole = Role::firstOrCreate(['name' => 'admin']);
+        // Create permissions for all models with Persian labels
+        $permissions = [
+            // Criminal permissions
+            ['name' => 'criminal.view_any', 'label' => 'مشاهده همه مجرمان'],
+            ['name' => 'criminal.view', 'label' => 'مشاهده مجرم'],
+            ['name' => 'criminal.create', 'label' => 'ایجاد مجرم'],
+            ['name' => 'criminal.update', 'label' => 'ویرایش مجرم'],
+            ['name' => 'criminal.delete', 'label' => 'حذف مجرم'],
+            ['name' => 'criminal.restore', 'label' => 'بازیابی مجرم'],
+            ['name' => 'criminal.force_delete', 'label' => 'حذف دائمی مجرم'],
 
-        $allPermissions = [];
+            // Department permissions
+            ['name' => 'department.view_any', 'label' => 'مشاهده همه بخش‌ها'],
+            ['name' => 'department.view', 'label' => 'مشاهده بخش'],
+            ['name' => 'department.create', 'label' => 'ایجاد بخش'],
+            ['name' => 'department.update', 'label' => 'ویرایش بخش'],
+            ['name' => 'department.delete', 'label' => 'حذف بخش'],
+            ['name' => 'department.restore', 'label' => 'بازیابی بخش'],
+            ['name' => 'department.force_delete', 'label' => 'حذف دائمی بخش'],
 
-        // Generate permissions for each model
-        foreach ($this->models as $model => $label) {
-            foreach ($this->actions as $action => $actionLabel) {
-                $permissionName = Str::kebab($action) . '-' . Str::kebab($model);
+            // District permissions
+            ['name' => 'district.view_any', 'label' => 'مشاهده همه ولسوالی‌ها'],
+            ['name' => 'district.view', 'label' => 'مشاهده ولسوالی'],
+            ['name' => 'district.create', 'label' => 'ایجاد ولسوالی'],
+            ['name' => 'district.update', 'label' => 'ویرایش ولسوالی'],
+            ['name' => 'district.delete', 'label' => 'حذف ولسوالی'],
+            ['name' => 'district.restore', 'label' => 'بازیابی ولسوالی'],
+            ['name' => 'district.force_delete', 'label' => 'حذف دائمی ولسوالی'],
 
-                // Create permission with label
-                $permission = Permission::firstOrCreate(
-                    ['name' => $permissionName],
-                    ['label' => $actionLabel . ' ' . $label]
-                );
+            // Incident permissions
+            ['name' => 'incident.view_any', 'label' => 'مشاهده همه حوادث'],
+            ['name' => 'incident.view', 'label' => 'مشاهده حادثه'],
+            ['name' => 'incident.create', 'label' => 'ایجاد حادثه'],
+            ['name' => 'incident.update', 'label' => 'ویرایش حادثه'],
+            ['name' => 'incident.delete', 'label' => 'حذف حادثه'],
+            ['name' => 'incident.restore', 'label' => 'بازیابی حادثه'],
+            ['name' => 'incident.force_delete', 'label' => 'حذف دائمی حادثه'],
 
-                $allPermissions[] = $permission->name;
+            // Incident Category permissions
+            ['name' => 'incident_category.view_any', 'label' => 'مشاهده همه دسته‌بندی‌های حوادث'],
+            ['name' => 'incident_category.view', 'label' => 'مشاهده دسته‌بندی حادثه'],
+            ['name' => 'incident_category.create', 'label' => 'ایجاد دسته‌بندی حادثه'],
+            ['name' => 'incident_category.update', 'label' => 'ویرایش دسته‌بندی حادثه'],
+            ['name' => 'incident_category.delete', 'label' => 'حذف دسته‌بندی حادثه'],
+            ['name' => 'incident_category.restore', 'label' => 'بازیابی دسته‌بندی حادثه'],
+            ['name' => 'incident_category.force_delete', 'label' => 'حذف دائمی دسته‌بندی حادثه'],
 
-                // Assign to admin role
-                $adminRole->givePermissionTo($permission);
-            }
+            // Incident Report permissions
+            ['name' => 'incident_report.view_any', 'label' => 'مشاهده همه گزارش‌های حوادث'],
+            ['name' => 'incident_report.view', 'label' => 'مشاهده گزارش حادثه'],
+            ['name' => 'incident_report.create', 'label' => 'ایجاد گزارش حادثه'],
+            ['name' => 'incident_report.update', 'label' => 'ویرایش گزارش حادثه'],
+            ['name' => 'incident_report.delete', 'label' => 'حذف گزارش حادثه'],
+            ['name' => 'incident_report.restore', 'label' => 'بازیابی گزارش حادثه'],
+            ['name' => 'incident_report.force_delete', 'label' => 'حذف دائمی گزارش حادثه'],
 
-            // Also create a list permission
-            $listPermissionName = 'list-' . Str::kebab($model);
-            $listPermission = Permission::firstOrCreate(
-                ['name' => $listPermissionName],
-                ['label' => 'List ' . $label]
-            );
+            // Info permissions
+            ['name' => 'info.view_any', 'label' => 'مشاهده همه اطلاعات'],
+            ['name' => 'info.view', 'label' => 'مشاهده اطلاعات'],
+            ['name' => 'info.create', 'label' => 'ایجاد اطلاعات'],
+            ['name' => 'info.update', 'label' => 'ویرایش اطلاعات'],
+            ['name' => 'info.delete', 'label' => 'حذف اطلاعات'],
+            ['name' => 'info.confirm', 'label' => 'تایید اطلاعات'],
+            ['name' => 'info.restore', 'label' => 'بازیابی اطلاعات'],
+            ['name' => 'info.force_delete', 'label' => 'حذف دائمی اطلاعات'],
 
-            $allPermissions[] = $listPermission->name;
-            $adminRole->givePermissionTo($listPermission);
+            // Info Category permissions
+            ['name' => 'info_category.view_any', 'label' => 'مشاهده همه دسته‌بندی‌های اطلاعات'],
+            ['name' => 'info_category.view', 'label' => 'مشاهده دسته‌بندی اطلاعات'],
+            ['name' => 'info_category.create', 'label' => 'ایجاد دسته‌بندی اطلاعات'],
+            ['name' => 'info_category.update', 'label' => 'ویرایش دسته‌بندی اطلاعات'],
+            ['name' => 'info_category.delete', 'label' => 'حذف دسته‌بندی اطلاعات'],
+            ['name' => 'info_category.confirm', 'label' => 'تایید دسته‌بندی اطلاعات'],
+            ['name' => 'info_category.restore', 'label' => 'بازیابی دسته‌بندی اطلاعات'],
+            ['name' => 'info_category.force_delete', 'label' => 'حذف دائمی دسته‌بندی اطلاعات'],
+
+            // Info Type permissions
+            ['name' => 'info_type.view_any', 'label' => 'مشاهده همه انواع اطلاعات'],
+            ['name' => 'info_type.view', 'label' => 'مشاهده نوع اطلاعات'],
+            ['name' => 'info_type.create', 'label' => 'ایجاد نوع اطلاعات'],
+            ['name' => 'info_type.update', 'label' => 'ویرایش نوع اطلاعات'],
+            ['name' => 'info_type.delete', 'label' => 'حذف نوع اطلاعات'],
+            ['name' => 'info_type.confirm', 'label' => 'تایید نوع اطلاعات'],
+            ['name' => 'info_type.restore', 'label' => 'بازیابی نوع اطلاعات'],
+            ['name' => 'info_type.force_delete', 'label' => 'حذف دائمی نوع اطلاعات'],
+
+            // Language permissions
+            ['name' => 'language.view_any', 'label' => 'مشاهده همه زبان‌ها'],
+            ['name' => 'language.view', 'label' => 'مشاهده زبان'],
+            ['name' => 'language.create', 'label' => 'ایجاد زبان'],
+            ['name' => 'language.update', 'label' => 'ویرایش زبان'],
+            ['name' => 'language.delete', 'label' => 'حذف زبان'],
+            ['name' => 'language.restore', 'label' => 'بازیابی زبان'],
+            ['name' => 'language.force_delete', 'label' => 'حذف دائمی زبان'],
+
+            // Meeting permissions
+            ['name' => 'meeting.view_any', 'label' => 'مشاهده همه جلسات'],
+            ['name' => 'meeting.view', 'label' => 'مشاهده جلسه'],
+            ['name' => 'meeting.create', 'label' => 'ایجاد جلسه'],
+            ['name' => 'meeting.update', 'label' => 'ویرایش جلسه'],
+            ['name' => 'meeting.delete', 'label' => 'حذف جلسه'],
+            ['name' => 'meeting.restore', 'label' => 'بازیابی جلسه'],
+            ['name' => 'meeting.force_delete', 'label' => 'حذف دائمی جلسه'],
+
+            // Meeting Message permissions
+            ['name' => 'meeting_message.view_any', 'label' => 'مشاهده همه پیام‌های جلسه'],
+            ['name' => 'meeting_message.view', 'label' => 'مشاهده پیام جلسه'],
+            ['name' => 'meeting_message.create', 'label' => 'ایجاد پیام جلسه'],
+            ['name' => 'meeting_message.update', 'label' => 'ویرایش پیام جلسه'],
+            ['name' => 'meeting_message.delete', 'label' => 'حذف پیام جلسه'],
+            ['name' => 'meeting_message.restore', 'label' => 'بازیابی پیام جلسه'],
+            ['name' => 'meeting_message.force_delete', 'label' => 'حذف دائمی پیام جلسه'],
+
+            // Meeting Session permissions
+            ['name' => 'meeting_session.view_any', 'label' => 'مشاهده همه نشست‌های جلسه'],
+            ['name' => 'meeting_session.view', 'label' => 'مشاهده نشست جلسه'],
+            ['name' => 'meeting_session.create', 'label' => 'ایجاد نشست جلسه'],
+            ['name' => 'meeting_session.update', 'label' => 'ویرایش نشست جلسه'],
+            ['name' => 'meeting_session.delete', 'label' => 'حذف نشست جلسه'],
+            ['name' => 'meeting_session.restore', 'label' => 'بازیابی نشست جلسه'],
+            ['name' => 'meeting_session.force_delete', 'label' => 'حذف دائمی نشست جلسه'],
+
+            // Province permissions
+            ['name' => 'province.view_any', 'label' => 'مشاهده همه ولایت‌ها'],
+            ['name' => 'province.view', 'label' => 'مشاهده ولایت'],
+            ['name' => 'province.create', 'label' => 'ایجاد ولایت'],
+            ['name' => 'province.update', 'label' => 'ویرایش ولایت'],
+            ['name' => 'province.delete', 'label' => 'حذف ولایت'],
+            ['name' => 'province.restore', 'label' => 'بازیابی ولایت'],
+            ['name' => 'province.force_delete', 'label' => 'حذف دائمی ولایت'],
+
+            // Report permissions
+            ['name' => 'report.view_any', 'label' => 'مشاهده همه گزارش‌ها'],
+            ['name' => 'report.view', 'label' => 'مشاهده گزارش'],
+            ['name' => 'report.create', 'label' => 'ایجاد گزارش'],
+            ['name' => 'report.update', 'label' => 'ویرایش گزارش'],
+            ['name' => 'report.delete', 'label' => 'حذف گزارش'],
+            ['name' => 'report.restore', 'label' => 'بازیابی گزارش'],
+            ['name' => 'report.force_delete', 'label' => 'حذف دائمی گزارش'],
+
+            // Report Stat permissions
+            ['name' => 'report_stat.view_any', 'label' => 'مشاهده همه آمار گزارش‌ها'],
+            ['name' => 'report_stat.view', 'label' => 'مشاهده آمار گزارش'],
+            ['name' => 'report_stat.create', 'label' => 'ایجاد آمار گزارش'],
+            ['name' => 'report_stat.update', 'label' => 'ویرایش آمار گزارش'],
+            ['name' => 'report_stat.delete', 'label' => 'حذف آمار گزارش'],
+            ['name' => 'report_stat.restore', 'label' => 'بازیابی آمار گزارش'],
+            ['name' => 'report_stat.force_delete', 'label' => 'حذف دائمی آمار گزارش'],
+
+            // Stat Category permissions
+            ['name' => 'stat_category.view_any', 'label' => 'مشاهده همه دسته‌بندی‌های آمار'],
+            ['name' => 'stat_category.view', 'label' => 'مشاهده دسته‌بندی آمار'],
+            ['name' => 'stat_category.create', 'label' => 'ایجاد دسته‌بندی آمار'],
+            ['name' => 'stat_category.update', 'label' => 'ویرایش دسته‌بندی آمار'],
+            ['name' => 'stat_category.delete', 'label' => 'حذف دسته‌بندی آمار'],
+            ['name' => 'stat_category.restore', 'label' => 'بازیابی دسته‌بندی آمار'],
+            ['name' => 'stat_category.force_delete', 'label' => 'حذف دائمی دسته‌بندی آمار'],
+
+            // Stat Category Item permissions
+            ['name' => 'stat_category_item.view_any', 'label' => 'مشاهده همه آیتم‌های دسته‌بندی آمار'],
+            ['name' => 'stat_category_item.view', 'label' => 'مشاهده آیتم دسته‌بندی آمار'],
+            ['name' => 'stat_category_item.create', 'label' => 'ایجاد آیتم دسته‌بندی آمار'],
+            ['name' => 'stat_category_item.update', 'label' => 'ویرایش آیتم دسته‌بندی آمار'],
+            ['name' => 'stat_category_item.delete', 'label' => 'حذف آیتم دسته‌بندی آمار'],
+            ['name' => 'stat_category_item.restore', 'label' => 'بازیابی آیتم دسته‌بندی آمار'],
+            ['name' => 'stat_category_item.force_delete', 'label' => 'حذف دائمی آیتم دسته‌بندی آمار'],
+
+            // Translation permissions
+            ['name' => 'translation.view_any', 'label' => 'مشاهده همه ترجمه‌ها'],
+            ['name' => 'translation.view', 'label' => 'مشاهده ترجمه'],
+            ['name' => 'translation.create', 'label' => 'ایجاد ترجمه'],
+            ['name' => 'translation.update', 'label' => 'ویرایش ترجمه'],
+            ['name' => 'translation.delete', 'label' => 'حذف ترجمه'],
+            ['name' => 'translation.restore', 'label' => 'بازیابی ترجمه'],
+            ['name' => 'translation.force_delete', 'label' => 'حذف دائمی ترجمه'],
+        ];
+
+        // Create permissions
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate([
+                'name' => $permission['name'],
+                'guard_name' => 'web',
+            ], [
+                'label' => $permission['label'],
+            ]);
         }
 
-        // Get the user with ID 1
-        $user = User::find(1);
+        // Create roles
+        $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        $userRole = Role::firstOrCreate(['name' => 'user', 'guard_name' => 'web']);
+        $managerRole = Role::firstOrCreate(['name' => 'manager', 'guard_name' => 'web']);
 
-        if ($user) {
-            // Assign admin role to user
-            $user->assignRole($adminRole);
+        // Assign all permissions to admin role
+        $adminRole->givePermissionTo(Permission::all());
 
-            // Also assign individual permissions to the user
-            $user->syncPermissions($allPermissions);
+        // Assign basic permissions to user role
+        $userRole->givePermissionTo([
+            'criminal.view_any', 'criminal.view',
+            'incident.view_any', 'incident.view',
+            'incident_report.view_any', 'incident_report.view',
+            'info.view_any', 'info.view', 'info.confirm',
+            'meeting.view_any', 'meeting.view',
+            'meeting_message.view_any', 'meeting_message.view', 'meeting_message.create',
+            'report.view_any', 'report.view',
+        ]);
 
-            $this->command->info('Admin role and permissions assigned to user ID 1');
-        } else {
-            $this->command->error('User with ID 1 not found. Permissions were created but not assigned to any user.');
-        }
+        // Assign manager permissions
+        $managerRole->givePermissionTo([
+            'criminal.view_any', 'criminal.view', 'criminal.create', 'criminal.update',
+            'incident.view_any', 'incident.view', 'incident.create', 'incident.update',
+            'incident_report.view_any', 'incident_report.view', 'incident_report.create', 'incident_report.update',
+            'info.view_any', 'info.view', 'info.create', 'info.update', 'info.confirm',
+            'info_category.view_any', 'info_category.view', 'info_category.confirm',
+            'info_type.view_any', 'info_type.view', 'info_type.confirm',
+            'meeting.view_any', 'meeting.view', 'meeting.create', 'meeting.update',
+            'meeting_message.view_any', 'meeting_message.view', 'meeting_message.create', 'meeting_message.update',
+            'report.view_any', 'report.view', 'report.create', 'report.update',
+            'report_stat.view_any', 'report_stat.view', 'report_stat.create', 'report_stat.update',
+        ]);
     }
 }

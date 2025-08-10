@@ -18,6 +18,8 @@ class CriminalController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('viewAny', Criminal::class);
+        
         // Validate query parameters
         $validated = $request->validate([
             'per_page' => 'nullable|integer|min:5|max:100',
@@ -81,6 +83,8 @@ class CriminalController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Criminal::class);
+        
         $departments = Department::orderBy('name')->get();
 
         return Inertia::render('Criminal/Create', [
@@ -93,6 +97,8 @@ class CriminalController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Criminal::class);
+        
         $validated = $request->validate([
             'photo' => 'nullable|image|max:2048',
             'number' => 'nullable|string|max:50',
@@ -138,6 +144,8 @@ class CriminalController extends Controller
      */
     public function show(Criminal $criminal)
     {
+        $this->authorize('view', $criminal);
+        
         $criminal->load(['department', 'creator']);
 
         return Inertia::render('Criminal/Show', [
@@ -150,6 +158,8 @@ class CriminalController extends Controller
      */
     public function edit(Criminal $criminal)
     {
+        $this->authorize('update', $criminal);
+        
         $departments = Department::orderBy('name')->get();
 
         return Inertia::render('Criminal/Edit', [
@@ -163,6 +173,8 @@ class CriminalController extends Controller
      */
     public function update(Request $request, Criminal $criminal)
     {
+        $this->authorize('update', $criminal);
+        
         $validated = $request->validate([
             'photo' => 'nullable|image|max:2048',
             'number' => 'nullable|string|max:50',
@@ -209,6 +221,8 @@ class CriminalController extends Controller
      */
     public function destroy(Criminal $criminal)
     {
+        $this->authorize('delete', $criminal);
+        
         // Delete the photo if exists
         if ($criminal->photo) {
             Storage::disk('public')->delete($criminal->photo);
@@ -226,6 +240,8 @@ class CriminalController extends Controller
      */
     public function print(Criminal $criminal)
     {
+        $this->authorize('view', $criminal);
+        
         $criminal->load(['department', 'creator']);
 
         // Don't preload any reports, as we'll create a new one on the client side

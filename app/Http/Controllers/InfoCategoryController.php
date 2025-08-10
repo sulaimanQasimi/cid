@@ -17,6 +17,8 @@ class InfoCategoryController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('viewAny', InfoCategory::class);
+        
         // Validate query parameters
         $validated = $request->validate([
             'per_page' => 'nullable|integer|min:5|max:100',
@@ -63,8 +65,7 @@ class InfoCategoryController extends Controller
      */
     public function create()
     {
-        // Check authorization
-        Gate::authorize('create', InfoCategory::class);
+        $this->authorize('create', InfoCategory::class);
 
         return Inertia::render('Info/Categories/Create');
     }
@@ -74,8 +75,7 @@ class InfoCategoryController extends Controller
      */
     public function store(Request $request)
     {
-        // Check authorization
-        Gate::authorize('create', InfoCategory::class);
+        $this->authorize('create', InfoCategory::class);
 
         $validated = $request->validate([
             'name' => 'required|string|min:2|max:255',
@@ -118,6 +118,8 @@ class InfoCategoryController extends Controller
      */
     public function show(InfoCategory $infoCategory)
     {
+        $this->authorize('view', $infoCategory);
+        
         // Load related data
         $infoCategory->load(['infos' => function($query) {
             $query->latest()->limit(5);
@@ -133,8 +135,7 @@ class InfoCategoryController extends Controller
      */
     public function edit(InfoCategory $infoCategory)
     {
-        // Check authorization
-        Gate::authorize('update', $infoCategory);
+        $this->authorize('update', $infoCategory);
 
         return Inertia::render('Info/Categories/Edit', [
             'infoCategory' => $infoCategory,
@@ -146,8 +147,7 @@ class InfoCategoryController extends Controller
      */
     public function update(Request $request, InfoCategory $infoCategory)
     {
-        // Check authorization
-        Gate::authorize('update', $infoCategory);
+        $this->authorize('update', $infoCategory);
 
         $validated = $request->validate([
             'name' => 'required|string|min:2|max:255',
@@ -191,8 +191,7 @@ class InfoCategoryController extends Controller
      */
     public function destroy(InfoCategory $infoCategory)
     {
-        // Check authorization
-        Gate::authorize('delete', $infoCategory);
+        $this->authorize('delete', $infoCategory);
 
         // Check if the info category has associated infos
         if ($infoCategory->infos()->count() > 0) {

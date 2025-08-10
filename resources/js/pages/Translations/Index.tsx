@@ -67,11 +67,14 @@ export default function TranslationsIndex({
   const { auth, csrf_token } = usePage<PageProps>().props;
   const [editMode, setEditMode] = useState(false);
   const [editedValues, setEditedValues] = useState<Record<string, string>>({});
+  const [editedKeys, setEditedKeys] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
 
   // Ensure we have valid language and group values for the selects
   const currentLanguage = filters.language || (languages[0]?.code || "en");
   const currentGroup = filters.group || "all";
+
+  const languageId = useMemo(() => languages.find(l => l.code === currentLanguage)?.id, [languages, currentLanguage]);
 
   // Pre-process groups to ensure no empty strings
   const safeGroups = groups.map(g => g || "unnamed-group");
@@ -90,42 +93,56 @@ export default function TranslationsIndex({
     ) :
     translationsData;
 
-  const hasEdits = useMemo(() => Object.keys(editedValues).length > 0, [editedValues]);
+  const hasEdits = useMemo(() => Object.keys(editedValues).length > 0 || Object.keys(editedKeys).length > 0, [editedValues, editedKeys]);
 
   const handleValueChange = (key: string, value: string) => {
     setEditedValues(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleRevert = () => setEditedValues({});
+  const handleKeyChange = (originalKey: string, newKey: string) => {
+    setEditedKeys(prev => ({ ...prev, [originalKey]: newKey }));
+  };
+
+  const handleRevert = () => { setEditedValues({}); setEditedKeys({}); };
+
+  const extractGroupFromKey = (key: string) => {
+    const idx = key.indexOf('.')
+    return idx > 0 ? key.slice(0, idx) : 'general';
+  };
 
   const handleSave = async () => {
     if (!hasEdits) return;
     try {
       setSaving(true);
-      // Group edits by group for efficient import calls
-      const keyToGroup: Record<string, string> = {};
-      translationsData.forEach(tr => {
-        keyToGroup[tr.key] = tr.group || 'general';
-      });
-
+      // Build final key/value map from current rows, considering key renames and value edits
       const grouped: Record<string, Record<string, string>> = {};
-      Object.entries(editedValues).forEach(([key, value]) => {
-        const group = keyToGroup[key] || 'general';
+      translationsData.forEach(tr => {
+        const originalKey = tr.key;
+        const newKey = (editedKeys[originalKey] ?? originalKey).trim();
+        if (!newKey) return; // skip empty key
+        const value = editedValues[originalKey] ?? (tr.value ?? '');
+        const group = extractGroupFromKey(newKey);
         if (!grouped[group]) grouped[group] = {};
-        grouped[group][key] = value;
+        grouped[group][newKey] = value;
       });
 
       // Perform batch import per group via API TranslationController::import
       const groupEntries = Object.entries(grouped);
       for (const [group, payload] of groupEntries) {
-        await axios.post('/api/translations/import', {
-          language_code: currentLanguage,
-          translations: payload,
-          group,
-        });
+        // Prefer web route: POST /translations (Admin Controller) with language_id
+        const requests = Object.entries(payload).map(([key, value]) =>
+          axios.post('/translations', {
+            language_id: languageId,
+            key,
+            value,
+            group,
+          })
+        );
+        await Promise.all(requests);
       }
 
       setEditedValues({});
+      setEditedKeys({});
       // Refresh current page
       window.location.href = route('translations.index', {
         page: currentPage,
@@ -252,10 +269,17 @@ export default function TranslationsIndex({
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredTranslations.map((translation) => (
-                    <TableRow key={translation.id}>
-                      <TableCell className="font-medium max-w-[250px] truncate" title={translation.key}>
-                        {translation.key}
+                  filteredTranslations.map((translation, idx) => (
+                    <TableRow key={translation.id ?? `${translation.key}-${idx}`}>
+                      <TableCell className="font-medium max-w-[250px]" title={editedKeys[translation.key] ?? translation.key}>
+                        {editMode ? (
+                          <Input
+                            value={editedKeys[translation.key] ?? translation.key}
+                            onChange={(e) => handleKeyChange(translation.key, e.target.value)}
+                          />
+                        ) : (
+                          <span className="truncate block">{translation.key}</span>
+                        )}
                       </TableCell>
                       <TableCell className="max-w-[300px]" title={editedValues[translation.key] ?? translation.value}>
                         {editMode ? (

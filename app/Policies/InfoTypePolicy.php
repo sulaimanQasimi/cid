@@ -4,16 +4,18 @@ namespace App\Policies;
 
 use App\Models\InfoType;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class InfoTypePolicy
 {
+    use HandlesAuthorization;
+
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return true; // All authenticated users can view the list
+        return $user->hasPermissionTo('info_type.view_any');
     }
 
     /**
@@ -21,7 +23,7 @@ class InfoTypePolicy
      */
     public function view(User $user, InfoType $infoType): bool
     {
-        return true; // All authenticated users can view info types
+        return $user->hasPermissionTo('info_type.view');
     }
 
     /**
@@ -29,10 +31,7 @@ class InfoTypePolicy
      */
     public function create(User $user): bool
     {
-        // Only users with admin rights should create info types
-        // In a real app, check for admin role
-        // return $this->isAdmin($user);
-        return true;
+        return $user->hasPermissionTo('info_type.create');
     }
 
     /**
@@ -40,9 +39,7 @@ class InfoTypePolicy
      */
     public function update(User $user, InfoType $infoType): bool
     {
-        // Only users with admin rights should update info types
-        // return $this->isAdmin($user);
-        return true;
+        return $user->hasPermissionTo('info_type.update');
     }
 
     /**
@@ -50,14 +47,15 @@ class InfoTypePolicy
      */
     public function delete(User $user, InfoType $infoType): bool
     {
-        // Only users with admin rights should delete info types
-        // First check if there are any infos using this type
-        if ($infoType->infos()->count() > 0) {
-            return false;
-        }
+        return $user->hasPermissionTo('info_type.delete');
+    }
 
-        // return $this->isAdmin($user);
-        return true;
+    /**
+     * Determine whether the user can confirm the model.
+     */
+    public function confirm(User $user, InfoType $infoType): bool
+    {
+        return $user->hasPermissionTo('info_type.confirm');
     }
 
     /**
@@ -65,9 +63,7 @@ class InfoTypePolicy
      */
     public function restore(User $user, InfoType $infoType): bool
     {
-        // Only users with admin rights should restore info types
-        // return $this->isAdmin($user);
-        return true;
+        return $user->hasPermissionTo('info_type.restore');
     }
 
     /**
@@ -75,28 +71,6 @@ class InfoTypePolicy
      */
     public function forceDelete(User $user, InfoType $infoType): bool
     {
-        // Only users with admin rights should force delete info types
-        // First check if there are any infos using this type
-        if ($infoType->infos()->count() > 0) {
-            return false;
-        }
-
-        // return $this->isAdmin($user);
-        return true;
-    }
-
-    /**
-     * Check if user is an admin
-     * This is a placeholder - implement proper role checking
-     */
-    private function isAdmin(User $user): bool
-    {
-        // Implement proper admin check based on your user roles system
-        // For now, we'll return true for specific test users
-        // In a real app, you would check roles and permissions
-        return in_array($user->email, [
-            'admin@example.com',
-            // Add other admin emails
-        ]);
+        return $user->hasPermissionTo('info_type.force_delete');
     }
 }
