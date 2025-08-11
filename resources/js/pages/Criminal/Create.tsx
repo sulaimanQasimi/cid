@@ -129,23 +129,25 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
             {/* Photo Upload Card */}
-            <Card className="lg:col-span-1 overflow-hidden border-none shadow-md">
-              <CardHeader className="bg-neutral-50 dark:bg-neutral-900 border-b pb-4">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Camera className="h-5 w-5 text-neutral-500" />
+            <Card className="lg:col-span-1 overflow-hidden border-none shadow-xl bg-gradient-to-bl from-white to-red-50/30">
+              <CardHeader className="bg-gradient-to-l from-red-500 to-red-600 text-white border-b pb-4">
+                <CardTitle className="flex items-center gap-3 text-lg">
+                  <div className="p-2 bg-white/20 rounded-lg">
+                    <Camera className="h-5 w-5" />
+                  </div>
                   {t('criminal.create.photo.title')}
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-red-100">
                   {t('criminal.create.photo.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6 space-y-6">
                 <div className="flex flex-col items-center justify-center">
                   <div className={cn(
-                    "relative mb-6 h-56 w-56 overflow-hidden rounded-xl border-2 border-dashed",
-                    "bg-neutral-50 text-center transition-all duration-200 hover:border-primary/50",
-                    "flex items-center justify-center",
-                    photoPreview ? "border-primary/30" : "border-neutral-200"
+                    "relative mb-6 h-56 w-56 overflow-hidden rounded-2xl border-2 border-dashed",
+                    "bg-gradient-to-bl from-red-50 to-red-100 text-center transition-all duration-300 hover:border-red-400/50 hover:shadow-xl",
+                    "flex items-center justify-center group",
+                    photoPreview ? "border-red-400/50 shadow-lg" : "border-red-200"
                   )}>
                     {photoPreview ? (
                       <img
@@ -155,17 +157,19 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                       />
                     ) : (
                       <div className="flex h-full w-full flex-col items-center justify-center p-6">
-                        <Camera className="mb-3 h-12 w-12 text-neutral-400" />
-                        <p className="text-sm text-neutral-500 font-medium">{t('criminal.create.photo.no_photo')}</p>
-                        <p className="text-xs text-neutral-400 mt-1">{t('criminal.create.photo.hint')}</p>
+                        <div className="p-4 bg-gradient-to-br from-red-100 to-red-200 rounded-full mb-3 group-hover:scale-110 transition-transform duration-300">
+                          <Camera className="h-12 w-12 text-red-600" />
+                        </div>
+                        <p className="text-sm text-red-700 font-medium">{t('criminal.create.photo.no_photo')}</p>
+                        <p className="text-xs text-red-500 mt-1">{t('criminal.create.photo.hint')}</p>
                       </div>
                     )}
                   </div>
                   <Label
                     htmlFor="photo"
                     className={cn(
-                      "cursor-pointer rounded-full px-5 py-2.5 text-sm font-medium transition-colors",
-                      "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
+                      "cursor-pointer rounded-full px-6 py-3 text-sm font-medium transition-all duration-300",
+                      "bg-gradient-to-l from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 shadow-lg hover:shadow-xl hover:scale-105"
                     )}
                   >
                     {photoPreview ? t('criminal.create.photo.change') : t('criminal.create.photo.upload')}
@@ -177,10 +181,10 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                     onChange={handlePhotoChange}
                     className="sr-only"
                   />
-                  {errors.photo && <p className="mt-3 text-sm text-red-500 font-medium">{errors.photo}</p>}
+                  {errors.photo && <p className="mt-3 text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200">{errors.photo}</p>}
 
                   <div className="mt-6 text-center max-w-xs">
-                    <p className="text-xs text-neutral-500">
+                    <p className="text-xs text-red-600 bg-red-50 p-3 rounded-lg border border-red-200">
                       {t('criminal.create.photo.helper_text')}
                     </p>
                   </div>
@@ -189,21 +193,26 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
             </Card>
 
             {/* Main Form Card */}
-            <Card className="lg:col-span-2 border-none shadow-md overflow-hidden">
-              <CardHeader className="bg-neutral-50 dark:bg-neutral-900 border-b pb-4">
-                <CardTitle className="text-lg">{t('criminal.create.form.title')}</CardTitle>
-                <CardDescription>
+            <Card className="lg:col-span-2 border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-orange-50/30">
+              <CardHeader className="bg-gradient-to-l from-orange-500 to-orange-600 text-white border-b pb-4">
+                <CardTitle className="text-lg flex items-center gap-3">
+                  <div className="p-2 bg-white/20 rounded-lg">
+                    <FileText className="h-5 w-5" />
+                  </div>
+                  {t('criminal.create.form.title')}
+                </CardTitle>
+                <CardDescription className="text-orange-100">
                   {t('criminal.create.form.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6">
                 <Tabs defaultValue="personal" value={activeTab} onValueChange={handleTabChange} className="w-full">
-                  <TabsList className="grid w-full grid-cols-3 mb-6 rounded-lg p-1 bg-neutral-100 dark:bg-neutral-800">
+                  <TabsList className="grid w-full grid-cols-3 mb-6 rounded-xl p-1 bg-gradient-to-l from-orange-100 to-orange-200 shadow-lg">
                     <TabsTrigger
                       value="personal"
                       className={cn(
-                        "data-[state=active]:shadow-sm flex items-center gap-2",
-                        "transition-all duration-200"
+                        "data-[state=active]:bg-gradient-to-l data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
+                        "transition-all duration-300 rounded-lg"
                       )}
                     >
                       <UserRound className="h-4 w-4" />
@@ -212,8 +221,8 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                     <TabsTrigger
                       value="crime"
                       className={cn(
-                        "data-[state=active]:shadow-sm flex items-center gap-2",
-                        "transition-all duration-200"
+                        "data-[state=active]:bg-gradient-to-l data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
+                        "transition-all duration-300 rounded-lg"
                       )}
                     >
                       <FileText className="h-4 w-4" />
@@ -222,8 +231,8 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                     <TabsTrigger
                       value="other"
                       className={cn(
-                        "data-[state=active]:shadow-sm flex items-center gap-2",
-                        "transition-all duration-200"
+                        "data-[state=active]:bg-gradient-to-l data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
+                        "transition-all duration-300 rounded-lg"
                       )}
                     >
                       <BookText className="h-4 w-4" />
@@ -234,105 +243,150 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                   {/* Personal Details Tab */}
                   <TabsContent value="personal" className="space-y-6 pt-2">
                     <div className="space-y-3">
-                      <Label htmlFor="name" className="text-base font-medium">
+                      <Label htmlFor="name" className="text-base font-medium flex items-center gap-2 text-orange-700">
+                        <Users className="h-4 w-4" />
                         {t('criminal.create.fields.full_name')} <span className="text-red-500">*</span>
                       </Label>
-                      <Input
-                        id="name"
-                        value={data.name}
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
-                        placeholder={t('criminal.create.placeholders.full_name')}
-                        className="h-11"
-                      />
-                      {errors.name && <p className="text-sm text-red-500 font-medium">{errors.name}</p>}
+                      <div className="relative">
+                        <Input
+                          id="name"
+                          value={data.name}
+                          onChange={(e) => setData('name', e.target.value)}
+                          required
+                          placeholder={t('criminal.create.placeholders.full_name')}
+                          className="h-12 border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white"
+                        />
+                      </div>
+                      {errors.name && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4" />
+                        {errors.name}
+                      </p>}
                     </div>
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="space-y-3">
-                        <Label htmlFor="father_name" className="font-medium">{t('criminal.create.fields.father_name')}</Label>
+                        <Label htmlFor="father_name" className="font-medium flex items-center gap-2 text-orange-700">
+                          <Users className="h-4 w-4" />
+                          {t('criminal.create.fields.father_name')}
+                        </Label>
                         <Input
                           id="father_name"
                           value={data.father_name}
                           onChange={(e) => setData('father_name', e.target.value)}
                           placeholder={t('criminal.create.placeholders.father_name')}
-                          className="h-11"
+                          className="h-12 border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white"
                         />
-                        {errors.father_name && <p className="text-sm text-red-500 font-medium">{errors.father_name}</p>}
+                        {errors.father_name && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2">
+                          <AlertTriangle className="h-4 w-4" />
+                          {errors.father_name}
+                        </p>}
                       </div>
 
                       <div className="space-y-3">
-                        <Label htmlFor="grandfather_name" className="font-medium">{t('criminal.create.fields.grandfather_name')}</Label>
+                        <Label htmlFor="grandfather_name" className="font-medium flex items-center gap-2 text-orange-700">
+                          <Users className="h-4 w-4" />
+                          {t('criminal.create.fields.grandfather_name')}
+                        </Label>
                         <Input
                           id="grandfather_name"
                           value={data.grandfather_name}
                           onChange={(e) => setData('grandfather_name', e.target.value)}
                           placeholder={t('criminal.create.placeholders.grandfather_name')}
-                          className="h-11"
+                          className="h-12 border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white"
                         />
-                        {errors.grandfather_name && <p className="text-sm text-red-500 font-medium">{errors.grandfather_name}</p>}
+                        {errors.grandfather_name && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2">
+                          <AlertTriangle className="h-4 w-4" />
+                          {errors.grandfather_name}
+                        </p>}
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="space-y-3">
-                        <Label htmlFor="id_card_number" className="font-medium">{t('criminal.create.fields.id_card_number')}</Label>
+                        <Label htmlFor="id_card_number" className="font-medium flex items-center gap-2 text-orange-700">
+                          <IdCard className="h-4 w-4" />
+                          {t('criminal.create.fields.id_card_number')}
+                        </Label>
                         <Input
                           id="id_card_number"
                           value={data.id_card_number}
                           onChange={(e) => setData('id_card_number', e.target.value)}
                           placeholder={t('criminal.create.placeholders.id_card_number')}
-                          className="h-11"
+                          className="h-12 border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white"
                         />
-                        {errors.id_card_number && <p className="text-sm text-red-500 font-medium">{errors.id_card_number}</p>}
+                        {errors.id_card_number && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2">
+                          <AlertTriangle className="h-4 w-4" />
+                          {errors.id_card_number}
+                        </p>}
                       </div>
 
                       <div className="space-y-3">
-                        <Label htmlFor="phone_number" className="font-medium">{t('criminal.create.fields.phone_number')}</Label>
+                        <Label htmlFor="phone_number" className="font-medium flex items-center gap-2 text-orange-700">
+                          <Phone className="h-4 w-4" />
+                          {t('criminal.create.fields.phone_number')}
+                        </Label>
                         <Input
                           id="phone_number"
                           value={data.phone_number}
                           onChange={(e) => setData('phone_number', e.target.value)}
                           placeholder={t('criminal.create.placeholders.phone_number')}
-                          className="h-11"
+                          className="h-12 border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white"
                         />
-                        {errors.phone_number && <p className="text-sm text-red-500 font-medium">{errors.phone_number}</p>}
+                        {errors.phone_number && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2">
+                          <AlertTriangle className="h-4 w-4" />
+                          {errors.phone_number}
+                        </p>}
                       </div>
                     </div>
 
                     <div className="space-y-3">
-                      <Label htmlFor="original_residence" className="font-medium">{t('criminal.create.fields.original_residence')}</Label>
+                      <Label htmlFor="original_residence" className="font-medium flex items-center gap-2 text-orange-700">
+                        <Home className="h-4 w-4" />
+                        {t('criminal.create.fields.original_residence')}
+                      </Label>
                       <Textarea
                         id="original_residence"
                         value={data.original_residence}
                         onChange={(e) => setData('original_residence', e.target.value)}
                         rows={2}
                         placeholder={t('criminal.create.placeholders.original_residence')}
-                        className="min-h-[80px] resize-none"
+                        className="min-h-[80px] resize-none border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white"
                       />
-                      {errors.original_residence && <p className="text-sm text-red-500 font-medium">{errors.original_residence}</p>}
+                      {errors.original_residence && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4" />
+                        {errors.original_residence}
+                      </p>}
                     </div>
 
                     <div className="space-y-3">
-                      <Label htmlFor="current_residence" className="font-medium">{t('criminal.create.fields.current_residence')}</Label>
+                      <Label htmlFor="current_residence" className="font-medium flex items-center gap-2 text-orange-700">
+                        <MapPin className="h-4 w-4" />
+                        {t('criminal.create.fields.current_residence')}
+                      </Label>
                       <Textarea
                         id="current_residence"
                         value={data.current_residence}
                         onChange={(e) => setData('current_residence', e.target.value)}
                         rows={2}
                         placeholder={t('criminal.create.placeholders.current_residence')}
-                        className="min-h-[80px] resize-none"
+                        className="min-h-[80px] resize-none border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white"
                       />
-                      {errors.current_residence && <p className="text-sm text-red-500 font-medium">{errors.current_residence}</p>}
+                      {errors.current_residence && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4" />
+                        {errors.current_residence}
+                      </p>}
                     </div>
 
                     <div className="space-y-3">
-                      <Label htmlFor="department_id" className="font-medium">{t('criminal.create.fields.department')}</Label>
+                      <Label htmlFor="department_id" className="font-medium flex items-center gap-2 text-orange-700">
+                        <Building2 className="h-4 w-4" />
+                        {t('criminal.create.fields.department')}
+                      </Label>
                       <Select
                         value={data.department_id}
                         onValueChange={(value) => setData('department_id', value)}
                       >
-                        <SelectTrigger id="department_id" className="h-11">
+                        <SelectTrigger id="department_id" className="h-12 border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white">
                           <SelectValue placeholder={t('criminal.create.placeholders.department')} />
                         </SelectTrigger>
                         <SelectContent>
@@ -344,11 +398,14 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                               </SelectItem>
                             ))
                           ) : (
-                            <div className="p-2 text-sm text-neutral-500">{t('criminal.create.no_departments')}</div>
+                            <div className="p-2 text-sm text-orange-500 bg-orange-50 rounded-lg">{t('criminal.create.no_departments')}</div>
                           )}
                         </SelectContent>
                       </Select>
-                      {errors.department_id && <p className="text-sm text-red-500 font-medium">{errors.department_id}</p>}
+                      {errors.department_id && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4" />
+                        {errors.department_id}
+                      </p>}
                     </div>
                   </TabsContent>
 
@@ -471,20 +528,20 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                 </Tabs>
               </CardContent>
 
-              <CardFooter className="flex justify-between border-t px-6 py-5 bg-neutral-50 dark:bg-neutral-900">
+              <CardFooter className="flex justify-between border-t px-6 py-5 bg-gradient-to-l from-orange-50 to-orange-100">
                 <Button
                   variant="outline"
                   onClick={() => reset()}
                   type="button"
                   disabled={processing}
-                  className="rounded-full"
+                  className="rounded-full border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400 shadow-lg"
                 >
                   {t('criminal.create.reset')}
                 </Button>
                 <Button
                   type="submit"
                   disabled={processing}
-                  className="rounded-full px-8 font-medium"
+                  className="rounded-full px-8 font-medium bg-gradient-to-l from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
                 >
                   {processing ? t('criminal.create.saving') : t('criminal.create.save')}
                 </Button>

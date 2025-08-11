@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash, Search, ArrowUpDown, FilterX, ChevronLeft, ChevronRight, Eye, BarChart3 } from 'lucide-react';
+import { Plus, Pencil, Trash, Search, ArrowUpDown, FilterX, ChevronRight, ChevronLeft, Eye, BarChart3, Shield, Users, Building2, Calendar, FileText, AlertTriangle, TrendingUp } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -250,28 +250,49 @@ export default function CriminalIndex({
       <Head title={t('criminal.page_title')} />
 
       <div className="container px-0 py-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight">{t('criminal.page_title')}</h2>
-            <p className="text-muted-foreground mt-1">{t('criminal.page_description')}</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <CanCreate model="criminal">
-              <Button asChild size="default" className="shadow-sm">
-                <Link href={route('criminals.create')}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  {t('criminal.add_button')}
-                </Link>
-              </Button>
-            </CanCreate>
+        {/* Header with gradient background */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-l from-red-600 via-orange-600 to-amber-600 p-8 text-white shadow-2xl mb-8">
+          <div className="absolute inset-0 bg-black/10"></div>
+          <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 -translate-x-32"></div>
+          <div className="absolute bottom-0 right-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 translate-x-24"></div>
+          
+          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
+            <div className="flex items-center gap-6">
+              <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl border border-white/30">
+                <Shield className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <h2 className="text-3xl lg:text-4xl font-bold text-white drop-shadow-lg">{t('criminal.page_title')}</h2>
+                <p className="text-white/90 flex items-center gap-2 mt-2 text-lg">
+                  <FileText className="h-5 w-5" />
+                  {t('criminal.page_description')}
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <CanCreate model="criminal">
+                <Button asChild size="default" className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 shadow-lg rounded-full">
+                  <Link href={route('criminals.create')}>
+                    <Plus className="ml-2 h-4 w-4" />
+                    {t('criminal.add_button')}
+                  </Link>
+                </Button>
+              </CanCreate>
+            </div>
           </div>
         </div>
 
-        <Card className="shadow-sm">
-          <CardHeader className="py-4">
-            <CardTitle className="text-base font-medium">{t('criminal.search_filters')}</CardTitle>
+        <Card className="shadow-xl bg-gradient-to-bl from-white to-orange-50/30 border-0">
+          <CardHeader className="py-4 bg-gradient-to-l from-orange-500 to-orange-600 text-white">
+            <CardTitle className="text-base font-medium flex items-center gap-3">
+              <div className="p-2 bg-white/20 rounded-lg">
+                <Search className="h-5 w-5" />
+              </div>
+              {t('criminal.search_filters')}
+            </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-6">
             <div className="flex flex-col gap-4 md:flex-row">
               {/* Search Bar */}
               <div className="flex-1">
@@ -280,9 +301,9 @@ export default function CriminalIndex({
                     placeholder={t('criminal.search_placeholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full"
+                    className="w-full border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white"
                   />
-                  <Button type="submit" variant="outline" size="sm" className="shadow-sm">
+                  <Button type="submit" variant="outline" size="sm" className="shadow-lg border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400">
                     <Search className="h-4 w-4" />
                   </Button>
                 </form>
@@ -291,7 +312,7 @@ export default function CriminalIndex({
               {/* Department Filter */}
               <div className="w-full md:w-56">
                 <Select value={selectedDepartment} onValueChange={handleDepartmentChange}>
-                  <SelectTrigger className="shadow-sm">
+                  <SelectTrigger className="shadow-lg border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white">
                     <SelectValue placeholder={t('criminal.filter_by_department')} />
                   </SelectTrigger>
                   <SelectContent>
@@ -308,7 +329,7 @@ export default function CriminalIndex({
               {/* Sort Options */}
               <div className="w-full md:w-44">
                 <Select value={filters.sort} onValueChange={handleSortChange}>
-                  <SelectTrigger className="shadow-sm">
+                  <SelectTrigger className="shadow-lg border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white">
                     <SelectValue placeholder={t('criminal.sort_by')} />
                   </SelectTrigger>
                   <SelectContent>
@@ -328,7 +349,7 @@ export default function CriminalIndex({
                   size="icon"
                   onClick={handleDirectionChange}
                   title={t(`criminal.sort_${filters.direction === 'asc' ? 'descending' : 'ascending'}`)}
-                  className="shadow-sm"
+                  className="shadow-lg border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400"
                 >
                   <ArrowUpDown className={`h-4 w-4 ${filters.direction === 'desc' ? 'rotate-180' : ''}`} />
                 </Button>
@@ -337,7 +358,7 @@ export default function CriminalIndex({
               {/* Per Page Options */}
               <div className="w-full md:w-40">
                 <Select value={filters.per_page.toString()} onValueChange={handlePerPageChange}>
-                  <SelectTrigger className="shadow-sm">
+                  <SelectTrigger className="shadow-lg border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white">
                     <SelectValue placeholder={t('criminal.items_per_page')} />
                   </SelectTrigger>
                   <SelectContent>
@@ -357,7 +378,7 @@ export default function CriminalIndex({
                   size="icon"
                   onClick={resetFilters}
                   title={t('criminal.reset_filters')}
-                  className="shadow-sm"
+                  className="shadow-lg border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400"
                 >
                   <FilterX className="h-4 w-4" />
                 </Button>
@@ -368,38 +389,48 @@ export default function CriminalIndex({
 
         {/* Results Table */}
         <div className="mt-6">
-          <Card className="shadow-sm overflow-hidden">
+          <Card className="shadow-xl overflow-hidden bg-gradient-to-bl from-white to-orange-50/30 border-0">
+            <CardHeader className="bg-gradient-to-l from-orange-500 to-orange-600 text-white">
+              <CardTitle className="flex items-center gap-3">
+                <div className="p-2 bg-white/20 rounded-lg">
+                  <TrendingUp className="h-5 w-5" />
+                </div>
+                {t('criminal.table.title')}
+              </CardTitle>
+            </CardHeader>
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-muted/50">
-                    <TableHead>{t('criminal.table.name')}</TableHead>
-                    <TableHead>{t('criminal.table.number')}</TableHead>
-                    <TableHead>{t('criminal.table.crime_type')}</TableHead>
-                    <TableHead>{t('criminal.table.department')}</TableHead>
-                    <TableHead>{t('criminal.table.arrest_date')}</TableHead>
-                    <TableHead>{t('criminal.table.actions')}</TableHead>
+                  <TableRow className="bg-gradient-to-l from-orange-100 to-orange-200">
+                    <TableHead className="text-orange-800 font-semibold">{t('criminal.table.name')}</TableHead>
+                    <TableHead className="text-orange-800 font-semibold">{t('criminal.table.number')}</TableHead>
+                    <TableHead className="text-orange-800 font-semibold">{t('criminal.table.crime_type')}</TableHead>
+                    <TableHead className="text-orange-800 font-semibold">{t('criminal.table.department')}</TableHead>
+                    <TableHead className="text-orange-800 font-semibold">{t('criminal.table.arrest_date')}</TableHead>
+                    <TableHead className="text-orange-800 font-semibold">{t('criminal.table.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {criminals.data && criminals.data.length > 0 ? (
                     criminals.data.map((criminal) => (
-                      <TableRow key={criminal.id} className="hover:bg-muted/30">
-                        <TableCell className="font-medium">{criminal.name}</TableCell>
-                        <TableCell>{criminal.number || t('criminal.na')}</TableCell>
-                        <TableCell>{criminal.crime_type || t('criminal.na')}</TableCell>
+                      <TableRow key={criminal.id} className="hover:bg-orange-50/50 transition-colors duration-200">
+                        <TableCell className="font-medium text-orange-900">{criminal.name}</TableCell>
+                        <TableCell className="text-orange-800">{criminal.number || t('criminal.na')}</TableCell>
+                        <TableCell className="text-orange-800">{criminal.crime_type || t('criminal.na')}</TableCell>
                         <TableCell>
                           {criminal.department ? (
-                            <Badge variant="outline" className="bg-background">{criminal.department.name}</Badge>
+                            <Badge variant="outline" className="bg-gradient-to-l from-orange-100 to-orange-200 text-orange-800 border-orange-300">
+                              {criminal.department.name}
+                            </Badge>
                           ) : (
-                            t('criminal.na')
+                            <span className="text-orange-600">{t('criminal.na')}</span>
                           )}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="text-orange-800">
                           {criminal.arrest_date ? (
                             format(new Date(criminal.arrest_date), 'MMM d, yyyy')
                           ) : (
-                            t('criminal.na')
+                            <span className="text-orange-600">{t('criminal.na')}</span>
                           )}
                         </TableCell>
                         <TableCell>
@@ -410,7 +441,7 @@ export default function CriminalIndex({
                                 size="icon"
                                 asChild
                                 title={t('criminal.actions.view')}
-                                className="h-8 w-8 rounded-full"
+                                className="h-8 w-8 rounded-full hover:bg-blue-100 text-blue-600 hover:text-blue-700"
                               >
                                 <Link href={route('criminals.show', criminal.id)}>
                                   <Eye className="h-4 w-4" />
@@ -423,7 +454,7 @@ export default function CriminalIndex({
                                 size="icon"
                                 asChild
                                 title={t('criminal.actions.edit')}
-                                className="h-8 w-8 rounded-full"
+                                className="h-8 w-8 rounded-full hover:bg-green-100 text-green-600 hover:text-green-700"
                               >
                                 <Link href={route('criminals.edit', criminal.id)}>
                                   <Pencil className="h-4 w-4" />
@@ -436,7 +467,7 @@ export default function CriminalIndex({
                                 size="icon"
                                 onClick={() => openDeleteDialog(criminal)}
                                 title={t('criminal.actions.delete')}
-                                className="h-8 w-8 rounded-full text-destructive hover:text-destructive hover:bg-destructive/10"
+                                className="h-8 w-8 rounded-full text-red-600 hover:text-red-700 hover:bg-red-100"
                               >
                                 <Trash className="h-4 w-4" />
                               </Button>
@@ -446,7 +477,7 @@ export default function CriminalIndex({
                               size="icon"
                               asChild
                               title={t('criminal.analytics.view_analytics')}
-                              className="h-8 w-8 rounded-full"
+                              className="h-8 w-8 rounded-full hover:bg-purple-100 text-purple-600 hover:text-purple-700"
                             >
                               <Link href={route('analytics.show', ['Criminal', criminal.id])}>
                                 <BarChart3 className="h-4 w-4" />
@@ -458,8 +489,11 @@ export default function CriminalIndex({
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
-                        {t('criminal.no_records')}
+                      <TableCell colSpan={6} className="h-24 text-center">
+                        <div className="flex flex-col items-center gap-3 text-orange-600">
+                          <AlertTriangle className="h-12 w-12 text-orange-400" />
+                          <p className="text-lg font-medium">{t('criminal.no_records')}</p>
+                        </div>
                       </TableCell>
                     </TableRow>
                   )}
@@ -478,21 +512,21 @@ export default function CriminalIndex({
                 size="icon"
                 onClick={() => criminals.meta && goToPage(1)}
                 disabled={!criminals.meta || criminals.meta.current_page === 1}
-                className="shadow-sm h-8 w-8"
+                className="shadow-lg h-8 w-8 border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400"
               >
-                <ChevronLeft className="h-4 w-4" />
-                <ChevronLeft className="h-4 w-4 -ml-2" />
+                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-4 w-4 -mr-2" />
               </Button>
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => criminals.meta && goToPage(criminals.meta.current_page - 1)}
                 disabled={!criminals.meta || criminals.meta.current_page === 1}
-                className="shadow-sm h-8 w-8"
+                className="shadow-lg h-8 w-8 border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400"
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronRight className="h-4 w-4" />
               </Button>
-              <span className="px-2 text-sm">
+              <span className="px-4 py-2 text-sm bg-gradient-to-l from-orange-100 to-orange-200 text-orange-800 rounded-lg font-medium">
                 {t('criminal.pagination', {
                   current: String(criminals.meta?.current_page ?? '1'),
                   total: String(criminals.meta?.last_page ?? '1')
@@ -503,19 +537,19 @@ export default function CriminalIndex({
                 size="icon"
                 onClick={() => criminals.meta && goToPage(criminals.meta.current_page + 1)}
                 disabled={!criminals.meta || criminals.meta.current_page === criminals.meta.last_page}
-                className="shadow-sm h-8 w-8"
+                className="shadow-lg h-8 w-8 border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400"
               >
-                <ChevronRight className="h-4 w-4" />
+                <ChevronLeft className="h-4 w-4" />
               </Button>
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => criminals.meta && goToPage(criminals.meta.last_page)}
                 disabled={!criminals.meta || criminals.meta.current_page === criminals.meta.last_page}
-                className="shadow-sm h-8 w-8"
+                className="shadow-lg h-8 w-8 border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400"
               >
-                <ChevronRight className="h-4 w-4" />
-                <ChevronRight className="h-4 w-4 -ml-2" />
+                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-4 w-4 -mr-2" />
               </Button>
             </div>
           </div>

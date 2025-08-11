@@ -19,6 +19,7 @@
     "criminal.items_per_page": "په یوه پاڼه کې توکي",
     "criminal.per_page_option": "په یوه پاڼه کې {{count}}",
     "criminal.reset_filters": "فلټرونه ریست کړئ",
+    "criminal.table.title": "د مجرمینو ثبتونه",
     "criminal.table.name": "نوم",
     "criminal.table.number": "شمېره",
     "criminal.table.crime_type": "د جرم ډول",

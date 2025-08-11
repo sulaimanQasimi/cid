@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Camera, Calendar, UserRound, FileText, BookText } from 'lucide-react';
+import { ArrowRight, Camera, Calendar, UserRound, FileText, BookText, Shield, Users, MapPin, Phone, IdCard, Home, Building2, Clock, Gavel, FileCheck, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/i18n/translate';
@@ -144,18 +144,32 @@ export default function CriminalEdit({ criminal, departments = [], auth }: Props
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={t('criminal.edit.page_title', { name: criminal.name })} />
       <div className="container px-0 py-6">
-        <div className="flex items-center gap-4 mb-8">
-          <Button variant="outline" size="sm" asChild className="rounded-full shadow-sm">
-            <a href={route('criminals.show', criminal.id)}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {t('criminal.edit.back_button')}
-            </a>
-          </Button>
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight">{t('criminal.edit.title')}</h2>
-            <p className="text-sm text-neutral-500">
-              {t('criminal.edit.created_on', { date: formattedCreatedAt })}
-            </p>
+        {/* Header with gradient background */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-l from-amber-600 via-orange-600 to-red-600 p-8 text-white shadow-2xl mb-8">
+          <div className="absolute inset-0 bg-black/10"></div>
+          <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 -translate-x-32"></div>
+          <div className="absolute bottom-0 right-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 translate-x-24"></div>
+          
+          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
+            <div className="flex items-center gap-6">
+              <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl border border-white/30">
+                <Shield className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <h2 className="text-3xl lg:text-4xl font-bold text-white drop-shadow-lg">{t('criminal.edit.title')}</h2>
+                <p className="text-white/90 flex items-center gap-2 mt-2 text-lg">
+                  <Clock className="h-5 w-5" />
+                  {t('criminal.edit.created_on', { date: formattedCreatedAt })}
+                </p>
+              </div>
+            </div>
+            
+            <Button variant="outline" size="sm" asChild className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 rounded-full shadow-lg">
+              <a href={route('criminals.show', criminal.id)}>
+                <ArrowRight className="ml-2 h-4 w-4" />
+                {t('criminal.edit.back_button')}
+              </a>
+            </Button>
           </div>
         </div>
 
