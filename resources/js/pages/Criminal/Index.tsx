@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash, Search, ArrowUpDown, FilterX, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
+import { Plus, Pencil, Trash, Search, ArrowUpDown, FilterX, ChevronLeft, ChevronRight, Eye, BarChart3 } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -62,6 +62,14 @@ interface Criminal {
     id: number;
     name: string;
   };
+  // Visitor statistics
+  visits_count?: number;
+  unique_visitors_count?: number;
+  today_visits_count?: number;
+  this_week_visits_count?: number;
+  this_month_visits_count?: number;
+  bounce_rate?: number;
+  average_time_spent?: number;
 }
 
 interface Department {
@@ -111,28 +119,21 @@ interface Props {
   };
 }
 
-const breadcrumbs: BreadcrumbItem[] = [
-  {
-    title: 'Criminal Records',
-    href: route('criminals.index'),
-  },
-];
-
 const sortOptions = [
-  { value: 'name', label: 'Name' },
-  { value: 'number', label: 'Number' },
-  { value: 'crime_type', label: 'Crime Type' },
-  { value: 'arrest_date', label: 'Arrest Date' },
-  { value: 'department_id', label: 'Department' },
-  { value: 'created_at', label: 'Created Date' },
-  { value: 'updated_at', label: 'Updated Date' },
+  { value: 'name', label: 'criminal.sort_options.name' },
+  { value: 'number', label: 'criminal.sort_options.number' },
+  { value: 'crime_type', label: 'criminal.sort_options.crime_type' },
+  { value: 'arrest_date', label: 'criminal.sort_options.arrest_date' },
+  { value: 'department_id', label: 'criminal.sort_options.department_id' },
+  { value: 'created_at', label: 'criminal.sort_options.created_at' },
+  { value: 'updated_at', label: 'criminal.sort_options.updated_at' },
 ];
 
 const perPageOptions = [
-  { value: 10, label: '10 per page' },
-  { value: 25, label: '25 per page' },
-  { value: 50, label: '50 per page' },
-  { value: 100, label: '100 per page' },
+  { value: 10, label: 'criminal.per_page_option' },
+  { value: 25, label: 'criminal.per_page_option' },
+  { value: 50, label: 'criminal.per_page_option' },
+  { value: 100, label: 'criminal.per_page_option' },
 ];
 
 export default function CriminalIndex({
@@ -156,6 +157,13 @@ export default function CriminalIndex({
 }: Props) {
   const { canCreate, canView, canUpdate, canDelete } = usePermissions();
   const { t } = useTranslation();
+  
+  const breadcrumbs: BreadcrumbItem[] = [
+    {
+      title: t('criminal.page_title'),
+      href: route('criminals.index'),
+    },
+  ];
   const [searchQuery, setSearchQuery] = useState(filters.search);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [criminalToDelete, setCriminalToDelete] = useState<Criminal | null>(null);
@@ -306,7 +314,7 @@ export default function CriminalIndex({
                   <SelectContent>
                     {sortOptions.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
-                        {t(`criminal.sort_options.${option.value}`)}
+                        {t(option.label)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -335,7 +343,7 @@ export default function CriminalIndex({
                   <SelectContent>
                     {perPageOptions.map((option) => (
                       <SelectItem key={option.value} value={option.value.toString()}>
-                        {t('criminal.per_page_option', { count: String(option.value) })}
+                        {t(option.label, { count: String(option.value) })}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -391,7 +399,7 @@ export default function CriminalIndex({
                           {criminal.arrest_date ? (
                             format(new Date(criminal.arrest_date), 'MMM d, yyyy')
                           ) : (
-                            'N/A'
+                            t('criminal.na')
                           )}
                         </TableCell>
                         <TableCell>
@@ -433,6 +441,17 @@ export default function CriminalIndex({
                                 <Trash className="h-4 w-4" />
                               </Button>
                             </CanDelete>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              asChild
+                              title={t('criminal.analytics.view_analytics')}
+                              className="h-8 w-8 rounded-full"
+                            >
+                              <Link href={route('analytics.show', ['Criminal', criminal.id])}>
+                                <BarChart3 className="h-4 w-4" />
+                              </Link>
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>

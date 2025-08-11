@@ -3,6 +3,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { ShieldCheck, Activity, Target, AlertTriangle, BarChart3, Users, Map, FileText } from 'lucide-react';
+import { useTranslation } from '@/lib/i18n/translate';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -12,6 +13,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Dashboard() {
+    const { t } = useTranslation();
+    
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Intelligence Dashboard" />
@@ -141,6 +144,63 @@ export default function Dashboard() {
                                         <div className="h-2 w-2 rounded-full bg-green-500"></div>
                                         <span className="text-xs text-muted-foreground">Online</span>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Visitor Analytics Section */}
+                <div className="grid gap-6 md:grid-cols-2">
+                    {/* Today's Visitor Statistics */}
+                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border">
+                        <div className="border-b border-border/50 bg-muted/20 px-6 py-4">
+                            <h3 className="font-semibold">{t('dashboard.visitor_analytics.title')}</h3>
+                        </div>
+                        <div className="p-6">
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm">{t('dashboard.visitor_analytics.total_visits')}</span>
+                                    <span className="text-lg font-semibold text-blue-600">24</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm">{t('dashboard.visitor_analytics.unique_visitors')}</span>
+                                    <span className="text-lg font-semibold text-green-600">18</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm">{t('dashboard.visitor_analytics.records_viewed')}</span>
+                                    <span className="text-lg font-semibold text-purple-600">12</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm">{t('dashboard.visitor_analytics.avg_time_spent')}</span>
+                                    <span className="text-lg font-semibold text-orange-600">4m 32s</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Visitor Insights */}
+                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border">
+                        <div className="border-b border-border/50 bg-muted/20 px-6 py-4">
+                            <h3 className="font-semibold">{t('dashboard.visitor_insights.title')}</h3>
+                        </div>
+                        <div className="p-6">
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm">{t('dashboard.visitor_insights.bounce_rate')}</span>
+                                    <span className="text-lg font-semibold text-red-600">23%</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm">{t('dashboard.visitor_insights.most_active_department')}</span>
+                                    <span className="text-lg font-semibold text-blue-600">Investigation</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm">{t('dashboard.visitor_insights.top_viewed_record')}</span>
+                                    <span className="text-lg font-semibold text-green-600">Case #CR-2024-001</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm">{t('dashboard.visitor_insights.peak_activity_time')}</span>
+                                    <span className="text-lg font-semibold text-purple-600">2:00 PM</span>
                                 </div>
                             </div>
                         </div>

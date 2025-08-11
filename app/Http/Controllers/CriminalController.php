@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Criminal;
 use App\Models\Department;
+use App\Services\VisitorTrackingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -13,6 +14,13 @@ use Inertia\Inertia;
 
 class CriminalController extends Controller
 {
+    protected $trackingService;
+
+    public function __construct(VisitorTrackingService $trackingService)
+    {
+        $this->trackingService = $trackingService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -59,8 +67,20 @@ class CriminalController extends Controller
 
         $query->orderBy($sort, $direction);
 
-        // Get paginated results
+        // Get paginated results with visitor statistics
         $criminals = $query->paginate($perPage)->withQueryString();
+        
+        // Load visitor statistics for each criminal
+        $criminals->getCollection()->transform(function ($criminal) {
+            $criminal->visits_count = $criminal->visits_count;
+            $criminal->unique_visitors_count = $criminal->unique_visitors_count;
+            $criminal->today_visits_count = $criminal->today_visits_count;
+            $criminal->this_week_visits_count = $criminal->this_week_visits_count;
+            $criminal->this_month_visits_count = $criminal->this_month_visits_count;
+            $criminal->bounce_rate = $criminal->bounce_rate;
+            $criminal->average_time_spent = $criminal->average_time_spent;
+            return $criminal;
+        });
 
         // Get all departments for filtering
         $departments = Department::orderBy('name')->get();
@@ -147,6 +167,18 @@ class CriminalController extends Controller
         $this->authorize('view', $criminal);
         
         $criminal->load(['department', 'creator']);
+
+        // Track the visit to this criminal record
+        $this->trackingService->trackVisit($criminal);
+
+        // Load visitor statistics
+        $criminal->visits_count = $criminal->visits_count;
+        $criminal->unique_visitors_count = $criminal->unique_visitors_count;
+        $criminal->today_visits_count = $criminal->today_visits_count;
+        $criminal->this_week_visits_count = $criminal->this_week_visits_count;
+        $criminal->this_month_visits_count = $criminal->this_month_visits_count;
+        $criminal->bounce_rate = $criminal->bounce_rate;
+        $criminal->average_time_spent = $criminal->average_time_spent;
 
         return Inertia::render('Criminal/Show', [
             'criminal' => $criminal,

@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Pencil, Trash, UserRound, MapPin, FileText, Calendar, Building, Phone, CreditCard, Printer } from 'lucide-react';
+import { ArrowLeft, Pencil, Trash, UserRound, MapPin, FileText, Calendar, Building, Phone, CreditCard, Printer, BarChart3, Eye, Clock, Users } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import {
   AlertDialog,
@@ -52,6 +52,14 @@ interface Criminal {
     id: number;
     name: string;
   };
+  // Visitor statistics
+  visits_count?: number;
+  unique_visitors_count?: number;
+  today_visits_count?: number;
+  this_week_visits_count?: number;
+  this_month_visits_count?: number;
+  bounce_rate?: number;
+  average_time_spent?: number;
 }
 
 interface Props {

@@ -7,7 +7,32 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use App\Models\Traits\HasVisitors;
-
+/**
+ * @property int $id
+ * @property string $photo
+ * @property string $number
+ * @property string $name
+ * @property string $father_name
+ * @property string $grandfather_name
+ * @property string $id_card_number
+ * @property string $phone_number
+ * @property string $original_residence
+ * @property string $current_residence
+ * @property string $crime_type
+ * @property string $arrest_location
+ * @property string $arrested_by
+ * @property string $arrest_date
+ * @property string $referred_to
+ * @property string $final_verdict
+ * @property string $notes
+ * @property int $department_id
+ * @property int $created_by
+ * @property int $visits_count
+ * @property int $unique_visitors_count
+ * @property int $today_visits_count
+ * @property int $this_week_visits_count
+ * @property int $this_month_visits_count
+ */
 class Criminal extends Model
 {
     use HasFactory, HasVisitors;
