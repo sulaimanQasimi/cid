@@ -14,6 +14,21 @@ use Spatie\Permission\Models\Role;
 class UserController extends Controller
 {
     /**
+     * Create a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            // Check if user has admin or superadmin role
+            if (!auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+                abort(403, 'Access denied. Admin privileges required.');
+            }
+            
+            return $next($request);
+        });
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
@@ -202,11 +217,6 @@ class UserController extends Controller
     {
         $this->authorize('delete', $user);
         
-        // Don't allow users to delete themselves
-        if (Auth::id() === $user->id) {
-            return Redirect::back()->with('error', 'You cannot delete your own account.');
-        }
-
         $user->delete();
 
         return Redirect::route('users.index')->with('success', 'User deleted successfully.');

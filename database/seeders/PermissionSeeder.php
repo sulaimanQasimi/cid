@@ -189,6 +189,15 @@ class PermissionSeeder extends Seeder
             ['name' => 'translation.delete', 'label' => 'حذف ترجمه'],
             ['name' => 'translation.restore', 'label' => 'بازیابی ترجمه'],
             ['name' => 'translation.force_delete', 'label' => 'حذف دائمی ترجمه'],
+
+            // User permissions
+            ['name' => 'user.view_any', 'label' => 'مشاهده همه کاربران'],
+            ['name' => 'user.view', 'label' => 'مشاهده کاربر'],
+            ['name' => 'user.create', 'label' => 'ایجاد کاربر'],
+            ['name' => 'user.update', 'label' => 'ویرایش کاربر'],
+            ['name' => 'user.delete', 'label' => 'حذف کاربر'],
+            ['name' => 'user.restore', 'label' => 'بازیابی کاربر'],
+            ['name' => 'user.force_delete', 'label' => 'حذف دائمی کاربر'],
         ];
 
         // Create permissions

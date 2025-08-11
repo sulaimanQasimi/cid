@@ -41,6 +41,7 @@ use App\Policies\ReportStatPolicy;
 use App\Policies\StatCategoryItemPolicy;
 use App\Policies\StatCategoryPolicy;
 use App\Policies\TranslationPolicy;
+use App\Policies\UserPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -68,7 +69,7 @@ class AuthServiceProvider extends ServiceProvider
         StatCategory::class => StatCategoryPolicy::class,
         StatCategoryItem::class => StatCategoryItemPolicy::class,
         Translation::class => TranslationPolicy::class,
-        User::class => null, // User model typically doesn't need a policy for basic CRUD
+        User::class => UserPolicy::class,
     ];
 
     /**
