@@ -333,13 +333,13 @@ export default function CriminalIndex({
                         placeholder={t('criminal.search_placeholder')}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full h-11 pl-10 pr-4 text-base border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white rounded-xl shadow-lg"
+                        className="w-full h-11 pl-20 pr-4 text-base border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white rounded-xl shadow-lg"
                       />
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-orange-400" />
+                      <Button type="submit" className="absolute left-1 top-1/2 -translate-y-1/2 h-9 px-4 bg-gradient-to-l from-orange-500 to-orange-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-sm">
+                        Search
+                      </Button>
+                      <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-orange-400" />
                     </div>
-                    <Button type="submit" className="absolute right-1 top-1/2 -translate-y-1/2 h-9 px-4 bg-gradient-to-l from-orange-500 to-orange-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-sm">
-                      Search
-                    </Button>
                   </form>
                 </div>
 
