@@ -9,7 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import AuthLayout from '@/layouts/auth-layout';
+import { useTranslation } from '@/lib/i18n/translate';
 
 type LoginForm = {
     email: string;
@@ -25,6 +25,7 @@ interface LoginProps {
 export default function Login({ status, canResetPassword }: LoginProps) {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const { t } = useTranslation();
     
     const { data, setData, post, processing, errors, reset } = useForm<Required<LoginForm>>({
         email: '',
@@ -45,7 +46,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
-            <Head title="Secure Access - Intelligence Department" />
+            <Head title={t('auth.login.page_title')} />
             
             <div className="w-full max-w-md">
                 {/* Header */}
@@ -55,15 +56,11 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-500/10 border border-blue-500/20">
                                 <Shield className="h-6 w-6 text-blue-400" />
                             </div>
-                            <div>
-                                <h1 className="text-xl font-bold text-white">Intelligence Department</h1>
-                                <p className="text-sm text-slate-400">Secure Information Management</p>
-                            </div>
                         </div>
                     </div>
-                    <h2 className="text-2xl font-bold text-white mb-2">Secure Access</h2>
+                    <h2 className="text-2xl font-bold text-white mb-2">{t('auth.login.secure_access')}</h2>
                     <p className="text-slate-400 text-sm">
-                        Enter your credentials to access the secure intelligence platform
+                        {t('auth.login.enter_credentials')}
                     </p>
                 </div>
 
@@ -71,10 +68,10 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                 <Card className="w-full bg-slate-800/50 border border-slate-700/50 shadow-2xl backdrop-blur-sm">
                     <CardHeader className="pb-4">
                         <CardTitle className="text-xl font-semibold text-white text-center">
-                            Authentication Required
+                            {t('auth.login.authentication_required')}
                         </CardTitle>
                         <CardDescription className="text-center text-slate-400">
-                            Multi-factor verification in progress
+                            {t('auth.login.multi_factor_verification')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="pt-2">
@@ -95,7 +92,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             {/* Email Field */}
                             <div className="space-y-2">
                                 <Label htmlFor="email" className="text-sm font-medium text-slate-200">
-                                    Email Address
+                                    {t('auth.login.email_address')}
                                 </Label>
                                 <div className="relative">
                                     <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
@@ -109,8 +106,9 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                         autoComplete="email"
                                         value={data.email}
                                         onChange={(e) => setData('email', e.target.value)}
-                                        placeholder="agent@intelligence.gov"
-                                        className="pl-10 bg-slate-700/50 border-slate-600/50 text-white placeholder:text-slate-400 focus:border-blue-500/50 focus:ring-blue-500/20"
+                                        placeholder={t('auth.login.email_placeholder')}
+                                        className="pl-10 bg-slate-700/50 border-slate-600/50 text-white placeholder:text-slate-400 focus:border-blue-500/50 focus:ring-blue-500/20 placeholder:text-left"
+                                        dir="ltr"
                                     />
                                 </div>
                                 <InputError message={errors.email} />
@@ -120,14 +118,14 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
                                     <Label htmlFor="password" className="text-sm font-medium text-slate-200">
-                                        Security Code
+                                        {t('auth.login.security_code')}
                                     </Label>
                                     {canResetPassword && (
                                         <TextLink
                                             href={route('password.request')}
                                             className="text-xs font-medium text-blue-400 hover:text-blue-300"
                                         >
-                                            Reset Access
+                                            {t('auth.login.reset_access')}
                                         </TextLink>
                                     )}
                                 </div>
@@ -142,8 +140,9 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                         autoComplete="current-password"
                                         value={data.password}
                                         onChange={(e) => setData('password', e.target.value)}
-                                        placeholder="••••••••••••"
-                                        className="pl-10 pr-10 bg-slate-700/50 border-slate-600/50 text-white placeholder:text-slate-400 focus:border-blue-500/50 focus:ring-blue-500/20"
+                                        placeholder={t('auth.login.password_placeholder')}
+                                        className="pl-10 pr-10 bg-slate-700/50 border-slate-600/50 text-white placeholder:text-slate-400 focus:border-blue-500/50 focus:ring-blue-500/20 placeholder:text-left"
+                                        dir="ltr"
                                     />
                                     <button
                                         type="button"
@@ -170,7 +169,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     className="h-4 w-4 rounded border-slate-600 bg-slate-700/50 text-blue-500 focus:ring-blue-500/20"
                                 />
                                 <Label htmlFor="remember" className="text-sm text-slate-300">
-                                    Maintain secure session
+                                    {t('auth.login.maintain_session')}
                                 </Label>
                             </div>
 
@@ -184,32 +183,11 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                 {(processing || isLoading) && (
                                     <LoaderCircle className="h-4 w-4 animate-spin mr-2" />
                                 )}
-                                {processing || isLoading ? 'Authenticating...' : 'Access Secure Platform'}
+                                {processing || isLoading ? t('auth.login.authenticating') : t('auth.login.access_platform')}
                             </Button>
                         </form>
-
-                        {/* Footer Links */}
-                        <div className="mt-6 pt-6 border-t border-slate-700/50">
-                            <div className="text-center text-sm text-slate-400">
-                                New to the platform?{' '}
-                                <TextLink 
-                                    href={route('register')} 
-                                    className="font-medium text-blue-400 hover:text-blue-300"
-                                >
-                                    Request Access
-                                </TextLink>
-                            </div>
-                        </div>
                     </CardContent>
                 </Card>
-
-                {/* Security Notice */}
-                <div className="mt-6 text-center">
-                    <div className="flex items-center justify-center space-x-2 text-xs text-slate-500">
-                        <Shield className="h-3 w-3" />
-                        <span>All access attempts are logged and monitored</span>
-                    </div>
-                </div>
             </div>
         </div>
     );
