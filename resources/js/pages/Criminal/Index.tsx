@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash, Search, ArrowUpDown, FilterX, ChevronRight, ChevronLeft, Eye, BarChart3, Shield, Users, Building2, Calendar, FileText, AlertTriangle, TrendingUp } from 'lucide-react';
+import { Plus, Pencil, Trash, Search, ArrowUpDown, FilterX, ChevronRight, ChevronLeft, Eye, BarChart3, Shield, Users, Building2, Calendar, FileText, AlertTriangle, TrendingUp, ChevronDown } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -168,6 +168,7 @@ export default function CriminalIndex({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [criminalToDelete, setCriminalToDelete] = useState<Criminal | null>(null);
   const [selectedDepartment, setSelectedDepartment] = useState<string>(filters.department_id || '');
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   // Handle search form submission
   const handleSearch = (e: React.FormEvent) => {
@@ -250,31 +251,37 @@ export default function CriminalIndex({
       <Head title={t('criminal.page_title')} />
 
       <div className="container px-0 py-6">
-        {/* Header with gradient background */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-l from-red-600 via-orange-600 to-amber-600 p-8 text-white shadow-2xl mb-8">
-          <div className="absolute inset-0 bg-black/10"></div>
-          <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 -translate-x-32"></div>
-          <div className="absolute bottom-0 right-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 translate-x-24"></div>
+        {/* Modern Header with Glassmorphism */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-l from-red-600 via-orange-600 to-amber-600 p-8 lg:p-12 text-white shadow-2xl mb-8 group">
+          {/* Animated background elements */}
+          <div className="absolute inset-0 bg-black/5"></div>
+          <div className="absolute top-0 left-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 -translate-x-40 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
+          <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full translate-y-32 translate-x-32 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
+          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white/5 rounded-full -translate-x-16 -translate-y-16 blur-xl group-hover:scale-150 transition-transform duration-500"></div>
           
-          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
-            <div className="flex items-center gap-6">
-              <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl border border-white/30">
-                <Shield className="h-8 w-8 text-white" />
+          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-8">
+            <div className="flex items-center gap-8">
+              <div className="p-6 bg-white/20 backdrop-blur-md rounded-3xl border border-white/30 shadow-2xl group-hover:scale-105 transition-transform duration-300">
+                <Shield className="h-10 w-10 text-white" />
               </div>
-              <div>
-                <h2 className="text-3xl lg:text-4xl font-bold text-white drop-shadow-lg">{t('criminal.page_title')}</h2>
-                <p className="text-white/90 flex items-center gap-2 mt-2 text-lg">
-                  <FileText className="h-5 w-5" />
+              <div className="space-y-3">
+                <h2 className="text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight">{t('criminal.page_title')}</h2>
+                <p className="text-white/90 flex items-center gap-3 text-xl font-medium">
+                  <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <FileText className="h-6 w-6" />
+                  </div>
                   {t('criminal.page_description')}
                 </p>
               </div>
             </div>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <CanCreate model="criminal">
-                <Button asChild size="default" className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 shadow-lg rounded-full">
-                  <Link href={route('criminals.create')}>
-                    <Plus className="ml-2 h-4 w-4" />
+                <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-8 py-4 text-lg font-semibold transition-all duration-300 hover:scale-105 group/btn">
+                  <Link href={route('criminals.create')} className="flex items-center gap-3">
+                    <div className="p-1 bg-white/20 rounded-lg group-hover/btn:scale-110 transition-transform duration-300">
+                      <Plus className="h-5 w-5" />
+                    </div>
                     {t('criminal.add_button')}
                   </Link>
                 </Button>
@@ -283,168 +290,202 @@ export default function CriminalIndex({
           </div>
         </div>
 
-        <Card className="shadow-xl bg-gradient-to-bl from-white to-orange-50/30 border-0">
-          <CardHeader className="py-4 bg-gradient-to-l from-orange-500 to-orange-600 text-white">
-            <CardTitle className="text-base font-medium flex items-center gap-3">
-              <div className="p-2 bg-white/20 rounded-lg">
-                <Search className="h-5 w-5" />
+        <Card className="shadow-2xl bg-gradient-to-bl from-white to-orange-50/30 border-0 rounded-3xl overflow-hidden">
+          <CardHeader className="py-4 bg-gradient-to-l from-orange-500 to-orange-600 text-white cursor-pointer" onClick={() => setIsFiltersOpen(!isFiltersOpen)}>
+            <CardTitle className="text-lg font-semibold flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm shadow-lg">
+                  <Search className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="text-xl font-bold">{t('criminal.search_filters')}</div>
+                  <div className="text-orange-100 text-xs font-medium">Find and filter criminal records</div>
+                </div>
               </div>
-              {t('criminal.search_filters')}
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-white hover:bg-white/20 rounded-xl"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    resetFilters();
+                  }}
+                >
+                  <FilterX className="h-4 w-4 mr-1" />
+                  Reset
+                </Button>
+                <div className={`transition-transform duration-300 ${isFiltersOpen ? 'rotate-180' : ''}`}>
+                  <ChevronDown className="h-5 w-5" />
+                </div>
+              </div>
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-6">
-            <div className="flex flex-col gap-4 md:flex-row">
-              {/* Search Bar */}
-              <div className="flex-1">
-                <form onSubmit={handleSearch} className="flex items-center gap-2">
-                  <Input
-                    placeholder={t('criminal.search_placeholder')}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white"
-                  />
-                  <Button type="submit" variant="outline" size="sm" className="shadow-lg border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400">
-                    <Search className="h-4 w-4" />
-                  </Button>
-                </form>
-              </div>
+          
+          <div className={`transition-all duration-300 overflow-hidden ${isFiltersOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Search Bar */}
+                <div className="md:col-span-2">
+                  <form onSubmit={handleSearch} className="relative">
+                    <div className="relative">
+                      <Input
+                        placeholder={t('criminal.search_placeholder')}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full h-11 pl-10 pr-4 text-base border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white rounded-xl shadow-lg"
+                      />
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-orange-400" />
+                    </div>
+                    <Button type="submit" className="absolute right-1 top-1/2 -translate-y-1/2 h-9 px-4 bg-gradient-to-l from-orange-500 to-orange-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-sm">
+                      Search
+                    </Button>
+                  </form>
+                </div>
 
-              {/* Department Filter */}
-              <div className="w-full md:w-56">
-                <Select value={selectedDepartment} onValueChange={handleDepartmentChange}>
-                  <SelectTrigger className="shadow-lg border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white">
-                    <SelectValue placeholder={t('criminal.filter_by_department')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="_all">{t('criminal.all_departments')}</SelectItem>
-                    {departments.map((department) => (
-                      <SelectItem key={department.id} value={department.id.toString()}>
-                        {department.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+                {/* Department Filter */}
+                <div>
+                  <Select value={selectedDepartment} onValueChange={handleDepartmentChange}>
+                    <SelectTrigger className="h-11 shadow-lg border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white rounded-xl text-sm">
+                      <SelectValue placeholder="Department" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="_all">{t('criminal.all_departments')}</SelectItem>
+                      {departments.map((department) => (
+                        <SelectItem key={department.id} value={department.id.toString()}>
+                          {department.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              {/* Sort Options */}
-              <div className="w-full md:w-44">
-                <Select value={filters.sort} onValueChange={handleSortChange}>
-                  <SelectTrigger className="shadow-lg border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white">
-                    <SelectValue placeholder={t('criminal.sort_by')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {sortOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {t(option.label)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+                {/* Sort Options */}
+                <div>
+                  <Select value={filters.sort} onValueChange={handleSortChange}>
+                    <SelectTrigger className="h-11 shadow-lg border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white rounded-xl text-sm">
+                      <SelectValue placeholder="Sort By" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {sortOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {t(option.label)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              {/* Direction Button */}
-              <div>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={handleDirectionChange}
-                  title={t(`criminal.sort_${filters.direction === 'asc' ? 'descending' : 'ascending'}`)}
-                  className="shadow-lg border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400"
-                >
-                  <ArrowUpDown className={`h-4 w-4 ${filters.direction === 'desc' ? 'rotate-180' : ''}`} />
-                </Button>
-              </div>
+                {/* Direction & Per Page Row */}
+                <div className="md:col-span-2 lg:col-span-4 grid grid-cols-3 gap-3">
+                  {/* Direction Button */}
+                  <div>
+                    <Button
+                      variant="outline"
+                      onClick={handleDirectionChange}
+                      title={t(`criminal.sort_${filters.direction === 'asc' ? 'descending' : 'ascending'}`)}
+                      className="h-11 w-full shadow-lg border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400 rounded-xl transition-all duration-300 hover:scale-105 text-sm"
+                    >
+                      <ArrowUpDown className={`h-4 w-4 mr-2 ${filters.direction === 'desc' ? 'rotate-180' : ''}`} />
+                      {filters.direction === 'asc' ? 'Asc' : 'Desc'}
+                    </Button>
+                  </div>
 
-              {/* Per Page Options */}
-              <div className="w-full md:w-40">
-                <Select value={filters.per_page.toString()} onValueChange={handlePerPageChange}>
-                  <SelectTrigger className="shadow-lg border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white">
-                    <SelectValue placeholder={t('criminal.items_per_page')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {perPageOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value.toString()}>
-                        {t(option.label, { count: String(option.value) })}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+                  {/* Per Page Options */}
+                  <div>
+                    <Select value={filters.per_page.toString()} onValueChange={handlePerPageChange}>
+                      <SelectTrigger className="h-11 shadow-lg border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white rounded-xl text-sm">
+                        <SelectValue placeholder="Per Page" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {perPageOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value.toString()}>
+                            {t(option.label, { count: String(option.value) })}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-              {/* Reset Filters Button */}
-              <div>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={resetFilters}
-                  title={t('criminal.reset_filters')}
-                  className="shadow-lg border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400"
-                >
-                  <FilterX className="h-4 w-4" />
-                </Button>
+                  {/* Quick Actions */}
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={resetFilters}
+                      className="h-11 px-3 shadow-lg border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400 rounded-xl transition-all duration-300 hover:scale-105 text-sm"
+                    >
+                      <FilterX className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </CardContent>
+            </CardContent>
+          </div>
         </Card>
 
         {/* Results Table */}
-        <div className="mt-6">
-          <Card className="shadow-xl overflow-hidden bg-gradient-to-bl from-white to-orange-50/30 border-0">
-            <CardHeader className="bg-gradient-to-l from-orange-500 to-orange-600 text-white">
-              <CardTitle className="flex items-center gap-3">
-                <div className="p-2 bg-white/20 rounded-lg">
-                  <TrendingUp className="h-5 w-5" />
+        <div className="mt-8">
+          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-orange-50/30 border-0 rounded-3xl">
+            <CardHeader className="bg-gradient-to-l from-orange-500 to-orange-600 text-white py-6">
+              <CardTitle className="flex items-center gap-4">
+                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
+                  <TrendingUp className="h-6 w-6" />
                 </div>
-                {t('criminal.table.title')}
+                <div>
+                  <div className="text-2xl font-bold">{t('criminal.table.title')}</div>
+                  <div className="text-orange-100 text-sm font-medium">Criminal records overview</div>
+                </div>
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-gradient-to-l from-orange-100 to-orange-200">
-                    <TableHead className="text-orange-800 font-semibold">{t('criminal.table.name')}</TableHead>
-                    <TableHead className="text-orange-800 font-semibold">{t('criminal.table.number')}</TableHead>
-                    <TableHead className="text-orange-800 font-semibold">{t('criminal.table.crime_type')}</TableHead>
-                    <TableHead className="text-orange-800 font-semibold">{t('criminal.table.department')}</TableHead>
-                    <TableHead className="text-orange-800 font-semibold">{t('criminal.table.arrest_date')}</TableHead>
-                    <TableHead className="text-orange-800 font-semibold">{t('criminal.table.actions')}</TableHead>
-                  </TableRow>
-                </TableHeader>
+              <div className="overflow-hidden rounded-b-3xl">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-gradient-to-l from-orange-100 to-orange-200 border-0">
+                      <TableHead className="text-orange-800 font-bold text-lg py-6 px-6">{t('criminal.table.name')}</TableHead>
+                      <TableHead className="text-orange-800 font-bold text-lg py-6 px-6">{t('criminal.table.number')}</TableHead>
+                      <TableHead className="text-orange-800 font-bold text-lg py-6 px-6">{t('criminal.table.crime_type')}</TableHead>
+                      <TableHead className="text-orange-800 font-bold text-lg py-6 px-6">{t('criminal.table.department')}</TableHead>
+                      <TableHead className="text-orange-800 font-bold text-lg py-6 px-6">{t('criminal.table.arrest_date')}</TableHead>
+                      <TableHead className="text-orange-800 font-bold text-lg py-6 px-6">{t('criminal.table.actions')}</TableHead>
+                    </TableRow>
+                  </TableHeader>
                 <TableBody>
                   {criminals.data && criminals.data.length > 0 ? (
                     criminals.data.map((criminal) => (
-                      <TableRow key={criminal.id} className="hover:bg-orange-50/50 transition-colors duration-200">
-                        <TableCell className="font-medium text-orange-900">{criminal.name}</TableCell>
-                        <TableCell className="text-orange-800">{criminal.number || t('criminal.na')}</TableCell>
-                        <TableCell className="text-orange-800">{criminal.crime_type || t('criminal.na')}</TableCell>
-                        <TableCell>
+                      <TableRow key={criminal.id} className="hover:bg-orange-50/50 transition-colors duration-300 border-b border-orange-100">
+                        <TableCell className="font-bold text-orange-900 py-6 px-6 text-lg">{criminal.name}</TableCell>
+                        <TableCell className="text-orange-800 py-6 px-6">{criminal.number || t('criminal.na')}</TableCell>
+                        <TableCell className="text-orange-800 py-6 px-6">{criminal.crime_type || t('criminal.na')}</TableCell>
+                        <TableCell className="py-6 px-6">
                           {criminal.department ? (
-                            <Badge variant="outline" className="bg-gradient-to-l from-orange-100 to-orange-200 text-orange-800 border-orange-300">
+                            <Badge variant="outline" className="bg-gradient-to-l from-orange-100 to-orange-200 text-orange-800 border-orange-300 px-4 py-2 rounded-xl font-semibold">
                               {criminal.department.name}
                             </Badge>
                           ) : (
-                            <span className="text-orange-600">{t('criminal.na')}</span>
+                            <span className="text-orange-600 font-medium">{t('criminal.na')}</span>
                           )}
                         </TableCell>
-                        <TableCell className="text-orange-800">
+                        <TableCell className="text-orange-800 py-6 px-6 font-medium">
                           {criminal.arrest_date ? (
                             format(new Date(criminal.arrest_date), 'MMM d, yyyy')
                           ) : (
                             <span className="text-orange-600">{t('criminal.na')}</span>
                           )}
                         </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1">
+                        <TableCell className="py-6 px-6">
+                          <div className="flex items-center gap-2">
                             <CanView model="criminal">
                               <Button
                                 variant="ghost"
                                 size="icon"
                                 asChild
                                 title={t('criminal.actions.view')}
-                                className="h-8 w-8 rounded-full hover:bg-blue-100 text-blue-600 hover:text-blue-700"
+                                className="h-10 w-10 rounded-xl hover:bg-blue-100 text-blue-600 hover:text-blue-700 transition-all duration-300 hover:scale-110"
                               >
                                 <Link href={route('criminals.show', criminal.id)}>
-                                  <Eye className="h-4 w-4" />
+                                  <Eye className="h-5 w-5" />
                                 </Link>
                               </Button>
                             </CanView>
@@ -454,10 +495,10 @@ export default function CriminalIndex({
                                 size="icon"
                                 asChild
                                 title={t('criminal.actions.edit')}
-                                className="h-8 w-8 rounded-full hover:bg-green-100 text-green-600 hover:text-green-700"
+                                className="h-10 w-10 rounded-xl hover:bg-green-100 text-green-600 hover:text-green-700 transition-all duration-300 hover:scale-110"
                               >
                                 <Link href={route('criminals.edit', criminal.id)}>
-                                  <Pencil className="h-4 w-4" />
+                                  <Pencil className="h-5 w-5" />
                                 </Link>
                               </Button>
                             </CanUpdate>
@@ -467,9 +508,9 @@ export default function CriminalIndex({
                                 size="icon"
                                 onClick={() => openDeleteDialog(criminal)}
                                 title={t('criminal.actions.delete')}
-                                className="h-8 w-8 rounded-full text-red-600 hover:text-red-700 hover:bg-red-100"
+                                className="h-10 w-10 rounded-xl text-red-600 hover:text-red-700 hover:bg-red-100 transition-all duration-300 hover:scale-110"
                               >
-                                <Trash className="h-4 w-4" />
+                                <Trash className="h-5 w-5" />
                               </Button>
                             </CanDelete>
                             <Button
@@ -477,10 +518,10 @@ export default function CriminalIndex({
                               size="icon"
                               asChild
                               title={t('criminal.analytics.view_analytics')}
-                              className="h-8 w-8 rounded-full hover:bg-purple-100 text-purple-600 hover:text-purple-700"
+                              className="h-10 w-10 rounded-xl hover:bg-purple-100 text-purple-600 hover:text-purple-700 transition-all duration-300 hover:scale-110"
                             >
                               <Link href={route('analytics.show', ['Criminal', criminal.id])}>
-                                <BarChart3 className="h-4 w-4" />
+                                <BarChart3 className="h-5 w-5" />
                               </Link>
                             </Button>
                           </div>
@@ -489,67 +530,71 @@ export default function CriminalIndex({
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={6} className="h-24 text-center">
-                        <div className="flex flex-col items-center gap-3 text-orange-600">
-                          <AlertTriangle className="h-12 w-12 text-orange-400" />
-                          <p className="text-lg font-medium">{t('criminal.no_records')}</p>
+                      <TableCell colSpan={6} className="h-32 text-center">
+                        <div className="flex flex-col items-center gap-4 text-orange-600">
+                          <div className="p-4 bg-orange-100 rounded-full">
+                            <AlertTriangle className="h-16 w-16 text-orange-400" />
+                          </div>
+                          <p className="text-xl font-bold">{t('criminal.no_records')}</p>
+                          <p className="text-orange-500">No criminal records found</p>
                         </div>
                       </TableCell>
                     </TableRow>
                   )}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-        {/* Pagination */}
+        {/* Modern Pagination */}
         {criminals.meta && criminals.meta.last_page > 1 && (
-          <div className="mt-6 flex justify-center">
-            <div className="flex items-center gap-2">
+          <div className="mt-8 flex justify-center">
+            <div className="flex items-center gap-3 bg-gradient-to-l from-orange-50 to-white p-4 rounded-3xl shadow-2xl border border-orange-200">
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => criminals.meta && goToPage(1)}
                 disabled={!criminals.meta || criminals.meta.current_page === 1}
-                className="shadow-lg h-8 w-8 border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400"
+                className="h-12 w-12 shadow-lg border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
               >
-                <ChevronRight className="h-4 w-4" />
-                <ChevronRight className="h-4 w-4 -mr-2" />
+                <ChevronRight className="h-5 w-5" />
+                <ChevronRight className="h-5 w-5 -mr-1" />
               </Button>
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => criminals.meta && goToPage(criminals.meta.current_page - 1)}
                 disabled={!criminals.meta || criminals.meta.current_page === 1}
-                className="shadow-lg h-8 w-8 border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400"
+                className="h-12 w-12 shadow-lg border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
               >
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-5 w-5" />
               </Button>
-              <span className="px-4 py-2 text-sm bg-gradient-to-l from-orange-100 to-orange-200 text-orange-800 rounded-lg font-medium">
+              <div className="px-6 py-3 bg-gradient-to-l from-orange-100 to-orange-200 text-orange-800 rounded-2xl font-bold text-lg shadow-lg">
                 {t('criminal.pagination', {
                   current: String(criminals.meta?.current_page ?? '1'),
                   total: String(criminals.meta?.last_page ?? '1')
                 })}
-              </span>
+              </div>
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => criminals.meta && goToPage(criminals.meta.current_page + 1)}
                 disabled={!criminals.meta || criminals.meta.current_page === criminals.meta.last_page}
-                className="shadow-lg h-8 w-8 border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400"
+                className="h-12 w-12 shadow-lg border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-5 w-5" />
               </Button>
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => criminals.meta && goToPage(criminals.meta.last_page)}
                 disabled={!criminals.meta || criminals.meta.current_page === criminals.meta.last_page}
-                className="shadow-lg h-8 w-8 border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400"
+                className="h-12 w-12 shadow-lg border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
               >
-                <ChevronLeft className="h-4 w-4" />
-                <ChevronLeft className="h-4 w-4 -mr-2" />
+                <ChevronLeft className="h-5 w-5" />
+                <ChevronLeft className="h-5 w-5 -mr-1" />
               </Button>
             </div>
           </div>
