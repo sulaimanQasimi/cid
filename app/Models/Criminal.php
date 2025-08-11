@@ -72,6 +72,14 @@ class Criminal extends Model
         'arrest_date' => 'date',
     ];
 
+    protected $appends = [
+        'visits_count',
+        'unique_visitors_count',
+        'today_visits_count',
+        'this_week_visits_count',
+        'this_month_visits_count',
+    ];
+
     /**
      * Get the department that the criminal belongs to.
      */

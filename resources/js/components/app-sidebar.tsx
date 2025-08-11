@@ -202,6 +202,13 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
             icon: Users 
         });
     }
+    if (hasPermission(auth, PermissionPatterns.department.viewAny)) {
+        adminItems.push({ 
+            title: t('sidebar.department_management'), 
+            href: route('departments.index'), 
+            icon: Building 
+        });
+    }
     if (hasPermission(auth, 'role.view_any')) {
         adminItems.push({ 
             title: t('sidebar.role_management'), 

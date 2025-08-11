@@ -77,7 +77,6 @@ class VisitorAnalyticsController extends Controller
         if (!$model) {
             abort(404, 'Model not found');
         }
-
         // Get model-specific analytics
         $analytics = $this->trackingService->getAnalytics($model, $period);
         
@@ -92,7 +91,7 @@ class VisitorAnalyticsController extends Controller
                 'type' => $modelType,
                 'id' => $model->id ?? null,
                 'name' => $this->getModelName($model),
-                'url' => $this->getModelUrl($model)
+                'url' => null
             ],
             'analytics' => $analytics,
             'recentVisitors' => $recentVisitors,

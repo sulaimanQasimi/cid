@@ -171,14 +171,8 @@ class CriminalController extends Controller
         // Track the visit to this criminal record
         $this->trackingService->trackVisit($criminal);
 
-        // Load visitor statistics
-        $criminal->visits_count = $criminal->visits_count;
-        $criminal->unique_visitors_count = $criminal->unique_visitors_count;
-        $criminal->today_visits_count = $criminal->today_visits_count;
-        $criminal->this_week_visits_count = $criminal->this_week_visits_count;
-        $criminal->this_month_visits_count = $criminal->this_month_visits_count;
-        $criminal->bounce_rate = $criminal->bounce_rate;
-        $criminal->average_time_spent = $criminal->average_time_spent;
+        // dd($criminal);
+        // return $criminal;
 
         return Inertia::render('Criminal/Show', [
             'criminal' => $criminal,
