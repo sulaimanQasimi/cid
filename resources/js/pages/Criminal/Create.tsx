@@ -40,7 +40,7 @@ interface Props {
 export default function CriminalCreate({ departments = [], auth }: Props) {
   const { t } = useTranslation();
   // Content tabs state
-  const [activeTab, setActiveTab] = useState<string>('personal');
+  const [activeTab, setActiveTab] = useState<string>('other');
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   const { data, setData, post, processing, errors, reset } = useForm({
@@ -206,17 +206,17 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6">
-                <Tabs defaultValue="personal" value={activeTab} onValueChange={handleTabChange} className="w-full">
+                <Tabs defaultValue="other" value={activeTab} onValueChange={handleTabChange} className="w-full">
                   <TabsList className="grid w-full grid-cols-3 mb-6 rounded-xl p-1 bg-gradient-to-l from-orange-100 to-orange-200 shadow-lg">
                     <TabsTrigger
-                      value="personal"
+                      value="other"
                       className={cn(
                         "data-[state=active]:bg-gradient-to-l data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
                         "transition-all duration-300 rounded-lg"
                       )}
                     >
-                      <UserRound className="h-4 w-4" />
-                      <span>{t('criminal.create.tabs.personal')}</span>
+                      <BookText className="h-4 w-4" />
+                      <span>{t('criminal.create.tabs.other')}</span>
                     </TabsTrigger>
                     <TabsTrigger
                       value="crime"
@@ -229,23 +229,24 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                       <span>{t('criminal.create.tabs.crime')}</span>
                     </TabsTrigger>
                     <TabsTrigger
-                      value="other"
+                      value="personal"
                       className={cn(
                         "data-[state=active]:bg-gradient-to-l data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
                         "transition-all duration-300 rounded-lg"
                       )}
                     >
-                      <BookText className="h-4 w-4" />
-                      <span>{t('criminal.create.tabs.other')}</span>
+                      <UserRound className="h-4 w-4" />
+                      <span>{t('criminal.create.tabs.personal')}</span>
                     </TabsTrigger>
                   </TabsList>
 
                   {/* Personal Details Tab */}
                   <TabsContent value="personal" className="space-y-6 pt-2">
                     <div className="space-y-3">
-                      <Label htmlFor="name" className="text-base font-medium flex items-center gap-2 text-orange-700">
+                      <Label htmlFor="name" className="text-base font-medium flex items-center gap-2 text-orange-700 text-right">
+                        <span className="text-red-500">*</span>
+                        {t('criminal.create.fields.full_name')}
                         <Users className="h-4 w-4" />
-                        {t('criminal.create.fields.full_name')} <span className="text-red-500">*</span>
                       </Label>
                       <div className="relative">
                         <Input
@@ -254,10 +255,10 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                           onChange={(e) => setData('name', e.target.value)}
                           required
                           placeholder={t('criminal.create.placeholders.full_name')}
-                          className="h-12 border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white"
+                          className="h-12 border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white text-right"
                         />
                       </div>
-                      {errors.name && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2">
+                      {errors.name && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
                         <AlertTriangle className="h-4 w-4" />
                         {errors.name}
                       </p>}
@@ -265,36 +266,36 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="space-y-3">
-                        <Label htmlFor="father_name" className="font-medium flex items-center gap-2 text-orange-700">
-                          <Users className="h-4 w-4" />
+                        <Label htmlFor="father_name" className="font-medium flex items-center gap-2 text-orange-700 text-right">
                           {t('criminal.create.fields.father_name')}
+                          <Users className="h-4 w-4" />
                         </Label>
                         <Input
                           id="father_name"
                           value={data.father_name}
                           onChange={(e) => setData('father_name', e.target.value)}
                           placeholder={t('criminal.create.placeholders.father_name')}
-                          className="h-12 border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white"
+                          className="h-12 border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white text-right"
                         />
-                        {errors.father_name && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2">
+                        {errors.father_name && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
                           <AlertTriangle className="h-4 w-4" />
                           {errors.father_name}
                         </p>}
                       </div>
 
                       <div className="space-y-3">
-                        <Label htmlFor="grandfather_name" className="font-medium flex items-center gap-2 text-orange-700">
-                          <Users className="h-4 w-4" />
+                        <Label htmlFor="grandfather_name" className="font-medium flex items-center gap-2 text-orange-700 text-right">
                           {t('criminal.create.fields.grandfather_name')}
+                          <Users className="h-4 w-4" />
                         </Label>
                         <Input
                           id="grandfather_name"
                           value={data.grandfather_name}
                           onChange={(e) => setData('grandfather_name', e.target.value)}
                           placeholder={t('criminal.create.placeholders.grandfather_name')}
-                          className="h-12 border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white"
+                          className="h-12 border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white text-right"
                         />
-                        {errors.grandfather_name && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2">
+                        {errors.grandfather_name && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
                           <AlertTriangle className="h-4 w-4" />
                           {errors.grandfather_name}
                         </p>}
@@ -303,36 +304,36 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="space-y-3">
-                        <Label htmlFor="id_card_number" className="font-medium flex items-center gap-2 text-orange-700">
-                          <IdCard className="h-4 w-4" />
+                        <Label htmlFor="id_card_number" className="font-medium flex items-center gap-2 text-orange-700 text-right">
                           {t('criminal.create.fields.id_card_number')}
+                          <IdCard className="h-4 w-4" />
                         </Label>
                         <Input
                           id="id_card_number"
                           value={data.id_card_number}
                           onChange={(e) => setData('id_card_number', e.target.value)}
                           placeholder={t('criminal.create.placeholders.id_card_number')}
-                          className="h-12 border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white"
+                          className="h-12 border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white text-right"
                         />
-                        {errors.id_card_number && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2">
+                        {errors.id_card_number && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
                           <AlertTriangle className="h-4 w-4" />
                           {errors.id_card_number}
                         </p>}
                       </div>
 
                       <div className="space-y-3">
-                        <Label htmlFor="phone_number" className="font-medium flex items-center gap-2 text-orange-700">
-                          <Phone className="h-4 w-4" />
+                        <Label htmlFor="phone_number" className="font-medium flex items-center gap-2 text-orange-700 text-right">
                           {t('criminal.create.fields.phone_number')}
+                          <Phone className="h-4 w-4" />
                         </Label>
                         <Input
                           id="phone_number"
                           value={data.phone_number}
                           onChange={(e) => setData('phone_number', e.target.value)}
                           placeholder={t('criminal.create.placeholders.phone_number')}
-                          className="h-12 border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white"
+                          className="h-12 border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white text-right"
                         />
-                        {errors.phone_number && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2">
+                        {errors.phone_number && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
                           <AlertTriangle className="h-4 w-4" />
                           {errors.phone_number}
                         </p>}
@@ -340,9 +341,9 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                     </div>
 
                     <div className="space-y-3">
-                      <Label htmlFor="original_residence" className="font-medium flex items-center gap-2 text-orange-700">
-                        <Home className="h-4 w-4" />
+                      <Label htmlFor="original_residence" className="font-medium flex items-center gap-2 text-orange-700 text-right">
                         {t('criminal.create.fields.original_residence')}
+                        <Home className="h-4 w-4" />
                       </Label>
                       <Textarea
                         id="original_residence"
@@ -350,18 +351,18 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                         onChange={(e) => setData('original_residence', e.target.value)}
                         rows={2}
                         placeholder={t('criminal.create.placeholders.original_residence')}
-                        className="min-h-[80px] resize-none border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white"
+                        className="min-h-[80px] resize-none border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white text-right"
                       />
-                      {errors.original_residence && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2">
+                      {errors.original_residence && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
                         <AlertTriangle className="h-4 w-4" />
                         {errors.original_residence}
                       </p>}
                     </div>
 
                     <div className="space-y-3">
-                      <Label htmlFor="current_residence" className="font-medium flex items-center gap-2 text-orange-700">
-                        <MapPin className="h-4 w-4" />
+                      <Label htmlFor="current_residence" className="font-medium flex items-center gap-2 text-orange-700 text-right">
                         {t('criminal.create.fields.current_residence')}
+                        <MapPin className="h-4 w-4" />
                       </Label>
                       <Textarea
                         id="current_residence"
@@ -369,24 +370,24 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                         onChange={(e) => setData('current_residence', e.target.value)}
                         rows={2}
                         placeholder={t('criminal.create.placeholders.current_residence')}
-                        className="min-h-[80px] resize-none border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white"
+                        className="min-h-[80px] resize-none border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white text-right"
                       />
-                      {errors.current_residence && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2">
+                      {errors.current_residence && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
                         <AlertTriangle className="h-4 w-4" />
                         {errors.current_residence}
                       </p>}
                     </div>
 
                     <div className="space-y-3">
-                      <Label htmlFor="department_id" className="font-medium flex items-center gap-2 text-orange-700">
-                        <Building2 className="h-4 w-4" />
+                      <Label htmlFor="department_id" className="font-medium flex items-center gap-2 text-orange-700 text-right">
                         {t('criminal.create.fields.department')}
+                        <Building2 className="h-4 w-4" />
                       </Label>
                       <Select
                         value={data.department_id}
                         onValueChange={(value) => setData('department_id', value)}
                       >
-                        <SelectTrigger id="department_id" className="h-12 border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white">
+                        <SelectTrigger id="department_id" className="h-12 border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white text-right">
                           <SelectValue placeholder={t('criminal.create.placeholders.department')} />
                         </SelectTrigger>
                         <SelectContent>
@@ -402,7 +403,7 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                           )}
                         </SelectContent>
                       </Select>
-                      {errors.department_id && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2">
+                      {errors.department_id && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
                         <AlertTriangle className="h-4 w-4" />
                         {errors.department_id}
                       </p>}
@@ -413,114 +414,114 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                   <TabsContent value="crime" className="space-y-6 pt-2">
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="space-y-3">
-                        <Label htmlFor="number" className="font-medium">{t('criminal.create.fields.record_number')}</Label>
+                        <Label htmlFor="number" className="font-medium text-right">{t('criminal.create.fields.record_number')}</Label>
                         <Input
                           id="number"
                           value={data.number}
                           onChange={(e) => setData('number', e.target.value)}
                           placeholder={t('criminal.create.placeholders.record_number')}
-                          className="h-11"
+                          className="h-11 text-right"
                         />
-                        {errors.number && <p className="text-sm text-red-500 font-medium">{errors.number}</p>}
+                        {errors.number && <p className="text-sm text-red-500 font-medium text-right">{errors.number}</p>}
                       </div>
 
                       <div className="space-y-3">
-                        <Label htmlFor="crime_type" className="font-medium">{t('criminal.create.fields.crime_type')}</Label>
+                        <Label htmlFor="crime_type" className="font-medium text-right">{t('criminal.create.fields.crime_type')}</Label>
                         <Input
                           id="crime_type"
                           value={data.crime_type}
                           onChange={(e) => setData('crime_type', e.target.value)}
                           placeholder={t('criminal.create.placeholders.crime_type')}
-                          className="h-11"
+                          className="h-11 text-right"
                         />
-                        {errors.crime_type && <p className="text-sm text-red-500 font-medium">{errors.crime_type}</p>}
+                        {errors.crime_type && <p className="text-sm text-red-500 font-medium text-right">{errors.crime_type}</p>}
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="space-y-3">
-                        <Label htmlFor="arrest_date" className="font-medium">{t('criminal.create.fields.arrest_date')}</Label>
+                        <Label htmlFor="arrest_date" className="font-medium text-right">{t('criminal.create.fields.arrest_date')}</Label>
                         <div className="relative">
                           <Input
                             id="arrest_date"
                             type="date"
                             value={data.arrest_date}
                             onChange={(e) => setData('arrest_date', e.target.value)}
-                            className="h-11"
+                            className="h-11 text-right"
                           />
-                          <Calendar className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400 pointer-events-none" />
+                          <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400 pointer-events-none" />
                         </div>
-                        {errors.arrest_date && <p className="text-sm text-red-500 font-medium">{errors.arrest_date}</p>}
+                        {errors.arrest_date && <p className="text-sm text-red-500 font-medium text-right">{errors.arrest_date}</p>}
                       </div>
 
                       <div className="space-y-3">
-                        <Label htmlFor="arrest_location" className="font-medium">{t('criminal.create.fields.arrest_location')}</Label>
+                        <Label htmlFor="arrest_location" className="font-medium text-right">{t('criminal.create.fields.arrest_location')}</Label>
                         <Input
                           id="arrest_location"
                           value={data.arrest_location}
                           onChange={(e) => setData('arrest_location', e.target.value)}
                           placeholder={t('criminal.create.placeholders.arrest_location')}
-                          className="h-11"
+                          className="h-11 text-right"
                         />
-                        {errors.arrest_location && <p className="text-sm text-red-500 font-medium">{errors.arrest_location}</p>}
+                        {errors.arrest_location && <p className="text-sm text-red-500 font-medium text-right">{errors.arrest_location}</p>}
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="space-y-3">
-                        <Label htmlFor="arrested_by" className="font-medium">{t('criminal.create.fields.arrested_by')}</Label>
+                        <Label htmlFor="arrested_by" className="font-medium text-right">{t('criminal.create.fields.arrested_by')}</Label>
                         <Input
                           id="arrested_by"
                           value={data.arrested_by}
                           onChange={(e) => setData('arrested_by', e.target.value)}
                           placeholder={t('criminal.create.placeholders.arrested_by')}
-                          className="h-11"
+                          className="h-11 text-right"
                         />
-                        {errors.arrested_by && <p className="text-sm text-red-500 font-medium">{errors.arrested_by}</p>}
+                        {errors.arrested_by && <p className="text-sm text-red-500 font-medium text-right">{errors.arrested_by}</p>}
                       </div>
 
                       <div className="space-y-3">
-                        <Label htmlFor="referred_to" className="font-medium">{t('criminal.create.fields.referred_to')}</Label>
+                        <Label htmlFor="referred_to" className="font-medium text-right">{t('criminal.create.fields.referred_to')}</Label>
                         <Input
                           id="referred_to"
                           value={data.referred_to}
                           onChange={(e) => setData('referred_to', e.target.value)}
                           placeholder={t('criminal.create.placeholders.referred_to')}
-                          className="h-11"
+                          className="h-11 text-right"
                         />
-                        {errors.referred_to && <p className="text-sm text-red-500 font-medium">{errors.referred_to}</p>}
+                        {errors.referred_to && <p className="text-sm text-red-500 font-medium text-right">{errors.referred_to}</p>}
                       </div>
                     </div>
 
                     <div className="space-y-3">
-                      <Label htmlFor="final_verdict" className="font-medium">{t('criminal.create.fields.final_verdict')}</Label>
+                      <Label htmlFor="final_verdict" className="font-medium text-right">{t('criminal.create.fields.final_verdict')}</Label>
                       <Textarea
                         id="final_verdict"
                         value={data.final_verdict}
                         onChange={(e) => setData('final_verdict', e.target.value)}
                         rows={3}
                         placeholder={t('criminal.create.placeholders.final_verdict')}
-                        className="min-h-[120px] resize-none"
+                        className="min-h-[120px] resize-none text-right"
                       />
-                      {errors.final_verdict && <p className="text-sm text-red-500 font-medium">{errors.final_verdict}</p>}
+                      {errors.final_verdict && <p className="text-sm text-red-500 font-medium text-right">{errors.final_verdict}</p>}
                     </div>
                   </TabsContent>
 
                   {/* Other Information Tab */}
                   <TabsContent value="other" className="space-y-6 pt-2">
                     <div className="space-y-3">
-                      <Label htmlFor="notes" className="font-medium">{t('criminal.create.fields.notes')}</Label>
+                      <Label htmlFor="notes" className="font-medium text-right">{t('criminal.create.fields.notes')}</Label>
                       <Textarea
                         id="notes"
                         value={data.notes}
                         onChange={(e) => setData('notes', e.target.value)}
                         rows={8}
                         placeholder={t('criminal.create.placeholders.notes')}
-                        className="min-h-[240px]"
+                        className="min-h-[240px] text-right"
                       />
-                      {errors.notes && <p className="text-sm text-red-500 font-medium">{errors.notes}</p>}
+                      {errors.notes && <p className="text-sm text-red-500 font-medium text-right">{errors.notes}</p>}
 
-                      <p className="text-xs text-neutral-500 mt-2">
+                      <p className="text-xs text-neutral-500 mt-2 text-right">
                         {t('criminal.create.notes_helper')}
                       </p>
                     </div>
