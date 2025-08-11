@@ -73,3 +73,10 @@ require __DIR__.'/criminals.php';
 require __DIR__.'/reports.php';
 require __DIR__.'/incidents.php';
 require __DIR__.'/locations.php';
+
+// Visitor Analytics routes
+Route::group(['middleware' => ['auth']], function () {
+    Route::get('analytics', [App\Http\Controllers\VisitorAnalyticsController::class, 'index'])->name('analytics.index');
+    Route::get('analytics/{modelType}', [App\Http\Controllers\VisitorAnalyticsController::class, 'show'])->name('analytics.show');
+    Route::get('analytics/{modelType}/{modelId}', [App\Http\Controllers\VisitorAnalyticsController::class, 'show'])->name('analytics.show.detail');
+});

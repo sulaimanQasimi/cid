@@ -217,6 +217,13 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
         });
     }
     
+    // Analytics - accessible to all authenticated users
+    adminItems.push({ 
+        title: 'Visitor Analytics', 
+        href: route('analytics.index'), 
+        icon: BarChart3 
+    });
+    
     if (adminItems.length > 0) {
         navigation.push({
             title: t('sidebar.system_administration'),
