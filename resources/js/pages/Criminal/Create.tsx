@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -117,12 +117,10 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
               </div>
             </div>
             
-            <Button variant="outline" size="sm" asChild className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 rounded-full shadow-lg">
-              <a href={route('criminals.index')}>
-                <ArrowRight className="ml-2 h-4 w-4" />
-                {t('criminal.create.back_to_list')}
-              </a>
-            </Button>
+            <Link href={route('criminals.index')} className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 rounded-full shadow-lg">
+              <ArrowRight className="ml-2 h-4 w-4" />
+              {t('criminal.create.back_to_list')}
+            </Link>
           </div>
         </div>
 
@@ -243,7 +241,7 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                   {/* Personal Details Tab */}
                   <TabsContent value="personal" className="space-y-6 pt-2">
                     <div className="space-y-3">
-                      <Label htmlFor="name" className="text-base font-medium flex items-center gap-2 text-orange-700 text-right">
+                      <Label htmlFor="name" className="text-base font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
                         <span className="text-red-500">*</span>
                         {t('criminal.create.fields.full_name')}
                         <Users className="h-4 w-4" />
@@ -266,7 +264,7 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="space-y-3">
-                        <Label htmlFor="father_name" className="font-medium flex items-center gap-2 text-orange-700 text-right">
+                        <Label htmlFor="father_name" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
                           {t('criminal.create.fields.father_name')}
                           <Users className="h-4 w-4" />
                         </Label>
@@ -284,7 +282,7 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                       </div>
 
                       <div className="space-y-3">
-                        <Label htmlFor="grandfather_name" className="font-medium flex items-center gap-2 text-orange-700 text-right">
+                        <Label htmlFor="grandfather_name" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
                           {t('criminal.create.fields.grandfather_name')}
                           <Users className="h-4 w-4" />
                         </Label>
@@ -304,7 +302,7 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="space-y-3">
-                        <Label htmlFor="id_card_number" className="font-medium flex items-center gap-2 text-orange-700 text-right">
+                        <Label htmlFor="id_card_number" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
                           {t('criminal.create.fields.id_card_number')}
                           <IdCard className="h-4 w-4" />
                         </Label>
@@ -322,7 +320,7 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                       </div>
 
                       <div className="space-y-3">
-                        <Label htmlFor="phone_number" className="font-medium flex items-center gap-2 text-orange-700 text-right">
+                        <Label htmlFor="phone_number" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
                           {t('criminal.create.fields.phone_number')}
                           <Phone className="h-4 w-4" />
                         </Label>
@@ -341,7 +339,7 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                     </div>
 
                     <div className="space-y-3">
-                      <Label htmlFor="original_residence" className="font-medium flex items-center gap-2 text-orange-700 text-right">
+                      <Label htmlFor="original_residence" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
                         {t('criminal.create.fields.original_residence')}
                         <Home className="h-4 w-4" />
                       </Label>
@@ -360,7 +358,7 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                     </div>
 
                     <div className="space-y-3">
-                      <Label htmlFor="current_residence" className="font-medium flex items-center gap-2 text-orange-700 text-right">
+                      <Label htmlFor="current_residence" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
                         {t('criminal.create.fields.current_residence')}
                         <MapPin className="h-4 w-4" />
                       </Label>
@@ -379,7 +377,7 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                     </div>
 
                     <div className="space-y-3">
-                      <Label htmlFor="department_id" className="font-medium flex items-center gap-2 text-orange-700 text-right">
+                      <Label htmlFor="department_id" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
                         {t('criminal.create.fields.department')}
                         <Building2 className="h-4 w-4" />
                       </Label>
@@ -414,7 +412,10 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                   <TabsContent value="crime" className="space-y-6 pt-2">
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="space-y-3">
-                        <Label htmlFor="number" className="font-medium text-right">{t('criminal.create.fields.record_number')}</Label>
+                        <Label htmlFor="number" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
+                          {t('criminal.create.fields.record_number')}
+                          <FileText className="h-4 w-4" />
+                        </Label>
                         <Input
                           id="number"
                           value={data.number}
@@ -426,7 +427,10 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                       </div>
 
                       <div className="space-y-3">
-                        <Label htmlFor="crime_type" className="font-medium text-right">{t('criminal.create.fields.crime_type')}</Label>
+                        <Label htmlFor="crime_type" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
+                          {t('criminal.create.fields.crime_type')}
+                          <Gavel className="h-4 w-4" />
+                        </Label>
                         <Input
                           id="crime_type"
                           value={data.crime_type}
@@ -440,7 +444,10 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="space-y-3">
-                        <Label htmlFor="arrest_date" className="font-medium text-right">{t('criminal.create.fields.arrest_date')}</Label>
+                        <Label htmlFor="arrest_date" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
+                          {t('criminal.create.fields.arrest_date')}
+                          <Calendar className="h-4 w-4" />
+                        </Label>
                         <div className="relative">
                           <Input
                             id="arrest_date"
@@ -455,7 +462,10 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                       </div>
 
                       <div className="space-y-3">
-                        <Label htmlFor="arrest_location" className="font-medium text-right">{t('criminal.create.fields.arrest_location')}</Label>
+                        <Label htmlFor="arrest_location" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
+                          {t('criminal.create.fields.arrest_location')}
+                          <MapPin className="h-4 w-4" />
+                        </Label>
                         <Input
                           id="arrest_location"
                           value={data.arrest_location}
@@ -469,7 +479,10 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="space-y-3">
-                        <Label htmlFor="arrested_by" className="font-medium text-right">{t('criminal.create.fields.arrested_by')}</Label>
+                        <Label htmlFor="arrested_by" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
+                          {t('criminal.create.fields.arrested_by')}
+                          <Shield className="h-4 w-4" />
+                        </Label>
                         <Input
                           id="arrested_by"
                           value={data.arrested_by}
@@ -481,7 +494,10 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                       </div>
 
                       <div className="space-y-3">
-                        <Label htmlFor="referred_to" className="font-medium text-right">{t('criminal.create.fields.referred_to')}</Label>
+                        <Label htmlFor="referred_to" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
+                          {t('criminal.create.fields.referred_to')}
+                          <Building2 className="h-4 w-4" />
+                        </Label>
                         <Input
                           id="referred_to"
                           value={data.referred_to}
@@ -494,7 +510,10 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                     </div>
 
                     <div className="space-y-3">
-                      <Label htmlFor="final_verdict" className="font-medium text-right">{t('criminal.create.fields.final_verdict')}</Label>
+                      <Label htmlFor="final_verdict" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
+                        {t('criminal.create.fields.final_verdict')}
+                        <FileCheck className="h-4 w-4" />
+                      </Label>
                       <Textarea
                         id="final_verdict"
                         value={data.final_verdict}
@@ -510,7 +529,10 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                   {/* Other Information Tab */}
                   <TabsContent value="other" className="space-y-6 pt-2">
                     <div className="space-y-3">
-                      <Label htmlFor="notes" className="font-medium text-right">{t('criminal.create.fields.notes')}</Label>
+                      <Label htmlFor="notes" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
+                        {t('criminal.create.fields.notes')}
+                        <BookText className="h-4 w-4" />
+                      </Label>
                       <Textarea
                         id="notes"
                         value={data.notes}
