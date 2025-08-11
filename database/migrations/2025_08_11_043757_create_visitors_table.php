@@ -56,7 +56,7 @@ return new class extends Migration
             $table->index(['visited_at']);
             $table->index(['user_id', 'visited_at']);
             $table->index(['ip_address', 'visited_at']);
-            $table->index(['visitable_type', 'visitable_id']);
+            // Note: morphs('visitable') already creates an index on visitable_type and visitable_id
         });
     }
 
