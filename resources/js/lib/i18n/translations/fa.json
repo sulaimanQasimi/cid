@@ -577,5 +577,32 @@
     "departments.form.code": "کوډ",
     "departments.edit_title": "د څانګې سمون: {{name}}",
     "departments.form.code_placeholder": "د څانګې کوډ ولیکئ",
-    "departments.form.name": "نوم"
+    "departments.form.name": "نوم",
+    "sidebar.intelligence_department": "د استخباراتو څانګه",
+    "sidebar.intelligence_dashboard": "استخباراتي ډشبورډ",
+
+    "sidebar.intelligence_operations": "ګزارشات تفصيلي و تحلیلی",
+
+    "sidebar.criminal_database": "د مجرمانو ډیټابیس",
+
+    "sidebar.incident_management": "صفحه اطلاعات",
+
+    "sidebar.analysis_reports": "شننه او راپورونه",
+
+    "sidebar.geographic_intelligence": "جغرافیایي استخبارات",
+
+    "sidebar.system_administration": "د سیستم اداره",
+
+    "sidebar.multilingual_support": "څو ژبې ملاتړ",
+
+    "sidebar.data_configuration": "د ډیټا تنظیم",
+    "sidebar.stat_categories": "احصایوي کټګورۍ",
+    "sidebar.stat_items": "احصایوي توکي",
+    "sidebar.system_status_secure": "د سیستم حالت: خوندي",
+    "criminal.create.form.title": "د مجرم جوړول",
+    "criminal.create.description": "د مجرم جزییات داخل کړئ",
+    "criminal.create.photo.title": "د مجرم عکس جزییات",
+    "criminal.create.fields.arrest_location": "د مجرم نیول کېدو ځای",
+    "criminal.create.fields.arrest_date": "د مجرم نیول کېدو نېټه",
+    "criminal.create.fields.crime_type": "د مجرم جرم ډول"
 }
