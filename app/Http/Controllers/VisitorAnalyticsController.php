@@ -311,7 +311,7 @@ class VisitorAnalyticsController extends Controller
     {
         return $visitors->whereNotNull('device_type')
             ->groupBy('device_type')
-            ->map(function ($group) {
+            ->map(function ($group) use ($visitors) {
                 return [
                     'device_type' => $group->first()->device_type,
                     'count' => $group->count(),
