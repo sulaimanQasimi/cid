@@ -21,7 +21,7 @@ import {
     Calendar,
     ArrowUpRight,
     ArrowDownRight,
-    ArrowLeft,
+    ArrowRight,
     User,
     Globe2,
     MonitorSmartphone,
@@ -157,8 +157,8 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
                 {/* Header */}
                 <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 p-8 text-white shadow-2xl">
                     <div className="absolute inset-0 bg-black/10"></div>
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32"></div>
-                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24"></div>
+                    <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 -translate-x-32"></div>
+                    <div className="absolute bottom-0 right-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 translate-x-24"></div>
                     
                     <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
                         <div className="flex items-center gap-6">
@@ -178,7 +178,7 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
                         <div className="flex items-center gap-4">
                             <Select value={period} onValueChange={handlePeriodChange}>
                                 <SelectTrigger className="w-56 bg-white/20 backdrop-blur-sm border-white/30 text-white">
-                                    <Calendar className="h-5 w-5 mr-2" />
+                                    <Calendar className="h-5 w-5 ml-2" />
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -196,7 +196,7 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
                                 onClick={() => router.get(route('analytics.index'))}
                                 className="hidden lg:flex bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30"
                             >
-                                <ArrowLeft className="h-4 w-4 mr-2" />
+                                <ArrowRight className="h-4 w-4 ml-2" />
                                 {t('analytics.back_to_analytics')}
                             </Button>
                         </div>
@@ -207,7 +207,7 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <Card className="relative overflow-hidden group hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-2xl">
                         <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-600 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
-                        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-full -translate-y-20 translate-x-20 blur-xl"></div>
+                        <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-full -translate-y-20 -translate-x-20 blur-xl"></div>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
                             <CardTitle className="text-sm font-medium text-blue-700">{t('analytics.overview.total_visits')}</CardTitle>
                             <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg">
@@ -226,7 +226,7 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
 
                     <Card className="relative overflow-hidden group hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-2xl">
                         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 to-emerald-600 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
-                        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-emerald-400/20 to-emerald-600/20 rounded-full -translate-y-20 translate-x-20 blur-xl"></div>
+                        <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-emerald-400/20 to-emerald-600/20 rounded-full -translate-y-20 -translate-x-20 blur-xl"></div>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
                             <CardTitle className="text-sm font-medium text-emerald-700">{t('analytics.overview.authenticated_users')}</CardTitle>
                             <div className="p-3 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl shadow-lg">
@@ -247,7 +247,7 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
 
                     <Card className="relative overflow-hidden group hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-2xl">
                         <div className="absolute inset-0 bg-gradient-to-br from-amber-500 to-amber-600 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
-                        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-amber-400/20 to-amber-600/20 rounded-full -translate-y-20 translate-x-20 blur-xl"></div>
+                        <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-amber-400/20 to-amber-600/20 rounded-full -translate-y-20 -translate-x-20 blur-xl"></div>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
                             <CardTitle className="text-sm font-medium text-amber-700">{t('analytics.overview.bounce_rate')}</CardTitle>
                             <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg">
@@ -266,7 +266,7 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
 
                     <Card className="relative overflow-hidden group hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-2xl">
                         <div className="absolute inset-0 bg-gradient-to-br from-violet-500 to-violet-600 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
-                        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-violet-400/20 to-violet-600/20 rounded-full -translate-y-20 translate-x-20 blur-xl"></div>
+                        <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-violet-400/20 to-violet-600/20 rounded-full -translate-y-20 -translate-x-20 blur-xl"></div>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
                             <CardTitle className="text-sm font-medium text-violet-700">{t('analytics.overview.avg_time_spent')}</CardTitle>
                             <div className="p-3 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl shadow-lg">
@@ -287,24 +287,24 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
                 {/* Detailed Analytics */}
                 <Tabs defaultValue="timeline" className="space-y-6">
                     <div className="flex flex-col sm:flex-row gap-4">
-                        <TabsList className="grid w-full sm:w-auto grid-cols-2 sm:grid-cols-5 bg-gradient-to-r from-gray-50 to-gray-100 p-1 rounded-xl shadow-lg">
-                            <TabsTrigger value="timeline" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300">
+                        <TabsList className="grid w-full sm:w-auto grid-cols-2 sm:grid-cols-5 bg-gradient-to-l from-gray-50 to-gray-100 p-1 rounded-xl shadow-lg">
+                            <TabsTrigger value="timeline" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-l data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300">
                                 <History className="h-4 w-4" />
                                 <span className="hidden sm:inline">{t('analytics.tabs.timeline')}</span>
                             </TabsTrigger>
-                            <TabsTrigger value="devices" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-emerald-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300">
+                            <TabsTrigger value="devices" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-l data-[state=active]:from-emerald-500 data-[state=active]:to-emerald-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300">
                                 <MonitorSmartphone className="h-4 w-4" />
                                 <span className="hidden sm:inline">{t('analytics.tabs.devices')}</span>
                             </TabsTrigger>
-                            <TabsTrigger value="browsers" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-amber-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300">
+                            <TabsTrigger value="browsers" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-l data-[state=active]:from-amber-500 data-[state=active]:to-amber-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300">
                                 <Globe2 className="h-4 w-4" />
                                 <span className="hidden sm:inline">{t('analytics.tabs.browsers')}</span>
                             </TabsTrigger>
-                            <TabsTrigger value="geography" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500 data-[state=active]:to-violet-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300">
+                            <TabsTrigger value="geography" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-l data-[state=active]:from-violet-500 data-[state=active]:to-violet-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300">
                                 <Map className="h-4 w-4" />
                                 <span className="hidden sm:inline">{t('analytics.tabs.geography')}</span>
                             </TabsTrigger>
-                            <TabsTrigger value="recent" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-500 data-[state=active]:to-rose-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300">
+                            <TabsTrigger value="recent" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-l data-[state=active]:from-rose-500 data-[state=active]:to-rose-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300">
                                 <Users className="h-4 w-4" />
                                 <span className="hidden sm:inline">{t('analytics.tabs.recent')}</span>
                             </TabsTrigger>
@@ -313,7 +313,7 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
 
                     <TabsContent value="timeline" className="space-y-4">
                         <Card className="shadow-xl border-0 bg-gradient-to-br from-white to-blue-50/30">
-                            <CardHeader className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-t-lg">
+                            <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 text-white rounded-t-lg">
                                 <CardTitle className="flex items-center gap-3">
                                     <div className="p-2 bg-white/20 rounded-lg">
                                         <History className="h-6 w-6" />
@@ -335,11 +335,11 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
                                         </div>
                                     ) : (
                                         timeline.map((visit, index) => (
-                                            <div key={visit.id} className="border border-blue-200 rounded-xl p-6 hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-white to-blue-50/50 hover:from-blue-50/50 hover:to-blue-100/50">
+                                            <div key={visit.id} className="border border-blue-200 rounded-xl p-6 hover:shadow-xl transition-all duration-300 bg-gradient-to-l from-white to-blue-50/50 hover:from-blue-50/50 hover:to-blue-100/50">
                                                 <div className="flex items-center justify-between mb-4">
                                                     <div className="flex items-center gap-4">
                                                         <div className="flex items-center gap-3">
-                                                            <div className={`w-3 h-3 rounded-full ${visit.is_bounce ? 'bg-gradient-to-r from-red-400 to-red-600' : 'bg-gradient-to-r from-green-400 to-green-600'} shadow-lg`}></div>
+                                                            <div className={`w-3 h-3 rounded-full ${visit.is_bounce ? 'bg-gradient-to-l from-red-400 to-red-600' : 'bg-gradient-to-l from-green-400 to-green-600'} shadow-lg`}></div>
                                                             <Badge variant={visit.is_bounce ? "destructive" : "secondary"} className="text-xs font-semibold px-3 py-1">
                                                                 {visit.is_bounce ? t('analytics.timeline.bounce') : t('analytics.timeline.engaged')}
                                                             </Badge>
@@ -351,31 +351,31 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
                                                     <div className="flex items-center gap-2">
                                                         <Badge className={`${getDeviceColor(visit.device_type)} text-xs font-semibold px-3 py-1`}>
                                                             {getDeviceIcon(visit.device_type)}
-                                                            <span className="ml-1 capitalize">{visit.device_type}</span>
+                                                            <span className="mr-1 capitalize">{visit.device_type}</span>
                                                         </Badge>
                                                     </div>
                                                 </div>
                                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                                                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
+                                                    <div className="bg-gradient-to-bl from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
                                                         <span className="text-blue-700 text-xs font-semibold uppercase tracking-wide">{t('analytics.timeline.ip_address')}</span>
                                                         <div className="font-bold text-sm text-blue-900 mt-1">{visit.ip_address}</div>
                                                     </div>
-                                                    <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-4 border border-emerald-200">
+                                                    <div className="bg-gradient-to-bl from-emerald-50 to-emerald-100 rounded-xl p-4 border border-emerald-200">
                                                         <span className="text-emerald-700 text-xs font-semibold uppercase tracking-wide">{t('analytics.timeline.browser')}</span>
                                                         <div className="font-bold text-sm text-emerald-900 mt-1">{visit.browser}</div>
                                                     </div>
-                                                    <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-4 border border-amber-200">
+                                                    <div className="bg-gradient-to-bl from-amber-50 to-amber-100 rounded-xl p-4 border border-amber-200">
                                                         <span className="text-amber-700 text-xs font-semibold uppercase tracking-wide">{t('analytics.timeline.location')}</span>
                                                         <div className="font-bold text-sm text-amber-900 mt-1">{visit.location}</div>
                                                     </div>
-                                                    <div className="bg-gradient-to-br from-violet-50 to-violet-100 rounded-xl p-4 border border-violet-200">
+                                                    <div className="bg-gradient-to-bl from-violet-50 to-violet-100 rounded-xl p-4 border border-violet-200">
                                                         <span className="text-violet-700 text-xs font-semibold uppercase tracking-wide">{t('analytics.timeline.duration')}</span>
                                                         <div className="font-bold text-sm text-violet-900 mt-1">{visit.duration}</div>
                                                     </div>
                                                 </div>
                                                 {visit.user && (
                                                     <div className="mt-4 pt-4 border-t border-blue-200">
-                                                        <div className="flex items-center gap-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-4 text-white">
+                                                        <div className="flex items-center gap-3 bg-gradient-to-l from-blue-500 to-blue-600 rounded-xl p-4 text-white">
                                                             <div className="p-2 bg-white/20 rounded-lg">
                                                                 <User className="h-5 w-5" />
                                                             </div>
@@ -396,8 +396,8 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
                     </TabsContent>
 
                     <TabsContent value="devices" className="space-y-4">
-                        <Card className="shadow-xl border-0 bg-gradient-to-br from-white to-emerald-50/30">
-                            <CardHeader className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-t-lg">
+                        <Card className="shadow-xl border-0 bg-gradient-to-bl from-white to-emerald-50/30">
+                            <CardHeader className="bg-gradient-to-l from-emerald-500 to-emerald-600 text-white rounded-t-lg">
                                 <CardTitle className="flex items-center gap-3">
                                     <div className="p-2 bg-white/20 rounded-lg">
                                         <MonitorSmartphone className="h-6 w-6" />
@@ -412,16 +412,16 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
                                 <div className="space-y-4">
                                     {Object.entries(analytics.device_distribution).length === 0 ? (
                                         <div className="text-center py-12">
-                                            <div className="p-4 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                                            <div className="p-4 bg-gradient-to-bl from-emerald-100 to-emerald-200 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
                                                 <MonitorSmartphone className="h-10 w-10 text-emerald-600" />
                                             </div>
                                             <p className="text-emerald-600 font-medium">{t('analytics.devices.no_data')}</p>
                                         </div>
                                     ) : (
                                         Object.entries(analytics.device_distribution).map(([deviceType, count]) => (
-                                            <div key={deviceType} className="flex items-center justify-between p-6 border border-emerald-200 rounded-xl hover:shadow-lg transition-all duration-300 bg-gradient-to-r from-white to-emerald-50/50 hover:from-emerald-50/50 hover:to-emerald-100/50">
+                                            <div key={deviceType} className="flex items-center justify-between p-6 border border-emerald-200 rounded-xl hover:shadow-lg transition-all duration-300 bg-gradient-to-l from-white to-emerald-50/50 hover:from-emerald-50/50 hover:to-emerald-100/50">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="p-3 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl shadow-lg">
+                                                    <div className="p-3 bg-gradient-to-bl from-emerald-500 to-emerald-600 rounded-xl shadow-lg">
                                                         {getDeviceIcon(deviceType)}
                                                     </div>
                                                     <div>
@@ -432,7 +432,7 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
                                                 <div className="flex items-center gap-6">
                                                     <div className="w-40 bg-emerald-200 rounded-full h-4 shadow-inner">
                                                         <div 
-                                                            className="bg-gradient-to-r from-emerald-500 to-emerald-600 h-4 rounded-full transition-all duration-500 shadow-lg" 
+                                                            className="bg-gradient-to-l from-emerald-500 to-emerald-600 h-4 rounded-full transition-all duration-500 shadow-lg" 
                                                             style={{ 
                                                                 width: `${analytics.total_visits > 0 
                                                                     ? (count / analytics.total_visits) * 100 
@@ -440,7 +440,7 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
                                                             }}
                                                         />
                                                     </div>
-                                                    <span className="text-lg font-bold w-20 text-right text-emerald-600">
+                                                    <span className="text-lg font-bold w-20 text-left text-emerald-600">
                                                         {analytics.total_visits > 0 
                                                             ? Math.round((count / analytics.total_visits) * 100)
                                                             : 0}{t('analytics.common.percentage')}
@@ -455,8 +455,8 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
                     </TabsContent>
 
                     <TabsContent value="browsers" className="space-y-4">
-                        <Card className="shadow-xl border-0 bg-gradient-to-br from-white to-amber-50/30">
-                            <CardHeader className="bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-t-lg">
+                        <Card className="shadow-xl border-0 bg-gradient-to-bl from-white to-amber-50/30">
+                            <CardHeader className="bg-gradient-to-l from-amber-500 to-amber-600 text-white rounded-t-lg">
                                 <CardTitle className="flex items-center gap-3">
                                     <div className="p-2 bg-white/20 rounded-lg">
                                         <Globe2 className="h-6 w-6" />
@@ -471,7 +471,7 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
                                 <div className="space-y-4">
                                     {Object.entries(analytics.browser_distribution).length === 0 ? (
                                         <div className="text-center py-12">
-                                            <div className="p-4 bg-gradient-to-br from-amber-100 to-amber-200 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                                            <div className="p-4 bg-gradient-to-bl from-amber-100 to-amber-200 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
                                                 <Globe2 className="h-10 w-10 text-amber-600" />
                                             </div>
                                             <p className="text-amber-600 font-medium">{t('analytics.browsers.no_data')}</p>
@@ -481,9 +481,9 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
                                             .sort(([,a], [,b]) => b - a)
                                             .slice(0, 10)
                                             .map(([browser, count], index) => (
-                                            <div key={browser} className="flex items-center justify-between p-6 border border-amber-200 rounded-xl hover:shadow-lg transition-all duration-300 bg-gradient-to-r from-white to-amber-50/50 hover:from-amber-50/50 hover:to-amber-100/50">
+                                            <div key={browser} className="flex items-center justify-between p-6 border border-amber-200 rounded-xl hover:shadow-lg transition-all duration-300 bg-gradient-to-l from-white to-amber-50/50 hover:from-amber-50/50 hover:to-amber-100/50">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg">
+                                                    <div className="p-3 bg-gradient-to-bl from-amber-500 to-amber-600 rounded-xl shadow-lg">
                                                         <Globe2 className="h-5 w-5 text-white" />
                                                     </div>
                                                     <div>
@@ -494,7 +494,7 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
                                                 <div className="flex items-center gap-6">
                                                     <div className="w-40 bg-amber-200 rounded-full h-4 shadow-inner">
                                                         <div 
-                                                            className="bg-gradient-to-r from-amber-500 to-amber-600 h-4 rounded-full transition-all duration-500 shadow-lg" 
+                                                            className="bg-gradient-to-l from-amber-500 to-amber-600 h-4 rounded-full transition-all duration-500 shadow-lg" 
                                                             style={{ 
                                                                 width: `${analytics.total_visits > 0 
                                                                     ? (count / analytics.total_visits) * 100 
@@ -502,7 +502,7 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
                                                             }}
                                                         />
                                                     </div>
-                                                    <span className="text-lg font-bold w-20 text-right text-amber-600">
+                                                    <span className="text-lg font-bold w-20 text-left text-amber-600">
                                                         {analytics.total_visits > 0 
                                                             ? Math.round((count / analytics.total_visits) * 100)
                                                             : 0}{t('analytics.common.percentage')}
@@ -517,8 +517,8 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
                     </TabsContent>
 
                     <TabsContent value="geography" className="space-y-4">
-                        <Card className="shadow-xl border-0 bg-gradient-to-br from-white to-violet-50/30">
-                            <CardHeader className="bg-gradient-to-r from-violet-500 to-violet-600 text-white rounded-t-lg">
+                        <Card className="shadow-xl border-0 bg-gradient-to-bl from-white to-violet-50/30">
+                            <CardHeader className="bg-gradient-to-l from-violet-500 to-violet-600 text-white rounded-t-lg">
                                 <CardTitle className="flex items-center gap-3">
                                     <div className="p-2 bg-white/20 rounded-lg">
                                         <Map className="h-6 w-6" />
@@ -533,7 +533,7 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
                                 <div className="space-y-4">
                                     {Object.entries(analytics.geographic_distribution).length === 0 ? (
                                         <div className="text-center py-12">
-                                            <div className="p-4 bg-gradient-to-br from-violet-100 to-violet-200 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                                            <div className="p-4 bg-gradient-to-bl from-violet-100 to-violet-200 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
                                                 <Map className="h-10 w-10 text-violet-600" />
                                             </div>
                                             <p className="text-violet-600 font-medium">{t('analytics.geography.no_data')}</p>
@@ -543,9 +543,9 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
                                             .sort(([,a], [,b]) => b - a)
                                             .slice(0, 10)
                                             .map(([country, count], index) => (
-                                            <div key={country} className="flex items-center justify-between p-6 border border-violet-200 rounded-xl hover:shadow-lg transition-all duration-300 bg-gradient-to-r from-white to-violet-50/50 hover:from-violet-50/50 hover:to-violet-100/50">
+                                            <div key={country} className="flex items-center justify-between p-6 border border-violet-200 rounded-xl hover:shadow-lg transition-all duration-300 bg-gradient-to-l from-white to-violet-50/50 hover:from-violet-50/50 hover:to-violet-100/50">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="p-3 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl shadow-lg">
+                                                    <div className="p-3 bg-gradient-to-bl from-violet-500 to-violet-600 rounded-xl shadow-lg">
                                                         <MapPin className="h-5 w-5 text-white" />
                                                     </div>
                                                     <div>
@@ -556,7 +556,7 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
                                                 <div className="flex items-center gap-6">
                                                     <div className="w-40 bg-violet-200 rounded-full h-4 shadow-inner">
                                                         <div 
-                                                            className="bg-gradient-to-r from-violet-500 to-violet-600 h-4 rounded-full transition-all duration-500 shadow-lg" 
+                                                            className="bg-gradient-to-l from-violet-500 to-violet-600 h-4 rounded-full transition-all duration-500 shadow-lg" 
                                                             style={{ 
                                                                 width: `${analytics.total_visits > 0 
                                                                     ? (count / analytics.total_visits) * 100 
@@ -564,7 +564,7 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
                                                             }}
                                                         />
                                                     </div>
-                                                    <span className="text-lg font-bold w-20 text-right text-violet-600">
+                                                    <span className="text-lg font-bold w-20 text-left text-violet-600">
                                                         {analytics.total_visits > 0 
                                                             ? Math.round((count / analytics.total_visits) * 100)
                                                             : 0}{t('analytics.common.percentage')}
@@ -579,8 +579,8 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
                     </TabsContent>
 
                     <TabsContent value="recent" className="space-y-4">
-                        <Card className="shadow-xl border-0 bg-gradient-to-br from-white to-rose-50/30">
-                            <CardHeader className="bg-gradient-to-r from-rose-500 to-rose-600 text-white rounded-t-lg">
+                        <Card className="shadow-xl border-0 bg-gradient-to-bl from-white to-rose-50/30">
+                            <CardHeader className="bg-gradient-to-l from-rose-500 to-rose-600 text-white rounded-t-lg">
                                 <CardTitle className="flex items-center gap-3">
                                     <div className="p-2 bg-white/20 rounded-lg">
                                         <Users className="h-6 w-6" />
@@ -595,18 +595,18 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
                                 <div className="space-y-4">
                                     {recentVisitors.length === 0 ? (
                                         <div className="text-center py-12">
-                                            <div className="p-4 bg-gradient-to-br from-rose-100 to-rose-200 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                                            <div className="p-4 bg-gradient-to-bl from-rose-100 to-rose-200 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
                                                 <Users className="h-10 w-10 text-rose-600" />
                                             </div>
                                             <p className="text-rose-600 font-medium">{t('analytics.recent.no_visitors')}</p>
                                         </div>
                                     ) : (
                                         recentVisitors.map((visitor) => (
-                                            <div key={visitor.id} className="border border-rose-200 rounded-xl p-6 hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-white to-rose-50/50 hover:from-rose-50/50 hover:to-rose-100/50">
+                                            <div key={visitor.id} className="border border-rose-200 rounded-xl p-6 hover:shadow-xl transition-all duration-300 bg-gradient-to-l from-white to-rose-50/50 hover:from-rose-50/50 hover:to-rose-100/50">
                                                 <div className="flex items-center justify-between mb-4">
                                                     <div className="flex items-center gap-4">
                                                         <div className="flex items-center gap-3">
-                                                            <div className={`w-3 h-3 rounded-full ${visitor.is_bounce ? 'bg-gradient-to-r from-red-400 to-red-600' : 'bg-gradient-to-r from-green-400 to-green-600'} shadow-lg`}></div>
+                                                            <div className={`w-3 h-3 rounded-full ${visitor.is_bounce ? 'bg-gradient-to-l from-red-400 to-red-600' : 'bg-gradient-to-l from-green-400 to-green-600'} shadow-lg`}></div>
                                                             <Badge variant={visitor.is_bounce ? "destructive" : "secondary"} className="text-xs font-semibold px-3 py-1">
                                                                 {visitor.is_bounce ? t('analytics.timeline.bounce') : t('analytics.timeline.engaged')}
                                                             </Badge>
@@ -618,31 +618,31 @@ export default function VisitorAnalyticsShow({ model, analytics, recentVisitors,
                                                     <div className="flex items-center gap-2">
                                                         <Badge className={`${getDeviceColor(visitor.device_type)} text-xs font-semibold px-3 py-1`}>
                                                             {getDeviceIcon(visitor.device_type)}
-                                                            <span className="ml-1 capitalize">{visitor.device_type}</span>
+                                                            <span className="mr-1 capitalize">{visitor.device_type}</span>
                                                         </Badge>
                                                     </div>
                                                 </div>
                                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                                                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
+                                                    <div className="bg-gradient-to-bl from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
                                                         <span className="text-blue-700 text-xs font-semibold uppercase tracking-wide">{t('analytics.timeline.ip_address')}</span>
                                                         <div className="font-bold text-sm text-blue-900 mt-1">{visitor.ip_address}</div>
                                                     </div>
-                                                    <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-4 border border-emerald-200">
+                                                    <div className="bg-gradient-to-bl from-emerald-50 to-emerald-100 rounded-xl p-4 border border-emerald-200">
                                                         <span className="text-emerald-700 text-xs font-semibold uppercase tracking-wide">{t('analytics.timeline.browser')}</span>
                                                         <div className="font-bold text-sm text-emerald-900 mt-1">{visitor.browser}</div>
                                                     </div>
-                                                    <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-4 border border-amber-200">
+                                                    <div className="bg-gradient-to-bl from-amber-50 to-amber-100 rounded-xl p-4 border border-amber-200">
                                                         <span className="text-amber-700 text-xs font-semibold uppercase tracking-wide">{t('analytics.timeline.location')}</span>
                                                         <div className="font-bold text-sm text-amber-900 mt-1">{visitor.location_formatted}</div>
                                                     </div>
-                                                    <div className="bg-gradient-to-br from-violet-50 to-violet-100 rounded-xl p-4 border border-violet-200">
+                                                    <div className="bg-gradient-to-bl from-violet-50 to-violet-100 rounded-xl p-4 border border-violet-200">
                                                         <span className="text-violet-700 text-xs font-semibold uppercase tracking-wide">{t('analytics.timeline.duration')}</span>
                                                         <div className="font-bold text-sm text-violet-900 mt-1">{visitor.duration_formatted}</div>
                                                     </div>
                                                 </div>
                                                 {visitor.user && (
                                                     <div className="mt-4 pt-4 border-t border-rose-200">
-                                                        <div className="flex items-center gap-3 bg-gradient-to-r from-rose-500 to-rose-600 rounded-xl p-4 text-white">
+                                                        <div className="flex items-center gap-3 bg-gradient-to-l from-rose-500 to-rose-600 rounded-xl p-4 text-white">
                                                             <div className="p-2 bg-white/20 rounded-lg">
                                                                 <User className="h-5 w-5" />
                                                             </div>
