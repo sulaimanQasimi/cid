@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use App\Models\Traits\HasVisitors;
 
 class Criminal extends Model
 {
-    use HasFactory;
+    use HasFactory, HasVisitors;
 
     /**
      * The attributes that are mass assignable.

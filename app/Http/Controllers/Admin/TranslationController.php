@@ -344,6 +344,7 @@ class TranslationController extends Controller
      */
     public function import(Request $request)
     {
+        Log::info('Importing translations');
         $request->validate([
             'language_id' => 'required|exists:languages,id',
             'file' => 'required|file|mimes:json',

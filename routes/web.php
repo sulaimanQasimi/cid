@@ -18,7 +18,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('languages', App\Http\Controllers\Admin\LanguageController::class);
 
     Route::resource('translations', App\Http\Controllers\Admin\TranslationController::class);
-    Route::post('translations/import', [App\Http\Controllers\Admin\TranslationController::class, 'import'])->name('translations.import');
+    Route::post('translations/import',[App\Http\Controllers\Admin\TranslationController::class, 'import'])->name('translations.import');
     Route::get('translations/export', [App\Http\Controllers\Admin\TranslationController::class, 'export'])->name('translations.export');
 
     // Add route for exporting translations to JSON files

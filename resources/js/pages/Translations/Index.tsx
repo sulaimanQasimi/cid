@@ -131,13 +131,14 @@ export default function TranslationsIndex({
       for (const [group, payload] of groupEntries) {
         // Prefer web route: POST /translations (Admin Controller) with language_id
         const requests = Object.entries(payload).map(([key, value]) =>
-          axios.post('/translations', {
+          axios.post('translations/import', {
             language_id: languageId,
             key,
             value,
             group,
           })
         );
+        console.log(requests);
         await Promise.all(requests);
       }
 
