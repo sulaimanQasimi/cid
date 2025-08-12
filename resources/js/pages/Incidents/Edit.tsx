@@ -69,7 +69,7 @@ export default function Edit({ incident, districts, categories, reports }: EditI
   
   const breadcrumbs: BreadcrumbItem[] = [
     {
-      title: 'Incidents',
+      title: t('incidents.page_title'),
       href: route('incidents.index'),
     },
     {
@@ -77,7 +77,7 @@ export default function Edit({ incident, districts, categories, reports }: EditI
       href: route('incidents.show', incident.id),
     },
     {
-      title: 'Edit',
+      title: t('common.edit'),
       href: route('incidents.edit', incident.id),
     },
   ];
@@ -85,7 +85,7 @@ export default function Edit({ incident, districts, categories, reports }: EditI
     title: incident.title || '',
     description: incident.description || '',
     incident_date: incident.incident_date || new Date().toISOString().split('T')[0],
-    incident_time: incident.incident_time || '',
+    incident_time: incident.incident_time ? incident.incident_time.substring(0, 5) : '',
     district_id: incident.district_id?.toString() || '',
     incident_category_id: incident.incident_category_id?.toString() || '',
     incident_report_id: incident.incident_report_id?.toString() || 'none',
@@ -99,6 +99,8 @@ export default function Edit({ incident, districts, categories, reports }: EditI
 
   const submit: FormEventHandler = (e) => {
     e.preventDefault();
+    
+    // Convert "none" to null for the incident_report_id
     if (data.incident_report_id === 'none') {
       setData('incident_report_id', '');
     }

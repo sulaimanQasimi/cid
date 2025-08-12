@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Traits\HasVisitors;
 // Controller: app/Http/Controllers/IncidentController.php
 // Route pages: resources/js/pages/Incidents/
-
+// Route File: routes/incident.php
 class Incident extends Model
 {
     use HasFactory, SoftDeletes, HasVisitors;
