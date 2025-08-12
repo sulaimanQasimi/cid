@@ -95,67 +95,102 @@ export default function CriminalShow({ criminal, auth }: Props) {
       <Head title={t('criminal.show.page_title', { name: criminal.name })} />
 
       <div className="container px-0 py-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Button variant="outline" size="icon" asChild className="rounded-full shadow-sm">
-              <Link href={route('criminals.index')}>
-                <ArrowLeft className="h-4 w-4" />
-              </Link>
-            </Button>
-            <div>
-              <h2 className="text-2xl font-bold tracking-tight">{criminal.name}</h2>
-              <p className="text-sm text-neutral-500">
-                {criminal.number
-                  ? t('criminal.show.id_number', { number: criminal.number })
-                  : t('criminal.show.no_id')}
-              </p>
+        {/* Modern Header with Glassmorphism */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-l from-red-600 via-orange-600 to-amber-600 p-8 lg:p-12 text-white shadow-2xl mb-8 group">
+          {/* Animated background elements */}
+          <div className="absolute inset-0 bg-black/5"></div>
+          <div className="absolute top-0 left-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 -translate-x-40 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
+          <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full translate-y-32 translate-x-32 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
+          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white/5 rounded-full -translate-x-16 -translate-y-16 blur-xl group-hover:scale-150 transition-transform duration-500"></div>
+          
+          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-8">
+            <div className="flex items-center gap-8">
+              <div className="p-6 bg-white/20 backdrop-blur-md rounded-3xl border border-white/30 shadow-2xl group-hover:scale-105 transition-transform duration-300">
+                <Shield className="h-10 w-10 text-white" />
+              </div>
+              <div className="space-y-3">
+                <h2 className="text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight">{criminal.name}</h2>
+                <p className="text-white/90 flex items-center gap-3 text-xl font-medium">
+                  <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <FileText className="h-6 w-6" />
+                  </div>
+                  {criminal.number
+                    ? t('criminal.show.id_number', { number: criminal.number })
+                    : t('criminal.show.no_id')}
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-3">
-            {auth.permissions.includes('criminal.update') && (
-              <Button variant="outline" asChild className="rounded-full shadow-sm">
-                <Link href={route('criminals.edit', criminal.id)}>
-                  <Pencil className="mr-2 h-4 w-4" />
-                  {t('criminal.show.edit_button')}
-                </Link>
-              </Button>
-            )}
-            {auth.permissions.includes('criminal.view') && (
-              <Button variant="outline" asChild className="rounded-full shadow-sm">
-                <Link href={route('criminals.print', criminal.id)} target="_blank">
-                  <Printer className="mr-2 h-4 w-4" />
-                  {t('criminal.show.print_button')}
-                </Link>
-              </Button>
-            )}
-            {auth.permissions.includes('criminal.delete') && (
-              <Button
-                variant="destructive"
-                onClick={() => setIsDeleteDialogOpen(true)}
-                className="rounded-full shadow-sm"
-              >
-                <Trash className="mr-2 h-4 w-4" />
-                {t('criminal.show.delete_button')}
-              </Button>
-            )}
+            
+            <div className="flex items-center gap-3">
+              <Link href={route('criminals.index')} className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 rounded-2xl shadow-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105 group/btn">
+                <div className="flex items-center gap-3">
+                  <div className="p-1 bg-white/20 rounded-lg group-hover/btn:scale-110 transition-transform duration-300">
+                    <ArrowRight className="h-5 w-5" />
+                  </div>
+                  {t('criminal.show.back_button')}
+                </div>
+              </Link>
+              
+              {auth.permissions.includes('criminal.update') && (
+                <Button asChild className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 rounded-2xl shadow-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
+                  <Link href={route('criminals.edit', criminal.id)}>
+                    <div className="flex items-center gap-3">
+                      <div className="p-1 bg-white/20 rounded-lg">
+                        <Pencil className="h-5 w-5" />
+                      </div>
+                      {t('criminal.show.edit_button')}
+                    </div>
+                  </Link>
+                </Button>
+              )}
+              
+              {auth.permissions.includes('criminal.view') && (
+                <Button asChild className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 rounded-2xl shadow-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
+                  <Link href={route('criminals.print', criminal.id)} target="_blank">
+                    <div className="flex items-center gap-3">
+                      <div className="p-1 bg-white/20 rounded-lg">
+                        <Printer className="h-5 w-5" />
+                      </div>
+                      {t('criminal.show.print_button')}
+                    </div>
+                  </Link>
+                </Button>
+              )}
+              
+              {auth.permissions.includes('criminal.delete') && (
+                <Button
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                  className="bg-red-500/20 backdrop-blur-md border-red-300/30 text-white hover:bg-red-500/30 rounded-2xl shadow-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-1 bg-red-500/20 rounded-lg">
+                      <Trash className="h-5 w-5" />
+                    </div>
+                    {t('criminal.show.delete_button')}
+                  </div>
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-12">
           {/* Photo and Basic Details */}
-          <Card className="md:col-span-4 border-none shadow-md overflow-hidden">
-            <CardHeader className="bg-neutral-50 dark:bg-neutral-900 border-b pb-4">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <UserRound className="h-5 w-5 text-neutral-500" />
+          <Card className="md:col-span-4 border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-red-50/30">
+            <CardHeader className="bg-gradient-to-l from-red-500 to-red-600 text-white border-b pb-4">
+              <CardTitle className="flex items-center gap-3 text-lg">
+                <div className="p-2 bg-white/20 rounded-lg">
+                  <UserRound className="h-5 w-5" />
+                </div>
                 {t('criminal.show.personal_info.title')}
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-red-100">
                 {t('criminal.show.personal_info.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6">
               {criminal.photo ? (
-                <div className="mb-6 overflow-hidden rounded-xl border border-neutral-200 shadow-sm">
+                <div className="mb-6 overflow-hidden rounded-2xl border border-red-200 shadow-lg">
                   <img
                     src={`/storage/${criminal.photo}`}
                     alt={criminal.name}
@@ -163,67 +198,78 @@ export default function CriminalShow({ criminal, auth }: Props) {
                   />
                 </div>
               ) : (
-                <div className="mb-6 flex aspect-square items-center justify-center rounded-xl border-2 border-dashed border-neutral-200 bg-neutral-50 text-center">
+                <div className="mb-6 flex aspect-square items-center justify-center rounded-2xl border-2 border-dashed border-red-200 bg-gradient-to-bl from-red-50 to-red-100 text-center">
                   <div className="flex flex-col items-center px-4 py-12">
-                    <UserRound className="mb-3 h-16 w-16 text-neutral-300" />
-                    <p className="text-sm font-medium text-neutral-500">{t('criminal.show.no_photo')}</p>
+                    <div className="p-4 bg-gradient-to-br from-red-100 to-red-200 rounded-full mb-3">
+                      <UserRound className="h-16 w-16 text-red-600" />
+                    </div>
+                    <p className="text-sm font-medium text-red-700">{t('criminal.show.no_photo')}</p>
                   </div>
                 </div>
               )}
 
               <div className="space-y-5">
                 <div>
-                  <h3 className="text-sm font-medium text-neutral-500 mb-2.5 flex items-center">
-                    <UserRound className="mr-1.5 h-3.5 w-3.5" />
+                  <h3 className="text-sm font-medium text-red-600 mb-3 flex items-center gap-2" dir="rtl">
                     {t('criminal.show.personal_details')}
+                    <UserRound className="h-4 w-4" />
                   </h3>
-                  <div className="rounded-lg border border-neutral-100 bg-neutral-50/50 p-3 space-y-2.5">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-neutral-600 font-medium">{t('criminal.show.full_name')}:</span>
-                      <span className="text-sm text-neutral-900 font-semibold">{criminal.name}</span>
+                  <div className="rounded-xl border border-red-100 bg-gradient-to-l from-red-50 to-white p-4 space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-red-700 font-medium flex items-center gap-2" dir="rtl">
+                        {t('criminal.show.full_name')}:
+                        <Users className="h-4 w-4" />
+                      </span>
+                      <span className="text-sm text-red-900 font-semibold">{criminal.name}</span>
                     </div>
 
                     {criminal.father_name && (
-                      <div className="flex justify-between">
-                        <span className="text-sm text-neutral-600 font-medium">{t('criminal.show.father_name')}:</span>
-                        <span className="text-sm text-neutral-900">{criminal.father_name}</span>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-red-700 font-medium flex items-center gap-2" dir="rtl">
+                          {t('criminal.show.father_name')}:
+                          <Users className="h-4 w-4" />
+                        </span>
+                        <span className="text-sm text-red-900">{criminal.father_name}</span>
                       </div>
                     )}
 
                     {criminal.grandfather_name && (
-                      <div className="flex justify-between">
-                        <span className="text-sm text-neutral-600 font-medium">{t('criminal.show.grandfather_name')}:</span>
-                        <span className="text-sm text-neutral-900">{criminal.grandfather_name}</span>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-red-700 font-medium flex items-center gap-2" dir="rtl">
+                          {t('criminal.show.grandfather_name')}:
+                          <Users className="h-4 w-4" />
+                        </span>
+                        <span className="text-sm text-red-900">{criminal.grandfather_name}</span>
                       </div>
                     )}
 
                     {criminal.id_card_number && (
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-neutral-600 font-medium flex items-center">
-                          <CreditCard className="mr-1 h-3 w-3" />
+                        <span className="text-sm text-red-700 font-medium flex items-center gap-2" dir="rtl">
                           {t('criminal.show.id_card')}:
+                          <IdCard className="h-4 w-4" />
                         </span>
-                        <span className="text-sm text-neutral-900">{criminal.id_card_number}</span>
+                        <span className="text-sm text-red-900">{criminal.id_card_number}</span>
                       </div>
                     )}
 
                     {criminal.phone_number && (
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-neutral-600 font-medium flex items-center">
-                          <Phone className="mr-1 h-3 w-3" />
+                        <span className="text-sm text-red-700 font-medium flex items-center gap-2" dir="rtl">
                           {t('criminal.show.phone')}:
+                          <Phone className="h-4 w-4" />
                         </span>
-                        <span className="text-sm text-neutral-900">{criminal.phone_number}</span>
+                        <span className="text-sm text-red-900">{criminal.phone_number}</span>
                       </div>
                     )}
 
                     {criminal.department && (
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-neutral-600 font-medium flex items-center">
-                          <Building className="mr-1 h-3 w-3" />
+                        <span className="text-sm text-red-700 font-medium flex items-center gap-2" dir="rtl">
                           {t('criminal.show.department')}:
+                          <Building2 className="h-4 w-4" />
                         </span>
-                        <Badge variant="secondary" className="text-xs font-medium">
+                        <Badge variant="outline" className="bg-gradient-to-l from-red-100 to-red-200 text-red-800 border-red-300 px-3 py-1 text-xs font-medium">
                           {criminal.department.name}
                         </Badge>
                       </div>
@@ -232,31 +278,37 @@ export default function CriminalShow({ criminal, auth }: Props) {
                 </div>
 
                 {(criminal.original_residence || criminal.current_residence) && (
-                  <div>
-                    <h3 className="text-sm font-medium text-neutral-500 mb-2.5 flex items-center">
-                      <MapPin className="mr-1.5 h-3.5 w-3.5" />
-                      {t('criminal.show.residence_info')}
-                    </h3>
-                    <div className="rounded-lg border border-neutral-100 bg-neutral-50/50 p-3 space-y-2.5">
-                      {criminal.original_residence && (
-                        <div>
-                          <span className="text-sm text-neutral-600 font-medium">{t('criminal.show.original_residence')}:</span>
-                          <p className="mt-1 text-sm text-neutral-900">{criminal.original_residence}</p>
-                        </div>
-                      )}
+                                  <div>
+                  <h3 className="text-sm font-medium text-red-600 mb-3 flex items-center gap-2" dir="rtl">
+                    {t('criminal.show.residence_info')}
+                    <MapPin className="h-4 w-4" />
+                  </h3>
+                  <div className="rounded-xl border border-red-100 bg-gradient-to-l from-red-50 to-white p-4 space-y-3">
+                    {criminal.original_residence && (
+                      <div>
+                        <span className="text-sm text-red-700 font-medium flex items-center gap-2" dir="rtl">
+                          {t('criminal.show.original_residence')}:
+                          <Home className="h-4 w-4" />
+                        </span>
+                        <p className="mt-2 text-sm text-red-900">{criminal.original_residence}</p>
+                      </div>
+                    )}
 
-                      {criminal.original_residence && criminal.current_residence && (
-                        <Separator className="my-2" />
-                      )}
+                    {criminal.original_residence && criminal.current_residence && (
+                      <Separator className="my-3" />
+                    )}
 
-                      {criminal.current_residence && (
-                        <div>
-                          <span className="text-sm text-neutral-600 font-medium">{t('criminal.show.current_residence')}:</span>
-                          <p className="mt-1 text-sm text-neutral-900">{criminal.current_residence}</p>
-                        </div>
-                      )}
-                    </div>
+                    {criminal.current_residence && (
+                      <div>
+                        <span className="text-sm text-red-700 font-medium flex items-center gap-2" dir="rtl">
+                          {t('criminal.show.current_residence')}:
+                          <MapPin className="h-4 w-4" />
+                        </span>
+                        <p className="mt-2 text-sm text-red-900">{criminal.current_residence}</p>
+                      </div>
+                    )}
                   </div>
+                </div>
                 )}
               </div>
             </CardContent>
@@ -264,74 +316,79 @@ export default function CriminalShow({ criminal, auth }: Props) {
 
           {/* Crime Details */}
           <div className="md:col-span-8 space-y-8">
-            <Card className="border-none shadow-md overflow-hidden">
-              <CardHeader className="bg-neutral-50 dark:bg-neutral-900 border-b pb-4">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <FileText className="h-5 w-5 text-neutral-500" />
+            <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-orange-50/30">
+              <CardHeader className="bg-gradient-to-l from-orange-500 to-orange-600 text-white border-b pb-4">
+                <CardTitle className="flex items-center gap-3 text-lg">
+                  <div className="p-2 bg-white/20 rounded-lg">
+                    <FileText className="h-5 w-5" />
+                  </div>
                   {t('criminal.show.crime_info.title')}
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-orange-100">
                   {t('criminal.show.crime_info.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6">
-                <div className="space-y-5">
+                <div className="space-y-6">
                   {criminal.crime_type && (
                     <div>
-                      <h3 className="text-sm font-medium text-neutral-500 mb-2.5">
+                      <h3 className="text-sm font-medium text-orange-600 mb-3 flex items-center gap-2" dir="rtl">
                         {t('criminal.show.crime_type')}
+                        <Gavel className="h-4 w-4" />
                       </h3>
-                      <div className="rounded-lg border border-neutral-100 bg-neutral-50/50 p-3">
-                        <p className="text-sm">{criminal.crime_type}</p>
+                      <div className="rounded-xl border border-orange-100 bg-gradient-to-l from-orange-50 to-white p-4">
+                        <p className="text-sm text-orange-900">{criminal.crime_type}</p>
                       </div>
                     </div>
                   )}
 
-                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     {criminal.arrest_location && (
                       <div>
-                        <h3 className="text-sm font-medium text-neutral-500 mb-2.5 flex items-center">
-                          <MapPin className="mr-1.5 h-3.5 w-3.5" />
+                        <h3 className="text-sm font-medium text-orange-600 mb-3 flex items-center gap-2" dir="rtl">
                           {t('criminal.show.arrest_location')}
+                          <MapPin className="h-4 w-4" />
                         </h3>
-                        <div className="rounded-lg border border-neutral-100 bg-neutral-50/50 p-3">
-                          <p className="text-sm">{criminal.arrest_location}</p>
+                        <div className="rounded-xl border border-orange-100 bg-gradient-to-l from-orange-50 to-white p-4">
+                          <p className="text-sm text-orange-900">{criminal.arrest_location}</p>
                         </div>
                       </div>
                     )}
 
                     {criminal.arrest_date && (
                       <div>
-                        <h3 className="text-sm font-medium text-neutral-500 mb-2.5 flex items-center">
-                          <Calendar className="mr-1.5 h-3.5 w-3.5" />
+                        <h3 className="text-sm font-medium text-orange-600 mb-3 flex items-center gap-2" dir="rtl">
                           {t('criminal.show.arrest_date')}
+                          <Calendar className="h-4 w-4" />
                         </h3>
-                        <div className="rounded-lg border border-neutral-100 bg-neutral-50/50 p-3">
-                          <p className="text-sm">{format(new Date(criminal.arrest_date), 'PPP')}</p>
+                        <div className="rounded-xl border border-orange-100 bg-gradient-to-l from-orange-50 to-white p-4">
+                          <p className="text-sm text-orange-900">{format(new Date(criminal.arrest_date), 'PPP')}</p>
                         </div>
                       </div>
                     )}
                   </div>
 
-                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     {criminal.arrested_by && (
                       <div>
-                        <h3 className="text-sm font-medium text-neutral-500 mb-2.5">
+                        <h3 className="text-sm font-medium text-orange-600 mb-3 flex items-center gap-2" dir="rtl">
                           {t('criminal.show.arrested_by')}
+                          <Shield className="h-4 w-4" />
                         </h3>
-                        <div className="rounded-lg border border-neutral-100 bg-neutral-50/50 p-3">
-                          <p className="text-sm">{criminal.arrested_by}</p>
+                        <div className="rounded-xl border border-orange-100 bg-gradient-to-l from-orange-50 to-white p-4">
+                          <p className="text-sm text-orange-900">{criminal.arrested_by}</p>
                         </div>
                       </div>
                     )}
 
                     {criminal.referred_to && (
                       <div>
-                        <h3 className="text-sm font-medium text-neutral-500 mb-2.5">
+                        <h3 className="text-sm font-medium text-orange-600 mb-3 flex items-center gap-2" dir="rtl">
                           {t('criminal.show.referred_to')}
+                          <Building2 className="h-4 w-4" />
                         </h3>
-                        <div className="rounded-lg border border-neutral-100 bg-neutral-50/50 p-3">
-                          <p className="text-sm">{criminal.referred_to}</p>
+                        <div className="rounded-xl border border-orange-100 bg-gradient-to-l from-orange-50 to-white p-4">
+                          <p className="text-sm text-orange-900">{criminal.referred_to}</p>
                         </div>
                       </div>
                     )}
@@ -339,11 +396,12 @@ export default function CriminalShow({ criminal, auth }: Props) {
 
                   {criminal.final_verdict && (
                     <div>
-                      <h3 className="text-sm font-medium text-neutral-500 mb-2.5">
+                      <h3 className="text-sm font-medium text-orange-600 mb-3 flex items-center gap-2" dir="rtl">
                         {t('criminal.show.final_verdict')}
+                        <FileCheck className="h-4 w-4" />
                       </h3>
-                      <div className="rounded-lg border border-neutral-100 bg-neutral-50/50 p-3">
-                        <p className="text-sm">{criminal.final_verdict}</p>
+                      <div className="rounded-xl border border-orange-100 bg-gradient-to-l from-orange-50 to-white p-4">
+                        <p className="text-sm text-orange-900">{criminal.final_verdict}</p>
                       </div>
                     </div>
                   )}
@@ -353,26 +411,30 @@ export default function CriminalShow({ criminal, auth }: Props) {
 
             {/* Notes */}
             {criminal.notes && (
-              <Card className="border-none shadow-md overflow-hidden">
-                <CardHeader className="bg-neutral-50 dark:bg-neutral-900 border-b pb-4">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <FileText className="h-5 w-5 text-neutral-500" />
+              <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-orange-50/30">
+                <CardHeader className="bg-gradient-to-l from-orange-500 to-orange-600 text-white border-b pb-4">
+                  <CardTitle className="flex items-center gap-3 text-lg">
+                    <div className="p-2 bg-white/20 rounded-lg">
+                      <BookText className="h-5 w-5" />
+                    </div>
                     {t('criminal.show.notes')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-6">
-                  <div className="rounded-lg border border-neutral-100 bg-neutral-50/50 p-3">
-                    <p className="text-sm whitespace-pre-wrap">{criminal.notes}</p>
+                  <div className="rounded-xl border border-orange-100 bg-gradient-to-l from-orange-50 to-white p-4">
+                    <p className="text-sm text-orange-900 whitespace-pre-wrap" dir="rtl">{criminal.notes}</p>
                   </div>
                 </CardContent>
               </Card>
             )}
 
             {/* System Info */}
-            <Card className="border-none shadow-md overflow-hidden">
-              <CardHeader className="bg-neutral-50 dark:bg-neutral-900 border-b pb-4">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <FileText className="h-5 w-5 text-neutral-500" />
+            <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-orange-50/30">
+              <CardHeader className="bg-gradient-to-l from-orange-500 to-orange-600 text-white border-b pb-4">
+                <CardTitle className="flex items-center gap-3 text-lg">
+                  <div className="p-2 bg-white/20 rounded-lg">
+                    <Clock className="h-5 w-5" />
+                  </div>
                   {t('criminal.show.system_info.title')}
                 </CardTitle>
               </CardHeader>
@@ -380,19 +442,19 @@ export default function CriminalShow({ criminal, auth }: Props) {
                 <div className="space-y-4">
                   {criminal.creator && (
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-neutral-600">{t('criminal.show.system_info.created_by')}:</span>
-                      <span className="text-sm font-medium">{criminal.creator.name}</span>
+                      <span className="text-sm text-orange-700 font-medium" dir="rtl">{t('criminal.show.system_info.created_by')}:</span>
+                      <span className="text-sm font-semibold text-orange-900">{criminal.creator.name}</span>
                     </div>
                   )}
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-neutral-600">{t('criminal.show.system_info.created_date')}:</span>
-                    <span className="text-sm font-medium">
+                    <span className="text-sm text-orange-700 font-medium" dir="rtl">{t('criminal.show.system_info.created_date')}:</span>
+                    <span className="text-sm font-semibold text-orange-900">
                       {format(new Date(criminal.created_at), 'PPP')}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-neutral-600">{t('criminal.show.system_info.updated_date')}:</span>
-                    <span className="text-sm font-medium">
+                    <span className="text-sm text-orange-700 font-medium" dir="rtl">{t('criminal.show.system_info.updated_date')}:</span>
+                    <span className="text-sm font-semibold text-orange-900">
                       {format(new Date(criminal.updated_at), 'PPP')}
                     </span>
                   </div>
