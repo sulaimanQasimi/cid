@@ -9,7 +9,7 @@ import {
     Database, 
     Folder, 
     LayoutGrid, 
-    List, 
+
     Tag, 
     Users, 
     Shield, 
