@@ -1,4 +1,24 @@
 {
+    "incident_reports.show.report_info": "د راپور معلومات",
+    "incident_reports.show.report_number": "د راپور نېټه",
+    "incident_reports.show.security_level": "د راپور سیکورټی",
+    "incident_reports.show.source": "د راپور منبع",
+    "incident_reports.show.user_info": "د راپور کاروونکی",
+    "incident_reports.show.updated_at": "د راپور تازه کیدو نېټه",
+    "incident_reports.show.status": "د راپور وضعيت",
+
+
+
+    "incident_reports.edit.back_button": "بېرته ثبتونه",
+    "incident_reports.edit.title": "ویرایش ثبت",
+    "incident_reports.edit.created_on": "په {{date}} کې جوړ شوی",
+    "incident_reports.edit.breadcrumb": "سمول",
+    "incident_reports.edit.update": "ثبت تازه کول",
+    "incident_reports.edit.saving": "تازه کیدل...",
+    "incident_reports.edit.form.title": "د ثبت معلومات سمون",
+    "incident_reports.edit.form.description": "د ثبت شخصي او د قضیې جزییات تازه کړئ",
+    "incident_reports.edit.form.status": "وضعيت",
+    "incident_reports.edit.form.status_placeholder": "لکه: ثبت شوی، روانه، حل شوی، تړل شوی",
     "incidents.edit_title": "ویرایش ثبت",
     "incidents.edit_description": "د ثبت سمول",
     "incidents.back_to_incident": "بېرته ثبتونه",

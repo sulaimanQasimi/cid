@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PageHeader } from '@/components/page-header';
-import { ArrowLeft, PlusCircle, Save, Trash2 } from 'lucide-react';
+import { ArrowRight, PlusCircle, Save, Trash2, Shield, FileText, BookText, AlertTriangle, Calendar, Clock, Users, Building2, MapPin, Phone, IdCard, Home, Gavel, FileCheck } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -18,6 +18,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import axios from 'axios';
 import TreeViewStatSelector from '@/components/reports/TreeViewStatSelector';
 import { useTranslation } from '@/lib/i18n/translate';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 interface StatCategory {
   id: number;
@@ -102,13 +104,10 @@ export default function Edit({ report, statItems, reportStats, statCategories }:
   const [statToDelete, setStatToDelete] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
+  // Generate breadcrumbs
   const breadcrumbs: BreadcrumbItem[] = [
     {
-      title: 'Dashboard',
-      href: '/dashboard',
-    },
-    {
-      title: 'Incident Reports',
+      title: t('incident_reports.page_title'),
       href: route('incident-reports.index'),
     },
     {
@@ -116,7 +115,7 @@ export default function Edit({ report, statItems, reportStats, statCategories }:
       href: route('incident-reports.show', report.id),
     },
     {
-      title: 'Edit',
+      title: t('incident_reports.edit.breadcrumb'),
       href: route('incident-reports.edit', report.id),
     },
   ];
@@ -215,113 +214,196 @@ export default function Edit({ report, statItems, reportStats, statCategories }:
     setStatToDelete(null);
   }
 
+  const formattedCreatedAt = report.created_at
+    ? format(new Date(report.created_at), 'MMM d, yyyy')
+    : 'N/A';
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={t('incident_reports.edit.page_title', { number: report.report_number })} />
-      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-        <PageHeader
-          title={t('incident_reports.edit.page_header', { number: report.report_number })}
-          description={t('incident_reports.edit.page_description')}
-          actions={
-            <div className="flex space-x-2">
-              <Button variant="outline" asChild>
-                <Link href={route('incident-reports.show', report.id)}>
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  {t('incident_reports.actions.back_to_report')}
-                </Link>
-              </Button>
+      <div className="container px-0 py-6">
+        {/* Modern Header with Glassmorphism */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-l from-teal-600 via-emerald-600 to-green-600 p-8 lg:p-12 text-white shadow-2xl mb-8 group">
+          {/* Animated background elements */}
+          <div className="absolute inset-0 bg-black/5"></div>
+          <div className="absolute top-0 left-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 -translate-x-40 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
+          <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full translate-y-32 translate-x-32 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
+          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white/5 rounded-full -translate-x-16 -translate-y-16 blur-xl group-hover:scale-150 transition-transform duration-500"></div>
+          
+          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-8">
+            <div className="flex items-center gap-8">
+              <div className="p-6 bg-white/20 backdrop-blur-md rounded-3xl border border-white/30 shadow-2xl group-hover:scale-105 transition-transform duration-300">
+                <Shield className="h-10 w-10 text-white" />
+              </div>
+              <div className="space-y-3">
+                <h2 className="text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight">{t('incident_reports.edit.title')}</h2>
+                <p className="text-white/90 flex items-center gap-3 text-xl font-medium">
+                  <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <Clock className="h-6 w-6" />
+                  </div>
+                  {t('incident_reports.edit.created_on', { date: formattedCreatedAt })}
+                </p>
+              </div>
             </div>
-          }
-        />
+            
+            <Link href={route('incident-reports.show', report.id)} className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 rounded-2xl shadow-2xl px-8 py-4 text-lg font-semibold transition-all duration-300 hover:scale-105 group/btn">
+              <div className="flex items-center gap-3">
+                <div className="p-1 bg-white/20 rounded-lg group-hover/btn:scale-110 transition-transform duration-300">
+                  <ArrowRight className="h-5 w-5" />
+                </div>
+                {t('incident_reports.edit.back_button')}
+              </div>
+            </Link>
+          </div>
+        </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="grid gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('incident_reports.form.info_title')}</CardTitle>
-                <CardDescription>{t('incident_reports.form.info_description')}</CardDescription>
+          <div className="grid gap-8">
+            <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-green-50/30">
+              <CardHeader className="bg-gradient-to-l from-green-500 to-green-600 text-white border-b pb-4">
+                <CardTitle className="flex items-center gap-3 text-lg">
+                  <div className="p-2 bg-white/20 rounded-lg">
+                    <FileText className="h-5 w-5" />
+                  </div>
+                  {t('incident_reports.form.info_title')}
+                </CardTitle>
+                <CardDescription className="text-green-100">
+                  {t('incident_reports.form.info_description')}
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid gap-3">
-                  <Label htmlFor="report_number">{t('incident_reports.form.report_number')}</Label>
-                  <Input
-                    id="report_number"
-                    value={data.report_number}
-                    onChange={(e) => setData('report_number', e.target.value)}
-                    disabled
-                  />
-                  <InputError message={errors.report_number} />
+              <CardContent className="p-6 space-y-6">
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <div className="space-y-3">
+                    <Label htmlFor="report_number" className="text-base font-medium flex items-center gap-2 text-green-700 text-right" dir="rtl">
+                      {t('incident_reports.form.report_number')}
+                      <FileText className="h-4 w-4" />
+                    </Label>
+                    <Input
+                      id="report_number"
+                      value={data.report_number}
+                      onChange={(e) => setData('report_number', e.target.value)}
+                      disabled
+                      className="h-12 border-green-200 focus:border-green-500 focus:ring-green-500/20 bg-gradient-to-l from-green-50 to-white text-right"
+                    />
+                    {errors.report_number && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                      <AlertTriangle className="h-4 w-4" />
+                      {errors.report_number}
+                    </p>}
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label htmlFor="report_date" className="text-base font-medium flex items-center gap-2 text-green-700 text-right" dir="rtl">
+                      <span className="text-red-500">*</span>
+                      {t('incident_reports.form.report_date')}
+                      <Calendar className="h-4 w-4" />
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="report_date"
+                        type="date"
+                        value={data.report_date}
+                        onChange={(e) => setData('report_date', e.target.value)}
+                        required
+                        className="h-12 border-green-200 focus:border-green-500 focus:ring-green-500/20 bg-gradient-to-l from-green-50 to-white text-right"
+                      />
+                      <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-green-400 pointer-events-none" />
+                    </div>
+                    {errors.report_date && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                      <AlertTriangle className="h-4 w-4" />
+                      {errors.report_date}
+                    </p>}
+                  </div>
                 </div>
 
-                <div className="grid gap-3">
-                  <Label htmlFor="report_date">{t('incident_reports.form.report_date')}</Label>
-                  <Input
-                    id="report_date"
-                    type="date"
-                    value={data.report_date}
-                    onChange={(e) => setData('report_date', e.target.value)}
-                    required
-                  />
-                  <InputError message={errors.report_date} />
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <div className="space-y-3">
+                    <Label htmlFor="security_level" className="text-base font-medium flex items-center gap-2 text-green-700 text-right" dir="rtl">
+                      {t('incident_reports.form.security_level')}
+                      <Shield className="h-4 w-4" />
+                    </Label>
+                    <Select
+                      value={data.security_level}
+                      onValueChange={(value) => setData('security_level', value)}
+                    >
+                      <SelectTrigger id="security_level" className="h-12 border-green-200 focus:border-green-500 focus:ring-green-500/20 bg-gradient-to-l from-green-50 to-white text-right">
+                        <SelectValue placeholder={t('incident_reports.form.security_level_placeholder')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="normal">{t('incident_reports.level.normal')}</SelectItem>
+                        <SelectItem value="restricted">{t('incident_reports.level.restricted')}</SelectItem>
+                        <SelectItem value="classified">{t('incident_reports.level.classified')}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {errors.security_level && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                      <AlertTriangle className="h-4 w-4" />
+                      {errors.security_level}
+                    </p>}
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label htmlFor="report_status" className="text-base font-medium flex items-center gap-2 text-green-700 text-right" dir="rtl">
+                      {t('incident_reports.form.status')}
+                      <Clock className="h-4 w-4" />
+                    </Label>
+                    <Select
+                      value={data.report_status}
+                      onValueChange={(value) => setData('report_status', value)}
+                    >
+                      <SelectTrigger id="report_status" className="h-12 border-green-200 focus:border-green-500 focus:ring-green-500/20 bg-gradient-to-l from-green-50 to-white text-right">
+                        <SelectValue placeholder={t('incident_reports.form.status_placeholder')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="submitted">{t('incident_reports.status.submitted')}</SelectItem>
+                        <SelectItem value="reviewed">{t('incident_reports.status.reviewed')}</SelectItem>
+                        <SelectItem value="approved">{t('incident_reports.status.approved')}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {errors.report_status && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                      <AlertTriangle className="h-4 w-4" />
+                      {errors.report_status}
+                    </p>}
+                  </div>
                 </div>
 
-                <div className="grid gap-3">
-                  <Label htmlFor="security_level">{t('incident_reports.form.security_level')}</Label>
-                  <Select
-                    value={data.security_level}
-                    onValueChange={(value) => setData('security_level', value)}
-                  >
-                    <SelectTrigger id="security_level">
-                      <SelectValue placeholder={t('incident_reports.form.security_level_placeholder')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="normal">{t('incident_reports.level.normal')}</SelectItem>
-                      <SelectItem value="restricted">{t('incident_reports.level.restricted')}</SelectItem>
-                      <SelectItem value="classified">{t('incident_reports.level.classified')}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <InputError message={errors.security_level} />
-                </div>
-
-                <div className="grid gap-3">
-                  <Label htmlFor="report_status">{t('incident_reports.form.status')}</Label>
-                  <Select
-                    value={data.report_status}
-                    onValueChange={(value) => setData('report_status', value)}
-                  >
-                    <SelectTrigger id="report_status">
-                      <SelectValue placeholder={t('incident_reports.form.status_placeholder')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="submitted">{t('incident_reports.status.submitted')}</SelectItem>
-                      <SelectItem value="reviewed">{t('incident_reports.status.reviewed')}</SelectItem>
-                      <SelectItem value="approved">{t('incident_reports.status.approved')}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <InputError message={errors.report_status} />
-                </div>
-
-                <div className="grid gap-3">
-                  <Label htmlFor="source">{t('incident_reports.form.source_label')}</Label>
+                <div className="space-y-3">
+                  <Label htmlFor="source" className="text-base font-medium flex items-center gap-2 text-green-700 text-right" dir="rtl">
+                    {t('incident_reports.form.source_label')}
+                    <Users className="h-4 w-4" />
+                  </Label>
                   <Input
                     id="source"
                     value={data.source}
                     onChange={(e) => setData('source', e.target.value)}
                     placeholder={t('incident_reports.form.source_placeholder')}
+                    className="h-12 border-green-200 focus:border-green-500 focus:ring-green-500/20 bg-gradient-to-l from-green-50 to-white text-right"
                   />
-                  <InputError message={errors.source} />
+                  {errors.source && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                    <AlertTriangle className="h-4 w-4" />
+                    {errors.source}
+                  </p>}
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('incident_reports.details.title')}</CardTitle>
-                <CardDescription>{t('incident_reports.details.edit_description')}</CardDescription>
+            <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-green-50/30">
+              <CardHeader className="bg-gradient-to-l from-green-500 to-green-600 text-white border-b pb-4">
+                <CardTitle className="flex items-center gap-3 text-lg">
+                  <div className="p-2 bg-white/20 rounded-lg">
+                    <BookText className="h-5 w-5" />
+                  </div>
+                  {t('incident_reports.details.title')}
+                </CardTitle>
+                <CardDescription className="text-green-100">
+                  {t('incident_reports.details.edit_description')}
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid gap-3">
-                  <Label htmlFor="details">{t('incident_reports.details.details_label')}</Label>
+              <CardContent className="p-6 space-y-6">
+                <div className="space-y-3">
+                  <Label htmlFor="details" className="text-base font-medium flex items-center gap-2 text-green-700 text-right" dir="rtl">
+                    <span className="text-red-500">*</span>
+                    {t('incident_reports.details.details_label')}
+                    <FileText className="h-4 w-4" />
+                  </Label>
                   <Textarea
                     id="details"
                     rows={5}
@@ -329,52 +411,78 @@ export default function Edit({ report, statItems, reportStats, statCategories }:
                     onChange={(e) => setData('details', e.target.value)}
                     placeholder={t('incident_reports.details.details_placeholder')}
                     required
+                    className="min-h-[120px] resize-none border-green-200 focus:border-green-500 focus:ring-green-500/20 bg-gradient-to-l from-green-50 to-white text-right"
                   />
-                  <InputError message={errors.details} />
+                  {errors.details && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                    <AlertTriangle className="h-4 w-4" />
+                    {errors.details}
+                  </p>}
                 </div>
 
-                <div className="grid gap-3">
-                  <Label htmlFor="action_taken">{t('incident_reports.details.action_taken_label')}</Label>
+                <div className="space-y-3">
+                  <Label htmlFor="action_taken" className="text-base font-medium flex items-center gap-2 text-green-700 text-right" dir="rtl">
+                    {t('incident_reports.details.action_taken_label')}
+                    <Gavel className="h-4 w-4" />
+                  </Label>
                   <Textarea
                     id="action_taken"
                     rows={3}
                     value={data.action_taken}
                     onChange={(e) => setData('action_taken', e.target.value)}
                     placeholder={t('incident_reports.details.action_taken_placeholder')}
+                    className="min-h-[80px] resize-none border-green-200 focus:border-green-500 focus:ring-green-500/20 bg-gradient-to-l from-green-50 to-white text-right"
                   />
-                  <InputError message={errors.action_taken} />
+                  {errors.action_taken && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                    <AlertTriangle className="h-4 w-4" />
+                    {errors.action_taken}
+                  </p>}
                 </div>
 
-                <div className="grid gap-3">
-                  <Label htmlFor="recommendation">{t('incident_reports.details.recommendation_label')}</Label>
+                <div className="space-y-3">
+                  <Label htmlFor="recommendation" className="text-base font-medium flex items-center gap-2 text-green-700 text-right" dir="rtl">
+                    {t('incident_reports.details.recommendation_label')}
+                    <FileCheck className="h-4 w-4" />
+                  </Label>
                   <Textarea
                     id="recommendation"
                     rows={3}
                     value={data.recommendation}
                     onChange={(e) => setData('recommendation', e.target.value)}
                     placeholder={t('incident_reports.details.recommendation_placeholder')}
+                    className="min-h-[80px] resize-none border-green-200 focus:border-green-500 focus:ring-green-500/20 bg-gradient-to-l from-green-50 to-white text-right"
                   />
-                  <InputError message={errors.recommendation} />
+                  {errors.recommendation && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                    <AlertTriangle className="h-4 w-4" />
+                    {errors.recommendation}
+                  </p>}
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('incident_reports.stats.title')}</CardTitle>
-                <CardDescription>
+            <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-green-50/30">
+              <CardHeader className="bg-gradient-to-l from-green-500 to-green-600 text-white border-b pb-4">
+                <CardTitle className="flex items-center gap-3 text-lg">
+                  <div className="p-2 bg-white/20 rounded-lg">
+                    <AlertTriangle className="h-5 w-5" />
+                  </div>
+                  {t('incident_reports.stats.title')}
+                </CardTitle>
+                <CardDescription className="text-green-100">
                   {t('incident_reports.stats.description')}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="p-6 space-y-6">
                 {/* Category filter dropdown */}
                 <div className="mb-6">
-                  <Label htmlFor="category-filter">{t('incident_reports.stats.filter_by_category')}</Label>
+                  <Label htmlFor="category-filter" className="text-base font-medium flex items-center gap-2 text-green-700 text-right" dir="rtl">
+                    {t('incident_reports.stats.filter_by_category')}
+                    <Building2 className="h-4 w-4" />
+                  </Label>
                   <Select
                     value={selectedCategory?.toString() || 'all'}
                     onValueChange={(value) => setSelectedCategory(value !== 'all' ? parseInt(value) : null)}
                   >
-                    <SelectTrigger id="category-filter">
+                    <SelectTrigger id="category-filter" className="h-12 border-green-200 focus:border-green-500 focus:ring-green-500/20 bg-gradient-to-l from-green-50 to-white text-right">
                       <SelectValue placeholder={t('incidents.filters.all_categories')} />
                     </SelectTrigger>
                     <SelectContent>
@@ -404,18 +512,23 @@ export default function Edit({ report, statItems, reportStats, statCategories }:
               </CardContent>
             </Card>
 
-            <Card>
-              <CardFooter className="flex justify-end space-x-2 pt-6">
+            <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-green-50/30">
+              <CardFooter className="flex justify-between border-t px-6 py-5 bg-gradient-to-l from-green-50 to-green-100">
                 <Button
                   variant="outline"
                   asChild
                   type="button"
+                  className="rounded-full border-green-300 text-green-700 hover:bg-green-100 hover:border-green-400 shadow-lg"
                 >
                   <Link href={route('incident-reports.show', report.id)}>
                     {t('common.cancel')}
                   </Link>
                 </Button>
-                <Button type="submit" disabled={processing}>
+                <Button 
+                  type="submit" 
+                  disabled={processing}
+                  className="rounded-full px-8 font-medium bg-gradient-to-l from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                >
                   <Save className="mr-2 h-4 w-4" />
                   {processing ? t('incident_reports.actions.saving') : t('incident_reports.actions.save_changes')}
                 </Button>
