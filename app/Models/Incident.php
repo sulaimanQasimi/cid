@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Traits\HasVisitors;
+// Controller: app/Http/Controllers/IncidentController.php
+// Route pages: resources/js/pages/Incidents/
 
 class Incident extends Model
 {

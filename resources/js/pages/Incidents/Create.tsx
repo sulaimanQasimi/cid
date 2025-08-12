@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { PageHeader } from '@/components/page-header';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowRight, Save, Shield, FileText, AlertTriangle, MapPin, Calendar, Users, Building2, Clock, AlertCircle, Home, Gavel, FileCheck, BookText } from 'lucide-react';
 import { FormEventHandler } from 'react';
 import InputError from '@/components/input-error';
 import {
@@ -98,54 +98,98 @@ export default function Create({ districts, categories, reports }: CreateInciden
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={t('incidents.create_title')} />
-      <PageHeader
-        title={t('incidents.create_title')}
-        description={t('incidents.create_description')}
-        actions={
-          <Button variant="outline" asChild>
-            <Link href={route('incidents.index')}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {t('incidents.back_to_list')}
-            </Link>
-          </Button>
-        }
-      />
+      <div className="container px-0 py-6">
+        {/* Header with gradient background */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-l from-blue-600 via-indigo-600 to-purple-600 p-8 text-white shadow-2xl mb-8">
+          <div className="absolute inset-0 bg-black/10"></div>
+          <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 -translate-x-32"></div>
+          <div className="absolute bottom-0 right-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 translate-x-24"></div>
+          
+          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
+            <div className="flex items-center gap-6">
+              <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl border border-white/30">
+                <Shield className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <h2 className="text-3xl lg:text-4xl font-bold text-white drop-shadow-lg">{t('incidents.create_title')}</h2>
+                <p className="text-white/90 flex items-center gap-2 mt-2 text-lg">
+                  <AlertTriangle className="h-5 w-5" />
+                  {t('incidents.create_description')}
+                </p>
+              </div>
+            </div>
+            
+            <Button asChild className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 rounded-full shadow-lg">
+              <Link href={route('incidents.index')}>
+                <ArrowRight className="ml-2 h-4 w-4" />
+                {t('incidents.back_to_list')}
+              </Link>
+            </Button>
+          </div>
+        </div>
 
-      <form onSubmit={submit} className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('incidents.basic_info')}</CardTitle>
-            <CardDescription>{t('incidents.basic_info_description')}</CardDescription>
+        <form onSubmit={submit}>
+        <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30">
+          <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 text-white border-b pb-4">
+            <CardTitle className="flex items-center gap-3 text-lg">
+              <div className="p-2 bg-white/20 rounded-lg">
+                <FileText className="h-5 w-5" />
+              </div>
+              {t('incidents.basic_info')}
+            </CardTitle>
+            <CardDescription className="text-blue-100">
+              {t('incidents.basic_info_description')}
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="title">{t('incidents.form.title')} <span className="text-destructive">*</span></Label>
+          <CardContent className="p-6 space-y-6">
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div className="space-y-3">
+                <Label htmlFor="title" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+                  <span className="text-red-500">*</span>
+                  {t('incidents.form.title')}
+                  <FileText className="h-4 w-4" />
+                </Label>
                 <Input
                   id="title"
                   value={data.title}
                   onChange={e => setData('title', e.target.value)}
                   placeholder={t('incidents.form.title_placeholder')}
                   required
+                  className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
                 />
-                <InputError message={errors.title} />
+                {errors.title && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                  <AlertTriangle className="h-4 w-4" />
+                  {errors.title}
+                </p>}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="incident_type">{t('incidents.form.type')} <span className="text-destructive">*</span></Label>
+              <div className="space-y-3">
+                <Label htmlFor="incident_type" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+                  <span className="text-red-500">*</span>
+                  {t('incidents.form.type')}
+                  <AlertCircle className="h-4 w-4" />
+                </Label>
                 <Input
                   id="incident_type"
                   value={data.incident_type}
                   onChange={e => setData('incident_type', e.target.value)}
                   placeholder={t('incidents.form.type_placeholder')}
                   required
+                  className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
                 />
-                <InputError message={errors.incident_type} />
+                {errors.incident_type && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                  <AlertTriangle className="h-4 w-4" />
+                  {errors.incident_type}
+                </p>}
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="description">{t('incidents.form.description')} <span className="text-destructive">*</span></Label>
+            <div className="space-y-3">
+              <Label htmlFor="description" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+                <span className="text-red-500">*</span>
+                {t('incidents.form.description')}
+                <BookText className="h-4 w-4" />
+              </Label>
               <Textarea
                 id="description"
                 value={data.description}
@@ -153,51 +197,85 @@ export default function Create({ districts, categories, reports }: CreateInciden
                 placeholder={t('incidents.form.description_placeholder')}
                 rows={5}
                 required
+                className="min-h-[120px] resize-none border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
               />
-              <InputError message={errors.description} />
+              {errors.description && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                <AlertTriangle className="h-4 w-4" />
+                {errors.description}
+              </p>}
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="incident_date">{t('incidents.form.date')} <span className="text-destructive">*</span></Label>
-                <Input
-                  id="incident_date"
-                  type="date"
-                  value={data.incident_date}
-                  onChange={e => setData('incident_date', e.target.value)}
-                  required
-                />
-                <InputError message={errors.incident_date} />
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div className="space-y-3">
+                <Label htmlFor="incident_date" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+                  <span className="text-red-500">*</span>
+                  {t('incidents.form.date')}
+                  <Calendar className="h-4 w-4" />
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="incident_date"
+                    type="date"
+                    value={data.incident_date}
+                    onChange={e => setData('incident_date', e.target.value)}
+                    required
+                    className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
+                  />
+                  <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-400 pointer-events-none" />
+                </div>
+                {errors.incident_date && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                  <AlertTriangle className="h-4 w-4" />
+                  {errors.incident_date}
+                </p>}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="incident_time">{t('incidents.form.time')}</Label>
-                <Input
-                  id="incident_time"
-                  type="time"
-                  value={data.incident_time}
-                  onChange={e => setData('incident_time', e.target.value)}
-                />
-                <InputError message={errors.incident_time} />
+              <div className="space-y-3">
+                <Label htmlFor="incident_time" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+                  {t('incidents.form.time')}
+                  <Clock className="h-4 w-4" />
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="incident_time"
+                    type="time"
+                    value={data.incident_time}
+                    onChange={e => setData('incident_time', e.target.value)}
+                    className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
+                  />
+                  <Clock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-400 pointer-events-none" />
+                </div>
+                {errors.incident_time && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                  <AlertTriangle className="h-4 w-4" />
+                  {errors.incident_time}
+                </p>}
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('incidents.location_classification')}</CardTitle>
+        <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30">
+          <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 text-white border-b pb-4">
+            <CardTitle className="flex items-center gap-3 text-lg">
+              <div className="p-2 bg-white/20 rounded-lg">
+                <MapPin className="h-5 w-5" />
+              </div>
+              {t('incidents.location_classification')}
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="district_id">{t('incidents.form.district')} <span className="text-destructive">*</span></Label>
+          <CardContent className="p-6 space-y-6">
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div className="space-y-3">
+                <Label htmlFor="district_id" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+                  <span className="text-red-500">*</span>
+                  {t('incidents.form.district')}
+                  <Building2 className="h-4 w-4" />
+                </Label>
                 <Select
                   value={data.district_id}
                   onValueChange={value => setData('district_id', value)}
                   required
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right">
                     <SelectValue placeholder={t('incidents.form.select_district')} />
                   </SelectTrigger>
                   <SelectContent>
@@ -208,17 +286,24 @@ export default function Create({ districts, categories, reports }: CreateInciden
                     ))}
                   </SelectContent>
                 </Select>
-                <InputError message={errors.district_id} />
+                {errors.district_id && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                  <AlertTriangle className="h-4 w-4" />
+                  {errors.district_id}
+                </p>}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="incident_category_id">{t('incidents.form.category')} <span className="text-destructive">*</span></Label>
+              <div className="space-y-3">
+                <Label htmlFor="incident_category_id" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+                  <span className="text-red-500">*</span>
+                  {t('incidents.form.category')}
+                  <AlertCircle className="h-4 w-4" />
+                </Label>
                 <Select
                   value={data.incident_category_id}
                   onValueChange={value => setData('incident_category_id', value)}
                   required
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right">
                     <SelectValue placeholder={t('incidents.form.select_category')} />
                   </SelectTrigger>
                   <SelectContent>
@@ -229,73 +314,113 @@ export default function Create({ districts, categories, reports }: CreateInciden
                     ))}
                   </SelectContent>
                 </Select>
-                <InputError message={errors.incident_category_id} />
+                {errors.incident_category_id && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                  <AlertTriangle className="h-4 w-4" />
+                  {errors.incident_category_id}
+                </p>}
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="location">{t('incidents.form.location')}</Label>
+            <div className="space-y-3">
+              <Label htmlFor="location" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+                {t('incidents.form.location')}
+                <MapPin className="h-4 w-4" />
+              </Label>
               <Input
                 id="location"
                 value={data.location}
                 onChange={e => setData('location', e.target.value)}
                 placeholder={t('incidents.form.location_placeholder')}
+                className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
               />
-              <InputError message={errors.location} />
+              {errors.location && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                <AlertTriangle className="h-4 w-4" />
+                {errors.location}
+              </p>}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="coordinates">{t('incidents.form.coordinates')}</Label>
+            <div className="space-y-3">
+              <Label htmlFor="coordinates" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+                {t('incidents.form.coordinates')}
+                <MapPin className="h-4 w-4" />
+              </Label>
               <Input
                 id="coordinates"
                 value={data.coordinates}
                 onChange={e => setData('coordinates', e.target.value)}
                 placeholder={t('incidents.form.coordinates_placeholder')}
+                className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
               />
-              <InputError message={errors.coordinates} />
+              {errors.coordinates && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                <AlertTriangle className="h-4 w-4" />
+                {errors.coordinates}
+              </p>}
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('incidents.impact_status')}</CardTitle>
+        <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30">
+          <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 text-white border-b pb-4">
+            <CardTitle className="flex items-center gap-3 text-lg">
+              <div className="p-2 bg-white/20 rounded-lg">
+                <AlertCircle className="h-5 w-5" />
+              </div>
+              {t('incidents.impact_status')}
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="casualties">{t('incidents.form.casualties')}</Label>
+          <CardContent className="p-6 space-y-6">
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div className="space-y-3">
+                <Label htmlFor="casualties" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+                  {t('incidents.form.casualties')}
+                  <AlertTriangle className="h-4 w-4" />
+                </Label>
                 <Input
                   id="casualties"
                   type="number"
                   min="0"
                   value={data.casualties}
                   onChange={e => setData('casualties', e.target.value)}
+                  className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
                 />
-                <InputError message={errors.casualties} />
+                {errors.casualties && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                  <AlertTriangle className="h-4 w-4" />
+                  {errors.casualties}
+                </p>}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="injuries">{t('incidents.form.injuries')}</Label>
+              <div className="space-y-3">
+                <Label htmlFor="injuries" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+                  {t('incidents.form.injuries')}
+                  <AlertTriangle className="h-4 w-4" />
+                </Label>
                 <Input
                   id="injuries"
                   type="number"
                   min="0"
                   value={data.injuries}
                   onChange={e => setData('injuries', e.target.value)}
+                  className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
                 />
-                <InputError message={errors.injuries} />
+                {errors.injuries && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                  <AlertTriangle className="h-4 w-4" />
+                  {errors.injuries}
+                </p>}
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="status">{t('incidents.form.status')} <span className="text-destructive">*</span></Label>
+            <div className="space-y-3">
+              <Label htmlFor="status" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+                <span className="text-red-500">*</span>
+                {t('incidents.form.status')}
+                <FileCheck className="h-4 w-4" />
+              </Label>
               <Select
                 value={data.status}
                 onValueChange={value => setData('status', value)}
                 required
               >
-                <SelectTrigger>
+                <SelectTrigger className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right">
                   <SelectValue placeholder={t('incidents.form.select_status')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -305,18 +430,24 @@ export default function Create({ districts, categories, reports }: CreateInciden
                   <SelectItem value="closed">{t('incidents.status.closed')}</SelectItem>
                 </SelectContent>
               </Select>
-              <InputError message={errors.status} />
+              {errors.status && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                <AlertTriangle className="h-4 w-4" />
+                {errors.status}
+              </p>}
             </div>
 
-            <Separator className="my-4" />
+            <Separator className="my-6" />
 
-            <div className="space-y-2">
-              <Label htmlFor="incident_report_id">{t('incidents.form.assign_report')}</Label>
+            <div className="space-y-3">
+              <Label htmlFor="incident_report_id" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+                {t('incidents.form.assign_report')}
+                <FileText className="h-4 w-4" />
+              </Label>
               <Select
                 value={data.incident_report_id}
                 onValueChange={value => setData('incident_report_id', value)}
               >
-                <SelectTrigger>
+                <SelectTrigger className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right">
                   <SelectValue placeholder={t('incidents.form.select_report_optional')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -328,21 +459,35 @@ export default function Create({ districts, categories, reports }: CreateInciden
                   ))}
                 </SelectContent>
               </Select>
-              <InputError message={errors.incident_report_id} />
+              {errors.incident_report_id && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                <AlertTriangle className="h-4 w-4" />
+                {errors.incident_report_id}
+              </p>}
             </div>
           </CardContent>
 
-          <CardFooter className="flex justify-end space-x-2">
-            <Button variant="outline" onClick={() => reset()}>
+          <CardFooter className="flex justify-between border-t px-6 py-5 bg-gradient-to-l from-blue-50 to-blue-100">
+            <Button
+              variant="outline"
+              onClick={() => reset()}
+              type="button"
+              disabled={processing}
+              className="rounded-full border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 shadow-lg"
+            >
               {t('common.cancel')}
             </Button>
-            <Button type="submit" disabled={processing}>
+            <Button
+              type="submit"
+              disabled={processing}
+              className="rounded-full px-8 font-medium bg-gradient-to-l from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+            >
               <Save className="mr-2 h-4 w-4" />
-              {t('incidents.save_incident')}
+              {processing ? t('incidents.saving') : t('incidents.save_incident')}
             </Button>
           </CardFooter>
         </Card>
       </form>
+      </div>
     </AppLayout>
   );
 }
