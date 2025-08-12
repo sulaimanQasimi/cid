@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Pencil, Trash, UserRound, MapPin, FileText, Calendar, Building, Phone, CreditCard, Printer, BarChart3, Eye, Clock, Users } from 'lucide-react';
+import { ArrowRight, Pencil, Trash, UserRound, MapPin, FileText, Calendar, Building2, Phone, IdCard, Printer, BarChart3, Eye, Clock, Users, Shield, Home, Gavel, FileCheck, BookText, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import {
   AlertDialog,
