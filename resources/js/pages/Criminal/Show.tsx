@@ -122,21 +122,21 @@ export default function CriminalShow({ criminal, auth }: Props) {
             </div>
             
             <div className="flex items-center gap-3">
-              <Link href={route('criminals.index')} className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 rounded-2xl shadow-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105 group/btn">
-                <div className="flex items-center gap-3">
+              <Link href={route('criminals.index')} className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105 group/btn">
+                <div className="flex items-center gap-2">
                   <div className="p-1 bg-white/20 rounded-lg group-hover/btn:scale-110 transition-transform duration-300">
-                    <ArrowRight className="h-5 w-5" />
+                    <ArrowRight className="h-4 w-4" />
                   </div>
                   {t('criminal.show.back_button')}
                 </div>
               </Link>
               
               {auth.permissions.includes('criminal.update') && (
-                <Button asChild className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 rounded-2xl shadow-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
+                <Button asChild className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105">
                   <Link href={route('criminals.edit', criminal.id)}>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <div className="p-1 bg-white/20 rounded-lg">
-                        <Pencil className="h-5 w-5" />
+                        <Pencil className="h-4 w-4" />
                       </div>
                       {t('criminal.show.edit_button')}
                     </div>
@@ -145,11 +145,11 @@ export default function CriminalShow({ criminal, auth }: Props) {
               )}
               
               {auth.permissions.includes('criminal.view') && (
-                <Button asChild className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 rounded-2xl shadow-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
+                <Button asChild className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105">
                   <Link href={route('criminals.print', criminal.id)} target="_blank">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <div className="p-1 bg-white/20 rounded-lg">
-                        <Printer className="h-5 w-5" />
+                        <Printer className="h-4 w-4" />
                       </div>
                       {t('criminal.show.print_button')}
                     </div>
@@ -160,11 +160,11 @@ export default function CriminalShow({ criminal, auth }: Props) {
               {auth.permissions.includes('criminal.delete') && (
                 <Button
                   onClick={() => setIsDeleteDialogOpen(true)}
-                  className="bg-red-500/20 backdrop-blur-md border-red-300/30 text-white hover:bg-red-500/30 rounded-2xl shadow-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105"
+                  className="bg-red-500/20 backdrop-blur-md border-red-300/30 text-white hover:bg-red-500/30 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
                     <div className="p-1 bg-red-500/20 rounded-lg">
-                      <Trash className="h-5 w-5" />
+                      <Trash className="h-4 w-4" />
                     </div>
                     {t('criminal.show.delete_button')}
                   </div>
