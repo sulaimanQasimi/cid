@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Pagination } from '@/components/pagination';
 import { PageHeader } from '@/components/page-header';
-import { Plus, FileText, AlertCircle, Search, ArrowUpDown, X } from 'lucide-react';
+import { Plus, FileText, AlertCircle, Search, ArrowUpDown, X, Shield, Users, Building2, Calendar, TrendingUp, AlertTriangle, ChevronDown, FilterX, ChevronRight, ChevronLeft } from 'lucide-react';
 import { format } from 'date-fns';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -87,6 +87,7 @@ export default function Index({ incidents, filters = {}, categories }: IncidentP
   const [categoryId, setCategoryId] = useState(filters.category_id || '');
   const [sortField, setSortField] = useState(filters.sort_field || 'incident_date');
   const [sortDirection, setSortDirection] = useState<SortDirection>(filters.sort_direction || 'desc');
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   const debouncedSearch = useDebounce(search, 500);
 
@@ -156,230 +157,365 @@ export default function Index({ incidents, filters = {}, categories }: IncidentP
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={t('incidents.page_title')} />
-      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-        <PageHeader
-          title={t('incidents.page_title')}
-          description={t('incidents.page_description')}
-          actions={
-            <Button asChild>
-              <Link href={route('incidents.create')}>
-                <Plus className="mr-2 h-4 w-4" />
-                {t('incidents.new_incident')}
-              </Link>
-            </Button>
-          }
-        />
 
-        <Card>
-          <CardHeader>
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div>
-                <CardTitle>{t('incidents.all_incidents')}</CardTitle>
-                <CardDescription>
-                  {t('incidents.list_description')}
-                </CardDescription>
+      <div className="container px-0 py-6">
+        {/* Modern Header with Glassmorphism */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-l from-blue-600 via-indigo-600 to-purple-600 p-8 lg:p-12 text-white shadow-2xl mb-8 group">
+          {/* Animated background elements */}
+          <div className="absolute inset-0 bg-black/5"></div>
+          <div className="absolute top-0 left-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 -translate-x-40 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
+          <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full translate-y-32 translate-x-32 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
+          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white/5 rounded-full -translate-x-16 -translate-y-16 blur-xl group-hover:scale-150 transition-transform duration-500"></div>
+          
+          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-8">
+            <div className="flex items-center gap-8">
+              <div className="p-6 bg-white/20 backdrop-blur-md rounded-3xl border border-white/30 shadow-2xl group-hover:scale-105 transition-transform duration-300">
+                <Shield className="h-10 w-10 text-white" />
               </div>
-              <div className="flex items-center space-x-2">
-                <div className="relative w-full md:w-auto">
-                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder={t('incidents.search_placeholder')}
-                    className="pl-8 pr-4"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                  />
-                </div>
-                {(search || status || categoryId || sortField !== 'incident_date' || sortDirection !== 'desc') && (
-                  <Button variant="ghost" size="sm" onClick={clearFilters}>
-                    <X className="mr-2 h-4 w-4" />
-                    {t('common.clear')}
-                  </Button>
-                )}
+              <div className="space-y-3">
+                <h2 className="text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight">{t('incidents.page_title')}</h2>
+                <p className="text-white/90 flex items-center gap-3 text-xl font-medium">
+                  <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <FileText className="h-6 w-6" />
+                  </div>
+                  {t('incidents.page_description')}
+                </p>
               </div>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="mb-4 grid gap-4 md:grid-cols-3">
-              <div>
-                <Label htmlFor="status-filter">{t('incidents.filters.status')}</Label>
-                <Select
-                  value={status}
-                  onValueChange={setStatus}
-                >
-                  <SelectTrigger id="status-filter">
-                    <SelectValue placeholder={t('incidents.filters.all_statuses')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{t('incidents.filters.all_statuses')}</SelectItem>
-                    <SelectItem value="reported">{t('incidents.status.reported')}</SelectItem>
-                    <SelectItem value="investigating">{t('incidents.status.investigating')}</SelectItem>
-                    <SelectItem value="resolved">{t('incidents.status.resolved')}</SelectItem>
-                    <SelectItem value="closed">{t('incidents.status.closed')}</SelectItem>
-                  </SelectContent>
-                </Select>
+            
+            <div className="flex items-center gap-3">
+              <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-8 py-4 text-lg font-semibold transition-all duration-300 hover:scale-105 group/btn">
+                <Link href={route('incidents.create')} className="flex items-center gap-3">
+                  <div className="p-1 bg-white/20 rounded-lg group-hover/btn:scale-110 transition-transform duration-300">
+                    <Plus className="h-5 w-5" />
+                  </div>
+                  {t('incidents.new_incident')}
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <Card className="shadow-2xl bg-gradient-to-bl from-white to-blue-50/30 border-0 rounded-3xl overflow-hidden">
+          <CardHeader className="py-4 bg-gradient-to-l from-blue-500 to-blue-600 text-white cursor-pointer" onClick={() => setIsFiltersOpen(!isFiltersOpen)}>
+            <CardTitle className="text-lg font-semibold flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm shadow-lg">
+                  <Search className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="text-xl font-bold">{t('incidents.search_filters')}</div>
+                  <div className="text-blue-100 text-xs font-medium">Find and filter incident records</div>
+                </div>
               </div>
-              <div>
-                <Label htmlFor="category-filter">{t('incidents.filters.category')}</Label>
-                <Select
-                  value={categoryId}
-                  onValueChange={setCategoryId}
-                >
-                  <SelectTrigger id="category-filter">
-                    <SelectValue placeholder={t('incidents.filters.all_categories')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{t('incidents.filters.all_categories')}</SelectItem>
-                    {categories.map((category) => (
-                      <SelectItem key={category.id} value={category.id.toString()}>
-                        <div className="flex items-center">
-                          <div
-                            className="mr-2 h-3 w-3 rounded-full"
-                            style={{ backgroundColor: category.color }}
-                          ></div>
-                          {category.name}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="sort-by">{t('incidents.filters.sort_by')}</Label>
-                <Select
-                  value={`${sortField}:${sortDirection}`}
-                  onValueChange={(value) => {
-                    const [field, direction] = value.split(':');
-                    setSortField(field);
-                    setSortDirection(direction as SortDirection);
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-white hover:bg-white/20 rounded-xl"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    clearFilters();
                   }}
                 >
-                  <SelectTrigger id="sort-by">
-                    <SelectValue placeholder={t('incidents.filters.sort_by')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="incident_date:desc">{t('incidents.sort.date_newest')}</SelectItem>
-                    <SelectItem value="incident_date:asc">{t('incidents.sort.date_oldest')}</SelectItem>
-                    <SelectItem value="title:asc">{t('incidents.sort.title_asc')}</SelectItem>
-                    <SelectItem value="title:desc">{t('incidents.sort.title_desc')}</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <FilterX className="h-4 w-4 mr-1" />
+                  Reset
+                </Button>
+                <div className={`transition-transform duration-300 ${isFiltersOpen ? 'rotate-180' : ''}`}>
+                  <ChevronDown className="h-5 w-5" />
+                </div>
               </div>
-            </div>
+            </CardTitle>
+          </CardHeader>
+          <div className={`transition-all duration-300 overflow-hidden ${isFiltersOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Search Bar */}
+                <div className="md:col-span-2">
+                  <div className="relative">
+                    <div className="relative">
+                      <Input
+                        placeholder={t('incidents.search_placeholder')}
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="w-full h-11 pl-20 pr-4 text-base border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white rounded-xl shadow-lg"
+                      />
+                      <Button className="absolute left-1 top-1/2 -translate-y-1/2 h-9 px-4 bg-gradient-to-l from-blue-500 to-blue-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-sm">
+                        Search
+                      </Button>
+                      <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-400" />
+                    </div>
+                  </div>
+                </div>
 
-            <div className="relative w-full overflow-auto">
-              <table className="w-full caption-bottom text-sm">
-                <thead className="[&_tr]:border-b">
-                  <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                    <th
-                      className="h-12 px-4 text-left align-middle font-medium cursor-pointer"
-                      onClick={() => handleSort('title')}
+                {/* Status Filter */}
+                <div>
+                  <Select value={status} onValueChange={setStatus}>
+                    <SelectTrigger className="h-11 shadow-lg border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white rounded-xl text-sm">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{t('incidents.filters.all_statuses')}</SelectItem>
+                      <SelectItem value="reported">{t('incidents.status.reported')}</SelectItem>
+                      <SelectItem value="investigating">{t('incidents.status.investigating')}</SelectItem>
+                      <SelectItem value="resolved">{t('incidents.status.resolved')}</SelectItem>
+                      <SelectItem value="closed">{t('incidents.status.closed')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Category Filter */}
+                <div>
+                  <Select value={categoryId} onValueChange={setCategoryId}>
+                    <SelectTrigger className="h-11 shadow-lg border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white rounded-xl text-sm">
+                      <SelectValue placeholder="Category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{t('incidents.filters.all_categories')}</SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id.toString()}>
+                          <div className="flex items-center">
+                            <div
+                              className="mr-2 h-3 w-3 rounded-full"
+                              style={{ backgroundColor: category.color }}
+                            ></div>
+                            {category.name}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Sort Options */}
+                <div>
+                  <Select
+                    value={`${sortField}:${sortDirection}`}
+                    onValueChange={(value) => {
+                      const [field, direction] = value.split(':');
+                      setSortField(field);
+                      setSortDirection(direction as SortDirection);
+                    }}
+                  >
+                    <SelectTrigger className="h-11 shadow-lg border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white rounded-xl text-sm">
+                      <SelectValue placeholder="Sort By" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="incident_date:desc">{t('incidents.sort.date_newest')}</SelectItem>
+                      <SelectItem value="incident_date:asc">{t('incidents.sort.date_oldest')}</SelectItem>
+                      <SelectItem value="title:asc">{t('incidents.sort.title_asc')}</SelectItem>
+                      <SelectItem value="title:desc">{t('incidents.sort.title_desc')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Direction & Quick Actions Row */}
+                <div className="md:col-span-2 lg:col-span-4 grid grid-cols-3 gap-3">
+                  {/* Direction Button */}
+                  <div>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        const newDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+                        setSortDirection(newDirection);
+                      }}
+                      title={sortDirection === 'asc' ? 'Descending' : 'Ascending'}
+                      className="h-11 w-full shadow-lg border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 rounded-xl transition-all duration-300 hover:scale-105 text-sm"
                     >
-                      {t('incidents.table.title')} {getSortIcon('title')}
-                    </th>
-                    <th
-                      className="h-12 px-4 text-left align-middle font-medium cursor-pointer"
-                      onClick={() => handleSort('incident_date')}
+                      <ArrowUpDown className={`h-4 w-4 mr-2 ${sortDirection === 'desc' ? 'rotate-180' : ''}`} />
+                      {sortDirection === 'asc' ? 'Asc' : 'Desc'}
+                    </Button>
+                  </div>
+
+                  {/* Quick Actions */}
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={clearFilters}
+                      className="h-11 px-3 shadow-lg border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 rounded-xl transition-all duration-300 hover:scale-105 text-sm"
                     >
-                      {t('incidents.table.date')} {getSortIcon('incident_date')}
-                    </th>
-                    <th className="h-12 px-4 text-left align-middle font-medium">
-                      {t('incidents.table.location')}
-                    </th>
-                    <th className="h-12 px-4 text-left align-middle font-medium">
-                      {t('incidents.table.category')}
-                    </th>
-                    <th className="h-12 px-4 text-left align-middle font-medium">
-                      {t('incidents.table.report')}
-                    </th>
-                    <th
-                      className="h-12 px-4 text-left align-middle font-medium cursor-pointer"
-                      onClick={() => handleSort('status')}
-                    >
-                      {t('incidents.table.status')} {getSortIcon('status')}
-                    </th>
-                    <th className="h-12 px-4 text-left align-middle font-medium">
-                      {t('common.actions')}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="[&_tr:last-child]:border-0">
-                  {incidents.data.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} className="h-12 px-4 text-center align-middle">
-                        {t('incidents.no_incidents')}
-                      </td>
-                    </tr>
-                  ) : (
-                    incidents.data.map((incident) => (
-                      <tr
-                        key={incident.id}
-                        className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                      <FilterX className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </div>
+        </Card>
+
+        {/* Results Table */}
+        <div className="mt-8">
+          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30 border-0 rounded-3xl">
+            <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 text-white py-6">
+              <CardTitle className="flex items-center gap-4">
+                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
+                  <TrendingUp className="h-6 w-6" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">{t('incidents.table.title')}</div>
+                  <div className="text-blue-100 text-sm font-medium">Incident records overview</div>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-hidden rounded-b-3xl">
+                <table className="w-full caption-bottom text-sm">
+                  <thead className="[&_tr]:border-b">
+                    <tr className="bg-gradient-to-l from-blue-100 to-blue-200 border-0">
+                      <th
+                        className="h-12 px-6 text-left align-middle font-bold text-blue-800 text-lg cursor-pointer"
+                        onClick={() => handleSort('title')}
                       >
-                        <td className="p-4 align-middle">
-                          <Link
-                            href={route('incidents.show', incident.id)}
-                            className="font-medium text-primary hover:underline"
-                          >
-                            {incident.title}
-                          </Link>
-                        </td>
-                        <td className="p-4 align-middle">
-                          {format(new Date(incident.incident_date), 'PPP')}
-                        </td>
-                        <td className="p-4 align-middle">
-                          {incident.district?.name}, {incident.district_province?.name}
-                        </td>
-                        <td className="p-4 align-middle">
-                          <Badge style={{ backgroundColor: incident.category?.color || '#888888' }}>
-                            {incident.category?.name || t('incidents.unspecified')}
-                          </Badge>
-                        </td>
-                        <td className="p-4 align-middle">
-                          {incident.report ? (
-                            <Link
-                              href={route('incident-reports.show', incident.report.id)}
-                              className="flex items-center text-sm text-muted-foreground hover:underline"
-                            >
-                              <FileText className="mr-1 h-4 w-4" />
-                              {incident.report.report_number}
-                            </Link>
-                          ) : (
-                            <span className="text-muted-foreground text-sm">{t('incidents.none')}</span>
-                          )}
-                        </td>
-                        <td className="p-4 align-middle">
-                          <Badge variant={incident.status === 'resolved' ? 'default' :
-                                          incident.status === 'investigating' ? 'default' :
-                                          incident.status === 'closed' ? 'outline' : 'default'}>
-                            {t(`incidents.status.${incident.status}`)}
-                          </Badge>
-                        </td>
-                        <td className="p-4 align-middle">
-                          <div className="flex space-x-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              asChild
-                            >
-                              <Link href={route('incidents.show', incident.id)}>
-                                <AlertCircle className="h-4 w-4 mr-1" />
-                                {t('incidents.details')}
-                              </Link>
-                            </Button>
+                        {t('incidents.table.title')} {getSortIcon('title')}
+                      </th>
+                      <th
+                        className="h-12 px-6 text-left align-middle font-bold text-blue-800 text-lg cursor-pointer"
+                        onClick={() => handleSort('incident_date')}
+                      >
+                        {t('incidents.table.date')} {getSortIcon('incident_date')}
+                      </th>
+                      <th className="h-12 px-6 text-left align-middle font-bold text-blue-800 text-lg">
+                        {t('incidents.table.location')}
+                      </th>
+                      <th className="h-12 px-6 text-left align-middle font-bold text-blue-800 text-lg">
+                        {t('incidents.table.category')}
+                      </th>
+                      <th className="h-12 px-6 text-left align-middle font-bold text-blue-800 text-lg">
+                        {t('incidents.table.report')}
+                      </th>
+                      <th
+                        className="h-12 px-6 text-left align-middle font-bold text-blue-800 text-lg cursor-pointer"
+                        onClick={() => handleSort('status')}
+                      >
+                        {t('incidents.table.status')} {getSortIcon('status')}
+                      </th>
+                      <th className="h-12 px-6 text-left align-middle font-bold text-blue-800 text-lg">
+                        {t('common.actions')}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="[&_tr:last-child]:border-0">
+                    {incidents.data.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="h-32 text-center align-middle">
+                          <div className="flex flex-col items-center gap-4 text-blue-600">
+                            <div className="p-4 bg-blue-100 rounded-full">
+                              <AlertTriangle className="h-16 w-16 text-blue-400" />
+                            </div>
+                            <p className="text-xl font-bold">{t('incidents.no_incidents')}</p>
+                            <p className="text-blue-500">No incident records found</p>
                           </div>
                         </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                    ) : (
+                      incidents.data.map((incident) => (
+                        <tr
+                          key={incident.id}
+                          className="border-b border-blue-100 transition-colors hover:bg-blue-50/50 data-[state=selected]:bg-muted"
+                        >
+                          <td className="p-6 align-middle">
+                            <Link
+                              href={route('incidents.show', incident.id)}
+                              className="font-bold text-blue-900 text-lg hover:underline"
+                            >
+                              {incident.title}
+                            </Link>
+                          </td>
+                          <td className="p-6 align-middle text-blue-800 font-medium">
+                            {format(new Date(incident.incident_date), 'PPP')}
+                          </td>
+                          <td className="p-6 align-middle text-blue-800">
+                            {incident.district?.name}, {incident.district_province?.name}
+                          </td>
+                          <td className="p-6 align-middle">
+                            <Badge variant="outline" className="bg-gradient-to-l from-blue-100 to-blue-200 text-blue-800 border-blue-300 px-4 py-2 rounded-xl font-semibold">
+                              {incident.category?.name || t('incidents.unspecified')}
+                            </Badge>
+                          </td>
+                          <td className="p-6 align-middle">
+                            {incident.report ? (
+                              <Link
+                                href={route('incident-reports.show', incident.report.id)}
+                                className="flex items-center text-sm text-blue-600 hover:underline font-medium"
+                              >
+                                <FileText className="mr-1 h-4 w-4" />
+                                {incident.report.report_number}
+                              </Link>
+                            ) : (
+                              <span className="text-blue-600 font-medium">{t('incidents.none')}</span>
+                            )}
+                          </td>
+                          <td className="p-6 align-middle">
+                            <Badge variant="outline" className="bg-gradient-to-l from-blue-100 to-blue-200 text-blue-800 border-blue-300 px-4 py-2 rounded-xl font-semibold">
+                              {t(`incidents.status.${incident.status}`)}
+                            </Badge>
+                          </td>
+                          <td className="p-6 align-middle">
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                asChild
+                                title={t('incidents.details')}
+                                className="h-10 w-10 rounded-xl hover:bg-blue-100 text-blue-600 hover:text-blue-700 transition-all duration-300 hover:scale-110"
+                              >
+                                <Link href={route('incidents.show', incident.id)}>
+                                  <AlertCircle className="h-5 w-5" />
+                                </Link>
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-            <div className="mt-6">
-              <Pagination links={incidents.links} />
+        {/* Modern Pagination */}
+        {incidents.links && incidents.links.length > 0 && (
+          <div className="mt-8 flex justify-center">
+            <div className="flex items-center gap-3 bg-gradient-to-l from-blue-50 to-white p-4 rounded-3xl shadow-2xl border border-blue-200">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-12 w-12 shadow-lg border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
+              >
+                <ChevronRight className="h-5 w-5" />
+                <ChevronRight className="h-5 w-5 -mr-1" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-12 w-12 shadow-lg border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </Button>
+              <div className="px-6 py-3 bg-gradient-to-l from-blue-100 to-blue-200 text-blue-800 rounded-2xl font-bold text-lg shadow-lg">
+                Page 1 of 1
+              </div>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-12 w-12 shadow-lg border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-12 w-12 shadow-lg border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
+              >
+                <ChevronLeft className="h-5 w-5" />
+                <ChevronLeft className="h-5 w-5 -mr-1" />
+              </Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        )}
       </div>
     </AppLayout>
   );
