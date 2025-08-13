@@ -48,7 +48,14 @@ export function AppContent({ variant = 'header', children, ...props }: AppConten
     }, [variant]);
 
     if (variant === 'sidebar') {
-        return <SidebarInset {...props}>{children}</SidebarInset>;
+        return (
+            <SidebarInset 
+                className="ml-4 mr-4 mt-4 mb-4 rounded-xl bg-white shadow-sm border border-gray-200" 
+                {...props}
+            >
+                {children}
+            </SidebarInset>
+        );
     }
 
     return (

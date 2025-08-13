@@ -337,7 +337,7 @@ export function AppSidebar() {
             collapsible="icon" 
             variant="sidebar" 
             side={sidebarSide} 
-            className="bg-slate-900 dark:bg-slate-950 border-r border-slate-800 dark:border-slate-700"
+            className="bg-slate-900 dark:bg-slate-950 border-r border-slate-800 dark:border-slate-700 shadow-2xl z-50"
         >
             {/* Clean Header */}
             <SidebarHeader className="p-4 border-b border-slate-800 dark:border-slate-700">
@@ -366,7 +366,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             {/* Content Area */}
-            <SidebarContent className="p-0">
+            <SidebarContent className="p-0 overflow-hidden">
                 <NavMain
                     items={getPermissionBasedNavigation(auth, t)}
                 />
@@ -374,27 +374,7 @@ export function AppSidebar() {
 
             {/* Footer */}
             <SidebarFooter className="p-4 border-t border-slate-800 dark:border-slate-700">
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton 
-                            className="hover:bg-slate-700/50 transition-colors justify-start text-white hover:text-white"
-                        >
-                            <div className="flex items-center gap-3 w-full">
-                                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium text-sm">
-                                    {auth?.user?.name ? auth.user.name.charAt(0).toUpperCase() : 'U'}
-                                </div>
-                                <div className="flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
-                                    <div className="font-medium text-white text-sm">
-                                        {auth?.user?.name || 'User'}
-                                    </div>
-                                    <div className="text-gray-400 text-xs">
-                                        {auth?.user?.email || 'user@example.com'}
-                                    </div>
-                                </div>
-                            </div>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
+                <NavUser />
             </SidebarFooter>
         </Sidebar>
     );

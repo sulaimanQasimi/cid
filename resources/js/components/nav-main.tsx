@@ -24,8 +24,18 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
 
     const renderNavItem = (item: NavItem) => {
         const hasItems = item.items && item.items.length > 0;
-        const isActive = item.href === page.url ||
-            (hasItems && item.items?.some(subItem => subItem.href === page.url));
+        
+        // More precise active state detection
+        const isActive = (item.href && (
+            page.url === item.href || 
+            (item.href !== '/' && !item.href.startsWith('#') && page.url.startsWith(item.href + '/'))
+        )) ||
+        (hasItems && item.items?.some(subItem => 
+            subItem.href && (
+                page.url === subItem.href || 
+                (subItem.href !== '/' && !subItem.href.startsWith('#') && page.url.startsWith(subItem.href + '/'))
+            )
+        ));
 
         if (hasItems) {
             const isOpen = openSubmenu === item.title;
@@ -36,7 +46,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                         asChild
                         tooltip={{ children: item.title }}
                         isActive={isActive}
-                        className="mx-3 my-1 text-blue-900 hover:text-blue-900 hover:bg-blue-200 data-[active=true]:bg-blue-600 data-[active=true]:text-white transition-colors rounded-md"
+                        className="mx-3 my-1 text-blue-900 hover:text-blue-900 hover:bg-blue-200 data-[active=true]:bg-blue-400 data-[active=true]:text-white transition-colors rounded-md"
                     >
                         <Link href={item.href || '#'} prefetch>
                             <div className="flex items-center gap-3 w-full">
@@ -45,7 +55,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                             </div>
                             {!isCollapsed && item.items && item.items.length > 0 && (
                                 <ChevronDown 
-                                    className={`ml-auto h-4 w-4 text-blue-900 group-hover:text-blue-900 group-data-[active=true]:text-black transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                                    className={`ml-10 h-4 w-4 text-blue-900 group-hover:text-blue-900 group-data-[active=true]:text-black transition-transform ${isOpen ? 'rotate-180' : ''}`}
                                     onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
@@ -62,9 +72,12 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                 <SidebarMenuButton
                                     key={subItem.title}
                                     asChild
-                                    isActive={subItem.href === page.url}
+                                    isActive={!!(subItem.href && (
+                                        page.url === subItem.href || 
+                                        (subItem.href !== '/' && !subItem.href.startsWith('#') && page.url.startsWith(subItem.href + '/'))
+                                    ))}
                                     tooltip={{ children: subItem.title }}
-                                    className="mx-3 text-blue-900 hover:text-blue-900 hover:bg-blue-200 data-[active=true]:bg-blue-600 data-[active=true]:text-white transition-colors rounded-md"
+                                    className="mx-3 text-blue-900 hover:text-blue-900 hover:bg-blue-200 data-[active=true]:bg-blue-400 data-[active=true]:text-white transition-colors rounded-md"
                                 >
                                     <Link href={subItem.href || '#'} prefetch>
                                         <div className="flex items-center gap-3 w-full pl-4">
@@ -100,8 +113,8 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
     };
 
     return (
-        <SidebarGroup className="px-0 py-4">
-            <SidebarMenu className="space-y-1">
+        <SidebarGroup className="px-0 py-4 overflow-hidden">
+            <SidebarMenu className="space-y-1 overflow-hidden">
                 {items.map(renderNavItem)}
             </SidebarMenu>
         </SidebarGroup>
