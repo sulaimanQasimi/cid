@@ -454,10 +454,10 @@ export default function DepartmentIndex({
         </div>
 
                 {/* Pagination */}
-        {departments.links && departments.total > 0 && (
+        {departments.meta && departments.meta.links && departments.meta.total > 0 && (
           <div className="mt-8 flex justify-center">
             <div className="bg-gradient-to-l from-blue-50 to-white p-4 rounded-3xl shadow-2xl border border-blue-200">
-              <Pagination links={departments.links} />
+              <Pagination links={departments.meta.links} />
             </div>
           </div>
         )}

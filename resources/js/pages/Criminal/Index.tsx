@@ -537,10 +537,10 @@ export default function CriminalIndex({
       </div>
 
         {/* Pagination */}
-        {criminals && criminals.links && criminals.total > 0 && (
+        {criminals && criminals.meta && criminals.meta.links && criminals.meta.total > 0 && (
           <div className="mt-8 flex justify-center">
             <div className="bg-gradient-to-l from-orange-50 to-white p-4 rounded-3xl shadow-2xl border border-orange-200">
-              <Pagination links={criminals.links} />
+              <Pagination links={criminals.meta.links} />
             </div>
           </div>
         )}

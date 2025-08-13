@@ -105,6 +105,7 @@ interface Props {
   infos: {
     data?: InfoRecord[];
     links?: PaginationLinks;
+    meta?: PaginationMeta;
   };
   types: InfoType[];
   categories: InfoCategory[];
@@ -629,10 +630,10 @@ export default function InfoIndex({
         </div>
 
         {/* Pagination */}
-        {infos && infos.links && infos.total > 0 && (
+        {infos && infos.meta && infos.meta.links && infos.meta.total > 0 && (
           <div className="mt-8 flex justify-center">
             <div className="bg-gradient-to-l from-purple-50 to-white p-4 rounded-3xl shadow-2xl border border-purple-200">
-              <Pagination links={infos.links} />
+              <Pagination links={infos.meta.links} />
             </div>
           </div>
         )}
