@@ -5,22 +5,17 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { 
-    BookOpen, 
     Database, 
     Folder, 
-    LayoutGrid, 
-
+    LayoutGrid,
     Tag, 
     Users, 
     Shield, 
     UserCog, 
-    Video, 
-    Calendar, 
     Building, 
     FileText, 
     QrCode, 
     Globe, 
-    TabletSmartphone, 
     AlertTriangle, 
     AlertCircle, 
     FileBarChart, 
@@ -28,16 +23,10 @@ import {
     MapPin,
     ShieldCheck,
     Eye,
-    Search,
     BarChart3,
     Settings,
-    Lock,
-    Activity,
     Target,
-    Briefcase,
-    Archive
 } from 'lucide-react';
-import AppLogo from './app-logo';
 import { useLanguage } from '@/lib/i18n/language-context';
 import { useTranslation } from '@/lib/i18n/translate';
 import { hasPermission, PermissionPatterns } from '@/lib/permissions';
@@ -62,28 +51,28 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
     if (hasPermission(auth, PermissionPatterns.info.viewAny)) {
         intelligenceItems.push({ 
             title: t('sidebar.active_cases'), 
-            href: route('infos.index'), 
+            href: '/infos', 
             icon: Target 
         });
     }
     if (hasPermission(auth, PermissionPatterns.department.viewAny)) {
         intelligenceItems.push({ 
             title: t('sidebar.surveillance'), 
-            href: route('departments.index'), 
+            href: '/departments', 
             icon: Eye 
         });
     }
     if (hasPermission(auth, PermissionPatterns.infoType.viewAny)) {
         intelligenceItems.push({ 
             title: t('sidebar.intelligence_reports'), 
-            href: route('info-types.index'), 
+            href: '/info-types', 
             icon: FileBarChart 
         });
     }
     if (hasPermission(auth, PermissionPatterns.infoCategory.viewAny)) {
         intelligenceItems.push({ 
             title: t('sidebar.case_categories'), 
-            href: route('info-categories.index'), 
+            href: '/info-categories', 
             icon: Folder 
         });
     }
@@ -102,7 +91,7 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
     if (hasPermission(auth, PermissionPatterns.criminal.viewAny)) {
         criminalItems.push({ 
             title: t('sidebar.criminal_records'), 
-            href: route('criminals.index'), 
+            href: '/criminals', 
             icon: FileText 
         });
     }
@@ -120,21 +109,21 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
     if (hasPermission(auth, PermissionPatterns.incident.viewAny)) {
         incidentItems.push({ 
             title: t('sidebar.active_incidents'), 
-            href: route('incidents.index'), 
+            href: '/incidents', 
             icon: AlertCircle 
         });
     }
     if (hasPermission(auth, PermissionPatterns.incidentReport.viewAny)) {
         incidentItems.push({ 
             title: t('sidebar.incident_reports'), 
-            href: route('incident-reports.index'), 
+            href: '/incident-reports', 
             icon: FileBarChart 
         });
     }
     if (hasPermission(auth, PermissionPatterns.incidentCategory.viewAny)) {
         incidentItems.push({ 
             title: t('sidebar.incident_categories'), 
-            href: route('incident-categories.index'), 
+            href: '/incident-categories', 
             icon: Tag 
         });
     }
@@ -153,7 +142,7 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
     if (hasPermission(auth, PermissionPatterns.report.viewAny)) {
         analysisItems.push({ 
             title: t('sidebar.report_scanner'), 
-            href: route('reports.scan'), 
+            href: '/reports/scan', 
             icon: QrCode 
         });
     }
@@ -172,14 +161,14 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
     if (hasPermission(auth, PermissionPatterns.province.viewAny)) {
         geographicItems.push({ 
             title: t('sidebar.provinces'), 
-            href: route('provinces.index'), 
+            href: '/provinces', 
             icon: Map 
         });
     }
     if (hasPermission(auth, PermissionPatterns.district.viewAny)) {
         geographicItems.push({ 
             title: t('sidebar.districts'), 
-            href: route('districts.index'), 
+            href: '/districts', 
             icon: MapPin 
         });
     }
@@ -198,36 +187,36 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
     if (hasPermission(auth, PermissionPatterns.user.viewAny)) {
         adminItems.push({ 
             title: t('sidebar.user_management'), 
-            href: route('users.index'), 
+            href: '/users', 
             icon: Users 
         });
     }
     if (hasPermission(auth, PermissionPatterns.department.viewAny)) {
         adminItems.push({ 
             title: t('sidebar.department_management'), 
-            href: route('departments.index'), 
+            href: '/departments', 
             icon: Building 
         });
     }
     if (hasPermission(auth, 'role.view_any')) {
         adminItems.push({ 
             title: t('sidebar.role_management'), 
-            href: route('roles.index'), 
+            href: '/roles', 
             icon: UserCog 
         });
     }
     if (hasPermission(auth, 'permission.view_any')) {
         adminItems.push({ 
             title: t('sidebar.security_permissions'), 
-            href: route('permissions.index'), 
+            href: '/permissions', 
             icon: Shield 
         });
     }
     
     // Analytics - accessible to all authenticated users
     adminItems.push({ 
-        title: 'Visitor Analytics', 
-        href: route('analytics.index'), 
+        title: t('sidebar.visitor_analytics'), 
+        href: '/analytics', 
         icon: BarChart3 
     });
     
@@ -321,7 +310,7 @@ export function AppSidebar() {
                 }
                 .fixed.md\\:flex {
                     right: 0 !important;
-                    left: auto !important;
+                    left:  !important;
                 }
                 [data-side="right"] {
                     right: 0 !important;
@@ -344,40 +333,68 @@ export function AppSidebar() {
     }, [direction]);
 
     return (
-        <Sidebar collapsible="icon" variant="inset" side={sidebarSide} className="border-r border-border/50 bg-gradient-to-b from-background to-muted/20">
-            <SidebarHeader className="border-b border-border/50 bg-gradient-to-r from-primary/5 to-primary/10">
+        <Sidebar 
+            collapsible="icon" 
+            variant="sidebar" 
+            side={sidebarSide} 
+            className="bg-slate-900 dark:bg-slate-950 border-r border-slate-800 dark:border-slate-700"
+        >
+            {/* Clean Header */}
+            <SidebarHeader className="p-4 border-b border-slate-800 dark:border-slate-700">
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild className="hover:bg-primary/10 transition-colors">
+                        <SidebarMenuButton 
+                            size="lg" 
+                            asChild 
+                            className=" bg-blue-600 transition-colors justify-start text-white hover:text-blue-600 hover:bg-blue-700"
+                        >
                             <Link href="/dashboard" prefetch>
-                                <AppLogo />
+                                <div className="flex items-center gap-3 w-full">
+                                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg">
+                                        <ShieldCheck className="h-4 w-4 text-white" />
+                                    </div>
+                                    <div className="flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
+                                        <div className="font-semibold text-white text-sm">
+                                            {t('common.app_name')}
+                                        </div>
+                                    </div>
+                                </div>
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarContent className="px-2 py-4">
-                <div className="mb-4 px-3">
-                    <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        <ShieldCheck className="h-3 w-3" />
-                        {t('sidebar.intelligence_department')}
-                    </div>
-                </div>
+            {/* Content Area */}
+            <SidebarContent className="p-0">
                 <NavMain
                     items={getPermissionBasedNavigation(auth, t)}
                 />
             </SidebarContent>
 
-            <SidebarFooter className="border-t border-border/50 bg-gradient-to-t from-muted/20 to-background">
-                <div className="px-4 py-2">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                        <Activity className="h-3 w-3" />
-                        {t('sidebar.system_status_secure')}
-                    </div>
-                </div>
-                <NavFooter items={footerNavItems} className="mt-auto px-4" />
-                <NavUser />
+            {/* Footer */}
+            <SidebarFooter className="p-4 border-t border-slate-800 dark:border-slate-700">
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton 
+                            className="hover:bg-slate-700/50 transition-colors justify-start text-white hover:text-white"
+                        >
+                            <div className="flex items-center gap-3 w-full">
+                                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium text-sm">
+                                    {auth?.user?.name ? auth.user.name.charAt(0).toUpperCase() : 'U'}
+                                </div>
+                                <div className="flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
+                                    <div className="font-medium text-white text-sm">
+                                        {auth?.user?.name || 'User'}
+                                    </div>
+                                    <div className="text-gray-400 text-xs">
+                                        {auth?.user?.email || 'user@example.com'}
+                                    </div>
+                                </div>
+                            </div>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
             </SidebarFooter>
         </Sidebar>
     );
