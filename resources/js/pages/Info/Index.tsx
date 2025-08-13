@@ -30,6 +30,7 @@ import { useTranslation } from '@/lib/i18n/translate';
 import { usePermissions } from '@/hooks/use-permissions';
 import { CanCreate, CanView, CanUpdate, CanDelete, CanConfirm } from '@/components/ui/permission-guard';
 import { cn } from '@/lib/utils';
+import { Pagination } from '@/components/pagination';
 
 interface InfoRecord {
   id: number;
@@ -148,20 +149,7 @@ const perPageOptions = [
 ];
 
 export default function InfoIndex({
-  infos = {
-    data: [],
-    links: { first: null, last: null, prev: null, next: null },
-    meta: {
-      current_page: 1,
-      from: 1,
-      last_page: 1,
-      links: [],
-      path: '',
-      per_page: 10,
-      to: 0,
-      total: 0
-    }
-  },
+  infos ,
   types = [],
   categories = [],
   departments = [],
@@ -641,54 +629,11 @@ export default function InfoIndex({
           </Card>
         </div>
 
-        {/* Modern Pagination */}
-        {infos?.meta && infos.meta.last_page > 1 && (
+        {/* Pagination */}
+        {infos && infos.links && infos.total > 0 && (
           <div className="mt-8 flex justify-center">
-            <div className="flex items-center gap-3 bg-gradient-to-l from-purple-50 to-white p-4 rounded-3xl shadow-2xl border border-purple-200">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => goToPage(1)}
-                disabled={!infos?.meta || infos.meta.current_page === 1}
-                className="h-12 w-12 shadow-lg border-purple-300 text-purple-700 hover:bg-purple-100 hover:border-purple-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
-              >
-                <ChevronRight className="h-5 w-5" />
-                <ChevronRight className="h-5 w-5 -mr-1" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => goToPage((infos?.meta?.current_page || 1) - 1)}
-                disabled={!infos?.links || !infos.links.prev}
-                className="h-12 w-12 shadow-lg border-purple-300 text-purple-700 hover:bg-purple-100 hover:border-purple-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
-              >
-                <ChevronRight className="h-5 w-5" />
-              </Button>
-              <div className="px-6 py-3 bg-gradient-to-l from-purple-100 to-purple-200 text-purple-800 rounded-2xl font-bold text-lg shadow-lg">
-                {t('info.pagination', {
-                  current: String(infos.meta?.current_page ?? '1'),
-                  total: String(infos.meta?.last_page ?? '1')
-                })}
-              </div>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => goToPage((infos?.meta?.current_page || 1) + 1)}
-                disabled={!infos?.links || !infos.links.next}
-                className="h-12 w-12 shadow-lg border-purple-300 text-purple-700 hover:bg-purple-100 hover:border-purple-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => goToPage(infos.meta?.last_page || 1)}
-                disabled={!infos?.meta || infos.meta.current_page === infos.meta.last_page}
-                className="h-12 w-12 shadow-lg border-purple-300 text-purple-700 hover:bg-purple-100 hover:border-purple-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
-              >
-                <ChevronLeft className="h-5 w-5" />
-                <ChevronLeft className="h-5 w-5 -mr-1" />
-              </Button>
+            <div className="bg-gradient-to-l from-purple-50 to-white p-4 rounded-3xl shadow-2xl border border-purple-200">
+              <Pagination links={infos.links} />
             </div>
           </div>
         )}

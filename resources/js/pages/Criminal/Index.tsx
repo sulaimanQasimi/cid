@@ -30,6 +30,7 @@ import { format } from 'date-fns';
 import { useTranslation } from '@/lib/i18n/translate';
 import { usePermissions } from '@/hooks/use-permissions';
 import { CanCreate, CanView, CanUpdate, CanDelete } from '@/components/ui/permission-guard';
+import { Pagination } from '@/components/pagination';
 
 interface Criminal {
   id: number;
@@ -137,20 +138,7 @@ const perPageOptions = [
 ];
 
 export default function CriminalIndex({
-  criminals = {
-    data: [],
-    links: { first: null, last: null, prev: null, next: null },
-    meta: {
-      current_page: 1,
-      from: 1,
-      last_page: 1,
-      links: [],
-      path: '',
-      per_page: 10,
-      to: 0,
-      total: 0
-    }
-  },
+  criminals,
   departments = [],
   filters,
   auth
@@ -548,54 +536,11 @@ export default function CriminalIndex({
         </Card>
       </div>
 
-        {/* Modern Pagination */}
-        {criminals.meta && criminals.meta.last_page > 1 && (
+        {/* Pagination */}
+        {criminals && criminals.links && criminals.total > 0 && (
           <div className="mt-8 flex justify-center">
-            <div className="flex items-center gap-3 bg-gradient-to-l from-orange-50 to-white p-4 rounded-3xl shadow-2xl border border-orange-200">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => criminals.meta && goToPage(1)}
-                disabled={!criminals.meta || criminals.meta.current_page === 1}
-                className="h-12 w-12 shadow-lg border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
-              >
-                <ChevronRight className="h-5 w-5" />
-                <ChevronRight className="h-5 w-5 -mr-1" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => criminals.meta && goToPage(criminals.meta.current_page - 1)}
-                disabled={!criminals.meta || criminals.meta.current_page === 1}
-                className="h-12 w-12 shadow-lg border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
-              >
-                <ChevronRight className="h-5 w-5" />
-              </Button>
-              <div className="px-6 py-3 bg-gradient-to-l from-orange-100 to-orange-200 text-orange-800 rounded-2xl font-bold text-lg shadow-lg">
-                {t('criminal.pagination', {
-                  current: String(criminals.meta?.current_page ?? '1'),
-                  total: String(criminals.meta?.last_page ?? '1')
-                })}
-              </div>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => criminals.meta && goToPage(criminals.meta.current_page + 1)}
-                disabled={!criminals.meta || criminals.meta.current_page === criminals.meta.last_page}
-                className="h-12 w-12 shadow-lg border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => criminals.meta && goToPage(criminals.meta.last_page)}
-                disabled={!criminals.meta || criminals.meta.current_page === criminals.meta.last_page}
-                className="h-12 w-12 shadow-lg border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
-              >
-                <ChevronLeft className="h-5 w-5" />
-                <ChevronLeft className="h-5 w-5 -mr-1" />
-              </Button>
+            <div className="bg-gradient-to-l from-orange-50 to-white p-4 rounded-3xl shadow-2xl border border-orange-200">
+              <Pagination links={criminals.links} />
             </div>
           </div>
         )}

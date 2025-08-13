@@ -464,43 +464,11 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
           </Card>
         </div>
 
-        {/* Modern Pagination */}
+        {/* Pagination */}
         {reports.links && reports.links.length > 0 && (
           <div className="mt-8 flex justify-center">
-            <div className="flex items-center gap-3 bg-gradient-to-l from-green-50 to-white p-4 rounded-3xl shadow-2xl border border-green-200">
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-12 w-12 shadow-lg border-green-300 text-green-700 hover:bg-green-100 hover:border-green-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
-              >
-                <ChevronRight className="h-5 w-5" />
-                <ChevronRight className="h-5 w-5 -mr-1" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-12 w-12 shadow-lg border-green-300 text-green-700 hover:bg-green-100 hover:border-green-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
-              >
-                <ChevronRight className="h-5 w-5" />
-              </Button>
-              <div className="px-6 py-3 bg-gradient-to-l from-green-100 to-green-200 text-green-800 rounded-2xl font-bold text-lg shadow-lg">
-                Page 1 of 1
-              </div>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-12 w-12 shadow-lg border-green-300 text-green-700 hover:bg-green-100 hover:border-green-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-12 w-12 shadow-lg border-green-300 text-green-700 hover:bg-green-100 hover:border-green-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
-              >
-                <ChevronLeft className="h-5 w-5" />
-                <ChevronLeft className="h-5 w-5 -mr-1" />
-              </Button>
+            <div className="bg-gradient-to-l from-green-50 to-white p-4 rounded-3xl shadow-2xl border border-green-200">
+              <Pagination links={reports.links} />
             </div>
           </div>
         )}
