@@ -105,7 +105,6 @@ interface Props {
   infos: {
     data?: InfoRecord[];
     links?: PaginationLinks;
-    meta?: PaginationMeta;
   };
   types: InfoType[];
   categories: InfoCategory[];
