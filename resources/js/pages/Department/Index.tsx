@@ -472,7 +472,7 @@ export default function DepartmentIndex({
       </div>
 
         {/* Modern Pagination */}
-        {departments.meta && departments.meta.total > 0 && (
+        {/* {departments.meta && departments.meta.total > 0 && ( */}
           <div className="mt-8 flex justify-center">
             <div className="flex items-center gap-3 bg-gradient-to-l from-blue-50 to-white p-4 rounded-3xl shadow-2xl border border-blue-200">
               {/* First Page Button */}
@@ -537,7 +537,7 @@ export default function DepartmentIndex({
               </Button>
             </div>
           </div>
-        )}
+        {/* )} */}
       </div>
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
