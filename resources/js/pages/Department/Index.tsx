@@ -472,56 +472,72 @@ export default function DepartmentIndex({
       </div>
 
         {/* Modern Pagination */}
-        {departments.meta && departments.meta.last_page > 1 && (
+        {/* {departments.meta && departments.meta.total > 0 && ( */}
           <div className="mt-8 flex justify-center">
             <div className="flex items-center gap-3 bg-gradient-to-l from-blue-50 to-white p-4 rounded-3xl shadow-2xl border border-blue-200">
+              {/* First Page Button */}
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => departments.meta && goToPage(1)}
                 disabled={!departments.meta || departments.meta.current_page === 1}
                 className="h-12 w-12 shadow-lg border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
+                title={t('departments.pagination.first_page')}
               >
                 <ChevronRight className="h-5 w-5" />
                 <ChevronRight className="h-5 w-5 -mr-1" />
               </Button>
+              
+              {/* Previous Page Button */}
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => departments.meta && goToPage(departments.meta.current_page - 1)}
                 disabled={!departments.meta || departments.meta.current_page === 1}
                 className="h-12 w-12 shadow-lg border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
+                title={t('departments.pagination.previous_page')}
               >
                 <ChevronRight className="h-5 w-5" />
               </Button>
+              
+              {/* Page Info */}
               <div className="px-6 py-3 bg-gradient-to-l from-blue-100 to-blue-200 text-blue-800 rounded-2xl font-bold text-lg shadow-lg">
-                {t('departments.pagination', {
+                {t('departments.pagination.info', {
                   current: String(departments.meta?.current_page ?? '1'),
-                  total: String(departments.meta?.last_page ?? '1')
+                  total: String(departments.meta?.last_page ?? '1'),
+                  from: String(departments.meta?.from ?? '0'),
+                  to: String(departments.meta?.to ?? '0'),
+                  total_records: String(departments.meta?.total ?? '0')
                 })}
               </div>
+              
+              {/* Next Page Button */}
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => departments.meta && goToPage(departments.meta.current_page + 1)}
                 disabled={!departments.meta || departments.meta.current_page === departments.meta.last_page}
                 className="h-12 w-12 shadow-lg border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
+                title={t('departments.pagination.next_page')}
               >
                 <ChevronLeft className="h-5 w-5" />
               </Button>
+              
+              {/* Last Page Button */}
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => departments.meta && goToPage(departments.meta.last_page)}
                 disabled={!departments.meta || departments.meta.current_page === departments.meta.last_page}
                 className="h-12 w-12 shadow-lg border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
+                title={t('departments.pagination.last_page')}
               >
                 <ChevronLeft className="h-5 w-5" />
                 <ChevronLeft className="h-5 w-5 -mr-1" />
               </Button>
             </div>
           </div>
-        )}
+        {/* )} */}
       </div>
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
