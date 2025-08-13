@@ -80,10 +80,9 @@ interface Department {
 }
 
 interface PaginationLinks {
-  first: string | null;
-  last: string | null;
-  prev: string | null;
-  next: string | null;
+  url: string | null;
+  label: string;
+  active: boolean;
 }
 
 interface PaginationMeta {
@@ -104,7 +103,7 @@ interface PaginationMeta {
 interface Props {
   infos: {
     data?: InfoRecord[];
-    links?: PaginationLinks;
+    links?: PaginationLinks[];
     meta?: PaginationMeta;
   };
   types: InfoType[];
@@ -630,10 +629,10 @@ export default function InfoIndex({
         </div>
 
         {/* Pagination */}
-        {infos && infos.meta && infos.meta.links && infos.meta.total > 0 && (
+        {infos && infos.links && infos.links.length > 0 && (
           <div className="mt-8 flex justify-center">
             <div className="bg-gradient-to-l from-purple-50 to-white p-4 rounded-3xl shadow-2xl border border-purple-200">
-              <Pagination links={infos.meta.links} />
+              <Pagination links={infos.links} />
             </div>
           </div>
         )}

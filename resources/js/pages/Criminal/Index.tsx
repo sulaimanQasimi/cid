@@ -80,10 +80,9 @@ interface Department {
 }
 
 interface PaginationLinks {
-  first: string | null;
-  last: string | null;
-  prev: string | null;
-  next: string | null;
+  url: string | null;
+  label: string;
+  active: boolean;
 }
 
 interface PaginationMeta {
@@ -104,7 +103,7 @@ interface PaginationMeta {
 interface Props {
   criminals: {
     data?: Criminal[];
-    links?: PaginationLinks;
+    links?: PaginationLinks[];
     meta?: PaginationMeta;
   };
   departments: Department[];
@@ -537,10 +536,10 @@ export default function CriminalIndex({
       </div>
 
         {/* Pagination */}
-        {criminals && criminals.meta && criminals.meta.links && criminals.meta.total > 0 && (
+        {criminals && criminals.links && criminals.links.length > 0 && (
           <div className="mt-8 flex justify-center">
             <div className="bg-gradient-to-l from-orange-50 to-white p-4 rounded-3xl shadow-2xl border border-orange-200">
-              <Pagination links={criminals.meta.links} />
+              <Pagination links={criminals.links} />
             </div>
           </div>
         )}

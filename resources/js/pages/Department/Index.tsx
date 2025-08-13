@@ -42,10 +42,9 @@ interface Department {
 }
 
 interface PaginationLinks {
-  first: string | null;
-  last: string | null;
-  prev: string | null;
-  next: string | null;
+  url: string | null;
+  label: string;
+  active: boolean;
 }
 
 interface PaginationMeta {
@@ -66,7 +65,7 @@ interface PaginationMeta {
 interface Props {
   departments: {
     data?: Department[];
-    links?: PaginationLinks;
+    links?: PaginationLinks[];
     meta?: PaginationMeta;
   };
   filters: {
@@ -454,10 +453,10 @@ export default function DepartmentIndex({
         </div>
 
                 {/* Pagination */}
-        {departments.meta && departments.meta.links && departments.meta.total > 0 && (
+        {departments.links && departments.links.length > 0 && (
           <div className="mt-8 flex justify-center">
             <div className="bg-gradient-to-l from-blue-50 to-white p-4 rounded-3xl shadow-2xl border border-blue-200">
-              <Pagination links={departments.meta.links} />
+              <Pagination links={departments.links} />
             </div>
           </div>
         )}
