@@ -198,7 +198,7 @@ export default function DepartmentIndex({
       });
     }
   };
-
+console.log(departments);
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={t('departments.page_title')} />
