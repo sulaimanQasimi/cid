@@ -27,7 +27,7 @@ export function Pagination({ links }: PaginationProps) {
   return (
     <UIPagination>
       {previousLink && (
-        <UIPagination.Prev
+        <UIPagination.Next
           href={previousLink.url || '#'}
           disabled={!previousLink.url}
         />
@@ -50,7 +50,7 @@ export function Pagination({ links }: PaginationProps) {
       })}
 
       {nextLink && (
-        <UIPagination.Next
+        <UIPagination.Prev
           href={nextLink.url || '#'}
           disabled={!nextLink.url}
         />
