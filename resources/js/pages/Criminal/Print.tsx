@@ -984,7 +984,7 @@ export default function CriminalPrint({ criminal }: Props) {
               <div className="border-2 border-gray-300 rounded-lg h-40 flex items-center justify-center overflow-hidden bg-gray-50 shadow-inner relative">
                 {criminal.photo ? (
                   <img
-                    src={`/storage/${criminal.photo}`}
+                    src={`/storage/photos/${criminal.photo}`}
                     alt={criminal.name}
                     className="max-h-full object-contain"
                   />

@@ -192,7 +192,7 @@ export default function CriminalShow({ criminal, auth }: Props) {
               {criminal.photo ? (
                 <div className="mb-6 overflow-hidden rounded-2xl border border-red-200 shadow-lg">
                   <img
-                    src={`/storage/${criminal.photo}`}
+                    src={`/storage/photos/${criminal.photo}`}
                     alt={criminal.name}
                     className="aspect-square h-auto w-full object-cover"
                   />
