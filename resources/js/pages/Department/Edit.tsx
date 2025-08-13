@@ -1,95 +1,198 @@
 import React from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { PageProps } from '@/types';
-import { useTranslation } from '@/lib/i18n/translate';
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { ArrowRight, FileText, Building2, AlertTriangle, BookText, Hash } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useTranslation } from '@/lib/i18n/translate';
 
 interface Department {
   id: number;
   name: string;
   code: string;
+  description?: string;
 }
 
-interface Props extends PageProps {
+interface Props {
   department: Department;
+  auth: {
+    permissions: string[];
+  };
 }
 
-export default function DepartmentEdit({ department }: Props) {
+const breadcrumbs: BreadcrumbItem[] = [
+  {
+    title: 'Departments',
+    href: route('departments.index'),
+  },
+  {
+    title: 'Edit',
+    href: '#',
+  },
+];
+
+export default function DepartmentEdit({ department, auth }: Props) {
   const { t } = useTranslation();
-  const { data, setData, put, processing, errors } = useForm({
+
+  const { data, setData, put, processing, errors, reset } = useForm({
     name: department.name,
     code: department.code,
+    description: department.description || '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    put(route('departments.update', department.id));
+    put(route('departments.update', department.id), {
+      onSuccess: () => {
+        // Redirect happens automatically from the controller
+      }
+    });
   };
 
   return (
-    <AppLayout>
-      <Head title={t('departments.edit_title', { name: department.name })} />
-      <div className="container p-6">
-        <div className="mb-6">
-          <Link href={route('departments.index')}>
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {t('departments.back_to_list')}
-            </Button>
-          </Link>
+    <AppLayout breadcrumbs={breadcrumbs}>
+      <Head title={t('departments.edit.page_title', { name: department.name })} />
+      <div className="container px-0 py-6">
+        {/* Header with gradient background */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-l from-blue-600 via-blue-700 to-indigo-700 p-8 text-white shadow-2xl mb-8">
+          <div className="absolute inset-0 bg-black/10"></div>
+          <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 -translate-x-32"></div>
+          <div className="absolute bottom-0 right-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 translate-x-24"></div>
+          
+          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
+            <div className="flex items-center gap-6">
+              <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl border border-white/30">
+                <Building2 className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <h2 className="text-3xl lg:text-4xl font-bold text-white drop-shadow-lg">{t('departments.edit.title', { name: department.name })}</h2>
+                <p className="text-white/90 flex items-center gap-2 mt-2 text-lg">
+                  <FileText className="h-5 w-5" />
+                  {t('departments.edit.description')}
+                </p>
+              </div>
+            </div>
+            
+            <Link href={route('departments.index')} className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 rounded-full shadow-lg px-4 py-2 flex items-center gap-2">
+              <ArrowRight className="h-4 w-4" />
+              {t('departments.edit.back_to_list')}
+            </Link>
+          </div>
         </div>
 
-        <Card className="max-w-2xl mx-auto">
-          <CardHeader>
-            <CardTitle>
-              {t('departments.edit_title', { name: department.name })}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="name">{t('departments.form.name')}</Label>
-                <Input
-                  id="name"
-                  value={data.name}
-                  onChange={(e) => setData('name', e.target.value)}
-                  placeholder={t('departments.form.name_placeholder')}
-                  className={errors.name ? 'border-red-500' : ''}
-                />
-                {errors.name && (
-                  <p className="text-red-500 text-sm mt-1">{errors.name}</p>
-                )}
-              </div>
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 gap-8">
+            {/* Main Form Card */}
+            <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30">
+              <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 text-white border-b pb-4">
+                <CardTitle className="text-lg flex items-center gap-3">
+                  <div className="p-2 bg-white/20 rounded-lg">
+                    <FileText className="h-5 w-5" />
+                  </div>
+                  {t('departments.edit.form.title')}
+                </CardTitle>
+                <CardDescription className="text-blue-100">
+                  {t('departments.edit.form.description')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="space-y-6">
+                  {/* Department Name */}
+                  <div className="space-y-3">
+                    <Label htmlFor="name" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+                      <span className="text-red-500">*</span>
+                      {t('departments.edit.fields.name')}
+                      <Building2 className="h-4 w-4" />
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="name"
+                        value={data.name}
+                        onChange={(e) => setData('name', e.target.value)}
+                        required
+                        placeholder={t('departments.edit.placeholders.name')}
+                        className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
+                      />
+                    </div>
+                    {errors.name && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                      <AlertTriangle className="h-4 w-4" />
+                      {errors.name}
+                    </p>}
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="code">{t('departments.form.code')}</Label>
-                <Input
-                  id="code"
-                  value={data.code}
-                  onChange={(e) => setData('code', e.target.value)}
-                  placeholder={t('departments.form.code_placeholder')}
-                  className={errors.code ? 'border-red-500' : ''}
-                />
-                {errors.code && (
-                  <p className="text-red-500 text-sm mt-1">{errors.code}</p>
-                )}
-              </div>
+                  {/* Department Code */}
+                  <div className="space-y-3">
+                    <Label htmlFor="code" className="font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+                      <span className="text-red-500">*</span>
+                      {t('departments.edit.fields.code')}
+                      <Hash className="h-4 w-4" />
+                    </Label>
+                    <Input
+                      id="code"
+                      value={data.code}
+                      onChange={(e) => setData('code', e.target.value)}
+                      required
+                      placeholder={t('departments.edit.placeholders.code')}
+                      className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
+                    />
+                    {errors.code && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                      <AlertTriangle className="h-4 w-4" />
+                      {errors.code}
+                    </p>}
+                  </div>
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={processing}
-              >
-                {t('departments.update_button')}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+                  {/* Department Description */}
+                  <div className="space-y-3">
+                    <Label htmlFor="description" className="font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+                      {t('departments.edit.fields.description')}
+                      <BookText className="h-4 w-4" />
+                    </Label>
+                    <Textarea
+                      id="description"
+                      value={data.description}
+                      onChange={(e) => setData('description', e.target.value)}
+                      rows={6}
+                      placeholder={t('departments.edit.placeholders.description')}
+                      className="min-h-[180px] resize-none border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
+                    />
+                    {errors.description && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                      <AlertTriangle className="h-4 w-4" />
+                      {errors.description}
+                    </p>}
+
+                    <p className="text-xs text-neutral-500 mt-2 text-right">
+                      {t('departments.edit.description_helper')}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+
+              <CardFooter className="flex justify-between border-t px-6 py-5 bg-gradient-to-l from-blue-50 to-blue-100">
+                <Button
+                  variant="outline"
+                  onClick={() => reset()}
+                  type="button"
+                  disabled={processing}
+                  className="rounded-full border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 shadow-lg"
+                >
+                  {t('departments.edit.reset')}
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={processing}
+                  className="rounded-full px-8 font-medium bg-gradient-to-l from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  {processing ? t('departments.edit.updating') : t('departments.edit.update')}
+                </Button>
+              </CardFooter>
+            </Card>
+          </div>
+        </form>
       </div>
     </AppLayout>
   );

@@ -109,8 +109,15 @@ export default function DepartmentIndex({
       total: 0
     }
   },
-  filters,
-  auth
+  filters = {
+    search: '',
+    sort: 'created_at',
+    direction: 'desc',
+    per_page: 10
+  },
+  auth = {
+    permissions: []
+  }
 }: Props) {
   const { canCreate, canView, canUpdate, canDelete } = usePermissions();
   const { t } = useTranslation();
@@ -198,7 +205,7 @@ export default function DepartmentIndex({
 
       <div className="container px-0 py-6">
         {/* Modern Header with Glassmorphism */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-l from-indigo-600 via-purple-600 to-blue-600 p-8 lg:p-12 text-white shadow-2xl mb-8 group">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-l from-blue-600 via-blue-700 to-indigo-700 p-8 lg:p-12 text-white shadow-2xl mb-8 group">
           {/* Animated background elements */}
           <div className="absolute inset-0 bg-black/5"></div>
           <div className="absolute top-0 left-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 -translate-x-40 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
@@ -236,8 +243,8 @@ export default function DepartmentIndex({
           </div>
         </div>
 
-        <Card className="shadow-2xl bg-gradient-to-bl from-white to-indigo-50/30 border-0 rounded-3xl overflow-hidden">
-          <CardHeader className="py-4 bg-gradient-to-l from-indigo-500 to-indigo-600 text-white cursor-pointer" onClick={() => setIsFiltersOpen(!isFiltersOpen)}>
+        <Card className="shadow-2xl bg-gradient-to-bl from-white to-blue-50/30 border-0 rounded-3xl overflow-hidden">
+          <CardHeader className="py-4 bg-gradient-to-l from-blue-500 to-blue-600 text-white cursor-pointer" onClick={() => setIsFiltersOpen(!isFiltersOpen)}>
             <CardTitle className="text-lg font-semibold flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm shadow-lg">
@@ -245,7 +252,7 @@ export default function DepartmentIndex({
                 </div>
                 <div>
                   <div className="text-xl font-bold">{t('departments.search_filters')}</div>
-                  <div className="text-indigo-100 text-xs font-medium">Find and filter department records</div>
+                  <div className="text-blue-100 text-xs font-medium">Find and filter department records</div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -279,12 +286,12 @@ export default function DepartmentIndex({
                         placeholder={t('departments.search_placeholder')}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full h-11 pl-20 pr-4 text-base border-indigo-200 focus:border-indigo-500 focus:ring-indigo-500/20 bg-gradient-to-l from-indigo-50 to-white rounded-xl shadow-lg"
+                        className="w-full h-11 pl-20 pr-4 text-base border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white rounded-xl shadow-lg"
                       />
-                      <Button type="submit" className="absolute left-1 top-1/2 -translate-y-1/2 h-9 px-4 bg-gradient-to-l from-indigo-500 to-indigo-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-sm">
+                      <Button type="submit" className="absolute left-1 top-1/2 -translate-y-1/2 h-9 px-4 bg-gradient-to-l from-blue-500 to-blue-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-sm">
                         Search
                       </Button>
-                      <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-400" />
+                      <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-400" />
                     </div>
                   </form>
                 </div>
@@ -292,7 +299,7 @@ export default function DepartmentIndex({
                 {/* Sort Options */}
                 <div>
                   <Select value={filters.sort} onValueChange={handleSortChange}>
-                    <SelectTrigger className="h-11 shadow-lg border-indigo-200 focus:border-indigo-500 focus:ring-indigo-500/20 bg-gradient-to-l from-indigo-50 to-white rounded-xl text-sm">
+                    <SelectTrigger className="h-11 shadow-lg border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white rounded-xl text-sm">
                       <SelectValue placeholder="Sort By" />
                     </SelectTrigger>
                     <SelectContent>
@@ -313,7 +320,7 @@ export default function DepartmentIndex({
                       variant="outline"
                       onClick={handleDirectionChange}
                       title={t(`departments.sort_${filters.direction === 'asc' ? 'descending' : 'ascending'}`)}
-                      className="h-11 w-full shadow-lg border-indigo-300 text-indigo-700 hover:bg-indigo-100 hover:border-indigo-400 rounded-xl transition-all duration-300 hover:scale-105 text-sm"
+                      className="h-11 w-full shadow-lg border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 rounded-xl transition-all duration-300 hover:scale-105 text-sm"
                     >
                       <ArrowUpDown className={`h-4 w-4 mr-2 ${filters.direction === 'desc' ? 'rotate-180' : ''}`} />
                       {filters.direction === 'asc' ? 'Asc' : 'Desc'}
@@ -323,7 +330,7 @@ export default function DepartmentIndex({
                   {/* Per Page Options */}
                   <div>
                     <Select value={filters.per_page.toString()} onValueChange={handlePerPageChange}>
-                      <SelectTrigger className="h-11 shadow-lg border-indigo-200 focus:border-indigo-500 focus:ring-indigo-500/20 bg-gradient-to-l from-indigo-50 to-white rounded-xl text-sm">
+                      <SelectTrigger className="h-11 shadow-lg border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white rounded-xl text-sm">
                         <SelectValue placeholder="Per Page" />
                       </SelectTrigger>
                       <SelectContent>
@@ -342,7 +349,7 @@ export default function DepartmentIndex({
                       variant="outline"
                       size="sm"
                       onClick={resetFilters}
-                      className="h-11 px-3 shadow-lg border-indigo-300 text-indigo-700 hover:bg-indigo-100 hover:border-indigo-400 rounded-xl transition-all duration-300 hover:scale-105 text-sm"
+                      className="h-11 px-3 shadow-lg border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 rounded-xl transition-all duration-300 hover:scale-105 text-sm"
                     >
                       <FilterX className="h-4 w-4" />
                     </Button>
@@ -355,15 +362,15 @@ export default function DepartmentIndex({
 
         {/* Results Table */}
         <div className="mt-8">
-          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-indigo-50/30 border-0 rounded-3xl">
-            <CardHeader className="bg-gradient-to-l from-indigo-500 to-indigo-600 text-white py-6">
+          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30 border-0 rounded-3xl">
+            <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 text-white py-6">
               <CardTitle className="flex items-center gap-4">
                 <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
                   <TrendingUp className="h-6 w-6" />
                 </div>
                 <div>
                   <div className="text-2xl font-bold">{t('departments.table.title')}</div>
-                  <div className="text-indigo-100 text-sm font-medium">Department records overview</div>
+                  <div className="text-blue-100 text-sm font-medium">Department records overview</div>
                 </div>
               </CardTitle>
             </CardHeader>
@@ -371,34 +378,34 @@ export default function DepartmentIndex({
               <div className="overflow-hidden rounded-b-3xl">
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-gradient-to-l from-indigo-100 to-indigo-200 border-0">
-                      <TableHead className="text-indigo-800 font-bold text-lg py-6 px-6">{t('departments.table.name')}</TableHead>
-                      <TableHead className="text-indigo-800 font-bold text-lg py-6 px-6">{t('departments.table.code')}</TableHead>
-                      <TableHead className="text-indigo-800 font-bold text-lg py-6 px-6">{t('departments.table.info_count')}</TableHead>
-                      <TableHead className="text-indigo-800 font-bold text-lg py-6 px-6">{t('departments.table.created_at')}</TableHead>
-                      <TableHead className="text-indigo-800 font-bold text-lg py-6 px-6">{t('departments.table.actions')}</TableHead>
+                    <TableRow className="bg-gradient-to-l from-blue-100 to-blue-200 border-0">
+                      <TableHead className="text-blue-800 font-bold text-lg py-6 px-6">{t('departments.table.name')}</TableHead>
+                      <TableHead className="text-blue-800 font-bold text-lg py-6 px-6">{t('departments.table.code')}</TableHead>
+                      <TableHead className="text-blue-800 font-bold text-lg py-6 px-6">{t('departments.table.info_count')}</TableHead>
+                      <TableHead className="text-blue-800 font-bold text-lg py-6 px-6">{t('departments.table.created_at')}</TableHead>
+                      <TableHead className="text-blue-800 font-bold text-lg py-6 px-6">{t('departments.table.actions')}</TableHead>
                     </TableRow>
                   </TableHeader>
                 <TableBody>
                   {departments.data && departments.data.length > 0 ? (
                     departments.data.map((department) => (
-                      <TableRow key={department.id} className="hover:bg-indigo-50/50 transition-colors duration-300 border-b border-indigo-100">
-                        <TableCell className="font-bold text-indigo-900 py-6 px-6 text-lg">{department.name}</TableCell>
-                        <TableCell className="text-indigo-800 py-6 px-6">
-                          <Badge variant="outline" className="bg-gradient-to-l from-indigo-100 to-indigo-200 text-indigo-800 border-indigo-300 px-4 py-2 rounded-xl font-semibold">
+                      <TableRow key={department.id} className="hover:bg-blue-50/50 transition-colors duration-300 border-b border-blue-100">
+                        <TableCell className="font-bold text-blue-900 py-6 px-6 text-lg">{department.name}</TableCell>
+                        <TableCell className="text-blue-800 py-6 px-6">
+                          <Badge variant="outline" className="bg-gradient-to-l from-blue-100 to-blue-200 text-blue-800 border-blue-300 px-4 py-2 rounded-xl font-semibold">
                             {department.code}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-indigo-800 py-6 px-6 font-medium">
+                        <TableCell className="text-orange-800 py-6 px-6 font-medium">
                           <Badge variant="outline" className="bg-gradient-to-l from-blue-100 to-blue-200 text-blue-800 border-blue-300 px-4 py-2 rounded-xl font-semibold">
                             {department.infos_count} {t('departments.info_records')}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-indigo-800 py-6 px-6 font-medium">
+                        <TableCell className="text-blue-800 py-6 px-6 font-medium">
                           {department.created_at ? (
                             format(new Date(department.created_at), 'MMM d, yyyy')
                           ) : (
-                            <span className="text-indigo-600">{t('departments.na')}</span>
+                            <span className="text-blue-600">{t('departments.na')}</span>
                           )}
                         </TableCell>
                         <TableCell className="py-6 px-6">
@@ -447,12 +454,12 @@ export default function DepartmentIndex({
                   ) : (
                     <TableRow>
                       <TableCell colSpan={5} className="h-32 text-center">
-                        <div className="flex flex-col items-center gap-4 text-indigo-600">
-                          <div className="p-4 bg-indigo-100 rounded-full">
-                            <AlertTriangle className="h-16 w-16 text-indigo-400" />
+                        <div className="flex flex-col items-center gap-4 text-blue-600">
+                          <div className="p-4 bg-blue-100 rounded-full">
+                            <AlertTriangle className="h-16 w-16 text-blue-400" />
                           </div>
                           <p className="text-xl font-bold">{t('departments.no_records')}</p>
-                          <p className="text-indigo-500">No department records found</p>
+                          <p className="text-blue-500">No department records found</p>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -467,13 +474,13 @@ export default function DepartmentIndex({
         {/* Modern Pagination */}
         {departments.meta && departments.meta.last_page > 1 && (
           <div className="mt-8 flex justify-center">
-            <div className="flex items-center gap-3 bg-gradient-to-l from-indigo-50 to-white p-4 rounded-3xl shadow-2xl border border-indigo-200">
+            <div className="flex items-center gap-3 bg-gradient-to-l from-blue-50 to-white p-4 rounded-3xl shadow-2xl border border-blue-200">
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => departments.meta && goToPage(1)}
                 disabled={!departments.meta || departments.meta.current_page === 1}
-                className="h-12 w-12 shadow-lg border-indigo-300 text-indigo-700 hover:bg-indigo-100 hover:border-indigo-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
+                className="h-12 w-12 shadow-lg border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
               >
                 <ChevronRight className="h-5 w-5" />
                 <ChevronRight className="h-5 w-5 -mr-1" />
@@ -483,11 +490,11 @@ export default function DepartmentIndex({
                 size="icon"
                 onClick={() => departments.meta && goToPage(departments.meta.current_page - 1)}
                 disabled={!departments.meta || departments.meta.current_page === 1}
-                className="h-12 w-12 shadow-lg border-indigo-300 text-indigo-700 hover:bg-indigo-100 hover:border-indigo-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
+                className="h-12 w-12 shadow-lg border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
               >
                 <ChevronRight className="h-5 w-5" />
               </Button>
-              <div className="px-6 py-3 bg-gradient-to-l from-indigo-100 to-indigo-200 text-indigo-800 rounded-2xl font-bold text-lg shadow-lg">
+              <div className="px-6 py-3 bg-gradient-to-l from-blue-100 to-blue-200 text-blue-800 rounded-2xl font-bold text-lg shadow-lg">
                 {t('departments.pagination', {
                   current: String(departments.meta?.current_page ?? '1'),
                   total: String(departments.meta?.last_page ?? '1')
@@ -498,7 +505,7 @@ export default function DepartmentIndex({
                 size="icon"
                 onClick={() => departments.meta && goToPage(departments.meta.current_page + 1)}
                 disabled={!departments.meta || departments.meta.current_page === departments.meta.last_page}
-                className="h-12 w-12 shadow-lg border-indigo-300 text-indigo-700 hover:bg-indigo-100 hover:border-indigo-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
+                className="h-12 w-12 shadow-lg border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
               >
                 <ChevronLeft className="h-5 w-5" />
               </Button>
@@ -507,7 +514,7 @@ export default function DepartmentIndex({
                 size="icon"
                 onClick={() => departments.meta && goToPage(departments.meta.last_page)}
                 disabled={!departments.meta || departments.meta.current_page === departments.meta.last_page}
-                className="h-12 w-12 shadow-lg border-indigo-300 text-indigo-700 hover:bg-indigo-100 hover:border-indigo-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
+                className="h-12 w-12 shadow-lg border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50"
               >
                 <ChevronLeft className="h-5 w-5" />
                 <ChevronLeft className="h-5 w-5 -mr-1" />
