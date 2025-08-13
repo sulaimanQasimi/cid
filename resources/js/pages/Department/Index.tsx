@@ -472,7 +472,7 @@ console.log(departments);
       </div>
 
         {/* Modern Pagination */}
-        {/* {departments.meta && departments.meta.total > 0 && ( */}
+        {departments.meta && departments.meta.total > 0 && (
           <div className="mt-8 flex justify-center">
             <div className="flex items-center gap-3 bg-gradient-to-l from-blue-50 to-white p-4 rounded-3xl shadow-2xl border border-blue-200">
               {/* First Page Button */}
@@ -502,13 +502,7 @@ console.log(departments);
               
               {/* Page Info */}
               <div className="px-6 py-3 bg-gradient-to-l from-blue-100 to-blue-200 text-blue-800 rounded-2xl font-bold text-lg shadow-lg">
-                {t('departments.pagination.info', {
-                  current: String(departments.meta?.current_page ?? '1'),
-                  total: String(departments.meta?.last_page ?? '1'),
-                  from: String(departments.meta?.from ?? '0'),
-                  to: String(departments.meta?.to ?? '0'),
-                  total_records: String(departments.meta?.total ?? '0')
-                })}
+                Page {departments.meta?.current_page} of {departments.meta?.last_page} ({departments.meta?.from}-{departments.meta?.to} of {departments.meta?.total})
               </div>
               
               {/* Next Page Button */}
@@ -537,7 +531,7 @@ console.log(departments);
               </Button>
             </div>
           </div>
-        {/* )} */}
+        )}
       </div>
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
