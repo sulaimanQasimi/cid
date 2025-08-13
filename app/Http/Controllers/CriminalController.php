@@ -216,7 +216,7 @@ class CriminalController extends Controller
             'arrested_by' => 'nullable|string|max:255',
             'arrest_date' => 'nullable|date',
             'referred_to' => 'nullable|string|max:255',
-            'final_verdict' => 'nullable|string|max:1000',
+            'final_verdict' => 'nullable|string',
             'notes' => 'nullable|string|max:1000',
             'department_id' => 'nullable|string|exists:departments,id|not_in:none',
         ]);
