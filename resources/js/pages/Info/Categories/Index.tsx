@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash, Search, ArrowUpDown, FilterX, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
+import { Plus, Pencil, Trash, Search, ArrowUpDown, FilterX, ChevronLeft, ChevronRight, Eye, BarChart3, Shield, Users, Building2, Calendar, FileText, AlertTriangle, TrendingUp, ChevronDown } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -15,7 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,7 +26,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useDebounce } from '@/hooks/use-debounce';
+import { useTranslation } from '@/lib/i18n/translate';
+import { usePermissions } from '@/hooks/use-permissions';
+import { CanCreate, CanView, CanUpdate, CanDelete, CanConfirm } from '@/components/ui/permission-guard';
+import { cn } from '@/lib/utils';
+import { Pagination } from '@/components/pagination';
 
 interface InfoCategory {
   id: number;
@@ -37,10 +41,9 @@ interface InfoCategory {
 }
 
 interface PaginationLinks {
-  first: string | null;
-  last: string | null;
-  prev: string | null;
-  next: string | null;
+  url: string | null;
+  label: string;
+  active: boolean;
 }
 
 interface PaginationMeta {
@@ -59,12 +62,12 @@ interface PaginationMeta {
 }
 
 interface Props {
-  categories: {
-    data: InfoCategory[];
-    links: PaginationLinks;
-    meta: PaginationMeta;
+  categories?: {
+    data?: InfoCategory[];
+    links?: PaginationLinks[];
+    meta?: PaginationMeta;
   };
-  filters: {
+  filters?: {
     search: string;
     sort: string;
     direction: string;
@@ -72,19 +75,9 @@ interface Props {
   };
 }
 
-const breadcrumbs: BreadcrumbItem[] = [
-  {
-    title: 'Info Management',
-    href: '#',
-  },
-  {
-    title: 'Info Categories',
-    href: route('info-categories.index'),
-  },
-];
-
 const sortOptions = [
   { value: 'name', label: 'Name' },
+  { value: 'description', label: 'Description' },
   { value: 'created_at', label: 'Created Date' },
   { value: 'updated_at', label: 'Updated Date' },
 ];
@@ -96,339 +89,395 @@ const perPageOptions = [
   { value: 100, label: '100 per page' },
 ];
 
-export default function InfoCategoriesIndex({ categories, filters }: Props) {
-  // Use local state for all filter values
-  const [searchQuery, setSearchQuery] = useState(filters.search || '');
-  const [sortField, setSortField] = useState(filters.sort || 'name');
-  const [sortDirection, setSortDirection] = useState(filters.direction || 'asc');
-  const [perPage, setPerPage] = useState(filters.per_page || 10);
-  const [currentPage, setCurrentPage] = useState(categories.meta?.current_page || 1);
-
+export default function InfoCategoriesIndex({
+  categories = { data: [], links: [], meta: undefined },
+  filters = { search: '', sort: 'name', direction: 'asc', per_page: 10 }
+}: Props) {
+  const { canCreate, canView, canUpdate, canDelete, canConfirm } = usePermissions();
+  const { t } = useTranslation();
+  
+  const breadcrumbs: BreadcrumbItem[] = [
+    {
+      title: t('info.page_title'),
+      href: route('infos.index'),
+    },
+    {
+      title: t('info_categories.page_title'),
+      href: '#',
+    },
+  ];
+  const [searchQuery, setSearchQuery] = useState(filters.search);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<InfoCategory | null>(null);
-
-  // Create debounced versions of filters for search to avoid too many requests
-  const debouncedSearch = useDebounce(searchQuery, 300);
-
-  // Apply filters when debounced values change
-  useEffect(() => {
-    if (debouncedSearch !== filters.search ||
-        sortField !== filters.sort ||
-        sortDirection !== filters.direction ||
-        perPage !== filters.per_page) {
-      applyFilters();
-    }
-  }, [debouncedSearch, sortField, sortDirection, perPage]);
-
-  // Function to safely navigate with filters
-  const applyFilters = () => {
-    try {
-      const params = {
-        search: debouncedSearch,
-        sort: sortField,
-        direction: sortDirection,
-        per_page: perPage,
-        page: 1  // Reset to first page when filters change
-      };
-
-      router.get(route('info-categories.index'), params, {
-        preserveState: true,
-        preserveScroll: false,
-        replace: true
-      });
-    } catch (error) {
-      console.error('Error applying filters:', error);
-    }
-  };
-
-  // Handle pagination separately
-  const goToPage = (page: number) => {
-    if (page === currentPage) return;
-
-    setCurrentPage(page);
-    try {
-      router.get(route('info-categories.index'), {
-        search: debouncedSearch,
-        sort: sortField,
-        direction: sortDirection,
-        per_page: perPage,
-        page
-      }, {
-        preserveState: true,
-        preserveScroll: true,
-        replace: true
-      });
-    } catch (error) {
-      console.error('Error navigating to page:', error);
-    }
-  };
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   // Handle search form submission
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // The useEffect will handle the actual navigation
+    applyFilters({ search: searchQuery });
   };
 
-  // Toggle sort direction
+  // Handle sort change
+  const handleSortChange = (value: string) => {
+    applyFilters({ sort: value });
+  };
+
+  // Handle direction change
   const handleDirectionChange = () => {
-    setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    const newDirection = filters.direction === 'asc' ? 'desc' : 'asc';
+    applyFilters({ direction: newDirection });
+  };
+
+  // Handle per page change
+  const handlePerPageChange = (value: string) => {
+    applyFilters({ per_page: parseInt(value) });
+  };
+
+  // Navigate to page
+  const goToPage = (page: number) => {
+    router.get(route('info-categories.index'),
+      { ...filters, page },
+      { preserveState: true, preserveScroll: true }
+    );
+  };
+
+  // Apply filters to the URL
+  const applyFilters = (newFilters: Partial<Props['filters']>) => {
+    router.get(route('info-categories.index'),
+      { ...filters, ...newFilters, page: 1 },
+      { preserveState: true, preserveScroll: true }
+    );
   };
 
   // Reset all filters
   const resetFilters = () => {
     setSearchQuery('');
-    setSortField('name');
-    setSortDirection('asc');
-    setPerPage(10);
+    router.get(route('info-categories.index'), {
+      search: '',
+      sort: 'name',
+      direction: 'asc',
+      per_page: 10,
+      page: 1,
+    });
+  };
+
+  // Open delete confirmation dialog
+  const openDeleteDialog = (category: InfoCategory) => {
+    setCategoryToDelete(category);
+    setIsDeleteDialogOpen(true);
   };
 
   // Handle delete confirmation
   const confirmDelete = () => {
     if (categoryToDelete) {
-      try {
-        router.delete(route('info-categories.destroy', categoryToDelete.id), {
-          onSuccess: () => {
-            setCategoryToDelete(null);
-            setIsDeleteDialogOpen(false);
-          },
-          preserveScroll: true
-        });
-      } catch (error) {
-        console.error('Error deleting category:', error);
-        setCategoryToDelete(null);
-        setIsDeleteDialogOpen(false);
-      }
+      router.delete(route('info-categories.destroy', categoryToDelete.id), {
+        onSuccess: () => {
+          setCategoryToDelete(null);
+          setIsDeleteDialogOpen(false);
+        },
+      });
     }
   };
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title="Info Categories" />
-      <div className="py-12">
-        <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-          <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div className="p-6 text-gray-900">
-              <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">Info Categories</h1>
-                <Button asChild>
-                  <Link href={route('info-categories.create')}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Create Category
-                  </Link>
-                </Button>
-              </div>
-
-              {/* Filters */}
-              <Card className="mb-6">
-                <CardContent className="pt-6">
-                  <div className="flex flex-col md:flex-row gap-4">
-                    <div className="flex-1">
-                      <form onSubmit={handleSearch} className="flex w-full items-center space-x-2">
-                        <Input
-                          type="search"
-                          placeholder="Search categories..."
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          className="flex-1"
-                        />
-                        <Button type="submit" size="sm">
-                          <Search className="h-4 w-4 mr-2" />
-                          Search
-                        </Button>
-                      </form>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-2">
-                      <div className="flex items-center gap-2">
-                        <Select
-                          value={sortField}
-                          onValueChange={setSortField}
-                        >
-                          <SelectTrigger className="w-[130px]">
-                            <SelectValue placeholder="Sort by" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {sortOptions.map(option => (
-                              <SelectItem key={option.value} value={option.value}>
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={handleDirectionChange}
-                          title={sortDirection === 'asc' ? 'Ascending' : 'Descending'}
-                        >
-                          <ArrowUpDown className={`h-4 w-4 ${sortDirection === 'asc' ? '' : 'transform rotate-180'}`} />
-                        </Button>
-                      </div>
-
-                      <Select
-                        value={perPage.toString()}
-                        onValueChange={(value) => setPerPage(parseInt(value))}
-                      >
-                        <SelectTrigger className="w-[130px]">
-                          <SelectValue placeholder="Items per page" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {perPageOptions.map(option => (
-                            <SelectItem key={option.value} value={option.value.toString()}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-
-                      {/* Reset filters button */}
-                      {(searchQuery || sortField !== 'name' || sortDirection !== 'asc' || perPage !== 10) && (
-                        <Button variant="ghost" size="sm" onClick={resetFilters} className="ml-2">
-                          <FilterX className="h-4 w-4 mr-2" />
-                          Reset
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Active filters */}
-                  {(searchQuery || sortField !== 'name' || sortDirection !== 'asc' || perPage !== 10) && (
-                    <div className="mt-4 flex flex-wrap items-center gap-2">
-                      <span className="text-sm text-gray-500">Active filters:</span>
-                      {searchQuery && (
-                        <Badge variant="secondary" className="text-xs">
-                          Search: {searchQuery}
-                        </Badge>
-                      )}
-                      <Badge variant="secondary" className="text-xs">
-                        Sort: {sortOptions.find(o => o.value === sortField)?.label || sortField} ({sortDirection === 'asc' ? 'Ascending' : 'Descending'})
-                      </Badge>
-                      <Badge variant="secondary" className="text-xs">
-                        Per page: {perPage}
-                      </Badge>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Created At</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {categories.data && categories.data.length > 0 ? (
-                    categories.data.map((category) => (
-                      <TableRow key={category.id}>
-                        <TableCell>{category.id}</TableCell>
-                        <TableCell className="font-medium">{category.name}</TableCell>
-                        <TableCell>{category.description || '-'}</TableCell>
-                        <TableCell>{new Date(category.created_at).toLocaleDateString()}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button size="sm" variant="outline" asChild>
-                              <Link href={route('info-categories.show', category.id)}>
-                                <Eye className="h-4 w-4" />
-                              </Link>
-                            </Button>
-                            <Button size="sm" variant="outline" asChild>
-                              <Link href={route('info-categories.edit', category.id)}>
-                                <Pencil className="h-4 w-4" />
-                              </Link>
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => {
-                                setCategoryToDelete(category);
-                                setIsDeleteDialogOpen(true);
-                              }}
-                            >
-                              <Trash className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-center py-4">
-                        No categories found. {searchQuery ? 'Try clearing your search filters.' : 'Create your first one!'}
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-
-              {/* Pagination */}
-              {categories.meta && categories.meta.last_page > 1 && (
-                <div className="mt-4 flex items-center justify-between">
-                  <div className="text-sm text-gray-600">
-                    Showing {categories.meta.from} to {categories.meta.to} of {categories.meta.total} categories
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => goToPage(categories.meta.current_page - 1)}
-                      disabled={categories.meta.current_page === 1}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-
-                    {categories.meta.links.slice(1, -1).map((link, index) => (
-                      <Button
-                        key={index}
-                        variant={link.active ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => link.url && goToPage(Number(link.label))}
-                        disabled={!link.url}
-                      >
-                        {link.label}
-                      </Button>
-                    ))}
-
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => goToPage(categories.meta.current_page + 1)}
-                      disabled={categories.meta.current_page === categories.meta.last_page}
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+      <Head title={t('info_categories.page_title')} />
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>{t('info_categories.delete_dialog.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the category "{categoryToDelete?.name}".
-              <br />
-              This action cannot be undone.
+              {t('info_categories.delete_dialog.description', { name: categoryToDelete?.name || '' })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setCategoryToDelete(null)}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-red-500 hover:bg-red-600">
-              Delete
+            <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>{t('info_categories.delete_dialog.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
+              {t('info_categories.delete_dialog.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <div className="container px-0 py-6">
+        {/* Modern Header with Glassmorphism */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-l from-purple-600 via-indigo-600 to-blue-600 p-8 lg:p-12 text-white shadow-2xl mb-8 group">
+          {/* Animated background elements */}
+          <div className="absolute inset-0 bg-black/5"></div>
+          <div className="absolute top-0 left-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 -translate-x-40 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
+          <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full translate-y-32 translate-x-32 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
+          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white/5 rounded-full -translate-x-16 -translate-y-16 blur-xl group-hover:scale-150 transition-transform duration-500"></div>
+          
+          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-8">
+            <div className="flex items-center gap-8">
+              <div className="p-6 bg-white/20 backdrop-blur-md rounded-3xl border border-white/30 shadow-2xl group-hover:scale-105 transition-transform duration-300">
+                <FileText className="h-10 w-10 text-white" />
+              </div>
+              <div className="space-y-3">
+                <h2 className="text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight">{t('info_categories.page_title')}</h2>
+                <div className="text-white/90 flex items-center gap-3 text-xl font-medium">
+                  <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <BarChart3 className="h-6 w-6" />
+                  </div>
+                  {t('info_categories.page_description')}
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <CanCreate model="info_category">
+                <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-8 py-4 text-lg font-semibold transition-all duration-300 hover:scale-105 group/btn">
+                  <Link href={route('info-categories.create')} className="flex items-center gap-3">
+                    <div className="p-1 bg-white/20 rounded-lg group-hover/btn:scale-110 transition-transform duration-300">
+                      <Plus className="h-5 w-5" />
+                    </div>
+                    {t('info_categories.add_button')}
+                  </Link>
+                </Button>
+              </CanCreate>
+            </div>
+          </div>
+        </div>
+
+        <Card className="shadow-2xl bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl overflow-hidden">
+          <CardHeader className="py-4 bg-gradient-to-l from-purple-500 to-purple-600 text-white cursor-pointer" onClick={() => setIsFiltersOpen(!isFiltersOpen)}>
+            <CardTitle className="text-lg font-semibold flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm shadow-lg">
+                  <Search className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="text-xl font-bold">{t('info_categories.search_filters')}</div>
+                  <div className="text-purple-100 text-xs font-medium">{t('info_categories.find_and_filter')}</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-white hover:bg-white/20 rounded-xl"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    resetFilters();
+                  }}
+                >
+                  <FilterX className="h-4 w-4 mr-1" />
+                  {t('info_categories.reset_filters')}
+                </Button>
+                <div className={`transition-transform duration-300 ${isFiltersOpen ? 'rotate-180' : ''}`}>
+                  <ChevronDown className="h-5 w-5" />
+                </div>
+              </div>
+            </CardTitle>
+          </CardHeader>
+          
+          <div className={`transition-all duration-300 overflow-hidden ${isFiltersOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Search Bar */}
+                <div className="md:col-span-2">
+                  <form onSubmit={handleSearch} className="relative">
+                    <div className="relative">
+                      <Input
+                        placeholder={t('info_categories.search_placeholder')}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full h-11 pl-20 pr-4 text-base border-purple-200 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 to-white rounded-xl shadow-lg"
+                      />
+                      <Button type="submit" className="absolute left-1 top-1/2 -translate-y-1/2 h-9 px-4 bg-gradient-to-l from-purple-500 to-purple-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-sm">
+                        {t('common.search')}
+                      </Button>
+                      <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-400" />
+                    </div>
+                  </form>
+                </div>
+
+                {/* Sort Options */}
+                <div>
+                  <Select
+                    value={filters.sort}
+                    onValueChange={handleSortChange}
+                  >
+                    <SelectTrigger className="h-11 shadow-lg border-purple-200 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 to-white rounded-xl text-sm">
+                      <SelectValue placeholder={t('info_categories.sort_by')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {sortOptions.map(option => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {t(`info_categories.sort_options.${option.value}`)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Direction & Per Page Row */}
+                <div className="md:col-span-2 lg:col-span-4 grid grid-cols-3 gap-3">
+                  {/* Direction Button */}
+                  <div>
+                    <Button
+                      variant="outline"
+                      onClick={handleDirectionChange}
+                      title={t(`info_categories.sort_${filters.direction === 'asc' ? 'ascending' : 'descending'}`)}
+                      className="h-11 w-full shadow-lg border-purple-300 text-purple-700 hover:bg-purple-100 hover:border-purple-400 rounded-xl transition-all duration-300 hover:scale-105 text-sm"
+                    >
+                      <ArrowUpDown className={`h-4 w-4 mr-2 ${filters.direction === 'asc' ? '' : 'transform rotate-180'}`} />
+                      {filters.direction === 'asc' ? t('info_categories.sort_ascending') : t('info_categories.sort_descending')}
+                    </Button>
+                  </div>
+
+                  {/* Per Page Options */}
+                  <div>
+                    <Select
+                      value={filters.per_page.toString()}
+                      onValueChange={handlePerPageChange}
+                    >
+                      <SelectTrigger className="h-11 shadow-lg border-purple-200 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 to-white rounded-xl text-sm">
+                        <SelectValue placeholder={t('info_categories.items_per_page')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {perPageOptions.map(option => (
+                          <SelectItem key={option.value} value={option.value.toString()}>
+                            {option.value.toString()}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Quick Actions */}
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={resetFilters}
+                      className="h-11 px-3 shadow-lg border-purple-300 text-purple-700 hover:bg-purple-100 hover:border-purple-400 rounded-xl transition-all duration-300 hover:scale-105 text-sm"
+                    >
+                      <FilterX className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </div>
+        </Card>
+
+        {/* Results Table */}
+        <div className="mt-8">
+          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl">
+            <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 text-white py-6">
+              <CardTitle className="flex items-center gap-4">
+                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
+                  <TrendingUp className="h-6 w-6" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">{t('info_categories.table.title')}</div>
+                  <div className="text-purple-100 text-sm font-medium">{t('info_categories.table.description')}</div>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-hidden rounded-b-3xl">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-gradient-to-l from-purple-100 to-purple-200 border-0">
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_categories.table.id')}</TableHead>
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_categories.table.name')}</TableHead>
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_categories.table.description')}</TableHead>
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_categories.table.created_at')}</TableHead>
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6 text-right">{t('info_categories.table.actions')}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {categories?.data && categories.data.length > 0 ? (
+                      categories.data.map((category: InfoCategory) => (
+                        <TableRow key={category.id} className="hover:bg-purple-50/50 transition-colors duration-300 border-b border-purple-100">
+                          <TableCell className="font-bold text-purple-900 py-6 px-6 text-lg">{category.id}</TableCell>
+                          <TableCell className="font-bold text-purple-900 py-6 px-6 text-lg">{category.name}</TableCell>
+                          <TableCell className="py-6 px-6">
+                            {category.description ? (
+                              <span className="text-purple-800 font-medium">{category.description}</span>
+                            ) : (
+                              <span className="text-purple-600 font-medium">-</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-purple-800 py-6 px-6 font-medium">
+                            {new Date(category.created_at).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell className="py-6 px-6">
+                            <div className="flex items-center gap-2 justify-end">
+                              <CanView model="info_category">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  asChild
+                                  title={t('info_categories.actions.view')}
+                                  className="h-10 w-10 rounded-xl hover:bg-blue-100 text-blue-600 hover:text-blue-700 transition-all duration-300 hover:scale-110"
+                                >
+                                  <Link href={route('info-categories.show', category.id)}>
+                                    <Eye className="h-5 w-5" />
+                                  </Link>
+                                </Button>
+                              </CanView>
+                              <CanUpdate model="info_category">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  asChild
+                                  title={t('info_categories.actions.edit')}
+                                  className="h-10 w-10 rounded-xl hover:bg-green-100 text-green-600 hover:text-green-700 transition-all duration-300 hover:scale-110"
+                                >
+                                  <Link href={route('info-categories.edit', category.id)}>
+                                    <Pencil className="h-5 w-5" />
+                                  </Link>
+                                </Button>
+                              </CanUpdate>
+                              <CanDelete model="info_category">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => openDeleteDialog(category)}
+                                  title={t('info_categories.actions.delete')}
+                                  className="h-10 w-10 rounded-xl text-red-600 hover:text-red-700 hover:bg-red-100 transition-all duration-300 hover:scale-110"
+                                >
+                                  <Trash className="h-5 w-5" />
+                                </Button>
+                              </CanDelete>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={5} className="h-32 text-center">
+                          <div className="flex flex-col items-center gap-4 text-purple-600">
+                            <div className="p-4 bg-purple-100 rounded-full">
+                              <AlertTriangle className="h-16 w-16 text-purple-400" />
+                            </div>
+                            <p className="text-xl font-bold">{t('info_categories.no_records')}</p>
+                            <p className="text-purple-500">{t('info_categories.no_records_description')}</p>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Pagination */}
+        {categories?.links && categories.links.length > 0 && (
+          <div className="mt-8 flex justify-center">
+            <div className="bg-gradient-to-l from-purple-50 to-white p-4 rounded-3xl shadow-2xl border border-purple-200">
+              <Pagination links={categories.links} />
+            </div>
+          </div>
+        )}
+      </div>
     </AppLayout>
   );
 }
