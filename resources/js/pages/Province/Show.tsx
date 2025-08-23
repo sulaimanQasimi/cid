@@ -1,14 +1,16 @@
+import React, { useEffect, useRef, useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Pagination } from '@/components/pagination';
-import { PageHeader } from '@/components/page-header';
-import { ArrowLeft, Edit, Eye, MapPin, Users, Calendar, User, Clock } from 'lucide-react';
-import { format } from 'date-fns';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { useEffect, useRef, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Pagination } from '@/components/pagination';
+import { ArrowLeft, Edit, Eye, MapPin, Users, Calendar, User, Clock, FileText, BarChart3, TrendingUp, AlertTriangle, Plus, ArrowRight } from 'lucide-react';
+import { format } from 'date-fns';
+import { useTranslation } from '@/lib/i18n/translate';
+import { usePermissions } from '@/hooks/use-permissions';
+import { CanCreate, CanView, CanUpdate, CanDelete } from '@/components/ui/permission-guard';
 
 // Map of province codes to simplified SVG paths
 const provincePaths: { [key: string]: string } = {
@@ -103,9 +105,27 @@ interface ShowProps {
 }
 
 export default function Show({ province, districts }: ShowProps) {
+  const { canCreate, canView, canUpdate, canDelete } = usePermissions();
+  const { t } = useTranslation();
+  
   const chartRef = useRef<HTMLDivElement>(null);
   const rootInstanceRef = useRef<any>(null);
   const [mapInitialized, setMapInitialized] = useState(false);
+
+  const breadcrumbs: BreadcrumbItem[] = [
+    {
+      title: t('dashboard.page_title'),
+      href: route('dashboard'),
+    },
+    {
+      title: t('provinces.page_title'),
+      href: route('provinces.index'),
+    },
+    {
+      title: province.name,
+      href: '#',
+    },
+  ];
 
   // Function to dispose the chart when unmounting or when province changes
   const disposeChart = () => {
@@ -300,71 +320,93 @@ export default function Show({ province, districts }: ShowProps) {
     };
   }, [province.id, province.code, province.status, province.name]);
 
-  const breadcrumbs: BreadcrumbItem[] = [
-    {
-      title: 'Dashboard',
-      href: '/dashboard',
-    },
-    {
-      title: 'Provinces',
-      href: route('provinces.index'),
-    },
-    {
-      title: province.name,
-      href: route('provinces.show', province.id),
-    },
-  ];
-
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title={`Province - ${province.name}`} />
-      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-        <PageHeader
-          title={province.name}
-          description={`Province Code: ${province.code}`}
-          actions={
-            <div className="flex space-x-2">
-              <Button variant="outline" asChild>
-                <Link href={route('provinces.index')}>
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back
-                </Link>
+      <Head title={t('provinces.show.title', { name: province.name })} />
+      
+      <div className="container px-0 py-6">
+        {/* Modern Header with Glassmorphism */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-l from-purple-600 via-indigo-600 to-blue-600 p-8 lg:p-12 text-white shadow-2xl mb-8 group">
+          {/* Animated background elements */}
+          <div className="absolute inset-0 bg-black/5"></div>
+          <div className="absolute top-0 left-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 -translate-x-40 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
+          <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full translate-y-32 translate-x-32 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
+          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white/5 rounded-full -translate-x-16 -translate-y-16 blur-xl group-hover:scale-150 transition-transform duration-500"></div>
+          
+          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-8">
+            <div className="flex items-center gap-8">
+              <Button
+                variant="ghost"
+                size="lg"
+                onClick={() => window.history.back()}
+                className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105 group/btn"
+              >
+                <div className="p-1 bg-white/20 rounded-lg group-hover/btn:scale-110 transition-transform duration-300">
+                  <ArrowRight className="h-5 w-5" />
+                </div>
+                {t('common.back')}
               </Button>
-              <Button asChild>
-                <Link href={route('provinces.edit', province.id)}>
-                  <Edit className="mr-2 h-4 w-4" />
-                  Edit
-                </Link>
-              </Button>
+              
+              <div className="p-6 bg-white/20 backdrop-blur-md rounded-3xl border border-white/30 shadow-2xl group-hover:scale-105 transition-transform duration-300">
+                <MapPin className="h-10 w-10 text-white" />
+              </div>
+              <div className="space-y-3">
+                <h2 className="text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight">{province.name}</h2>
+                <div className="text-white/90 flex items-center gap-3 text-xl font-medium">
+                  <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <BarChart3 className="h-6 w-6" />
+                  </div>
+                  {t('provinces.show.description', { code: province.code })}
+                </div>
+              </div>
             </div>
-          }
-        />
+            
+            <div className="flex items-center gap-3">
+              <CanUpdate model="province">
+                <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-8 py-4 text-lg font-semibold transition-all duration-300 hover:scale-105 group/btn">
+                  <Link href={route('provinces.edit', province.id)} className="flex items-center gap-3">
+                    <div className="p-1 bg-white/20 rounded-lg group-hover/btn:scale-110 transition-transform duration-300">
+                      <Edit className="h-5 w-5" />
+                    </div>
+                    {t('common.edit')}
+                  </Link>
+                </Button>
+              </CanUpdate>
+            </div>
+          </div>
+        </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
-          <Card className="md:col-span-2">
-            <CardHeader>
-              <CardTitle>Province Details</CardTitle>
-              <CardDescription>
-                Detailed information about this province
-              </CardDescription>
+        <div className="grid gap-6 md:grid-cols-3">
+          {/* Province Details Card */}
+          <Card className="md:col-span-2 shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl">
+            <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 text-white py-6">
+              <CardTitle className="flex items-center gap-4">
+                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
+                  <FileText className="h-6 w-6" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">{t('provinces.show.details_title')}</div>
+                  <div className="text-purple-100 text-sm font-medium">{t('provinces.show.details_description')}</div>
+                </div>
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex flex-wrap gap-2 border-b pb-4">
+            <CardContent className="p-8 space-y-6">
+              <div className="flex flex-wrap gap-3">
                 {province.capital && (
-                  <Badge variant="outline" className="flex items-center">
-                    <MapPin className="mr-1 h-3 w-3" />
-                    Capital: {province.capital}
+                  <Badge variant="outline" className="flex items-center gap-2 px-4 py-2 text-purple-700 border-purple-300 bg-purple-50">
+                    <MapPin className="h-4 w-4" />
+                    {t('provinces.show.capital')}: {province.capital}
                   </Badge>
                 )}
                 {province.governor && (
-                  <Badge variant="outline" className="flex items-center">
-                    <User className="mr-1 h-3 w-3" />
-                    Governor: {province.governor}
+                  <Badge variant="outline" className="flex items-center gap-2 px-4 py-2 text-purple-700 border-purple-300 bg-purple-50">
+                    <User className="h-4 w-4" />
+                    {t('provinces.show.governor')}: {province.governor}
                   </Badge>
                 )}
                 <Badge
                   variant={province.status === 'active' ? 'default' : 'secondary'}
-                  className="flex items-center"
+                  className="flex items-center gap-2 px-4 py-2"
                 >
                   {province.status}
                 </Badge>
@@ -372,20 +414,20 @@ export default function Show({ province, districts }: ShowProps) {
 
               {/* Province Map */}
               <div>
-                <h3 className="text-lg font-semibold">Province Map</h3>
+                <h3 className="text-xl font-bold text-purple-900 mb-4">{t('provinces.show.map_title')}</h3>
                 <div
                   ref={chartRef}
-                  className="mt-2 h-[400px] w-full bg-gray-50 dark:bg-gray-900/30 rounded-md overflow-hidden shadow-sm border"
+                  className="h-[400px] w-full bg-gradient-to-l from-purple-50 to-white rounded-2xl overflow-hidden shadow-lg border border-purple-200"
                 ></div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Interactive map of Afghanistan with {province.name} province highlighted
+                <p className="text-sm text-purple-600 mt-3 font-medium">
+                  {t('provinces.show.map_description', { name: province.name })}
                 </p>
               </div>
 
               {province.description && (
                 <div>
-                  <h3 className="text-lg font-semibold">Description</h3>
-                  <div className="whitespace-pre-wrap mt-2 text-muted-foreground">
+                  <h3 className="text-xl font-bold text-purple-900 mb-4">{t('provinces.show.description_title')}</h3>
+                  <div className="whitespace-pre-wrap text-purple-800 bg-gradient-to-l from-purple-50 to-white p-6 rounded-2xl border border-purple-200">
                     {province.description}
                   </div>
                 </div>
@@ -393,138 +435,170 @@ export default function Show({ province, districts }: ShowProps) {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Province Information</CardTitle>
+          {/* Province Information Card */}
+          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl">
+            <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 text-white py-6">
+              <CardTitle className="flex items-center gap-4">
+                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
+                  <TrendingUp className="h-6 w-6" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">{t('provinces.show.info_title')}</div>
+                  <div className="text-purple-100 text-sm font-medium">{t('provinces.show.info_description')}</div>
+                </div>
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <div className="text-sm font-medium text-muted-foreground">Created By</div>
-                <div className="flex items-center mt-1">
-                  <User className="h-4 w-4 mr-2 text-muted-foreground" />
-                  {province.creator?.name || 'Unknown'}
+            <CardContent className="p-6 space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 p-4 bg-gradient-to-l from-purple-50 to-white rounded-xl border border-purple-200">
+                  <User className="h-5 w-5 text-purple-600" />
+                  <div>
+                    <div className="text-sm font-medium text-purple-600">{t('provinces.show.created_by')}</div>
+                    <div className="text-purple-900 font-semibold">{province.creator?.name || t('common.unknown')}</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-4 bg-gradient-to-l from-purple-50 to-white rounded-xl border border-purple-200">
+                  <Calendar className="h-5 w-5 text-purple-600" />
+                  <div>
+                    <div className="text-sm font-medium text-purple-600">{t('provinces.show.created_at')}</div>
+                    <div className="text-purple-900 font-semibold">{format(new Date(province.created_at), 'PPP')}</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-4 bg-gradient-to-l from-purple-50 to-white rounded-xl border border-purple-200">
+                  <Clock className="h-5 w-5 text-purple-600" />
+                  <div>
+                    <div className="text-sm font-medium text-purple-600">{t('provinces.show.updated_at')}</div>
+                    <div className="text-purple-900 font-semibold">{format(new Date(province.updated_at), 'PPP p')}</div>
+                  </div>
                 </div>
               </div>
 
-              <div>
-                <div className="text-sm font-medium text-muted-foreground">Created At</div>
-                <div className="flex items-center mt-1">
-                  <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
-                  {format(new Date(province.created_at), 'PPP')}
-                </div>
-              </div>
-
-              <div>
-                <div className="text-sm font-medium text-muted-foreground">Last Updated</div>
-                <div className="flex items-center mt-1">
-                  <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-                  {format(new Date(province.updated_at), 'PPP p')}
-                </div>
-              </div>
-
-              <div className="pt-4 border-t">
-                <Button variant="outline" className="w-full" asChild>
-                  <Link href={route('districts.create', { province_id: province.id })}>
-                    <MapPin className="mr-2 h-4 w-4" />
-                    Add District
-                  </Link>
-                </Button>
+              <div className="pt-4 border-t border-purple-200">
+                <CanCreate model="district">
+                  <Button variant="outline" className="w-full h-12 bg-gradient-to-l from-purple-50 to-white border-purple-300 text-purple-700 hover:bg-purple-100 hover:border-purple-400 rounded-xl transition-all duration-300 hover:scale-105" asChild>
+                    <Link href={route('districts.create', { province_id: province.id })}>
+                      <MapPin className="mr-2 h-5 w-5" />
+                      {t('provinces.show.add_district')}
+                    </Link>
+                  </Button>
+                </CanCreate>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle>Districts</CardTitle>
-              <CardDescription>
-                Districts in this province
-              </CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="relative w-full overflow-auto">
-              <table className="w-full caption-bottom text-sm">
-                <thead className="[&_tr]:border-b">
-                  <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                    <th className="h-12 px-4 text-left align-middle font-medium">Name</th>
-                    <th className="h-12 px-4 text-left align-middle font-medium">Code</th>
-                    <th className="h-12 px-4 text-left align-middle font-medium">Status</th>
-                    <th className="h-12 px-4 text-left align-middle font-medium">Created By</th>
-                    <th className="h-12 px-4 text-left align-middle font-medium">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="[&_tr:last-child]:border-0">
-                  {districts.data.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="h-12 px-4 text-center align-middle">
-                        No districts found
-                      </td>
+        {/* Districts Table */}
+        <div className="mt-8">
+          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl">
+            <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 text-white py-6">
+              <CardTitle className="flex items-center gap-4">
+                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
+                  <MapPin className="h-6 w-6" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">{t('provinces.show.districts_title')}</div>
+                  <div className="text-purple-100 text-sm font-medium">{t('provinces.show.districts_description')}</div>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-hidden rounded-b-3xl">
+                <table className="w-full caption-bottom text-sm">
+                  <thead className="bg-gradient-to-l from-purple-100 to-purple-200 border-0">
+                    <tr className="border-b border-purple-200">
+                      <th className="h-16 px-6 text-left align-middle font-bold text-purple-800 text-lg">{t('provinces.show.districts_table.name')}</th>
+                      <th className="h-16 px-6 text-left align-middle font-bold text-purple-800 text-lg">{t('provinces.show.districts_table.code')}</th>
+                      <th className="h-16 px-6 text-left align-middle font-bold text-purple-800 text-lg">{t('provinces.show.districts_table.status')}</th>
+                      <th className="h-16 px-6 text-left align-middle font-bold text-purple-800 text-lg">{t('provinces.show.districts_table.created_by')}</th>
+                      <th className="h-16 px-6 text-left align-middle font-bold text-purple-800 text-lg">{t('provinces.show.districts_table.actions')}</th>
                     </tr>
-                  ) : (
-                    districts.data.map((district) => (
-                      <tr
-                        key={district.id}
-                        className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
-                      >
-                        <td className="p-4 align-middle">
-                          <Link
-                            href={route('districts.show', district.id)}
-                            className="font-medium text-primary hover:underline flex items-center"
-                          >
-                            <MapPin className="h-4 w-4 mr-2" />
-                            {district.name}
-                          </Link>
-                        </td>
-                        <td className="p-4 align-middle">
-                          {district.code}
-                        </td>
-                        <td className="p-4 align-middle">
-                          <Badge variant={district.status === 'active' ? 'default' : 'secondary'}>
-                            {district.status}
-                          </Badge>
-                        </td>
-                        <td className="p-4 align-middle">
-                          {district.creator?.name || 'N/A'}
-                        </td>
-                        <td className="p-4 align-middle">
-                          <div className="flex space-x-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              asChild
-                            >
-                              <Link href={route('districts.show', district.id)}>
-                                <Eye className="h-4 w-4 mr-1" />
-                                View
-                              </Link>
-                            </Button>
-
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              asChild
-                            >
-                              <Link href={route('districts.edit', district.id)}>
-                                <Edit className="h-4 w-4 mr-1" />
-                                Edit
-                              </Link>
-                            </Button>
+                  </thead>
+                  <tbody>
+                    {districts.data.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="h-32 text-center">
+                          <div className="flex flex-col items-center gap-4 text-purple-600">
+                            <div className="p-4 bg-purple-100 rounded-full">
+                              <AlertTriangle className="h-16 w-16 text-purple-400" />
+                            </div>
+                            <p className="text-xl font-bold">{t('provinces.show.no_districts')}</p>
+                            <p className="text-purple-500">{t('provinces.show.no_districts_description')}</p>
                           </div>
                         </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                    ) : (
+                      districts.data.map((district) => (
+                        <tr key={district.id} className="border-b border-purple-100 hover:bg-purple-50/50 transition-colors duration-300">
+                          <td className="p-6">
+                            <CanView model="district">
+                              <Link
+                                href={route('districts.show', district.id)}
+                                className="font-bold text-purple-900 hover:text-purple-700 transition-colors duration-300 flex items-center gap-2 text-lg"
+                              >
+                                <MapPin className="h-5 w-5" />
+                                {district.name}
+                              </Link>
+                            </CanView>
+                          </td>
+                          <td className="font-bold text-purple-900 p-6 text-lg">{district.code}</td>
+                          <td className="p-6">
+                            <Badge variant={district.status === 'active' ? 'default' : 'secondary'} className="text-sm font-semibold">
+                              {district.status}
+                            </Badge>
+                          </td>
+                          <td className="text-purple-800 p-6 font-medium">
+                            {district.creator?.name || '-'}
+                          </td>
+                          <td className="p-6">
+                            <div className="flex items-center gap-2">
+                              <CanView model="district">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  asChild
+                                  title={t('provinces.show.districts_table.view')}
+                                  className="h-10 w-10 rounded-xl hover:bg-blue-100 text-blue-600 hover:text-blue-700 transition-all duration-300 hover:scale-110"
+                                >
+                                  <Link href={route('districts.show', district.id)}>
+                                    <Eye className="h-5 w-5" />
+                                  </Link>
+                                </Button>
+                              </CanView>
+                              <CanUpdate model="district">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  asChild
+                                  title={t('provinces.show.districts_table.edit')}
+                                  className="h-10 w-10 rounded-xl hover:bg-green-100 text-green-600 hover:text-green-700 transition-all duration-300 hover:scale-110"
+                                >
+                                  <Link href={route('districts.edit', district.id)}>
+                                    <Edit className="h-5 w-5" />
+                                  </Link>
+                                </Button>
+                              </CanUpdate>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-            <div className="mt-6">
+        {/* Pagination */}
+        {districts.links && districts.links.length > 0 && (
+          <div className="mt-8 flex justify-center">
+            <div className="bg-gradient-to-l from-purple-50 to-white p-4 rounded-3xl shadow-2xl border border-purple-200">
               <Pagination links={districts.links} />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        )}
       </div>
     </AppLayout>
   );
