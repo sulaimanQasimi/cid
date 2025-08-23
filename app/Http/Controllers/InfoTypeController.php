@@ -51,7 +51,7 @@ class InfoTypeController extends Controller
         $types = $query->paginate($perPage)->withQueryString();
 
         return Inertia::render('Info/Types/Index', [
-            'types' => $types,
+            'infoTypes' => $types,
             'filters' => [
                 'search' => $search,
                 'sort' => $sort,

@@ -335,12 +335,12 @@ export default function InfoTypesIndex({
                       onValueChange={handlePerPageChange}
                     >
                       <SelectTrigger className="h-11 shadow-lg border-purple-200 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 to-white rounded-xl text-sm">
-                        <SelectValue placeholder={t('info_types.items_per_page')} />
+                        <SelectValue placeholder={t('info_types.per_page_option')} />
                       </SelectTrigger>
                       <SelectContent>
                         {perPageOptions.map(option => (
                           <SelectItem key={option.value} value={option.value.toString()}>
-                            {t('info_types.per_page_option', { count: option.value.toString() })}
+                            {option.value.toString()}
                           </SelectItem>
                         ))}
                       </SelectContent>

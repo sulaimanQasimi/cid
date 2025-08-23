@@ -3,10 +3,14 @@ import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Pencil, Trash, ExternalLink } from 'lucide-react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { ArrowLeft, Pencil, Trash, ExternalLink, FileText, BarChart3, TrendingUp, AlertTriangle, Plus } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { useTranslation } from '@/lib/i18n/translate';
+import { usePermissions } from '@/hooks/use-permissions';
+import { CanCreate, CanView, CanUpdate, CanDelete } from '@/components/ui/permission-guard';
 
 interface Info {
   id: number;
@@ -30,23 +34,25 @@ interface Props {
   infoType: InfoType;
 }
 
-const breadcrumbs: BreadcrumbItem[] = [
-  {
-    title: 'Info Management',
-    href: '#',
-  },
-  {
-    title: 'Info Types',
-    href: route('info-types.index'),
-  },
-  {
-    title: 'View Type',
-    href: '#',
-  },
-];
-
 export default function ShowInfoType({ infoType }: Props) {
+  const { t } = useTranslation();
+  const { canCreate, canView, canUpdate, canDelete } = usePermissions();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+
+  const breadcrumbs: BreadcrumbItem[] = [
+    {
+      title: t('info.page_title'),
+      href: route('infos.index'),
+    },
+    {
+      title: t('info_types.page_title'),
+      href: route('info-types.index'),
+    },
+    {
+      title: infoType.name,
+      href: '#',
+    },
+  ];
 
   const handleDelete = () => {
     router.delete(route('info-types.destroy', infoType.id), {
@@ -58,145 +64,230 @@ export default function ShowInfoType({ infoType }: Props) {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title={`View Type: ${infoType.name}`} />
-      <div className="py-12">
-        <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-          <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div className="p-6 text-gray-900">
-              <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">Type Details</h1>
-                <div className="flex items-center gap-2">
-                  <Button variant="outline" asChild>
-                    <Link href={route('info-types.index')}>
-                      <ArrowLeft className="mr-2 h-4 w-4" />
-                      Back to Types
-                    </Link>
-                  </Button>
-                  <Button variant="outline" asChild>
-                    <Link href={route('info-types.edit', infoType.id)}>
-                      <Pencil className="mr-2 h-4 w-4" />
-                      Edit
-                    </Link>
-                  </Button>
-                  <Button variant="destructive" onClick={() => setIsDeleteDialogOpen(true)}>
-                    <Trash className="mr-2 h-4 w-4" />
-                    Delete
-                  </Button>
-                </div>
-              </div>
-
-              <Card className="mb-6">
-                <CardHeader className="pb-3">
-                  <h2 className="text-lg font-semibold">{infoType.name}</h2>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500">Description</h3>
-                      <p className="mt-1 text-sm text-gray-900">{infoType.description || 'No description provided'}</p>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500">Created At</h3>
-                      <p className="mt-1 text-sm text-gray-900">{new Date(infoType.created_at).toLocaleString()}</p>
-
-                      <h3 className="text-sm font-medium text-gray-500 mt-4">Updated At</h3>
-                      <p className="mt-1 text-sm text-gray-900">{new Date(infoType.updated_at).toLocaleString()}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Info records table */}
-              <div className="mt-8">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-semibold">Associated Info Records</h2>
-                  <Button asChild>
-                    <Link href={route('infos.create', { type_id: infoType.id })}>
-                      Create New Info
-                    </Link>
-                  </Button>
-                </div>
-
-                {infoType.infos && infoType.infos.length > 0 ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>ID</TableHead>
-                        <TableHead>Title</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Created At</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {infoType.infos.map((info) => (
-                        <TableRow key={info.id}>
-                          <TableCell>{info.id}</TableCell>
-                          <TableCell className="font-medium">{info.title}</TableCell>
-                          <TableCell>
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              info.status === 'published'
-                                ? 'bg-green-100 text-green-800'
-                                : info.status === 'draft'
-                                ? 'bg-gray-100 text-gray-800'
-                                : 'bg-yellow-100 text-yellow-800'
-                            }`}>
-                              {info.status.charAt(0).toUpperCase() + info.status.slice(1)}
-                            </span>
-                          </TableCell>
-                          <TableCell>{new Date(info.created_at).toLocaleString()}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex justify-end gap-2">
-                              <Button size="sm" variant="outline" asChild>
-                                <Link href={route('infos.show', info.id)}>
-                                  <ExternalLink className="h-4 w-4" />
-                                </Link>
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                ) : (
-                  <Card>
-                    <CardContent className="flex items-center justify-center p-6">
-                      <div className="text-center">
-                        <p className="text-gray-500 mb-4">No info records found for this type.</p>
-                        <Button asChild>
-                          <Link href={route('infos.create', { type_id: infoType.id })}>
-                            Create First Info Record
-                          </Link>
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Head title={t('info_types.show.title', { name: infoType.name })} />
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>{t('info_types.delete_dialog.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the type "{infoType.name}".
-              <br />
-              This action cannot be undone.
+              {t('info_types.delete_dialog.description', { name: infoType.name })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-500 hover:bg-red-600">
-              Delete
+            <AlertDialogCancel>{t('info_types.delete_dialog.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+              {t('info_types.delete_dialog.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <div className="container px-0 py-6">
+        {/* Modern Header with Glassmorphism */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-l from-purple-600 via-indigo-600 to-blue-600 p-8 lg:p-12 text-white shadow-2xl mb-8 group">
+          {/* Animated background elements */}
+          <div className="absolute inset-0 bg-black/5"></div>
+          <div className="absolute top-0 left-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 -translate-x-40 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
+          <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full translate-y-32 translate-x-32 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
+          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white/5 rounded-full -translate-x-16 -translate-y-16 blur-xl group-hover:scale-150 transition-transform duration-500"></div>
+          
+          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-8">
+            <div className="flex items-center gap-8">
+              <div className="p-6 bg-white/20 backdrop-blur-md rounded-3xl border border-white/30 shadow-2xl group-hover:scale-105 transition-transform duration-300">
+                <FileText className="h-10 w-10 text-white" />
+              </div>
+              <div className="space-y-3">
+                <h2 className="text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight">{infoType.name}</h2>
+                <div className="text-white/90 flex items-center gap-3 text-xl font-medium">
+                  <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <BarChart3 className="h-6 w-6" />
+                  </div>
+                  {t('info_types.show.description')}
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
+                <Link href={route('info-types.index')} className="flex items-center gap-3">
+                  <ArrowLeft className="h-5 w-5" />
+                  {t('info_types.show.back_button')}
+                </Link>
+              </Button>
+              <CanUpdate model="info_type">
+                <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
+                  <Link href={route('info-types.edit', infoType.id)} className="flex items-center gap-3">
+                    <Pencil className="h-5 w-5" />
+                    {t('info_types.show.edit_button')}
+                  </Link>
+                </Button>
+              </CanUpdate>
+              <CanDelete model="info_type">
+                <Button 
+                  size="lg" 
+                  variant="destructive" 
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                  className="bg-red-500/20 backdrop-blur-md border-red-300/30 text-white hover:bg-red-500/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105"
+                >
+                  <Trash className="h-5 w-5 mr-2" />
+                  {t('info_types.show.delete_button')}
+                </Button>
+              </CanDelete>
+            </div>
+          </div>
+        </div>
+
+        {/* Info Type Details Card */}
+        <Card className="shadow-2xl bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl overflow-hidden mb-8">
+          <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 text-white py-6">
+            <CardTitle className="flex items-center gap-4">
+              <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
+                <TrendingUp className="h-6 w-6" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold">{t('info_types.show.details_title')}</div>
+                <div className="text-purple-100 text-sm font-medium">{t('info_types.show.details_description')}</div>
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-purple-800 mb-2">{t('info_types.show.name_label')}</h3>
+                  <p className="text-xl font-bold text-purple-900 bg-gradient-to-l from-purple-50 to-white p-4 rounded-xl border border-purple-200">
+                    {infoType.name}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-purple-800 mb-2">{t('info_types.show.description_label')}</h3>
+                  <p className="text-purple-800 bg-gradient-to-l from-purple-50 to-white p-4 rounded-xl border border-purple-200 min-h-[60px]">
+                    {infoType.description || t('info_types.show.no_description')}
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-purple-800 mb-2">{t('info_types.show.created_at_label')}</h3>
+                  <p className="text-purple-800 bg-gradient-to-l from-purple-50 to-white p-4 rounded-xl border border-purple-200">
+                    {new Date(infoType.created_at).toLocaleString()}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-purple-800 mb-2">{t('info_types.show.updated_at_label')}</h3>
+                  <p className="text-purple-800 bg-gradient-to-l from-purple-50 to-white p-4 rounded-xl border border-purple-200">
+                    {new Date(infoType.updated_at).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Associated Info Records */}
+        <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl">
+          <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 text-white py-6">
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
+                  <FileText className="h-6 w-6" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">{t('info_types.show.associated_info_title')}</div>
+                  <div className="text-purple-100 text-sm font-medium">{t('info_types.show.associated_info_description')}</div>
+                </div>
+              </div>
+              <CanCreate model="info">
+                <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
+                  <Link href={route('infos.create', { type_id: infoType.id })} className="flex items-center gap-3">
+                    <Plus className="h-5 w-5" />
+                    {t('info_types.show.create_info_button')}
+                  </Link>
+                </Button>
+              </CanCreate>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-hidden rounded-b-3xl">
+              {infoType.infos && infoType.infos.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-gradient-to-l from-purple-100 to-purple-200 border-0">
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_types.show.table.id')}</TableHead>
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_types.show.table.title')}</TableHead>
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_types.show.table.status')}</TableHead>
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_types.show.table.created_at')}</TableHead>
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6 text-right">{t('info_types.show.table.actions')}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {infoType.infos.map((info) => (
+                      <TableRow key={info.id} className="hover:bg-purple-50/50 transition-colors duration-300 border-b border-purple-100">
+                        <TableCell className="font-bold text-purple-900 py-6 px-6 text-lg">{info.id}</TableCell>
+                        <TableCell className="font-bold text-purple-900 py-6 px-6 text-lg">{info.title}</TableCell>
+                        <TableCell className="py-6 px-6">
+                          <Badge 
+                            variant="outline" 
+                            className={`px-4 py-2 rounded-xl font-semibold ${
+                              info.status === 'published'
+                                ? 'bg-green-100 text-green-800 border-green-300'
+                                : info.status === 'draft'
+                                ? 'bg-gray-100 text-gray-800 border-gray-300'
+                                : 'bg-yellow-100 text-yellow-800 border-yellow-300'
+                            }`}
+                          >
+                            {info.status.charAt(0).toUpperCase() + info.status.slice(1)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-purple-800 py-6 px-6 font-medium">
+                          {new Date(info.created_at).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell className="py-6 px-6">
+                          <div className="flex items-center gap-2 justify-end">
+                            <CanView model="info">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                asChild
+                                title={t('info_types.show.actions.view')}
+                                className="h-10 w-10 rounded-xl hover:bg-blue-100 text-blue-600 hover:text-blue-700 transition-all duration-300 hover:scale-110"
+                              >
+                                <Link href={route('infos.show', info.id)}>
+                                  <ExternalLink className="h-5 w-5" />
+                                </Link>
+                              </Button>
+                            </CanView>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="h-32 flex items-center justify-center">
+                  <div className="flex flex-col items-center gap-4 text-purple-600">
+                    <div className="p-4 bg-purple-100 rounded-full">
+                      <AlertTriangle className="h-16 w-16 text-purple-400" />
+                    </div>
+                    <p className="text-xl font-bold">{t('info_types.show.no_info_records')}</p>
+                    <p className="text-purple-500">{t('info_types.show.no_info_records_description')}</p>
+                    <CanCreate model="info">
+                      <Button asChild className="bg-gradient-to-l from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
+                        <Link href={route('infos.create', { type_id: infoType.id })} className="flex items-center gap-3">
+                          <Plus className="h-5 w-5" />
+                          {t('info_types.show.create_first_info_button')}
+                        </Link>
+                      </Button>
+                    </CanCreate>
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </AppLayout>
   );
 }
