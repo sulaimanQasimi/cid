@@ -7,10 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Contracts\Activity;
 
 class StatCategoryItem extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     /**
      * The attributes that are mass assignable.
@@ -38,6 +41,36 @@ class StatCategoryItem extends Model
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
+
+    /**
+     * Get the activity log options for the model.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => match($eventName) {
+                'created' => 'آیتم آمار جدید ایجاد شد',
+                'updated' => 'اطلاعات آیتم آمار بروزرسانی شد',
+                'deleted' => 'آیتم آمار حذف شد',
+                default => "عملیات {$eventName} روی آیتم آمار انجام شد"
+            });
+    }
+
+    /**
+     * Customize the activity before it gets saved.
+     */
+    public function tapActivity(Activity $activity, string $eventName)
+    {
+        $activity->description = match($eventName) {
+            'created' => 'آیتم آمار جدید ایجاد شد',
+            'updated' => 'اطلاعات آیتم آمار بروزرسانی شد',
+            'deleted' => 'آیتم آمار حذف شد',
+            default => "عملیات {$eventName} روی آیتم آمار انجام شد"
+        };
+    }
 
     /**
      * Get the category that owns this item.

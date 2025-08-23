@@ -6,10 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Traits\HasVisitors;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Contracts\Activity;
 
 class Info extends Model
 {
-    use HasFactory, HasVisitors;
+    use HasFactory, HasVisitors, LogsActivity;
 
     /**
      * The attributes that are mass assignable.
@@ -39,6 +42,36 @@ class Info extends Model
         'value' => 'array',
         'confirmed' => 'boolean',
     ];
+
+    /**
+     * Get the activity log options for the model.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => match($eventName) {
+                'created' => 'اطلاعات جدید ثبت شد',
+                'updated' => 'اطلاعات بروزرسانی شد',
+                'deleted' => 'اطلاعات حذف شد',
+                default => "عملیات {$eventName} روی اطلاعات انجام شد"
+            });
+    }
+
+    /**
+     * Customize the activity before it gets saved.
+     */
+    public function tapActivity(Activity $activity, string $eventName)
+    {
+        $activity->description = match($eventName) {
+            'created' => 'اطلاعات جدید ثبت شد',
+            'updated' => 'اطلاعات بروزرسانی شد',
+            'deleted' => 'اطلاعات حذف شد',
+            default => "عملیات {$eventName} روی اطلاعات انجام شد"
+        };
+    }
 
     /**
      * Get the info type that owns the info.

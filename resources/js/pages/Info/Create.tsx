@@ -115,10 +115,10 @@ export default function InfoCreate({ infoTypes = [], infoCategories = [], depart
               </div>
               <div>
                 <h2 className="text-3xl lg:text-4xl font-bold text-white drop-shadow-lg">{t('info.create.title')}</h2>
-                <p className="text-white/90 flex items-center gap-2 mt-2 text-lg">
+                <div className="text-white/90 flex items-center gap-2 mt-2 text-lg">
                   <AlertTriangle className="h-5 w-5" />
                   {t('info.create.description')}
-                </p>
+                </div>
               </div>
             </div>
             
@@ -145,14 +145,14 @@ export default function InfoCreate({ infoTypes = [], infoCategories = [], depart
             <CardContent className="p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                    <Label htmlFor="info_type_id">Type <span className="text-red-500">*</span></Label>
+                    <Label htmlFor="info_type_id">{t('info.create.fields.type')} <span className="text-red-500">{t('common.required_field')}</span></Label>
                     <Select
                       value={data.info_type_id}
                       onValueChange={(value) => setData('info_type_id', value)}
                       required
                     >
                       <SelectTrigger id="info_type_id">
-                        <SelectValue placeholder="Select a type" />
+                        <SelectValue placeholder={t('info.create.placeholders.select_type')} />
                       </SelectTrigger>
                       <SelectContent>
                         {infoTypes.length > 0 ? (
@@ -162,7 +162,7 @@ export default function InfoCreate({ infoTypes = [], infoCategories = [], depart
                             </SelectItem>
                           ))
                         ) : (
-                          <div className="p-2 text-sm text-gray-500">No types available</div>
+                          <div className="p-2 text-sm text-gray-500">{t('info.create.no_types_available')}</div>
                         )}
                       </SelectContent>
                     </Select>
@@ -170,14 +170,14 @@ export default function InfoCreate({ infoTypes = [], infoCategories = [], depart
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="info_category_id">Category <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="info_category_id">{t('info.create.fields.category')} <span className="text-red-500">{t('common.required_field')}</span></Label>
                   <Select
                     value={data.info_category_id}
                     onValueChange={(value) => setData('info_category_id', value)}
                     required
                   >
                     <SelectTrigger id="info_category_id">
-                      <SelectValue placeholder="Select a category" />
+                      <SelectValue placeholder={t('info.create.placeholders.select_category')} />
                     </SelectTrigger>
                     <SelectContent>
                       {infoCategories.length > 0 ? (
@@ -187,7 +187,7 @@ export default function InfoCreate({ infoTypes = [], infoCategories = [], depart
                           </SelectItem>
                         ))
                       ) : (
-                        <div className="p-2 text-sm text-gray-500">No categories available</div>
+                        <div className="p-2 text-sm text-gray-500">{t('info.create.no_categories_available')}</div>
                       )}
                     </SelectContent>
                   </Select>
@@ -195,16 +195,16 @@ export default function InfoCreate({ infoTypes = [], infoCategories = [], depart
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="department_id">Department</Label>
+                  <Label htmlFor="department_id">{t('info.create.fields.department')}</Label>
                   <Select
                     value={data.department_id}
                     onValueChange={(value) => setData('department_id', value)}
                   >
                     <SelectTrigger id="department_id">
-                      <SelectValue placeholder="Select a department (optional)" />
+                      <SelectValue placeholder={t('info.create.placeholders.select_department')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="none">None</SelectItem>
+                      <SelectItem value="none">{t('common.none')}</SelectItem>
                       {departments.length > 0 ? (
                         departments.map((department) => (
                           <SelectItem key={department.id} value={department.id.toString()}>
@@ -212,7 +212,7 @@ export default function InfoCreate({ infoTypes = [], infoCategories = [], depart
                           </SelectItem>
                         ))
                       ) : (
-                        <div className="p-2 text-sm text-gray-500">No departments available</div>
+                        <div className="p-2 text-sm text-gray-500">{t('info.create.no_departments_available')}</div>
                       )}
                     </SelectContent>
                   </Select>
@@ -221,7 +221,7 @@ export default function InfoCreate({ infoTypes = [], infoCategories = [], depart
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="name">Name</Label>
+                  <Label htmlFor="name">{t('info.create.fields.name')}</Label>
                   <Input
                     id="name"
                     value={data.name}
@@ -231,19 +231,19 @@ export default function InfoCreate({ infoTypes = [], infoCategories = [], depart
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="code">Code</Label>
+                  <Label htmlFor="code">{t('info.create.fields.code')}</Label>
                   <Input
                     id="code"
                     value={data.code}
                     onChange={(e) => setData('code', e.target.value)}
-                    placeholder="Unique identifier (optional)"
+                    placeholder={t('info.create.placeholders.code')}
                   />
                   {errors.code && <p className="text-sm text-red-500">{errors.code}</p>}
-                  <p className="text-sm text-gray-500">A unique identifier for this record. Can contain letters, numbers, underscores, and hyphens.</p>
+                  <p className="text-sm text-gray-500">{t('info.create.code_helper')}</p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
+                  <Label htmlFor="description">{t('info.create.fields.description')}</Label>
                   <Textarea
                     id="description"
                     value={data.description}
@@ -255,14 +255,14 @@ export default function InfoCreate({ infoTypes = [], infoCategories = [], depart
 
                 {/* Content section with tabs */}
                 <div className="space-y-2">
-                  <Label>Content</Label>
+                  <Label>{t('info.create.fields.content')}</Label>
 
                   <Tabs defaultValue="basic" value={activeTab} onValueChange={handleTabChange}>
                     <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="basic">Basic Content</TabsTrigger>
+                      <TabsTrigger value="basic">{t('info.create.content_tabs.basic')}</TabsTrigger>
                       <TabsTrigger value="location" className="flex items-center gap-1">
                         <MapPin className="h-4 w-4" />
-                        Location
+                        {t('info.create.content_tabs.location')}
                       </TabsTrigger>
                     </TabsList>
 
@@ -272,13 +272,13 @@ export default function InfoCreate({ infoTypes = [], infoCategories = [], depart
                         value={data.value.content}
                         onChange={(e) => setData('value', { ...data.value, content: e.target.value })}
                         rows={5}
-                        placeholder="Enter content here..."
+                        placeholder={t('info.create.placeholders.content')}
                       />
                     </TabsContent>
 
                     <TabsContent value="location" className="pt-4">
                       <div className="space-y-2">
-                        <p className="text-sm text-gray-500">Click on the map to select a location in Afghanistan.</p>
+                        <p className="text-sm text-gray-500">{t('info.create.location_description')}</p>
                         {isMapTabMounted && (
                           <LocationSelector
                             value={location}
@@ -287,7 +287,7 @@ export default function InfoCreate({ infoTypes = [], infoCategories = [], depart
                         )}
                         {!isMapTabMounted && (
                           <div className="h-[400px] flex items-center justify-center bg-gray-100 rounded-md">
-                            Loading map...
+                            {t('info.create.loading_map')}
                           </div>
                         )}
                       </div>

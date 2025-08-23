@@ -17,21 +17,6 @@ import LocationSelector from '@/components/LocationSelector';
 import { useTranslation } from '@/lib/i18n/translate';
 import { cn } from '@/lib/utils';
 
-const breadcrumbs: BreadcrumbItem[] = [
-  {
-    title: 'Info Management',
-    href: '#',
-  },
-  {
-    title: 'Info Records',
-    href: route('infos.index'),
-  },
-  {
-    title: 'Edit',
-    href: '#',
-  },
-];
-
 interface Department {
   id: number;
   name: string;
@@ -54,6 +39,18 @@ interface Props {
 
 export default function InfoEdit({ info, infoTypes = [], infoCategories = [], departments = [] }: Props) {
   const { t } = useTranslation();
+  
+  const breadcrumbs: BreadcrumbItem[] = [
+    {
+      title: t('info.page_title'),
+      href: route('infos.index'),
+    },
+    {
+      title: t('info.edit.breadcrumb'),
+      href: '#',
+    },
+  ];
+  
   // Content tabs state
   const [activeTab, setActiveTab] = useState<string>('basic');
 
@@ -135,10 +132,10 @@ export default function InfoEdit({ info, infoTypes = [], infoCategories = [], de
               </div>
               <div>
                 <h2 className="text-3xl lg:text-4xl font-bold text-white drop-shadow-lg">{t('info.edit.title')}</h2>
-                <p className="text-white/90 flex items-center gap-2 mt-2 text-lg">
+                <div className="text-white/90 flex items-center gap-2 mt-2 text-lg">
                   <AlertTriangle className="h-5 w-5" />
                   {t('info.edit.description')}
-                </p>
+                </div>
               </div>
             </div>
             
@@ -167,14 +164,14 @@ export default function InfoEdit({ info, infoTypes = [], infoCategories = [], de
             <CardContent className="p-6 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="info_type_id">Type <span className="text-red-500">*</span></Label>
+                    <Label htmlFor="info_type_id">{t('info.edit.fields.type')} <span className="text-red-500">{t('common.required_field')}</span></Label>
                     <Select
                       value={data.info_type_id}
                       onValueChange={(value) => setData('info_type_id', value)}
                       required
                     >
                       <SelectTrigger id="info_type_id">
-                        <SelectValue placeholder="Select a type" />
+                        <SelectValue placeholder={t('info.edit.placeholders.select_type')} />
                       </SelectTrigger>
                       <SelectContent>
                         {infoTypes.length > 0 ? (
@@ -184,7 +181,7 @@ export default function InfoEdit({ info, infoTypes = [], infoCategories = [], de
                             </SelectItem>
                           ))
                         ) : (
-                          <div className="p-2 text-sm text-gray-500">No types available</div>
+                          <div className="p-2 text-sm text-gray-500">{t('info.edit.no_types_available')}</div>
                         )}
                       </SelectContent>
                     </Select>
@@ -192,14 +189,14 @@ export default function InfoEdit({ info, infoTypes = [], infoCategories = [], de
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="info_category_id">Category <span className="text-red-500">*</span></Label>
+                    <Label htmlFor="info_category_id">{t('info.edit.fields.category')} <span className="text-red-500">{t('common.required_field')}</span></Label>
                     <Select
                       value={data.info_category_id}
                       onValueChange={(value) => setData('info_category_id', value)}
                       required
                     >
                       <SelectTrigger id="info_category_id">
-                        <SelectValue placeholder="Select a category" />
+                        <SelectValue placeholder={t('info.edit.placeholders.select_category')} />
                       </SelectTrigger>
                       <SelectContent>
                         {infoCategories.length > 0 ? (
@@ -209,7 +206,7 @@ export default function InfoEdit({ info, infoTypes = [], infoCategories = [], de
                             </SelectItem>
                           ))
                         ) : (
-                          <div className="p-2 text-sm text-gray-500">No categories available</div>
+                          <div className="p-2 text-sm text-gray-500">{t('info.edit.no_categories_available')}</div>
                         )}
                       </SelectContent>
                     </Select>
@@ -217,16 +214,16 @@ export default function InfoEdit({ info, infoTypes = [], infoCategories = [], de
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="department_id">Department</Label>
+                    <Label htmlFor="department_id">{t('info.edit.fields.department')}</Label>
                     <Select
                       value={data.department_id}
                       onValueChange={(value) => setData('department_id', value)}
                     >
                       <SelectTrigger id="department_id">
-                        <SelectValue placeholder="Select a department (optional)" />
+                        <SelectValue placeholder={t('info.edit.placeholders.select_department')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="none">None</SelectItem>
+                        <SelectItem value="none">{t('common.none')}</SelectItem>
                         {departments.length > 0 ? (
                           departments.map((department) => (
                             <SelectItem key={department.id} value={department.id.toString()}>
@@ -234,7 +231,7 @@ export default function InfoEdit({ info, infoTypes = [], infoCategories = [], de
                             </SelectItem>
                           ))
                         ) : (
-                          <div className="p-2 text-sm text-gray-500">No departments available</div>
+                          <div className="p-2 text-sm text-gray-500">{t('info.edit.no_departments_available')}</div>
                         )}
                       </SelectContent>
                     </Select>
@@ -243,7 +240,7 @@ export default function InfoEdit({ info, infoTypes = [], infoCategories = [], de
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="name">Name</Label>
+                  <Label htmlFor="name">{t('info.edit.fields.name')}</Label>
                   <Input
                     id="name"
                     value={data.name}
@@ -253,19 +250,19 @@ export default function InfoEdit({ info, infoTypes = [], infoCategories = [], de
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="code">Code</Label>
+                  <Label htmlFor="code">{t('info.edit.fields.code')}</Label>
                   <Input
                     id="code"
                     value={data.code}
                     onChange={(e) => setData('code', e.target.value)}
-                    placeholder="Unique identifier (optional)"
+                    placeholder={t('info.edit.placeholders.code')}
                   />
                   {errors.code && <p className="text-sm text-red-500">{errors.code}</p>}
-                  <p className="text-sm text-gray-500">A unique identifier for this record. Can contain letters, numbers, underscores, and hyphens.</p>
+                  <p className="text-sm text-gray-500">{t('info.edit.code_helper')}</p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
+                  <Label htmlFor="description">{t('info.edit.fields.description')}</Label>
                   <Textarea
                     id="description"
                     value={data.description}
@@ -277,14 +274,14 @@ export default function InfoEdit({ info, infoTypes = [], infoCategories = [], de
 
                 {/* Content section with tabs */}
                 <div className="space-y-2">
-                  <Label>Content</Label>
+                  <Label>{t('info.edit.fields.content')}</Label>
 
                   <Tabs defaultValue="basic" value={activeTab} onValueChange={handleTabChange}>
                     <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="basic">Basic Content</TabsTrigger>
+                      <TabsTrigger value="basic">{t('info.edit.content_tabs.basic')}</TabsTrigger>
                       <TabsTrigger value="location" className="flex items-center gap-1">
                         <MapPin className="h-4 w-4" />
-                        Location
+                        {t('info.edit.content_tabs.location')}
                       </TabsTrigger>
                     </TabsList>
 
@@ -294,13 +291,13 @@ export default function InfoEdit({ info, infoTypes = [], infoCategories = [], de
                         value={data.value.content}
                         onChange={(e) => setData('value', { ...data.value, content: e.target.value })}
                         rows={5}
-                        placeholder="Enter content here..."
+                        placeholder={t('info.edit.placeholders.content')}
                       />
                     </TabsContent>
 
                     <TabsContent value="location" className="pt-4">
                       <div className="space-y-2">
-                        <p className="text-sm text-gray-500">Click on the map to select a location in Afghanistan.</p>
+                        <p className="text-sm text-gray-500">{t('info.edit.location_description')}</p>
                         {isMapTabMounted && (
                           <LocationSelector
                             value={location}
@@ -309,7 +306,7 @@ export default function InfoEdit({ info, infoTypes = [], infoCategories = [], de
                         )}
                         {!isMapTabMounted && (
                           <div className="h-[400px] flex items-center justify-center bg-gray-100 rounded-md">
-                            Loading map...
+                            {t('info.edit.loading_map')}
                           </div>
                         )}
                       </div>
@@ -328,7 +325,7 @@ export default function InfoEdit({ info, infoTypes = [], infoCategories = [], de
                       onChange={(e) => setData('confirmed', e.target.checked)}
                       className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     />
-                    <Label htmlFor="confirmed">Mark as Confirmed</Label>
+                    <Label htmlFor="confirmed">{t('info.edit.fields.confirmed')}</Label>
                   </div>
                   {errors.confirmed && <p className="text-sm text-red-500">{errors.confirmed}</p>}
                 </div>

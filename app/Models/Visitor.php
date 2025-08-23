@@ -6,9 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Carbon\Carbon;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Contracts\Activity;
 
 class Visitor extends Model
 {
+    use LogsActivity;
+
     protected $fillable = [
         'ip_address',
         'user_agent',
@@ -48,6 +53,36 @@ class Visitor extends Model
         'created_at',
         'updated_at',
     ];
+
+    /**
+     * Get the activity log options for the model.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => match($eventName) {
+                'created' => 'بازدید جدید ثبت شد',
+                'updated' => 'اطلاعات بازدید بروزرسانی شد',
+                'deleted' => 'بازدید حذف شد',
+                default => "عملیات {$eventName} روی بازدید انجام شد"
+            });
+    }
+
+    /**
+     * Customize the activity before it gets saved.
+     */
+    public function tapActivity(Activity $activity, string $eventName)
+    {
+        $activity->description = match($eventName) {
+            'created' => 'بازدید جدید ثبت شد',
+            'updated' => 'اطلاعات بازدید بروزرسانی شد',
+            'deleted' => 'بازدید حذف شد',
+            default => "عملیات {$eventName} روی بازدید انجام شد"
+        };
+    }
 
     /**
      * Get the user that owns the visit.

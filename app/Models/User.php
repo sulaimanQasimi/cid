@@ -7,12 +7,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Contracts\Activity;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
-    use HasRoles;
+    use HasFactory, Notifiable, HasRoles, LogsActivity;
+    
     /**
      * The attributes that are mass assignable.
      *
@@ -33,6 +36,36 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    /**
+     * Get the activity log options for the model.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => match($eventName) {
+                'created' => 'کاربر جدید ثبت شد',
+                'updated' => 'اطلاعات کاربر بروزرسانی شد',
+                'deleted' => 'کاربر حذف شد',
+                default => "عملیات {$eventName} روی کاربر انجام شد"
+            });
+    }
+
+    /**
+     * Customize the activity before it gets saved.
+     */
+    public function tapActivity(Activity $activity, string $eventName)
+    {
+        $activity->description = match($eventName) {
+            'created' => 'کاربر جدید ثبت شد',
+            'updated' => 'اطلاعات کاربر بروزرسانی شد',
+            'deleted' => 'کاربر حذف شد',
+            default => "عملیات {$eventName} روی کاربر انجام شد"
+        };
+    }
 
     /**
      * Get the attributes that should be cast.

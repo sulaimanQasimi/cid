@@ -507,7 +507,7 @@ export default function CriminalIndex({
                               title={t('criminal.analytics.view_analytics')}
                               className="h-10 w-10 rounded-xl hover:bg-purple-100 text-purple-600 hover:text-purple-700 transition-all duration-300 hover:scale-110"
                             >
-                              <Link href={route('analytics.show', ['Criminal', criminal.id])}>
+                              <Link href={`/analytics/Criminal/${criminal.id}`}>
                                 <BarChart3 className="h-5 w-5" />
                               </Link>
                             </Button>

@@ -8,12 +8,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Traits\HasVisitors;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Contracts\Activity;
+
 // Controller: app/Http/Controllers/IncidentController.php
 // Route pages: resources/js/pages/Incidents/
 // Route File: routes/incident.php
 class Incident extends Model
 {
-    use HasFactory, SoftDeletes, HasVisitors;
+    use HasFactory, SoftDeletes, HasVisitors, LogsActivity;
 
     /**
      * The attributes that are mass assignable.
@@ -48,6 +52,36 @@ class Incident extends Model
         'casualties' => 'integer',
         'injuries' => 'integer',
     ];
+
+    /**
+     * Get the activity log options for the model.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => match($eventName) {
+                'created' => 'حادثه جدید ثبت شد',
+                'updated' => 'اطلاعات حادثه بروزرسانی شد',
+                'deleted' => 'حادثه حذف شد',
+                default => "عملیات {$eventName} روی حادثه انجام شد"
+            });
+    }
+
+    /**
+     * Customize the activity before it gets saved.
+     */
+    public function tapActivity(Activity $activity, string $eventName)
+    {
+        $activity->description = match($eventName) {
+            'created' => 'حادثه جدید ثبت شد',
+            'updated' => 'اطلاعات حادثه بروزرسانی شد',
+            'deleted' => 'حادثه حذف شد',
+            default => "عملیات {$eventName} روی حادثه انجام شد"
+        };
+    }
 
     /**
      * Get the district that owns the incident.

@@ -6,10 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Contracts\Activity;
 
 class ReportStat extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     /**
      * The attributes that are mass assignable.
@@ -37,6 +40,36 @@ class ReportStat extends Model
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
+
+    /**
+     * Get the activity log options for the model.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => match($eventName) {
+                'created' => 'آمار جدید ثبت شد',
+                'updated' => 'اطلاعات آمار بروزرسانی شد',
+                'deleted' => 'آمار حذف شد',
+                default => "عملیات {$eventName} روی آمار انجام شد"
+            });
+    }
+
+    /**
+     * Customize the activity before it gets saved.
+     */
+    public function tapActivity(Activity $activity, string $eventName)
+    {
+        $activity->description = match($eventName) {
+            'created' => 'آمار جدید ثبت شد',
+            'updated' => 'اطلاعات آمار بروزرسانی شد',
+            'deleted' => 'آمار حذف شد',
+            default => "عملیات {$eventName} روی آمار انجام شد"
+        };
+    }
 
     /**
      * Get the incident report that owns this stat.

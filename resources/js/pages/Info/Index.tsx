@@ -120,17 +120,6 @@ interface Props {
   };
 }
 
-const breadcrumbs: BreadcrumbItem[] = [
-  {
-    title: 'Info Management',
-    href: '#',
-  },
-  {
-    title: 'Info Records',
-    href: route('infos.index'),
-  },
-];
-
 const sortOptions = [
   { value: 'name', label: 'Name' },
   { value: 'info_type_id', label: 'Type' },
@@ -156,6 +145,17 @@ export default function InfoIndex({
 }: Props) {
   const { canCreate, canView, canUpdate, canDelete, canConfirm } = usePermissions();
   const { t } = useTranslation();
+  
+  const breadcrumbs: BreadcrumbItem[] = [
+    {
+      title: t('info.page_title'),
+      href: '#',
+    },
+    {
+      title: t('info.page_title'),
+      href: route('infos.index'),
+    },
+  ];
   const [searchQuery, setSearchQuery] = useState(filters.search);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [infoToDelete, setInfoToDelete] = useState<InfoRecord | null>(null);
@@ -294,12 +294,12 @@ export default function InfoIndex({
               </div>
               <div className="space-y-3">
                 <h2 className="text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight">{t('info.page_title')}</h2>
-                <p className="text-white/90 flex items-center gap-3 text-xl font-medium">
+                <div className="text-white/90 flex items-center gap-3 text-xl font-medium">
                   <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
                     <FileText className="h-6 w-6" />
                   </div>
                   {t('info.page_description')}
-                </p>
+                </div>
               </div>
             </div>
             
@@ -327,7 +327,7 @@ export default function InfoIndex({
                 </div>
                 <div>
                   <div className="text-xl font-bold">{t('info.search_filters')}</div>
-                  <div className="text-purple-100 text-xs font-medium">Find and filter info records</div>
+                  <div className="text-purple-100 text-xs font-medium">{t('info.find_and_filter')}</div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -341,7 +341,7 @@ export default function InfoIndex({
                   }}
                 >
                   <FilterX className="h-4 w-4 mr-1" />
-                  Reset
+                  {t('info.reset_filters')}
                 </Button>
                 <div className={`transition-transform duration-300 ${isFiltersOpen ? 'rotate-180' : ''}`}>
                   <ChevronDown className="h-5 w-5" />
@@ -364,7 +364,7 @@ export default function InfoIndex({
                         className="w-full h-11 pl-20 pr-4 text-base border-purple-200 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 to-white rounded-xl shadow-lg"
                       />
                       <Button type="submit" className="absolute left-1 top-1/2 -translate-y-1/2 h-9 px-4 bg-gradient-to-l from-purple-500 to-purple-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-sm">
-                        Search
+                        {t('common.search')}
                       </Button>
                       <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-400" />
                     </div>
@@ -398,10 +398,10 @@ export default function InfoIndex({
                     onValueChange={handleCategoryChange}
                   >
                     <SelectTrigger className="h-11 shadow-lg border-purple-200 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 to-white rounded-xl text-sm">
-                      <SelectValue placeholder="Filter by Category" />
+                      <SelectValue placeholder={t('info.filter_by_category')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="_all">All Categories</SelectItem>
+                      <SelectItem value="_all">{t('info.all_categories')}</SelectItem>
                       {categories.map(category => (
                         <SelectItem key={category.id} value={category.id.toString()}>
                           {category.name}
@@ -418,10 +418,10 @@ export default function InfoIndex({
                     onValueChange={handleDepartmentChange}
                   >
                     <SelectTrigger className="h-11 shadow-lg border-purple-200 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 to-white rounded-xl text-sm">
-                      <SelectValue placeholder="Filter by Department" />
+                      <SelectValue placeholder={t('info.filter_by_department')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="_all">All Departments</SelectItem>
+                      <SelectItem value="_all">{t('info.all_departments')}</SelectItem>
                       {departments.map(department => (
                         <SelectItem key={department.id} value={department.id.toString()}>
                           {department.name}
@@ -461,7 +461,7 @@ export default function InfoIndex({
                       className="h-11 w-full shadow-lg border-purple-300 text-purple-700 hover:bg-purple-100 hover:border-purple-400 rounded-xl transition-all duration-300 hover:scale-105 text-sm"
                     >
                       <ArrowUpDown className={`h-4 w-4 mr-2 ${filters.direction === 'asc' ? '' : 'transform rotate-180'}`} />
-                      {filters.direction === 'asc' ? 'Asc' : 'Desc'}
+                      {filters.direction === 'asc' ? t('info.sort_ascending') : t('info.sort_descending')}
                     </Button>
                   </div>
 
@@ -511,7 +511,7 @@ export default function InfoIndex({
                 </div>
                 <div>
                   <div className="text-2xl font-bold">{t('info.table.title')}</div>
-                  <div className="text-purple-100 text-sm font-medium">Info records overview</div>
+                  <div className="text-purple-100 text-sm font-medium">{t('info.table.description')}</div>
                 </div>
               </CardTitle>
             </CardHeader>
@@ -520,13 +520,13 @@ export default function InfoIndex({
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-gradient-to-l from-purple-100 to-purple-200 border-0">
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">ID</TableHead>
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">Name</TableHead>
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">Type</TableHead>
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">Category</TableHead>
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">Department</TableHead>
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">Created At</TableHead>
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6 text-right">Actions</TableHead>
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info.table.id')}</TableHead>
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info.table.name')}</TableHead>
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info.table.type')}</TableHead>
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info.table.category')}</TableHead>
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info.table.department')}</TableHead>
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info.table.created_at')}</TableHead>
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6 text-right">{t('info.table.actions')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -616,7 +616,7 @@ export default function InfoIndex({
                               <AlertTriangle className="h-16 w-16 text-purple-400" />
                             </div>
                             <p className="text-xl font-bold">{t('info.no_records')}</p>
-                            <p className="text-purple-500">No info records found. Create your first one!</p>
+                            <p className="text-purple-500">{t('info.no_records_description')}</p>
                           </div>
                         </TableCell>
                       </TableRow>

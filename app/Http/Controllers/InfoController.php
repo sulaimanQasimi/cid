@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Log;
 
 class InfoController extends Controller
 {
@@ -201,6 +202,7 @@ class InfoController extends Controller
 
             return Redirect::route('infos.index')->with('success', 'Info created successfully.');
         } catch (\Exception $e) {
+            Log::error('Error creating info: ' . $e->getMessage());
             DB::rollBack();
             return Redirect::back()->with('error', 'An error occurred while creating the info: ' . $e->getMessage())->withInput();
         }

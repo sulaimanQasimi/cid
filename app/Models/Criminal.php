@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use App\Models\Traits\HasVisitors;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Contracts\Activity;
+
 /**
  * @property int $id
  * @property string $photo
@@ -35,7 +39,7 @@ use App\Models\Traits\HasVisitors;
  */
 class Criminal extends Model
 {
-    use HasFactory, HasVisitors;
+    use HasFactory, HasVisitors, LogsActivity;
 
     /**
      * The attributes that are mass assignable.
@@ -79,6 +83,36 @@ class Criminal extends Model
         'this_week_visits_count',
         'this_month_visits_count',
     ];
+
+    /**
+     * Get the activity log options for the model.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => match($eventName) {
+                'created' => 'مجرم جدید ایجاد شد',
+                'updated' => 'اطلاعات مجرم بروزرسانی شد',
+                'deleted' => 'مجرم حذف شد',
+                default => "عملیات {$eventName} روی مجرم انجام شد"
+            });
+    }
+
+    /**
+     * Customize the activity before it gets saved.
+     */
+    public function tapActivity(Activity $activity, string $eventName)
+    {
+        $activity->description = match($eventName) {
+            'created' => 'مجرم جدید ایجاد شد',
+            'updated' => 'اطلاعات مجرم بروزرسانی شد',
+            'deleted' => 'مجرم حذف شد',
+            default => "عملیات {$eventName} روی مجرم انجام شد"
+        };
+    }
 
     /**
      * Get the department that the criminal belongs to.
