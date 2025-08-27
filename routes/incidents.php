@@ -19,6 +19,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('incidents/{incident}/link-to-report/{report}', [IncidentController::class, 'linkToReport'])
         ->name('incidents.link-to-report');
 
+    // Confirmation routes for incidents
+    Route::post('incidents/{incident}/confirm', [IncidentController::class, 'confirm'])
+        ->name('incidents.confirm');
+    Route::post('incidents/{incident}/unconfirm', [IncidentController::class, 'unconfirm'])
+        ->name('incidents.unconfirm');
+
     // Route for viewing incidents within a report
     Route::get('incident-reports/{incident_report}/incidents', [IncidentReportController::class, 'showIncidents'])
         ->name('incident-reports.incidents');

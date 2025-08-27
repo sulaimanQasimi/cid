@@ -39,6 +39,10 @@ class Incident extends Model
         'incident_type',
         'status',
         'reported_by',
+        'is_confirmed',
+        'confirmed_by',
+        'confirmed_at',
+        'confirmation_notes',
     ];
 
     /**
@@ -51,6 +55,8 @@ class Incident extends Model
         'incident_time' => 'datetime',
         'casualties' => 'integer',
         'injuries' => 'integer',
+        'is_confirmed' => 'boolean',
+        'confirmed_at' => 'datetime',
     ];
 
     /**
@@ -113,5 +119,49 @@ class Incident extends Model
     public function reporter(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reported_by');
+    }
+
+    /**
+     * Get the admin that confirmed the incident.
+     */
+    public function confirmer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'confirmed_by');
+    }
+
+    /**
+     * Check if the incident can be edited by the given user.
+     */
+    public function canBeEditedBy(User $user): bool
+    {
+        // Admin can always edit
+        if ($user->hasRole('admin')) {
+            return true;
+        }
+
+        // Creator can edit if not confirmed
+        if ($this->reported_by === $user->id && !$this->is_confirmed) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if the incident can be deleted by the given user.
+     */
+    public function canBeDeletedBy(User $user): bool
+    {
+        // Admin can always delete
+        if ($user->hasRole('admin')) {
+            return true;
+        }
+
+        // Creator can delete if not confirmed
+        if ($this->reported_by === $user->id && !$this->is_confirmed) {
+            return true;
+        }
+
+        return false;
     }
 }

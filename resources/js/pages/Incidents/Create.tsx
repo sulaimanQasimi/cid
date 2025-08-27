@@ -75,6 +75,10 @@ export default function Create({ districts, categories, reports }: CreateInciden
     injuries: '0',
     incident_type: '',
     status: 'reported',
+    is_confirmed: false,
+    confirmed_by: null,
+    confirmed_at: null,
+    confirmation_notes: null,
   });
 
   const submit: FormEventHandler = (e) => {

@@ -23,9 +23,6 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            // Ensure only one value type is set
-            $table->check('(integer_value IS NOT NULL AND string_value IS NULL) OR (integer_value IS NULL AND string_value IS NOT NULL)');
-            
             // Ensure unique combination of info_type and stat_category_item
             $table->unique(['info_type_id', 'stat_category_item_id'], 'info_stats_unique');
         });

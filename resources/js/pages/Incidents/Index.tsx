@@ -9,7 +9,7 @@ import { format } from 'date-fns';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Input } from '@/components/ui/input';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Select,
   SelectContent,
@@ -18,7 +18,6 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import { Label } from '@/components/ui/label';
-import { useDebounce } from '@/hooks/use-debounce';
 import { useTranslation } from '@/lib/i18n/translate';
 
 // Define breadcrumb navigation
@@ -42,6 +41,8 @@ interface IncidentProps {
       title: string;
       incident_date: string;
       status: string;
+      is_confirmed: boolean;
+      confirmed_at: string | null;
       district: {
         id: number;
         name: string;
@@ -58,6 +59,14 @@ interface IncidentProps {
       report: {
         id: number;
         report_number: string;
+      } | null;
+      reporter: {
+        id: number;
+        name: string;
+      } | null;
+      confirmer: {
+        id: number;
+        name: string;
       } | null;
     }>;
     links: Array<{
@@ -78,9 +87,10 @@ interface IncidentProps {
     name: string;
     color: string;
   }>;
+  canConfirm: boolean;
 }
 
-export default function Index({ incidents, filters = {}, categories }: IncidentProps) {
+export default function Index({ incidents, filters = {}, categories, canConfirm }: IncidentProps) {
   const { t } = useTranslation();
   const [search, setSearch] = useState(filters.search || '');
   const [status, setStatus] = useState(filters.status || '');
@@ -88,43 +98,90 @@ export default function Index({ incidents, filters = {}, categories }: IncidentP
   const [sortField, setSortField] = useState(filters.sort_field || 'incident_date');
   const [sortDirection, setSortDirection] = useState<SortDirection>(filters.sort_direction || 'desc');
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const isInitialMount = useRef(true);
+  const prevFilters = useRef({
+    status: filters.status,
+    categoryId: filters.category_id,
+    sortField: filters.sort_field,
+    sortDirection: filters.sort_direction
+  });
 
-  const debouncedSearch = useDebounce(search, 500);
-
-  // Apply filters when they change
-  useEffect(() => {
+  // Apply search function (only for search)
+  const applySearch = () => {
     try {
-      // Only update if any filters have changed from their current values in the URL
-      if (debouncedSearch !== filters.search ||
-          status !== filters.status ||
-          categoryId !== filters.category_id ||
-          sortField !== filters.sort_field ||
-          sortDirection !== filters.sort_direction) {
+      const params = {
+        search: search,
+        status: status === 'all' ? '' : status,
+        category_id: categoryId === 'all' ? '' : categoryId,
+        sort_field: sortField,
+        sort_direction: sortDirection,
+      };
 
-        const params = {
-          search: debouncedSearch,
-          status: status === 'all' ? '' : status,
-          category_id: categoryId === 'all' ? '' : categoryId,
-          sort_field: sortField,
-          sort_direction: sortDirection,
-        };
+      const routeUrl = route('incidents.index');
+      const options = {
+        preserveState: true,
+        replace: true,
+      };
 
-        // Use a safely-wrapped version of router.get
-        const routeUrl = route('incidents.index');
-        const options = {
-          preserveState: true,
-          replace: true,
-        };
+      setTimeout(() => {
+        router.get(routeUrl, params, options);
+      }, 0);
+    } catch (error) {
+      console.error('Error applying search:', error);
+    }
+  };
 
-        // Using a setTimeout to avoid the version error that occurs during direct calls
-        setTimeout(() => {
-          router.get(routeUrl, params, options);
-        }, 0);
-      }
+  // Apply other filters (status, category, sort) without search
+  const applyOtherFilters = () => {
+    try {
+      const params = {
+        search: filters.search || '', // Keep current search from URL
+        status: status === 'all' ? '' : status,
+        category_id: categoryId === 'all' ? '' : categoryId,
+        sort_field: sortField,
+        sort_direction: sortDirection,
+      };
+
+      const routeUrl = route('incidents.index');
+      const options = {
+        preserveState: true,
+        replace: true,
+      };
+
+      setTimeout(() => {
+        router.get(routeUrl, params, options);
+      }, 0);
     } catch (error) {
       console.error('Error applying filters:', error);
     }
-  }, [debouncedSearch, status, categoryId, sortField, sortDirection, filters]);
+  };
+
+  // Apply filters when sort or other non-search filters change
+  useEffect(() => {
+    // Skip on initial mount to prevent unnecessary requests
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    // Check if there's an actual change compared to previous values
+    const hasStatusChange = status !== prevFilters.current.status;
+    const hasCategoryChange = categoryId !== prevFilters.current.categoryId;
+    const hasSortFieldChange = sortField !== prevFilters.current.sortField;
+    const hasSortDirectionChange = sortDirection !== prevFilters.current.sortDirection;
+
+    if (hasStatusChange || hasCategoryChange || hasSortFieldChange || hasSortDirectionChange) {
+      // Update the previous values
+      prevFilters.current = {
+        status,
+        categoryId,
+        sortField,
+        sortDirection
+      };
+      
+      applyOtherFilters();
+    }
+  }, [status, categoryId, sortField, sortDirection]);
 
   // Handle sorting
   const handleSort = (field: string) => {
@@ -152,6 +209,29 @@ export default function Index({ incidents, filters = {}, categories }: IncidentP
     setCategoryId('all');
     setSortField('incident_date');
     setSortDirection('desc');
+    
+    // Apply the cleared filters immediately
+    try {
+      const params = {
+        search: '',
+        status: '',
+        category_id: '',
+        sort_field: 'incident_date',
+        sort_direction: 'desc',
+      };
+
+      const routeUrl = route('incidents.index');
+      const options = {
+        preserveState: true,
+        replace: true,
+      };
+
+      setTimeout(() => {
+        router.get(routeUrl, params, options);
+      }, 0);
+    } catch (error) {
+      console.error('Error clearing filters:', error);
+    }
   };
 
   return (
@@ -232,19 +312,27 @@ export default function Index({ incidents, filters = {}, categories }: IncidentP
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Search Bar */}
                 <div className="md:col-span-2">
-                  <div className="relative">
-                    <div className="relative">
+                  <div className="flex gap-3">
+                    <div className="relative flex-1">
                       <Input
                         placeholder={t('incidents.search_placeholder')}
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full h-11 pl-20 pr-4 text-base border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white rounded-xl shadow-lg"
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            applySearch();
+                          }
+                        }}
+                        className="w-full h-11 pl-4 pr-4 text-base border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white rounded-xl shadow-lg"
                       />
-                      <Button className="absolute left-1 top-1/2 -translate-y-1/2 h-9 px-4 bg-gradient-to-l from-blue-500 to-blue-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-sm">
-                        Search
-                      </Button>
                       <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-400" />
                     </div>
+                    <Button 
+                      onClick={applySearch}
+                      className="h-11 px-6 bg-gradient-to-l from-blue-500 to-blue-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-sm font-semibold"
+                    >
+                      {t('incidents.search')}
+                    </Button>
                   </div>
                 </div>
 
@@ -391,6 +479,9 @@ export default function Index({ incidents, filters = {}, categories }: IncidentP
                         {t('incidents.table.status')} {getSortIcon('status')}
                       </th>
                       <th className="h-12 px-6 text-left align-middle font-bold text-blue-800 text-lg">
+                        {t('incidents.table.confirmation')}
+                      </th>
+                      <th className="h-12 px-6 text-left align-middle font-bold text-blue-800 text-lg">
                         {t('common.actions')}
                       </th>
                     </tr>
@@ -398,7 +489,7 @@ export default function Index({ incidents, filters = {}, categories }: IncidentP
                   <tbody className="[&_tr:last-child]:border-0">
                     {incidents.data.length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="h-32 text-center align-middle">
+                        <td colSpan={8} className="h-32 text-center align-middle">
                           <div className="flex flex-col items-center gap-4 text-blue-600">
                             <div className="p-4 bg-blue-100 rounded-full">
                               <AlertTriangle className="h-16 w-16 text-blue-400" />
@@ -450,6 +541,33 @@ export default function Index({ incidents, filters = {}, categories }: IncidentP
                             <Badge variant="outline" className="bg-gradient-to-l from-blue-100 to-blue-200 text-blue-800 border-blue-300 px-4 py-2 rounded-xl font-semibold">
                               {t(`incidents.status.${incident.status}`)}
                             </Badge>
+                          </td>
+                          <td className="p-6 align-middle">
+                            <Badge 
+                              variant={incident.is_confirmed ? "default" : "outline"} 
+                              className={`px-4 py-2 rounded-xl font-semibold ${
+                                incident.is_confirmed 
+                                  ? 'bg-green-100 text-green-800 border-green-300' 
+                                  : 'bg-yellow-100 text-yellow-800 border-yellow-300'
+                              }`}
+                            >
+                              {incident.is_confirmed ? (
+                                <div className="flex items-center gap-2">
+                                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                  {t('incidents.confirmed')}
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                                  {t('incidents.unconfirmed')}
+                                </div>
+                              )}
+                            </Badge>
+                            {incident.is_confirmed && incident.confirmer && (
+                              <div className="text-xs text-blue-600 mt-1">
+                                {t('incidents.confirmed_by')}: {incident.confirmer.name}
+                              </div>
+                            )}
                           </td>
                           <td className="p-6 align-middle">
                             <div className="flex items-center gap-2">

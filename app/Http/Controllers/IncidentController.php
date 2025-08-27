@@ -25,6 +25,8 @@ class IncidentController extends Controller
             'district.province:id,name',
             'category:id,name,color',
             'report:id,report_number',
+            'reporter:id,name',
+            'confirmer:id,name',
         ]);
 
         // Apply search filter
@@ -76,6 +78,7 @@ class IncidentController extends Controller
             'incidents' => $incidents,
             'categories' => $categories,
             'filters' => $request->only(['search', 'status', 'category_id', 'sort_field', 'sort_direction']),
+            'canConfirm' => Auth::user()->hasRole('admin') && Auth::user()->hasPermissionTo('incident.confirm'),
         ]);
     }
 
@@ -149,10 +152,14 @@ class IncidentController extends Controller
             'category',
             'report',
             'reporter:id,name',
+            'confirmer:id,name',
         ]);
 
         return Inertia::render('Incidents/Show', [
             'incident' => $incident,
+            'canEdit' => $incident->canBeEditedBy(Auth::user()),
+            'canDelete' => $incident->canBeDeletedBy(Auth::user()),
+            'canConfirm' => Auth::user()->can('confirm', $incident),
         ]);
     }
 
@@ -234,5 +241,45 @@ class IncidentController extends Controller
 
         return redirect()->route('incidents.show', $incident)
             ->with('success', 'Incident linked to report successfully.');
+    }
+
+    /**
+     * Confirm an incident (admin only).
+     */
+    public function confirm(Request $request, Incident $incident)
+    {
+        $this->authorize('confirm', $incident);
+        
+        $validated = $request->validate([
+            'confirmation_notes' => 'nullable|string|max:1000',
+        ]);
+
+        $incident->update([
+            'is_confirmed' => true,
+            'confirmed_by' => Auth::id(),
+            'confirmed_at' => now(),
+            'confirmation_notes' => $validated['confirmation_notes'] ?? null,
+        ]);
+
+        return redirect()->route('incidents.show', $incident)
+            ->with('success', 'Incident confirmed successfully.');
+    }
+
+    /**
+     * Unconfirm an incident (admin only).
+     */
+    public function unconfirm(Incident $incident)
+    {
+        $this->authorize('confirm', $incident);
+        
+        $incident->update([
+            'is_confirmed' => false,
+            'confirmed_by' => null,
+            'confirmed_at' => null,
+            'confirmation_notes' => null,
+        ]);
+
+        return redirect()->route('incidents.show', $incident)
+            ->with('success', 'Incident confirmation removed successfully.');
     }
 }

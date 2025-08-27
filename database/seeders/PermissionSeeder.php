@@ -49,6 +49,7 @@ class PermissionSeeder extends Seeder
             ['name' => 'incident.create', 'label' => 'ایجاد حادثه'],
             ['name' => 'incident.update', 'label' => 'ویرایش حادثه'],
             ['name' => 'incident.delete', 'label' => 'حذف حادثه'],
+            ['name' => 'incident.confirm', 'label' => 'تایید حادثه'],
             ['name' => 'incident.restore', 'label' => 'بازیابی حادثه'],
             ['name' => 'incident.force_delete', 'label' => 'حذف دائمی حادثه'],
 
@@ -232,7 +233,7 @@ class PermissionSeeder extends Seeder
         // Assign manager permissions
         $managerRole->givePermissionTo([
             'criminal.view_any', 'criminal.view', 'criminal.create', 'criminal.update',
-            'incident.view_any', 'incident.view', 'incident.create', 'incident.update',
+            'incident.view_any', 'incident.view', 'incident.create', 'incident.update', 'incident.confirm',
             'incident_report.view_any', 'incident_report.view', 'incident_report.create', 'incident_report.update',
             'info.view_any', 'info.view', 'info.create', 'info.update', 'info.confirm',
             'info_category.view_any', 'info_category.view', 'info_category.confirm',

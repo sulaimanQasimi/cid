@@ -21,6 +21,8 @@ import { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { useTranslation } from '@/lib/i18n/translate';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 interface IncidentDetailProps {
   incident: {
@@ -35,6 +37,9 @@ interface IncidentDetailProps {
     coordinates: string | null;
     casualties: number;
     injuries: number;
+    is_confirmed: boolean;
+    confirmed_at: string | null;
+    confirmation_notes: string | null;
     district: {
       id: number;
       name: string;
@@ -56,12 +61,21 @@ interface IncidentDetailProps {
       id: number;
       name: string;
     };
+    confirmer: {
+      id: number;
+      name: string;
+    } | null;
   };
+  canEdit: boolean;
+  canDelete: boolean;
+  canConfirm: boolean;
 }
 
-export default function Show({ incident }: IncidentDetailProps) {
+export default function Show({ incident, canEdit, canDelete, canConfirm }: IncidentDetailProps) {
   const { t } = useTranslation();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [confirmationNotes, setConfirmationNotes] = useState('');
 
   // Define breadcrumb navigation
   const breadcrumbs: BreadcrumbItem[] = [
@@ -81,6 +95,16 @@ export default function Show({ incident }: IncidentDetailProps) {
 
   const handleDelete = () => {
     router.delete(route('incidents.destroy', incident.id));
+  };
+
+  const handleConfirm = () => {
+    router.post(route('incidents.confirm', incident.id), {
+      confirmation_notes: confirmationNotes
+    });
+  };
+
+  const handleUnconfirm = () => {
+    router.post(route('incidents.unconfirm', incident.id));
   };
 
   return (
@@ -312,10 +336,149 @@ export default function Show({ incident }: IncidentDetailProps) {
                       {incident.status}
                     </Badge>
                   </div>
+
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-blue-700 font-medium flex items-center gap-2" dir="rtl">
+                      {t('incidents.confirmation_status')}:
+                      <Shield className="h-4 w-4" />
+                    </span>
+                    <div className="text-right">
+                      <Badge 
+                        variant={incident.is_confirmed ? "default" : "outline"} 
+                        className={`px-3 py-1 text-xs font-medium ${
+                          incident.is_confirmed 
+                            ? 'bg-green-100 text-green-800 border-green-300' 
+                            : 'bg-yellow-100 text-yellow-800 border-yellow-300'
+                        }`}
+                      >
+                        {incident.is_confirmed ? (
+                          <div className="flex items-center gap-1">
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            {t('incidents.confirmed')}
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-1">
+                            <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                            {t('incidents.unconfirmed')}
+                          </div>
+                        )}
+                      </Badge>
+                      {incident.is_confirmed && incident.confirmer && (
+                        <div className="text-xs text-blue-600 mt-1">
+                          {t('incidents.confirmed_by')}: {incident.confirmer.name}
+                        </div>
+                      )}
+                      {incident.is_confirmed && incident.confirmed_at && (
+                        <div className="text-xs text-blue-600">
+                          {t('incidents.confirmed_at')}: {format(new Date(incident.confirmed_at), 'PPP')}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {incident.confirmation_notes && (
+                    <div className="flex justify-between items-start">
+                      <span className="text-sm text-blue-700 font-medium flex items-center gap-2" dir="rtl">
+                        {t('incidents.confirmation_notes')}:
+                        <FileText className="h-4 w-4" />
+                      </span>
+                      <div className="text-right max-w-xs">
+                        <div className="text-sm text-blue-900 bg-blue-50 p-2 rounded-lg border border-blue-200">
+                          {incident.confirmation_notes}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
           </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="mt-8 flex flex-wrap gap-4 justify-center">
+          {canEdit && (
+            <Button asChild className="bg-gradient-to-l from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg rounded-xl px-6 py-3 font-semibold transition-all duration-300 hover:scale-105">
+              <Link href={route('incidents.edit', incident.id)}>
+                <Edit className="mr-2 h-4 w-4" />
+                {t('common.edit')}
+              </Link>
+            </Button>
+          )}
+
+          {canDelete && (
+            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" className="shadow-lg rounded-xl px-6 py-3 font-semibold transition-all duration-300 hover:scale-105">
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  {t('common.delete')}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="max-w-md">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="text-xl">{t('incidents.delete_title')}</AlertDialogTitle>
+                  <AlertDialogDescription className="mt-2">
+                    {t('incidents.delete_description')}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter className="mt-6">
+                  <AlertDialogCancel className="shadow-sm">{t('common.cancel')}</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground shadow-sm">
+                    {t('common.delete')}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+
+          {canConfirm && !incident.is_confirmed && (
+            <AlertDialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen}>
+              <AlertDialogTrigger asChild>
+                <Button className="bg-gradient-to-l from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg rounded-xl px-6 py-3 font-semibold transition-all duration-300 hover:scale-105">
+                  <Shield className="mr-2 h-4 w-4" />
+                  {t('incidents.confirm')}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="max-w-md">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="text-xl">{t('incidents.confirm_title')}</AlertDialogTitle>
+                  <AlertDialogDescription className="mt-2">
+                    {t('incidents.confirm_description')}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <div className="mt-4">
+                  <Label htmlFor="confirmation_notes" className="text-sm font-medium">
+                    {t('incidents.confirmation_notes')} ({t('common.optional')})
+                  </Label>
+                  <Textarea
+                    id="confirmation_notes"
+                    value={confirmationNotes}
+                    onChange={(e) => setConfirmationNotes(e.target.value)}
+                    placeholder={t('incidents.confirmation_notes_placeholder')}
+                    className="mt-2"
+                    rows={3}
+                  />
+                </div>
+                <AlertDialogFooter className="mt-6">
+                  <AlertDialogCancel className="shadow-sm">{t('common.cancel')}</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleConfirm} className="bg-green-600 text-white shadow-sm">
+                    {t('incidents.confirm')}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+
+          {canConfirm && incident.is_confirmed && (
+            <Button 
+              onClick={handleUnconfirm}
+              variant="outline" 
+              className="border-yellow-300 text-yellow-700 hover:bg-yellow-50 shadow-lg rounded-xl px-6 py-3 font-semibold transition-all duration-300 hover:scale-105"
+            >
+              <Shield className="mr-2 h-4 w-4" />
+              {t('incidents.unconfirm')}
+            </Button>
+          )}
         </div>
       </div>
 

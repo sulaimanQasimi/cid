@@ -39,7 +39,13 @@ class IncidentPolicy
      */
     public function update(User $user, Incident $incident): bool
     {
-        return $user->hasPermissionTo('incident.update');
+        // Check basic permission first
+        if (!$user->hasPermissionTo('incident.update')) {
+            return false;
+        }
+
+        // Use the model's method to check if user can edit
+        return $incident->canBeEditedBy($user);
     }
 
     /**
@@ -47,7 +53,21 @@ class IncidentPolicy
      */
     public function delete(User $user, Incident $incident): bool
     {
-        return $user->hasPermissionTo('incident.delete');
+        // Check basic permission first
+        if (!$user->hasPermissionTo('incident.delete')) {
+            return false;
+        }
+
+        // Use the model's method to check if user can delete
+        return $incident->canBeDeletedBy($user);
+    }
+
+    /**
+     * Determine whether the user can confirm the incident.
+     */
+    public function confirm(User $user, Incident $incident): bool
+    {
+        return $user->hasRole('admin') && $user->hasPermissionTo('incident.confirm');
     }
 
     /**

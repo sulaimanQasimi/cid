@@ -1390,5 +1390,11 @@
 
 "info_types.stats.title": "احصائیه",
 "info_types.stats.description": "د دې معلوماتو د ډول لپاره احصائیه اضافه کړئ",
-"info_types.stats.filter_by_category": "د کټه ګوري له مخې فلټر کړئ"
+"info_types.stats.filter_by_category": "د کټه ګوري له مخې فلټر کړئ",
+
+"translations.translations": "ترجمه‌ها",
+"translations.export": "خروجی گرفتن از ترجمه‌ها",
+"translations.export_translations": "خروجی ترجمه‌ها",
+"translations.add_translation": "افزودن ترجمه"
+
 }
