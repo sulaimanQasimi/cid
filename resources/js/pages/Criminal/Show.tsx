@@ -110,14 +110,14 @@ export default function CriminalShow({ criminal, auth }: Props) {
               </div>
               <div className="space-y-3">
                 <h2 className="text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight">{criminal.name}</h2>
-                <p className="text-white/90 flex items-center gap-3 text-xl font-medium">
+                <div className="text-white/90 flex items-center gap-3 text-xl font-medium">
                   <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
                     <FileText className="h-6 w-6" />
                   </div>
                   {criminal.number
                     ? t('criminal.show.id_number', { number: criminal.number })
                     : t('criminal.show.no_id')}
-                </p>
+                </div>
               </div>
             </div>
             

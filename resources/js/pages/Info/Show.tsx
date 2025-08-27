@@ -39,6 +39,14 @@ interface Props {
     user?: User;
     creator?: User;
     confirmer?: User;
+    // Visitor statistics
+    visits_count?: number;
+    unique_visitors_count?: number;
+    today_visits_count?: number;
+    this_week_visits_count?: number;
+    this_month_visits_count?: number;
+    bounce_rate?: number;
+    average_time_spent?: number;
   };
 }
 
@@ -293,6 +301,14 @@ export default function ShowInfo({ info }: Props) {
 
                 <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
                   <h3 className="text-sm font-medium text-slate-500 mb-2 flex items-center gap-2">
+                    <Users className="h-4 w-4 text-slate-400" />
+                    {t('info.show.fields.owner')}
+                  </h3>
+                  <p className="text-slate-900 font-medium">{info.user?.name || t('info.show.not_assigned')}</p>
+                </div>
+
+                <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                  <h3 className="text-sm font-medium text-slate-500 mb-2 flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-slate-400" />
                     {t('info.show.fields.created_at')}
                   </h3>
@@ -360,6 +376,55 @@ export default function ShowInfo({ info }: Props) {
                 </TabsContent>
               )}
             </Tabs>
+          </CardContent>
+        </Card>
+
+        {/* Visitor Statistics Card */}
+        <Card className="shadow-lg overflow-hidden border border-slate-200 rounded-xl mb-8">
+          <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100 border-b border-purple-200 py-6">
+            <CardTitle className="flex items-center gap-3">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Eye className="h-5 w-5 text-purple-600" />
+              </div>
+              <div>
+                <div className="text-xl font-semibold text-slate-900">{t('info.show.visitor_stats.title')}</div>
+                <div className="text-slate-600 text-sm">{t('info.show.visitor_stats.description')}</div>
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-center">
+                <div className="text-2xl font-bold text-purple-600 mb-1">{info.visits_count || 0}</div>
+                <div className="text-sm text-slate-600">{t('info.show.visitor_stats.total_visits')}</div>
+              </div>
+              <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-center">
+                <div className="text-2xl font-bold text-purple-600 mb-1">{info.unique_visitors_count || 0}</div>
+                <div className="text-sm text-slate-600">{t('info.show.visitor_stats.unique_visitors')}</div>
+              </div>
+              <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-center">
+                <div className="text-2xl font-bold text-purple-600 mb-1">{info.today_visits_count || 0}</div>
+                <div className="text-sm text-slate-600">{t('info.show.visitor_stats.today_visits')}</div>
+              </div>
+              <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-center">
+                <div className="text-2xl font-bold text-purple-600 mb-1">{info.this_week_visits_count || 0}</div>
+                <div className="text-sm text-slate-600">{t('info.show.visitor_stats.this_week_visits')}</div>
+              </div>
+            </div>
+            {info.bounce_rate !== undefined && info.average_time_spent !== undefined && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+                <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-center">
+                  <div className="text-2xl font-bold text-purple-600 mb-1">{info.bounce_rate?.toFixed(1)}%</div>
+                  <div className="text-sm text-slate-600">{t('info.show.visitor_stats.bounce_rate')}</div>
+                </div>
+                <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-center">
+                  <div className="text-2xl font-bold text-purple-600 mb-1">
+                    {info.average_time_spent ? Math.round(info.average_time_spent / 60) : 0}
+                  </div>
+                  <div className="text-sm text-slate-600">{t('info.show.visitor_stats.avg_time_minutes')}</div>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 

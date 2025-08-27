@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Contracts\Activity;
@@ -22,6 +23,8 @@ class InfoType extends Model
         'name',
         'code',
         'description',
+        'created_by',
+        'updated_by',
     ];
 
     /**
@@ -60,5 +63,29 @@ class InfoType extends Model
     public function infos(): HasMany
     {
         return $this->hasMany(Info::class);
+    }
+
+    /**
+     * Get the stats associated with the info type.
+     */
+    public function infoStats(): HasMany
+    {
+        return $this->hasMany(InfoStat::class);
+    }
+
+    /**
+     * Get the user that created this info type.
+     */
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * Get the user that last updated this info type.
+     */
+    public function updater(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 }

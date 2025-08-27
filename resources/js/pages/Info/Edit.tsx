@@ -16,6 +16,8 @@ import { ArrowLeft, Save, Shield, FileText, BookText, AlertTriangle, Calendar, C
 import LocationSelector from '@/components/LocationSelector';
 import { useTranslation } from '@/lib/i18n/translate';
 import { cn } from '@/lib/utils';
+import { usePermissions } from '@/hooks/use-permissions';
+import { CanConfirm } from '@/components/ui/permission-guard';
 
 interface Department {
   id: number;
@@ -39,6 +41,7 @@ interface Props {
 
 export default function InfoEdit({ info, infoTypes = [], infoCategories = [], departments = [] }: Props) {
   const { t } = useTranslation();
+  const { canConfirm } = usePermissions();
   
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -147,6 +150,25 @@ export default function InfoEdit({ info, infoTypes = [], infoCategories = [], de
             </Button>
           </div>
         </div>
+
+        {/* Warning Alert for Confirmed Info */}
+        {info.confirmed && (
+          <div className="mb-6">
+            <Card className="border-orange-200 bg-gradient-to-l from-orange-50 to-yellow-50">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-orange-100 rounded-lg">
+                    <AlertTriangle className="h-5 w-5 text-orange-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-orange-800">{t('info.edit.confirmed_warning.title')}</h3>
+                    <p className="text-orange-700">{t('info.edit.confirmed_warning.description')}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30">
@@ -316,19 +338,21 @@ export default function InfoEdit({ info, infoTypes = [], infoCategories = [], de
                   {errors.value && <p className="text-sm text-red-500">{errors.value}</p>}
                 </div>
 
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="confirmed"
-                      checked={data.confirmed}
-                      onChange={(e) => setData('confirmed', e.target.checked)}
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                    />
-                    <Label htmlFor="confirmed">{t('info.edit.fields.confirmed')}</Label>
+                <CanConfirm model="info">
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="confirmed"
+                        checked={data.confirmed}
+                        onChange={(e) => setData('confirmed', e.target.checked)}
+                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                      />
+                      <Label htmlFor="confirmed">{t('info.edit.fields.confirmed')}</Label>
+                    </div>
+                    {errors.confirmed && <p className="text-sm text-red-500">{errors.confirmed}</p>}
                   </div>
-                  {errors.confirmed && <p className="text-sm text-red-500">{errors.confirmed}</p>}
-                </div>
+                </CanConfirm>
               </CardContent>
 
               <CardFooter className="flex justify-between border-t px-6 py-5 bg-gradient-to-l from-blue-50 to-blue-100">

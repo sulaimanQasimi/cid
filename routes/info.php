@@ -14,4 +14,5 @@ Route::middleware(['auth'])->group(function () {
 
     // Info routes
     Route::resource('infos', InfoController::class);
+    Route::patch('infos/{info}/confirm', [InfoController::class, 'confirm'])->name('infos.confirm');
 });

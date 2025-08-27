@@ -23,7 +23,14 @@ class InfoPolicy
      */
     public function view(User $user, Info $info): bool
     {
-        return $user->hasPermissionTo('info.view');
+        // Admin and managers can view all infos
+        if ($user->hasAnyRole(['admin', 'superadmin', 'manager'])) {
+            return $user->hasPermissionTo('info.view');
+        }
+
+        // Regular users can only view their own infos
+        return $user->hasPermissionTo('info.view') && 
+               ($info->user_id === $user->id || $info->created_by === $user->id);
     }
 
     /**
@@ -39,7 +46,19 @@ class InfoPolicy
      */
     public function update(User $user, Info $info): bool
     {
-        return $user->hasPermissionTo('info.update');
+        // Cannot update confirmed infos
+        if ($info->confirmed) {
+            return false;
+        }
+
+        // Admin and managers can update all non-confirmed infos
+        if ($user->hasAnyRole(['admin', 'superadmin', 'manager'])) {
+            return $user->hasPermissionTo('info.update');
+        }
+
+        // Regular users can only update their own non-confirmed infos
+        return $user->hasPermissionTo('info.update') && 
+               ($info->user_id === $user->id || $info->created_by === $user->id);
     }
 
     /**
@@ -47,7 +66,19 @@ class InfoPolicy
      */
     public function delete(User $user, Info $info): bool
     {
-        return $user->hasPermissionTo('info.delete');
+        // Cannot delete confirmed infos
+        if ($info->confirmed) {
+            return false;
+        }
+
+        // Admin and managers can delete all non-confirmed infos
+        if ($user->hasAnyRole(['admin', 'superadmin', 'manager'])) {
+            return $user->hasPermissionTo('info.delete');
+        }
+
+        // Regular users can only delete their own non-confirmed infos
+        return $user->hasPermissionTo('info.delete') && 
+               ($info->user_id === $user->id || $info->created_by === $user->id);
     }
 
     /**
@@ -55,7 +86,12 @@ class InfoPolicy
      */
     public function confirm(User $user, Info $info): bool
     {
-        return $user->hasPermissionTo('info.confirm');
+        // Only admin and superadmin can confirm infos
+        if ($user->hasAnyRole(['admin', 'superadmin'])) {
+            return $user->hasPermissionTo('info.confirm');
+        }
+
+        return false;
     }
 
     /**
@@ -63,7 +99,12 @@ class InfoPolicy
      */
     public function restore(User $user, Info $info): bool
     {
-        return $user->hasPermissionTo('info.restore');
+        // Only admin and managers can restore infos
+        if ($user->hasAnyRole(['admin', 'superadmin', 'manager'])) {
+            return $user->hasPermissionTo('info.restore');
+        }
+
+        return false;
     }
 
     /**
@@ -71,6 +112,11 @@ class InfoPolicy
      */
     public function forceDelete(User $user, Info $info): bool
     {
-        return $user->hasPermissionTo('info.force_delete');
+        // Only admin and managers can permanently delete infos
+        if ($user->hasAnyRole(['admin', 'superadmin', 'manager'])) {
+            return $user->hasPermissionTo('info.force_delete');
+        }
+
+        return false;
     }
 }

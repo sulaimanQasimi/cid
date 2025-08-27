@@ -50,7 +50,15 @@ class InfoController extends Controller
         $departmentFilter = $validated['department_id'] ?? null;
 
         // Apply search and filters
-        $query = Info::with(['infoType', 'infoCategory', 'department']);
+        $query = Info::with(['infoType', 'infoCategory', 'department', 'user', 'creator']);
+
+        // Filter by user ownership - regular users can only see their own infos
+        if (!auth()->user()->hasAnyRole(['admin', 'superadmin', 'manager'])) {
+            $query->where(function ($q) {
+                $q->where('user_id', auth()->id())
+                  ->orWhere('created_by', auth()->id());
+            });
+        }
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -193,6 +201,7 @@ class InfoController extends Controller
 
         // Set the user who created the record
         $validated['created_by'] = Auth::id();
+        $validated['user_id'] = Auth::id();
 
         // Create the record within a transaction
         try {
@@ -214,6 +223,9 @@ class InfoController extends Controller
     public function show(Info $info)
     {
         $this->authorize('view', $info);
+
+        // Record the visit
+        $info->recordVisit();
 
         // Load related data without caching
         $info->load(['infoType', 'infoCategory', 'department', 'user', 'creator', 'confirmer']);
@@ -337,6 +349,30 @@ class InfoController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return Redirect::back()->with('error', 'An error occurred while updating the info: ' . $e->getMessage())->withInput();
+        }
+    }
+
+    /**
+     * Confirm the specified info.
+     */
+    public function confirm(Info $info)
+    {
+        $this->authorize('confirm', $info);
+
+        try {
+            DB::beginTransaction();
+            
+            $info->update([
+                'confirmed' => true,
+                'confirmed_by' => Auth::id(),
+            ]);
+            
+            DB::commit();
+
+            return Redirect::route('infos.index')->with('success', __('info.confirmation.success'));
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return Redirect::back()->with('error', 'An error occurred while confirming the info: ' . $e->getMessage());
         }
     }
 

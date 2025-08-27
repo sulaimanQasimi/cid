@@ -318,4 +318,74 @@ class IncidentReportController extends Controller
             'incidents' => $incidents,
         ]);
     }
+
+    /**
+     * Display the print view for a specific report.
+     */
+    public function print(IncidentReport $incidentReport)
+    {
+        $this->authorize('view', $incidentReport);
+        
+        // Check if user is admin
+        if (!auth()->user()->hasRole('admin')) {
+            abort(403, 'Only administrators can print reports.');
+        }
+        
+        // Load the report with all necessary relationships
+        $incidentReport->load([
+            'submitter:id,name',
+            'approver:id,name'
+        ]);
+
+        // Load all incidents for this report (no pagination for print)
+        $incidents = $incidentReport->incidents()
+            ->with([
+                'district:id,name',
+                'category:id,name,color',
+                'reporter:id,name'
+            ])
+            ->orderBy('incident_date', 'desc')
+            ->get();
+
+        // Get all active stat categories
+        $statCategories = StatCategory::where('status', 'active')
+            ->orderBy('label')
+            ->get();
+
+        // Load report stats with their related items and categories
+        $reportStats = $incidentReport->reportStats()
+            ->with(['statCategoryItem.category'])
+            ->get();
+
+        // Group stats by category for better organization
+        $statsByCategory = [];
+        foreach ($reportStats as $stat) {
+            $categoryName = $stat->statCategoryItem->category->label;
+            if (!isset($statsByCategory[$categoryName])) {
+                $statsByCategory[$categoryName] = [
+                    'category' => $stat->statCategoryItem->category,
+                    'stats' => []
+                ];
+            }
+            $statsByCategory[$categoryName]['stats'][] = $stat;
+        }
+
+        // Generate barcode data
+        $barcodeData = [
+            'report_number' => $incidentReport->report_number,
+            'report_id' => $incidentReport->id,
+            'date' => $incidentReport->report_date,
+            'security_level' => $incidentReport->security_level,
+        ];
+
+        return Inertia::render('Incidents/Reports/Print', [
+            'report' => $incidentReport,
+            'incidents' => $incidents,
+            'reportStats' => $reportStats,
+            'statsByCategory' => $statsByCategory,
+            'statCategories' => $statCategories,
+            'barcodeData' => $barcodeData,
+            'isAdmin' => auth()->user()->hasRole('admin'),
+        ]);
+    }
 }

@@ -16,15 +16,30 @@ router.on('error', (errors) => {
 
 // Patch router.get method to handle version issues
 const originalGet = router.get;
-router.get = function(url, data = {}, options = {}) {
+router.get = function(url: string | URL, data: any = {}, options: any = {}) {
   try {
     return originalGet.call(this, url, data, options);
   } catch (error) {
     console.error('Error in router.get:', error);
-    setTimeout(() => {
-      originalGet.call(this, url, data, options);
-    }, 0);
-    return this;
+    // Retry with basic options if it fails
+    try {
+      const retryOptions = { 
+        preserveState: false,
+        preserveScroll: false
+      };
+      return originalGet.call(this, url, data, retryOptions);
+    } catch (retryError) {
+      console.error('Retry failed:', retryError);
+      // Fallback to basic navigation
+      setTimeout(() => {
+        if (typeof url === 'string') {
+          window.location.href = url;
+        } else {
+          window.location.href = url.toString();
+        }
+      }, 0);
+      return this;
+    }
   }
 };
 

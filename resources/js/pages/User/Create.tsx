@@ -6,19 +6,32 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Shield, FileText, UserPlus, CheckCircle, AlertCircle, User, Mail, Lock, Users } from 'lucide-react';
+import { ArrowLeft, Shield, FileText, UserPlus, CheckCircle, AlertCircle, User, Mail, Lock, Users, Key } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useTranslation } from '@/lib/i18n/translate';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ChevronDown } from 'lucide-react';
 
 interface Role {
   id: number;
   name: string;
 }
 
+interface Permission {
+  id: number;
+  name: string;
+  label: string;
+}
+
+interface GroupedPermissions {
+  [key: string]: Permission[];
+}
+
 interface Props {
   roles: Role[];
+  groupedPermissions: GroupedPermissions;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -36,7 +49,7 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ];
 
-export default function UserCreate({ roles = [] }: Props) {
+export default function UserCreate({ roles = [], groupedPermissions = {} }: Props) {
   const { t } = useTranslation();
   const { data, setData, post, processing, errors } = useForm({
     name: '',
@@ -44,6 +57,7 @@ export default function UserCreate({ roles = [] }: Props) {
     password: '',
     password_confirmation: '',
     roles: [] as number[],
+    permissions: [] as number[],
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -66,6 +80,47 @@ export default function UserCreate({ roles = [] }: Props) {
     setData('roles', currentRoles);
   };
 
+  const togglePermission = (permissionId: number) => {
+    const currentPermissions = [...data.permissions];
+    const index = currentPermissions.indexOf(permissionId);
+
+    if (index === -1) {
+      // Add permission
+      currentPermissions.push(permissionId);
+    } else {
+      // Remove permission
+      currentPermissions.splice(index, 1);
+    }
+
+    setData('permissions', currentPermissions);
+  };
+
+  const getModelDisplayName = (model: string) => {
+    const modelNames: { [key: string]: string } = {
+      'criminal': 'Criminals',
+      'department': 'Departments',
+      'district': 'Districts',
+      'incident': 'Incidents',
+      'incident_category': 'Incident Categories',
+      'incident_report': 'Incident Reports',
+      'info': 'Information',
+      'info_category': 'Info Categories',
+      'info_type': 'Info Types',
+      'language': 'Languages',
+      'meeting': 'Meetings',
+      'meeting_message': 'Meeting Messages',
+      'meeting_session': 'Meeting Sessions',
+      'province': 'Provinces',
+      'report': 'Reports',
+      'report_stat': 'Report Statistics',
+      'stat_category': 'Statistics Categories',
+      'stat_category_item': 'Statistics Items',
+      'translation': 'Translations',
+      'user': 'Users',
+    };
+    return modelNames[model] || model;
+  };
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={t('users.create.title')} />
@@ -86,12 +141,12 @@ export default function UserCreate({ roles = [] }: Props) {
               </div>
               <div className="space-y-3">
                 <h2 className="text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight">{t('users.create.title')}</h2>
-                <p className="text-white/90 flex items-center gap-3 text-xl font-medium">
+                <div className="text-white/90 flex items-center gap-3 text-xl font-medium">
                   <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
                     <FileText className="h-6 w-6" />
                   </div>
                   {t('users.create.description')}
-                </p>
+                </div>
               </div>
             </div>
             
@@ -287,6 +342,73 @@ export default function UserCreate({ roles = [] }: Props) {
                         <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-xl border border-red-200 mt-4">
                           <AlertCircle className="h-4 w-4" />
                           <p className="text-sm font-medium">{errors.roles}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Permissions Section */}
+              {Object.keys(groupedPermissions).length > 0 && (
+                <>
+                  <Separator className="my-8 bg-blue-200" />
+                  
+                  <div className="mb-8">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="p-2 bg-blue-100 rounded-xl">
+                        <Key className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <h3 className="text-xl font-bold text-blue-900">{t('users.create.permissions_section')}</h3>
+                    </div>
+                    
+                    <div className="bg-gradient-to-l from-blue-50 to-white border-2 border-blue-200 rounded-2xl p-6 shadow-lg">
+                      <p className="text-blue-700 mb-6 font-medium">{t('users.create.permissions_description')}</p>
+                      
+                      <div className="space-y-4">
+                        {Object.entries(groupedPermissions).map(([model, permissions]) => (
+                          <Collapsible key={model} className="border border-blue-200 rounded-xl overflow-hidden">
+                            <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-gradient-to-l from-blue-100 to-blue-200 hover:from-blue-200 hover:to-blue-300 transition-all duration-300">
+                              <div className="flex items-center gap-3">
+                                <div className="p-2 bg-blue-600 rounded-lg">
+                                  <Shield className="h-4 w-4 text-white" />
+                                </div>
+                                <h4 className="text-lg font-bold text-blue-900">{getModelDisplayName(model)}</h4>
+                                <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">
+                                  {permissions.length} permissions
+                                </Badge>
+                              </div>
+                              <ChevronDown className="h-5 w-5 text-blue-700 transition-transform duration-300" />
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="p-4 bg-white">
+                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                {permissions.map(permission => (
+                                  <div key={permission.id} className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg border border-blue-100 hover:bg-blue-100 transition-all duration-300">
+                                    <Checkbox
+                                      id={`permission-${permission.id}`}
+                                      checked={data.permissions.includes(permission.id)}
+                                      onCheckedChange={() => togglePermission(permission.id)}
+                                      className="h-4 w-4 text-blue-600 border-blue-300 rounded"
+                                    />
+                                    <Label
+                                      htmlFor={`permission-${permission.id}`}
+                                      className="cursor-pointer text-sm font-medium text-blue-900 hover:text-blue-700 transition-colors duration-300 flex-1"
+                                      title={permission.name}
+                                    >
+                                      {permission.label}
+                                    </Label>
+                                  </div>
+                                ))}
+                              </div>
+                            </CollapsibleContent>
+                          </Collapsible>
+                        ))}
+                      </div>
+                      
+                      {errors.permissions && (
+                        <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-xl border border-red-200 mt-4">
+                          <AlertCircle className="h-4 w-4" />
+                          <p className="text-sm font-medium">{errors.permissions}</p>
                         </div>
                       )}
                     </div>

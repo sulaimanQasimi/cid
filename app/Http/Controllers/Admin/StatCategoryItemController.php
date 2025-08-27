@@ -73,7 +73,7 @@ class StatCategoryItemController extends Controller
         
         $validated = $request->validate([
             'stat_category_id' => 'required|exists:stat_categories,id',
-            'parent_id' => 'nullable|exists:stat_category_items,id',
+            'parent_id' => 'nullable|string',
             'name' => 'required|string|max:50',
             'label' => 'required|string|max:100',
             'color' => 'nullable|string|max:20',
@@ -97,10 +97,16 @@ class StatCategoryItemController extends Controller
             $validated['parent_id'] = null;
         }
 
-        // If parent_id is provided, ensure parent is in the same category
-        if (!empty($validated['parent_id'])) {
+        // If parent_id is provided and not null, validate it exists and belongs to the same category
+        if (!empty($validated['parent_id']) && $validated['parent_id'] !== null) {
             $parent = StatCategoryItem::find($validated['parent_id']);
-            if (!$parent || $parent->stat_category_id != $validated['stat_category_id']) {
+            if (!$parent) {
+                return back()->withErrors([
+                    'parent_id' => 'The selected parent item does not exist.',
+                ])->withInput();
+            }
+            
+            if ($parent->stat_category_id != $validated['stat_category_id']) {
                 return back()->withErrors([
                     'parent_id' => 'The parent item must belong to the same category.',
                 ])->withInput();
@@ -183,7 +189,7 @@ class StatCategoryItemController extends Controller
         
         $validated = $request->validate([
             'stat_category_id' => 'required|exists:stat_categories,id',
-            'parent_id' => 'nullable|exists:stat_category_items,id',
+            'parent_id' => 'nullable|string',
             'name' => 'required|string|max:50',
             'label' => 'required|string|max:100',
             'color' => 'nullable|string|max:20',
@@ -208,8 +214,8 @@ class StatCategoryItemController extends Controller
             $validated['parent_id'] = null;
         }
 
-        // If parent_id is provided, ensure parent is in the same category and not this item itself
-        if (!empty($validated['parent_id'])) {
+        // If parent_id is provided and not null, validate it exists and belongs to the same category
+        if (!empty($validated['parent_id']) && $validated['parent_id'] !== null) {
             if ($validated['parent_id'] == $statCategoryItem->id) {
                 return back()->withErrors([
                     'parent_id' => 'An item cannot be its own parent.',
@@ -217,7 +223,13 @@ class StatCategoryItemController extends Controller
             }
 
             $parent = StatCategoryItem::find($validated['parent_id']);
-            if (!$parent || $parent->stat_category_id != $validated['stat_category_id']) {
+            if (!$parent) {
+                return back()->withErrors([
+                    'parent_id' => 'The selected parent item does not exist.',
+                ])->withInput();
+            }
+            
+            if ($parent->stat_category_id != $validated['stat_category_id']) {
                 return back()->withErrors([
                     'parent_id' => 'The parent item must belong to the same category.',
                 ])->withInput();

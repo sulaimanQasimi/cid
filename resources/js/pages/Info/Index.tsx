@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash, Search, ArrowUpDown, FilterX, ChevronLeft, ChevronRight, Eye, BarChart3, Shield, Users, Building2, Calendar, FileText, AlertTriangle, TrendingUp, ChevronDown } from 'lucide-react';
+import { Plus, Pencil, Trash, Search, ArrowUpDown, FilterX, ChevronLeft, ChevronRight, Eye, BarChart3, Shield, Users, Building2, Calendar, FileText, AlertTriangle, TrendingUp, ChevronDown, Check } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -40,6 +40,10 @@ interface InfoRecord {
   info_type_id: number;
   info_category_id: number;
   department_id: number | null;
+  user_id: number | null;
+  created_by: number | null;
+  confirmed: boolean;
+  value?: any;
   created_at: string;
   updated_at: string;
   infoType?: {
@@ -55,6 +59,22 @@ interface InfoRecord {
     name: string;
     code: string;
   } | null;
+  user?: {
+    id: number;
+    name: string;
+  } | null;
+  creator?: {
+    id: number;
+    name: string;
+  } | null;
+  // Visitor statistics
+  visits_count?: number;
+  unique_visitors_count?: number;
+  today_visits_count?: number;
+  this_week_visits_count?: number;
+  this_month_visits_count?: number;
+  bounce_rate?: number;
+  average_time_spent?: number;
 }
 
 interface InfoCategory {
@@ -137,7 +157,7 @@ const perPageOptions = [
 ];
 
 export default function InfoIndex({
-  infos ,
+  infos,
   types = [],
   categories = [],
   departments = [],
@@ -145,7 +165,7 @@ export default function InfoIndex({
 }: Props) {
   const { canCreate, canView, canUpdate, canDelete, canConfirm } = usePermissions();
   const { t } = useTranslation();
-  
+
   const breadcrumbs: BreadcrumbItem[] = [
     {
       title: t('info.page_title'),
@@ -256,6 +276,18 @@ export default function InfoIndex({
     }
   };
 
+  // Handle info confirmation
+  const confirmInfo = (info: InfoRecord) => {
+    router.patch(route('infos.confirm', info.id), {}, {
+      onSuccess: () => {
+        // The page will refresh automatically
+      },
+      onError: (errors) => {
+        console.error('Confirmation error:', errors);
+      },
+    });
+  };
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={t('info.page_title')} />
@@ -286,7 +318,7 @@ export default function InfoIndex({
           <div className="absolute top-0 left-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 -translate-x-40 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
           <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full translate-y-32 translate-x-32 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
           <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white/5 rounded-full -translate-x-16 -translate-y-16 blur-xl group-hover:scale-150 transition-transform duration-500"></div>
-          
+
           <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-8">
             <div className="flex items-center gap-8">
               <div className="p-6 bg-white/20 backdrop-blur-md rounded-3xl border border-white/30 shadow-2xl group-hover:scale-105 transition-transform duration-300">
@@ -302,7 +334,7 @@ export default function InfoIndex({
                 </div>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-3">
               <CanCreate model="info">
                 <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-8 py-4 text-lg font-semibold transition-all duration-300 hover:scale-105 group/btn">
@@ -349,7 +381,7 @@ export default function InfoIndex({
               </div>
             </CardTitle>
           </CardHeader>
-          
+
           <div className={`transition-all duration-300 overflow-hidden ${isFiltersOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
             <CardContent className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -525,6 +557,9 @@ export default function InfoIndex({
                       <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info.table.type')}</TableHead>
                       <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info.table.category')}</TableHead>
                       <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info.table.department')}</TableHead>
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info.table.owner')}</TableHead>
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info.table.status')}</TableHead>
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info.table.visits')}</TableHead>
                       <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info.table.created_at')}</TableHead>
                       <TableHead className="text-purple-800 font-bold text-lg py-6 px-6 text-right">{t('info.table.actions')}</TableHead>
                     </TableRow>
@@ -562,6 +597,36 @@ export default function InfoIndex({
                               <span className="text-purple-600 font-medium">-</span>
                             )}
                           </TableCell>
+                          <TableCell className="py-6 px-6">
+                            {info.user ? (
+                              <Badge variant="outline" className="bg-gradient-to-l from-blue-100 to-blue-200 text-blue-800 border-blue-300 px-4 py-2 rounded-xl font-semibold">
+                                {info.user.name}
+                              </Badge>
+                            ) : info.creator ? (
+                              <Badge variant="outline" className="bg-gradient-to-l from-green-100 to-green-200 text-green-800 border-green-300 px-4 py-2 rounded-xl font-semibold">
+                                {info.creator.name}
+                              </Badge>
+                            ) : (
+                              <span className="text-purple-600 font-medium">-</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="py-6 px-6">
+                            {info.confirmed ? (
+                              <Badge variant="outline" className="bg-gradient-to-l from-green-100 to-green-200 text-green-800 border-green-300 px-4 py-2 rounded-xl font-semibold">
+                                {t('info.status.confirmed')}
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="bg-gradient-to-l from-yellow-100 to-yellow-200 text-yellow-800 border-yellow-300 px-4 py-2 rounded-xl font-semibold">
+                                {t('info.status.pending')}
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell className="py-6 px-6">
+                            <div className="flex flex-col items-center gap-1">
+                              <div className="text-lg font-bold text-purple-600">{info.visits_count || 0}</div>
+                              <div className="text-xs text-purple-500">{t('info.table.visits_label')}</div>
+                            </div>
+                          </TableCell>
                           <TableCell className="text-purple-800 py-6 px-6 font-medium">
                             {new Date(info.created_at).toLocaleDateString()}
                           </TableCell>
@@ -585,8 +650,12 @@ export default function InfoIndex({
                                   variant="ghost"
                                   size="icon"
                                   asChild
-                                  title={t('info.actions.edit')}
-                                  className="h-10 w-10 rounded-xl hover:bg-green-100 text-green-600 hover:text-green-700 transition-all duration-300 hover:scale-110"
+                                  disabled={info.confirmed}
+                                  title={info.confirmed ? t('info.actions.cannot_edit_confirmed') : t('info.actions.edit')}
+                                  className={`h-10 w-10 rounded-xl transition-all duration-300 hover:scale-110 ${info.confirmed
+                                      ? 'opacity-50 cursor-not-allowed text-gray-400'
+                                      : 'hover:bg-green-100 text-green-600 hover:text-green-700'
+                                    }`}
                                 >
                                   <Link href={route('infos.edit', info.id)}>
                                     <Pencil className="h-5 w-5" />
@@ -598,19 +667,48 @@ export default function InfoIndex({
                                   variant="ghost"
                                   size="icon"
                                   onClick={() => openDeleteDialog(info)}
-                                  title={t('info.actions.delete')}
-                                  className="h-10 w-10 rounded-xl text-red-600 hover:text-red-700 hover:bg-red-100 transition-all duration-300 hover:scale-110"
+                                  disabled={info.confirmed}
+                                  title={info.confirmed ? t('info.actions.cannot_delete_confirmed') : t('info.actions.delete')}
+                                  className={`h-10 w-10 rounded-xl transition-all duration-300 hover:scale-110 ${info.confirmed
+                                      ? 'opacity-50 cursor-not-allowed text-gray-400'
+                                      : 'text-red-600 hover:text-red-700 hover:bg-red-100'
+                                    }`}
                                 >
                                   <Trash className="h-5 w-5" />
                                 </Button>
                               </CanDelete>
+                              <CanConfirm model="info">
+                                {!info.confirmed && (
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => confirmInfo(info)}
+                                    title={t('info.actions.confirm')}
+                                    className="h-10 w-10 rounded-xl hover:bg-green-100 text-green-600 hover:text-green-700 transition-all duration-300 hover:scale-110"
+                                  >
+                                    <Check className="h-5 w-5" />
+                                  </Button>
+                                )}
+                              </CanConfirm>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                asChild
+                                title={t('criminal.analytics.view_analytics')}
+                                className="h-10 w-10 rounded-xl hover:bg-purple-100 text-purple-600 hover:text-purple-700 transition-all duration-300 hover:scale-110"
+                              >
+                                <Link href={`/analytics/Info/${info.id}`}>
+                                  <BarChart3 className="h-5 w-5" />
+                                </Link>
+                              </Button>
+
                             </div>
                           </TableCell>
                         </TableRow>
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={7} className="h-32 text-center">
+                        <TableCell colSpan={10} className="h-32 text-center">
                           <div className="flex flex-col items-center gap-4 text-purple-600">
                             <div className="p-4 bg-purple-100 rounded-full">
                               <AlertTriangle className="h-16 w-16 text-purple-400" />

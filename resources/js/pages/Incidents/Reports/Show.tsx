@@ -219,6 +219,17 @@ export default function Show({ report, incidents, reportStats, statCategories }:
                 </Link>
               </Button>
               
+              <Button asChild className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105">
+                <Link href={route('incident-reports.print', report.id)}>
+                  <div className="flex items-center gap-2">
+                    <div className="p-1 bg-white/20 rounded-lg">
+                      <Printer className="h-4 w-4" />
+                    </div>
+                    {t('incident_reports.actions.print_report')}
+                  </div>
+                </Link>
+              </Button>
+              
               <Link href={route('incident-reports.index')} className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105 group/btn">
                 <div className="flex items-center gap-2">
                   {t('common.back')}

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { PageHeader } from '@/components/page-header';
-import { ArrowRight, Plus, FileText, MapPin, Calendar, Shield, AlertTriangle, TrendingUp } from 'lucide-react';
+import { ArrowRight, Plus, FileText, MapPin, Calendar, Shield, AlertTriangle, TrendingUp, Printer } from 'lucide-react';
 import { format } from 'date-fns';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -129,6 +129,15 @@ export default function Incidents({ report, incidents }: IncidentsProps) {
                     <Plus className="h-5 w-5" />
                   </div>
                   {t('incident_reports.actions.add_incident')}
+                </Link>
+              </Button>
+              
+              <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105 group/btn">
+                <Link href={route('incident-reports.print', report.id)} className="flex items-center gap-3">
+                  <div className="p-1 bg-white/20 rounded-lg group-hover/btn:scale-110 transition-transform duration-300">
+                    <Printer className="h-5 w-5" />
+                  </div>
+                  {t('incident_reports.actions.print_report')}
                 </Link>
               </Button>
             </div>

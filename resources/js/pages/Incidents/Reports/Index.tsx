@@ -4,12 +4,12 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Pagination } from '@/components/pagination';
 import { PageHeader } from '@/components/page-header';
-import { Plus, FileText, AlertCircle, Shield, Search, ArrowUpDown, X, Users, Building2, Calendar, TrendingUp, AlertTriangle, ChevronDown, FilterX, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Plus, FileText, AlertCircle, Shield, Search, ArrowUpDown, X, Users, Building2, Calendar, TrendingUp, AlertTriangle, ChevronDown, FilterX, ChevronRight, ChevronLeft, Printer } from 'lucide-react';
 import { format } from 'date-fns';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Input } from '@/components/ui/input';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Select,
   SelectContent,
@@ -72,42 +72,66 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
   const [sortField, setSortField] = useState(filters.sort_field || 'created_at');
   const [sortDirection, setSortDirection] = useState<SortDirection>(filters.sort_direction || 'desc');
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const debouncedSearch = useDebounce(search, 500);
 
-  // Apply filters when they change
+  // Function to perform search with loading state
+  const performSearch = (searchTerm: string, currentStatus: string, currentSecurityLevel: string, currentSortField: string, currentSortDirection: SortDirection) => {
+    if (isLoading) return; // Prevent simultaneous requests
+    
+    setIsLoading(true);
+    
+    const params = {
+      search: searchTerm,
+      status: currentStatus === 'all' ? '' : currentStatus,
+      security_level: currentSecurityLevel === 'all' ? '' : currentSecurityLevel,
+      sort_field: currentSortField,
+      sort_direction: currentSortDirection,
+    };
+
+    const routeUrl = route('incident-reports.index');
+    const options = {
+      preserveState: true,
+      replace: true,
+      onFinish: () => setIsLoading(false),
+    };
+
+    router.get(routeUrl, params, options);
+  };
+
+  // Manual search function for the search button
+  const handleManualSearch = () => {
+    performSearch(search, status, securityLevel, sortField, sortDirection);
+  };
+
+  // Apply filters when they change (debounced search only)
   useEffect(() => {
-    try {
-      // Only update if any filters have changed from their current values in the URL
-      if (debouncedSearch !== filters.search ||
-          status !== filters.status ||
-          securityLevel !== filters.security_level ||
-          sortField !== filters.sort_field ||
-          sortDirection !== filters.sort_direction) {
-
-        const params = {
-          search: debouncedSearch,
-          status: status === 'all' ? '' : status,
-          security_level: securityLevel === 'all' ? '' : securityLevel,
-          sort_field: sortField,
-          sort_direction: sortDirection,
-        };
-
-        const routeUrl = route('incident-reports.index');
-        const options = {
-          preserveState: true,
-          replace: true,
-        };
-
-        // Using a setTimeout to avoid the version error that occurs during direct calls
-        setTimeout(() => {
-          router.get(routeUrl, params, options);
-        }, 0);
-      }
-    } catch (error) {
-      console.error('Error applying filters:', error);
+    // Clear any existing timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
     }
-  }, [debouncedSearch, status, securityLevel, sortField, sortDirection, filters]);
+
+    // Only trigger search if search term has changed and is different from current filter
+    if (debouncedSearch !== filters.search) {
+      searchTimeoutRef.current = setTimeout(() => {
+        performSearch(debouncedSearch, status, securityLevel, sortField, sortDirection);
+      }, 100);
+    }
+  }, [debouncedSearch]);
+
+  // Apply filters when status, security level, or sort changes
+  useEffect(() => {
+    // Only update if any filters have changed from their current values in the URL
+    if (status !== filters.status ||
+        securityLevel !== filters.security_level ||
+        sortField !== filters.sort_field ||
+        sortDirection !== filters.sort_direction) {
+
+      performSearch(search, status, securityLevel, sortField, sortDirection);
+    }
+  }, [status, securityLevel, sortField, sortDirection]);
 
   // Handle sorting
   const handleSort = (field: string) => {
@@ -130,11 +154,23 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
 
   // Clear all filters
   const clearFilters = () => {
+    if (isLoading) return; // Prevent clearing while loading
+    
     setSearch('');
     setStatus('all');
     setSecurityLevel('all');
     setSortField('created_at');
     setSortDirection('desc');
+    
+    // Perform search with cleared filters
+    performSearch('', 'all', 'all', 'created_at', 'desc');
+  };
+
+  // Handle Enter key press in search input
+  const handleSearchKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleManualSearch();
+    }
   };
 
   return (
@@ -221,10 +257,23 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
                         placeholder={t('incident_reports.search_placeholder')}
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full h-11 pl-20 pr-4 text-base border-green-200 focus:border-green-500 focus:ring-green-500/20 bg-gradient-to-l from-green-50 to-white rounded-xl shadow-lg"
+                        onKeyPress={handleSearchKeyPress}
+                        disabled={isLoading}
+                        className="w-full h-11 pl-20 pr-4 text-base border-green-200 focus:border-green-500 focus:ring-green-500/20 bg-gradient-to-l from-green-50 to-white rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                       />
-                      <Button className="absolute left-1 top-1/2 -translate-y-1/2 h-9 px-4 bg-gradient-to-l from-green-500 to-green-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-sm">
-                        Search
+                      <Button 
+                        className="absolute left-1 top-1/2 -translate-y-1/2 h-9 px-4 bg-gradient-to-l from-green-500 to-green-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-sm disabled:opacity-50 disabled:cursor-not-allowed" 
+                        onClick={handleManualSearch}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            {t('common.searching')}
+                          </div>
+                        ) : (
+                          t('common.search')
+                        )}
                       </Button>
                       <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-green-400" />
                     </div>
@@ -233,8 +282,8 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
 
                 {/* Status Filter */}
                 <div>
-                  <Select value={status} onValueChange={setStatus}>
-                    <SelectTrigger className="h-11 shadow-lg border-green-200 focus:border-green-500 focus:ring-green-500/20 bg-gradient-to-l from-green-50 to-white rounded-xl text-sm">
+                  <Select value={status} onValueChange={setStatus} disabled={isLoading}>
+                    <SelectTrigger className="h-11 shadow-lg border-green-200 focus:border-green-500 focus:ring-green-500/20 bg-gradient-to-l from-green-50 to-white rounded-xl text-sm disabled:opacity-50 disabled:cursor-not-allowed">
                       <SelectValue placeholder="Status" />
                     </SelectTrigger>
                     <SelectContent>
@@ -249,8 +298,8 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
 
                 {/* Security Level Filter */}
                 <div>
-                  <Select value={securityLevel} onValueChange={setSecurityLevel}>
-                    <SelectTrigger className="h-11 shadow-lg border-green-200 focus:border-green-500 focus:ring-green-500/20 bg-gradient-to-l from-green-50 to-white rounded-xl text-sm">
+                  <Select value={securityLevel} onValueChange={setSecurityLevel} disabled={isLoading}>
+                    <SelectTrigger className="h-11 shadow-lg border-green-200 focus:border-green-500 focus:ring-green-500/20 bg-gradient-to-l from-green-50 to-white rounded-xl text-sm disabled:opacity-50 disabled:cursor-not-allowed">
                       <SelectValue placeholder="Security Level" />
                     </SelectTrigger>
                     <SelectContent>
@@ -272,8 +321,9 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
                       setSortField(field);
                       setSortDirection(direction as SortDirection);
                     }}
+                    disabled={isLoading}
                   >
-                    <SelectTrigger className="h-11 shadow-lg border-green-200 focus:border-green-500 focus:ring-green-500/20 bg-gradient-to-l from-green-50 to-white rounded-xl text-sm">
+                    <SelectTrigger className="h-11 shadow-lg border-green-200 focus:border-green-500 focus:ring-green-500/20 bg-gradient-to-l from-green-50 to-white rounded-xl text-sm disabled:opacity-50 disabled:cursor-not-allowed">
                       <SelectValue placeholder="Sort By" />
                     </SelectTrigger>
                     <SelectContent>
@@ -294,11 +344,13 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
                     <Button
                       variant="outline"
                       onClick={() => {
+                        if (isLoading) return; // Prevent clicking while loading
                         const newDirection = sortDirection === 'asc' ? 'desc' : 'asc';
                         setSortDirection(newDirection);
                       }}
                       title={sortDirection === 'asc' ? 'Descending' : 'Ascending'}
-                      className="h-11 w-full shadow-lg border-green-300 text-green-700 hover:bg-green-100 hover:border-green-400 rounded-xl transition-all duration-300 hover:scale-105 text-sm"
+                      className="h-11 w-full shadow-lg border-green-300 text-green-700 hover:bg-green-100 hover:border-green-400 rounded-xl transition-all duration-300 hover:scale-105 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={isLoading}
                     >
                       <ArrowUpDown className={`h-4 w-4 mr-2 ${sortDirection === 'desc' ? 'rotate-180' : ''}`} />
                       {sortDirection === 'asc' ? 'Asc' : 'Desc'}
@@ -311,7 +363,8 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
                       variant="outline"
                       size="sm"
                       onClick={clearFilters}
-                      className="h-11 px-3 shadow-lg border-green-300 text-green-700 hover:bg-green-100 hover:border-green-400 rounded-xl transition-all duration-300 hover:scale-105 text-sm"
+                      className="h-11 px-3 shadow-lg border-green-300 text-green-700 hover:bg-green-100 hover:border-green-400 rounded-xl transition-all duration-300 hover:scale-105 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={isLoading}
                     >
                       <FilterX className="h-4 w-4" />
                     </Button>
@@ -380,7 +433,19 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
                     </tr>
                   </thead>
                   <tbody className="[&_tr:last-child]:border-0">
-                    {reports.data.length === 0 ? (
+                    {isLoading ? (
+                      <tr>
+                        <td colSpan={7} className="h-32 text-center align-middle">
+                          <div className="flex flex-col items-center gap-4 text-green-600">
+                            <div className="p-4 bg-green-100 rounded-full">
+                              <TrendingUp className="h-16 w-16 text-green-400 animate-spin" />
+                            </div>
+                            <p className="text-xl font-bold">{t('incident_reports.loading_reports')}</p>
+                            <p className="text-green-500">{t('incident_reports.loading_description')}</p>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : reports.data.length === 0 ? (
                       <tr>
                         <td colSpan={7} className="h-32 text-center align-middle">
                           <div className="flex flex-col items-center gap-4 text-green-600">
@@ -450,6 +515,17 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
                               >
                                 <Link href={route('incident-reports.incidents', report.id)}>
                                   <AlertCircle className="h-5 w-5" />
+                                </Link>
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                asChild
+                                title={t('incident_reports.print.title')}
+                                className="h-10 w-10 rounded-xl hover:bg-green-100 text-green-600 hover:text-green-700 transition-all duration-300 hover:scale-110"
+                              >
+                                <Link href={route('incident-reports.print', report.id)}>
+                                  <Printer className="h-5 w-5" />
                                 </Link>
                               </Button>
                             </div>

@@ -200,12 +200,12 @@ export default function DepartmentIndex({
               </div>
               <div className="space-y-3">
                 <h2 className="text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight">{t('departments.page_title')}</h2>
-                <p className="text-white/90 flex items-center gap-3 text-xl font-medium">
+                <div className="text-white/90 flex items-center gap-3 text-xl font-medium">
                   <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
                     <FileText className="h-6 w-6" />
                   </div>
                   {t('departments.page_description')}
-                </p>
+                </div>
               </div>
             </div>
 

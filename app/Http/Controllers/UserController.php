@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class UserController extends Controller
 {
@@ -87,8 +88,49 @@ class UserController extends Controller
         $this->authorize('create', User::class);
         
         $roles = Role::all();
+        $permissions = Permission::all();
+
+        // Group permissions by model
+        $groupedPermissions = [];
+        foreach ($permissions as $permission) {
+            $parts = explode('.', $permission->name);
+            if (count($parts) >= 2) {
+                $model = $parts[0];
+                if (!isset($groupedPermissions[$model])) {
+                    $groupedPermissions[$model] = [];
+                }
+                $groupedPermissions[$model][] = [
+                    'id' => $permission->id,
+                    'name' => $permission->name,
+                    'label' => $permission->label,
+                ];
+            }
+        }
+
+        // Sort permissions within each group
+        foreach ($groupedPermissions as $model => &$modelPermissions) {
+            usort($modelPermissions, function ($a, $b) {
+                $order = [
+                    'view_any' => 1,
+                    'view' => 2,
+                    'create' => 3,
+                    'update' => 4,
+                    'delete' => 5,
+                    'restore' => 6,
+                    'force_delete' => 7,
+                    'confirm' => 8,
+                ];
+                
+                $aAction = explode('.', $a['name'])[1] ?? '';
+                $bAction = explode('.', $b['name'])[1] ?? '';
+                
+                return ($order[$aAction] ?? 999) - ($order[$bAction] ?? 999);
+            });
+        }
+
         return Inertia::render('User/Create', [
-            'roles' => $roles
+            'roles' => $roles,
+            'groupedPermissions' => $groupedPermissions,
         ]);
     }
 
@@ -105,6 +147,8 @@ class UserController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,id',
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'exists:permissions,id',
         ], [
             'name.required' => 'The name field is required.',
             'email.required' => 'The email field is required.',
@@ -113,6 +157,7 @@ class UserController extends Controller
             'password.min' => 'The password must be at least 8 characters.',
             'password.confirmed' => 'The password confirmation does not match.',
             'roles.*.exists' => 'One or more selected roles do not exist.',
+            'permissions.*.exists' => 'One or more selected permissions do not exist.',
         ]);
 
         // Create the user
@@ -125,6 +170,11 @@ class UserController extends Controller
         // Assign roles if provided
         if (!empty($validated['roles'])) {
             $user->syncRoles($validated['roles']);
+        }
+
+        // Assign permissions if provided
+        if (!empty($validated['permissions'])) {
+            $user->syncPermissions($validated['permissions']);
         }
 
         return Redirect::route('users.index')->with('success', 'User created successfully.');
@@ -150,13 +200,54 @@ class UserController extends Controller
     {
         $this->authorize('update', $user);
         
-        $user->load('roles');
+        $user->load('roles', 'permissions');
         $roles = Role::all();
+        $permissions = Permission::all();
+
+        // Group permissions by model
+        $groupedPermissions = [];
+        foreach ($permissions as $permission) {
+            $parts = explode('.', $permission->name);
+            if (count($parts) >= 2) {
+                $model = $parts[0];
+                if (!isset($groupedPermissions[$model])) {
+                    $groupedPermissions[$model] = [];
+                }
+                $groupedPermissions[$model][] = [
+                    'id' => $permission->id,
+                    'name' => $permission->name,
+                    'label' => $permission->label,
+                ];
+            }
+        }
+
+        // Sort permissions within each group
+        foreach ($groupedPermissions as $model => &$modelPermissions) {
+            usort($modelPermissions, function ($a, $b) {
+                $order = [
+                    'view_any' => 1,
+                    'view' => 2,
+                    'create' => 3,
+                    'update' => 4,
+                    'delete' => 5,
+                    'restore' => 6,
+                    'force_delete' => 7,
+                    'confirm' => 8,
+                ];
+                
+                $aAction = explode('.', $a['name'])[1] ?? '';
+                $bAction = explode('.', $b['name'])[1] ?? '';
+                
+                return ($order[$aAction] ?? 999) - ($order[$bAction] ?? 999);
+            });
+        }
 
         return Inertia::render('User/Edit', [
             'user' => $user,
             'userRoles' => $user->roles->pluck('id')->toArray(),
+            'userPermissions' => $user->permissions->pluck('id')->toArray(),
             'roles' => $roles,
+            'groupedPermissions' => $groupedPermissions,
         ]);
     }
 
@@ -179,6 +270,8 @@ class UserController extends Controller
             'password' => 'nullable|string|min:8|confirmed',
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,id',
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'exists:permissions,id',
         ], [
             'name.required' => 'The name field is required.',
             'email.required' => 'The email field is required.',
@@ -187,6 +280,7 @@ class UserController extends Controller
             'password.min' => 'The password must be at least 8 characters.',
             'password.confirmed' => 'The password confirmation does not match.',
             'roles.*.exists' => 'One or more selected roles do not exist.',
+            'permissions.*.exists' => 'One or more selected permissions do not exist.',
         ]);
 
         // Update user details
@@ -205,6 +299,11 @@ class UserController extends Controller
         // Sync roles if provided
         if (isset($validated['roles'])) {
             $user->syncRoles($validated['roles']);
+        }
+
+        // Sync permissions if provided
+        if (isset($validated['permissions'])) {
+            $user->syncPermissions($validated['permissions']);
         }
 
         return Redirect::route('users.index')->with('success', 'User updated successfully.');
