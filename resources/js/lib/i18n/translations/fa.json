@@ -1395,6 +1395,21 @@
 "translations.translations": "ترجمه‌ها",
 "translations.export": "خروجی گرفتن از ترجمه‌ها",
 "translations.export_translations": "خروجی ترجمه‌ها",
-"translations.add_translation": "افزودن ترجمه"
+"translations.add_translation": "افزودن ترجمه",
+"dashboard.active_cases":"فعاله قضیې",
+
+"dashboard.total_provinces": "ټول ولایتونه",
+"dashboard.reports_generated": "جوړ شوي راپورونه",
+"dashboard.province_statistics": "د ولایت احصائیه",
+"dashboard.total_districts": "ټول ولسوالۍ",
+"dashboard.total_incidents": "ټولې پیښې",
+"dashboard.active_incidents": "فعاله پیښې",
+"dashboard.system_status": "د سیسټم وضعیت",
+"dashboard.operational": "فعال",
+"dashboard.database_size": "د ډیټابیس اندازه",
+"dashboard.storage_usage": "د ذخیره کارونه",
+"dashboard.storage_free": "وړیا ذخیره",
+"dashboard.location_map": "د موقعیت نقشه"
+
 
 }

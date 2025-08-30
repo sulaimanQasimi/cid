@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
@@ -74,5 +75,13 @@ class Province extends Model
     public function districts(): HasMany
     {
         return $this->hasMany(District::class);
+    }
+
+    /**
+     * Get the incidents for the province through districts.
+     */
+    public function incidents(): HasManyThrough
+    {
+        return $this->hasManyThrough(Incident::class, District::class);
     }
 }
