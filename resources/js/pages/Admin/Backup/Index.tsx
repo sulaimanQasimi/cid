@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Head, useForm, router } from '@inertiajs/react';
 import { useTranslation } from '@/lib/i18n/translate';
-import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
+import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,8 +9,20 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
-import { Download, Trash2, Plus, RefreshCw, AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import { Download, Trash2, Plus, RefreshCw, AlertCircle, CheckCircle, Clock, Database, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { PageHeader } from '@/components/page-header';
+import { type BreadcrumbItem } from '@/types';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface Backup {
     filename: string;
@@ -29,6 +41,24 @@ export default function BackupIndex({ backups, backupPath }: BackupPageProps) {
     const { t } = useTranslation();
     const [isCreating, setIsCreating] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [backupToDelete, setBackupToDelete] = useState<Backup | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Dashboard',
+            href: '/dashboard',
+        },
+        {
+            title: 'System Administration',
+            href: '#',
+        },
+        {
+            title: t('backup.page_title'),
+            href: route('backup.index'),
+        },
+    ];
 
     const { data, setData, post, processing, reset } = useForm({
         name: '',
@@ -54,21 +84,44 @@ export default function BackupIndex({ backups, backupPath }: BackupPageProps) {
     };
 
     const handleDownload = (filename: string) => {
-        window.open(route('backup.download', { filename }), '_blank');
+        try {
+            const downloadUrl = route('backup.download', { filename });
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            toast.success(t('backup.download_started'));
+        } catch (error) {
+            console.error('Download error:', error);
+            toast.error(t('backup.download_error'));
+        }
     };
 
-    const handleDelete = (filename: string) => {
-        if (confirm(t('backup.delete_confirm', { filename }))) {
-            router.delete(route('backup.delete', { filename }), {
-                onSuccess: () => {
-                    toast.success(t('backup.delete_success'));
-                    window.location.reload();
-                },
-                onError: () => {
-                    toast.error(t('backup.delete_error'));
-                },
-            });
-        }
+    const confirmDelete = (backup: Backup) => {
+        setBackupToDelete(backup);
+        setIsDeleteDialogOpen(true);
+    };
+
+    const handleDelete = () => {
+        if (!backupToDelete) return;
+
+        setIsDeleting(true);
+
+        router.delete(route('backup.delete', { filename: backupToDelete.filename }), {
+            preserveScroll: true,
+            onSuccess: () => {
+                setIsDeleteDialogOpen(false);
+                setIsDeleting(false);
+                toast.success(t('backup.delete_success'));
+                window.location.reload();
+            },
+            onError: () => {
+                setIsDeleting(false);
+                toast.error(t('backup.delete_error'));
+            },
+        });
     };
 
     const handleRefresh = () => {
@@ -81,21 +134,26 @@ export default function BackupIndex({ backups, backupPath }: BackupPageProps) {
     };
 
     return (
-        <AuthenticatedLayout>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('backup.page_title')} />
-
-            <div className="container mx-auto py-6 space-y-6">
-                {/* Header */}
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-3xl font-bold">{t('backup.page_title')}</h1>
-                        <p className="text-muted-foreground">{t('backup.page_description')}</p>
-                    </div>
-                    <Button onClick={handleRefresh} disabled={isRefreshing} variant="outline">
-                        <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-                        {t('backup.refresh')}
-                    </Button>
-                </div>
+            
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+                <PageHeader
+                    title={t('backup.page_title')}
+                    description={t('backup.page_description')}
+                    actions={
+                        <div className="flex space-x-2">
+                            <Button 
+                                onClick={handleRefresh} 
+                                disabled={isRefreshing} 
+                                variant="outline"
+                            >
+                                <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                                {t('backup.refresh')}
+                            </Button>
+                        </div>
+                    }
+                />
 
                 {/* Create Backup Card */}
                 <Card>
@@ -128,7 +186,7 @@ export default function BackupIndex({ backups, backupPath }: BackupPageProps) {
                                     >
                                         {isCreating ? (
                                             <>
-                                                <Clock className="h-4 w-4 mr-2 animate-spin" />
+                                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                                                 {t('backup.creating')}
                                             </>
                                         ) : (
@@ -151,48 +209,79 @@ export default function BackupIndex({ backups, backupPath }: BackupPageProps) {
                         <CardDescription>{t('backup.list_description')}</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        {backups.length === 0 ? (
-                            <div className="text-center py-8">
-                                <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                                <p className="text-muted-foreground">{t('backup.no_backups')}</p>
-                            </div>
-                        ) : (
-                            <div className="space-y-4">
-                                {backups.map((backup) => (
-                                    <div key={backup.filename} className="flex items-center justify-between p-4 border rounded-lg">
-                                        <div className="flex-1">
-                                            <div className="flex items-center space-x-2">
-                                                <CheckCircle className="h-4 w-4 text-green-500" />
-                                                <span className="font-medium">{backup.filename}</span>
-                                                <Badge variant="secondary">{backup.size}</Badge>
-                                            </div>
-                                            <p className="text-sm text-muted-foreground mt-1">
-                                                {t('backup.created_at')}: {formatDate(backup.created_at)}
-                                            </p>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => handleDownload(backup.filename)}
+                        <div className="relative w-full overflow-auto">
+                            <table className="w-full caption-bottom text-sm">
+                                <thead className="[&_tr]:border-b">
+                                    <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                        <th className="h-12 px-4 text-left align-middle font-medium">
+                                            {t('backup.filename')}
+                                        </th>
+                                        <th className="h-12 px-4 text-left align-middle font-medium">
+                                            {t('backup.size')}
+                                        </th>
+                                        <th className="h-12 px-4 text-left align-middle font-medium">
+                                            {t('backup.created_at')}
+                                        </th>
+                                        <th className="h-12 px-4 text-left align-middle font-medium">
+                                            {t('backup.actions')}
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="[&_tr:last-child]:border-0">
+                                    {backups.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={4} className="h-12 px-4 text-center align-middle">
+                                                <div className="flex flex-col items-center justify-center py-8">
+                                                    <Database className="h-12 w-12 text-muted-foreground mb-4" />
+                                                    <p className="text-muted-foreground">{t('backup.no_backups')}</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        backups.map((backup) => (
+                                            <tr
+                                                key={backup.filename}
+                                                className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
                                             >
-                                                <Download className="h-4 w-4 mr-2" />
-                                                {t('backup.download')}
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => handleDelete(backup.filename)}
-                                                className="text-destructive hover:text-destructive"
-                                            >
-                                                <Trash2 className="h-4 w-4 mr-2" />
-                                                {t('backup.delete')}
-                                            </Button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                                                <td className="p-4 align-middle">
+                                                    <div className="flex items-center space-x-2">
+                                                        <CheckCircle className="h-4 w-4 text-green-500" />
+                                                        <span className="font-medium">{backup.filename}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="p-4 align-middle">
+                                                    <Badge variant="secondary">{backup.size}</Badge>
+                                                </td>
+                                                <td className="p-4 align-middle">
+                                                    {formatDate(backup.created_at)}
+                                                </td>
+                                                <td className="p-4 align-middle">
+                                                    <div className="flex space-x-2">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => handleDownload(backup.filename)}
+                                                        >
+                                                            <Download className="h-4 w-4 mr-1" />
+                                                            {t('backup.download')}
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => confirmDelete(backup)}
+                                                            className="text-destructive hover:text-destructive"
+                                                        >
+                                                            <Trash2 className="h-4 w-4 mr-1" />
+                                                            {t('backup.delete')}
+                                                        </Button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </CardContent>
                 </Card>
 
@@ -222,6 +311,34 @@ export default function BackupIndex({ backups, backupPath }: BackupPageProps) {
                     </CardContent>
                 </Card>
             </div>
-        </AuthenticatedLayout>
+
+            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{t('backup.delete_confirm_title')}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {t('backup.delete_confirm_description', { filename: backupToDelete?.filename || '' })}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel disabled={isDeleting}>{t('common.cancel')}</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleDelete}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            disabled={isDeleting}
+                        >
+                            {isDeleting ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    {t('backup.deleting')}
+                                </>
+                            ) : (
+                                t('backup.delete')
+                            )}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </AppLayout>
     );
 }

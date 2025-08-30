@@ -1437,6 +1437,14 @@
 "backup.delete_success": "د پشتیبان‌گیری فایل په بریالیتوب سره ړنګ شو.",
 "backup.delete_error": "د پشتیبان‌گیری فایل د ړنګولو کې تیروتنه رامنځته شوه.",
 
-"sidebar.backup_management": "د پشتیبان‌گیری مدیریت"
+"sidebar.backup_management": "د پشتیبان‌گیری مدیریت",
+"backup.download_started": "د پشتیبان‌گیری ډاونلوډ پیل شو.",
+"backup.download_error": "د پشتیبان‌گیری ډاونلوډ کې تیروتنه رامنځته شوه.",
+"backup.filename": "د فایل نوم",
+"backup.size": "اندازه",
+"backup.actions": "عملیات",
+"backup.delete_confirm_title": "آیا تاسو ډاډه یاست؟",
+"backup.delete_confirm_description": "دا به د '{filename}' فایل د تل لپاره ړنګ کړي. دا عملیات نشي لغوه کیدی.",
+"backup.deleting": "ړنګیدل..."
 
 }

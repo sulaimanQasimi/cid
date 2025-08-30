@@ -256,5 +256,13 @@
     "backup.delete_success": "Backup file deleted successfully.",
     "backup.delete_error": "An error occurred while deleting the backup file.",
     
-    "sidebar.backup_management": "Backup Management"
+    "sidebar.backup_management": "Backup Management",
+    "backup.download_started": "Backup download started.",
+    "backup.download_error": "An error occurred while downloading the backup.",
+    "backup.filename": "Filename",
+    "backup.size": "Size",
+    "backup.actions": "Actions",
+    "backup.delete_confirm_title": "Are you sure?",
+    "backup.delete_confirm_description": "This will permanently delete the file '{filename}'. This action cannot be undone.",
+    "backup.deleting": "Deleting..."
 }

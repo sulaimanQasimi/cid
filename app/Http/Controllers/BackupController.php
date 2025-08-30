@@ -45,26 +45,24 @@ class BackupController extends Controller
 
     public function download($filename)
     {
-        $backupPath = config('backup.backup.destination.disks')[0] ?? 'local';
-        $fullPath = "backups/{$filename}";
+        $backupPath = config('backup.backup.destination.disks')[0] ?? 'backups';
 
-        if (!Storage::disk($backupPath)->exists($fullPath)) {
+        if (!Storage::disk($backupPath)->exists($filename)) {
             abort(404, 'Backup file not found.');
         }
 
-        return Storage::disk($backupPath)->download($fullPath);
+        return Storage::disk($backupPath)->download($filename);
     }
 
     public function delete($filename)
     {
-        $backupPath = config('backup.backup.destination.disks')[0] ?? 'local';
-        $fullPath = "backups/{$filename}";
+        $backupPath = config('backup.backup.destination.disks')[0] ?? 'backups';
 
-        if (!Storage::disk($backupPath)->exists($fullPath)) {
+        if (!Storage::disk($backupPath)->exists($filename)) {
             abort(404, 'Backup file not found.');
         }
 
-        Storage::disk($backupPath)->delete($fullPath);
+        Storage::disk($backupPath)->delete($filename);
 
         return redirect()->route('backup.index')
             ->with('success', 'Backup file deleted successfully.');
@@ -85,31 +83,29 @@ class BackupController extends Controller
 
     private function getBackups()
     {
-        $backupPath = config('backup.backup.destination.disks')[0] ?? 'local';
+        $backupPath = config('backup.backup.destination.disks')[0] ?? 'backups';
         $backups = [];
 
-        if (Storage::disk($backupPath)->exists('backups')) {
-            $files = Storage::disk($backupPath)->files('backups');
+        $files = Storage::disk($backupPath)->files();
+        
+        foreach ($files as $file) {
+            $filename = basename($file);
+            $size = Storage::disk($backupPath)->size($file);
+            $modified = Storage::disk($backupPath)->lastModified($file);
             
-            foreach ($files as $file) {
-                $filename = basename($file);
-                $size = Storage::disk($backupPath)->size($file);
-                $modified = Storage::disk($backupPath)->lastModified($file);
-                
-                $backups[] = [
-                    'filename' => $filename,
-                    'size' => $this->formatBytes($size),
-                    'size_bytes' => $size,
-                    'created_at' => date('Y-m-d H:i:s', $modified),
-                    'created_at_timestamp' => $modified,
-                ];
-            }
-
-            // Sort by creation date (newest first)
-            usort($backups, function ($a, $b) {
-                return $b['created_at_timestamp'] - $a['created_at_timestamp'];
-            });
+            $backups[] = [
+                'filename' => $filename,
+                'size' => $this->formatBytes($size),
+                'size_bytes' => $size,
+                'created_at' => date('Y-m-d H:i:s', $modified),
+                'created_at_timestamp' => $modified,
+            ];
         }
+
+        // Sort by creation date (newest first)
+        usort($backups, function ($a, $b) {
+            return $b['created_at_timestamp'] - $a['created_at_timestamp'];
+        });
 
         return $backups;
     }
