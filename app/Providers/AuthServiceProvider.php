@@ -42,6 +42,7 @@ use App\Policies\StatCategoryItemPolicy;
 use App\Policies\StatCategoryPolicy;
 use App\Policies\TranslationPolicy;
 use App\Policies\UserPolicy;
+use App\Policies\BackupPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -70,6 +71,8 @@ class AuthServiceProvider extends ServiceProvider
         StatCategoryItem::class => StatCategoryItemPolicy::class,
         Translation::class => TranslationPolicy::class,
         User::class => UserPolicy::class,
+        Meeting::class => MeetingPolicy::class,
+        MeetingMessage::class => MeetingMessagePolicy::class,
     ];
 
     /**

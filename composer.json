@@ -16,6 +16,7 @@
         "laravel/reverb": "*",
         "laravel/tinker": "^2.10.1",
         "spatie/laravel-activitylog": "*",
+        "spatie/laravel-backup": "*",
         "spatie/laravel-permission": "^6.17",
         "tightenco/ziggy": "^2.4"
     },

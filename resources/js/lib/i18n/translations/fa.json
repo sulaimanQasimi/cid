@@ -1409,7 +1409,34 @@
 "dashboard.database_size": "د ډیټابیس اندازه",
 "dashboard.storage_usage": "د ذخیره کارونه",
 "dashboard.storage_free": "وړیا ذخیره",
-"dashboard.location_map": "د موقعیت نقشه"
+"dashboard.location_map": "د موقعیت نقشه",
 
+"backup.page_title": "د پشتیبان‌گیری مدیریت",
+"backup.page_description": "د سیسټم پشتیبان‌گیری او مدیریت",
+"backup.create_title": "نوی پشتیبان‌گیری جوړول",
+"backup.create_description": "د سیسټم د پشتیبان‌گیری فایل جوړول",
+"backup.create_button": "پشتیبان‌گیری جوړول",
+"backup.creating": "جوړیدل...",
+"backup.name_label": "د پشتیبان‌گیری نوم",
+"backup.name_placeholder": "د پشتیبان‌گیری نوم (اختیاري)",
+"backup.name_helper": "د پشتیبان‌گیری لپاره یو ځانګړی نوم. که خالي پرېږدئ، د تاریخ او وخت سره به جوړ شي.",
+"backup.list_title": "د پشتیبان‌گیری فایلونه",
+"backup.list_description": "د موجودو پشتیبان‌گیری فایلونو لیست",
+"backup.no_backups": "هیڅ پشتیبان‌گیری فایلونه ونه موندل شول",
+"backup.created_at": "د جوړیدو نېټه",
+"backup.download": "ډاونلوډ",
+"backup.delete": "ړنګول",
+"backup.delete_confirm": "آیا تاسو ډاډه یاست چې '{filename}' ړنګ کړئ؟",
+"backup.refresh": "تازه کول",
+"backup.info_title": "د پشتیبان‌گیری معلومات",
+"backup.storage_location": "د ذخیره ځای",
+"backup.total_backups": "د پشتیبان‌گیری شمیر",
+"backup.admin_only_warning": "دا پاڼه یوازې د مدیرانو لپاره ده. د پشتیبان‌گیری فایلونه حساس معلومات لري.",
+"backup.create_success": "د پشتیبان‌گیری کار په صف کې ځای پرځای شو او به ژر پیل شي.",
+"backup.create_error": "د پشتیبان‌گیری جوړولو کې تیروتنه رامنځته شوه.",
+"backup.delete_success": "د پشتیبان‌گیری فایل په بریالیتوب سره ړنګ شو.",
+"backup.delete_error": "د پشتیبان‌گیری فایل د ړنګولو کې تیروتنه رامنځته شوه.",
+
+"sidebar.backup_management": "د پشتیبان‌گیری مدیریت"
 
 }

@@ -71,6 +71,7 @@ require __DIR__.'/criminals.php';
 require __DIR__.'/reports.php';
 require __DIR__.'/incidents.php';
 require __DIR__.'/locations.php';
+require __DIR__.'/backup.php';
 
 // Visitor Analytics routes
 Route::group(['middleware' => ['auth']], function () {

@@ -199,6 +199,9 @@ class PermissionSeeder extends Seeder
             ['name' => 'user.delete', 'label' => 'حذف کاربر'],
             ['name' => 'user.restore', 'label' => 'بازیابی کاربر'],
             ['name' => 'user.force_delete', 'label' => 'حذف دائمی کاربر'],
+
+            // Backup permissions
+            ['name' => 'manage backups', 'label' => 'مدیریت پشتیبان‌گیری'],
         ];
 
         // Create permissions
