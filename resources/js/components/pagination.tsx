@@ -22,12 +22,13 @@ export function Pagination({ links }: PaginationProps) {
     link => link.label !== "&laquo; Previous" && link.label !== "Next &raquo;"
   );
 
-  if (links.length <= 3) return null;
+  // Don't show pagination if there are no page links and no navigation links
+  if (pageLinks.length === 0 && !previousLink && !nextLink) return null;
 
   return (
     <UIPagination>
       {previousLink && (
-        <UIPagination.Next
+        <UIPagination.Prev
           href={previousLink.url || '#'}
           disabled={!previousLink.url}
         />
@@ -50,7 +51,7 @@ export function Pagination({ links }: PaginationProps) {
       })}
 
       {nextLink && (
-        <UIPagination.Prev
+        <UIPagination.Next
           href={nextLink.url || '#'}
           disabled={!nextLink.url}
         />

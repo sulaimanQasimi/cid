@@ -53,6 +53,7 @@ interface UsersPaginatedData {
   total: number;
 }
 
+
 interface Props {
   users: UsersPaginatedData;
   filters: Filters;
@@ -427,7 +428,7 @@ export default function UserIndex({ users, filters }: Props) {
         </div>
 
         {/* Pagination */}
-        {users.last_page > 1 && (
+        {users.links && users.links.length > 0 && (
           <div className="mt-8 flex justify-center">
             <div className="bg-gradient-to-l from-blue-50 to-white p-4 rounded-3xl shadow-2xl border border-blue-200">
               <Pagination links={users.links} />
