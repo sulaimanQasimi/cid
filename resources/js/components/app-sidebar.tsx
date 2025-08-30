@@ -36,7 +36,6 @@ import React from 'react';
 const footerNavItems: NavItem[] = [
 ];
 
-// console.log(PermissionPatterns)
 function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
     const navigation: NavItem[] = []
     // Dashboard - always visible
