@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -7,10 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, FileText, BarChart3, Save, X, AlertTriangle, Building2 } from 'lucide-react';
+import { ArrowLeft, Save, Database, BarChart3, Settings, Plus, X, AlertTriangle, Building2 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/translate';
 import { usePermissions } from '@/hooks/use-permissions';
-import { CanCreate } from '@/components/ui/permission-guard';
+import { CanUpdate } from '@/components/ui/permission-guard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import TreeViewStatSelector from '@/components/reports/TreeViewStatSelector';
 import { useState } from 'react';
@@ -38,39 +38,75 @@ interface StatCategoryItem {
   };
 }
 
-interface CreateProps {
+interface InfoStat {
+  id: number;
+  stat_category_item: {
+    id: number;
+    name: string;
+    label: string;
+    category: {
+      id: number;
+      name: string;
+      label: string;
+      color: string;
+    };
+  };
+  integer_value: number | null;
+  string_value: string | null;
+  notes: string | null;
+  created_at: string;
+}
+
+interface InfoType {
+  id: number;
+  name: string;
+  description: string | null;
+  created_at: string;
+  updated_at: string;
+  infoStats?: InfoStat[];
+}
+
+interface ManageStatsProps {
+  infoType: InfoType;
   statItems: StatCategoryItem[];
   statCategories: StatCategory[];
 }
 
-type InfoTypeFormData = {
-  name: string;
-  code?: string;
-  description?: string;
-  stats?: Array<{
-    stat_category_item_id: number;
-    value: string;
-    notes?: string;
-  }>;
-};
-
-export default function InfoTypesCreate({ statItems, statCategories }: CreateProps) {
+export default function ManageStats({ infoType, statItems, statCategories }: ManageStatsProps) {
   const { t } = useTranslation();
-  const { canCreate } = usePermissions();
+  const { canUpdate } = usePermissions();
   
-  const { data, setData, post, processing, errors } = useForm<InfoTypeFormData>({
-    name: '',
-    code: '',
-    description: '',
-  });
-
   // State for managing statistical data
   const [statsData, setStatsData] = useState<{
     [key: number]: { value: string; notes: string | null };
-  }>({});
+  }>(() => {
+    // Initialize with existing stats
+    const initialData: { [key: number]: { value: string; notes: string | null } } = {};
+    
+    // Check if infoStats exists and is an array before iterating
+    if (infoType.infoStats && Array.isArray(infoType.infoStats)) {
+      infoType.infoStats.forEach(stat => {
+        const value = stat.integer_value !== null ? stat.integer_value.toString() : stat.string_value || '';
+        initialData[stat.stat_category_item.id] = {
+          value,
+          notes: stat.notes
+        };
+      });
+    }
+    
+    return initialData;
+  });
 
   // Add state for category filter
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+
+  const { put, processing, errors, setData } = useForm({
+    stats: [] as Array<{
+      stat_category_item_id: number;
+      value: string;
+      notes?: string;
+    }>
+  });
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -82,7 +118,11 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
       href: route('info-types.index'),
     },
     {
-      title: t('info_types.create.page_title'),
+      title: infoType.name,
+      href: route('info-types.show', infoType.id),
+    },
+    {
+      title: t('info_types.manage_stats.page_title'),
       href: '#',
     },
   ];
@@ -99,13 +139,9 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
         notes: notes || undefined,
       }));
 
-    // Add stats to form data
-    if (stats.length > 0) {
-      setData('stats', stats);
-    }
-
-    // Submit the form
-    post(route('info-types.store'));
+    // Update the form data and submit
+    setData('stats', stats);
+    put(route('info-types.stats.update', infoType.id));
   };
 
   // Group stat items by category for the dropdown filter
@@ -136,11 +172,12 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
     }));
   }
 
-  const statsCount = Object.keys(statsData).length;
+  // Get stats count for display
+  const statsCount = Object.values(statsData).filter(({ value }) => value.trim() !== '').length;
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title={t('info_types.create.page_title')} />
+      <Head title={t('info_types.manage_stats.page_title', { name: infoType.name })} />
       
       <div className="container px-0 py-6">
         {/* Modern Header with Glassmorphism */}
@@ -154,142 +191,58 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
           <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-8">
             <div className="flex items-center gap-8">
               <div className="p-6 bg-white/20 backdrop-blur-md rounded-3xl border border-white/30 shadow-2xl group-hover:scale-105 transition-transform duration-300">
-                <FileText className="h-10 w-10 text-white" />
+                <Settings className="h-10 w-10 text-white" />
               </div>
               <div className="space-y-3">
-                <h2 className="text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight">{t('info_types.create.page_title')}</h2>
+                <h2 className="text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight">
+                  {t('info_types.manage_stats.page_title', { name: infoType.name })}
+                </h2>
                 <div className="text-white/90 flex items-center gap-3 text-xl font-medium">
                   <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                    <BarChart3 className="h-6 w-6" />
+                    <Database className="h-6 w-6" />
                   </div>
-                  {t('info_types.create.page_description')}
+                  {t('info_types.manage_stats.page_description')}
                 </div>
               </div>
             </div>
             
             <div className="flex items-center gap-3">
               <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
-                <a href={route('info-types.index')} className="flex items-center gap-3">
+                <Link href={route('info-types.show', infoType.id)} className="flex items-center gap-3">
                   <ArrowLeft className="h-5 w-5" />
-                  {t('info_types.create.back_button')}
-                </a>
+                  {t('info_types.manage_stats.back_button')}
+                </Link>
               </Button>
             </div>
           </div>
         </div>
 
-        {/* Create Form Card */}
-        <CanCreate model="info_type">
+        {/* Stats Management Form */}
+        <CanUpdate model="info_type">
           <form onSubmit={handleSubmit}>
             <div className="grid gap-8">
-              <Card className="shadow-2xl bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl overflow-hidden">
-                <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 text-white py-6">
-                  <CardTitle className="flex items-center gap-4">
-                    <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
-                      <Save className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold">{t('info_types.create.form_title')}</div>
-                      <div className="text-purple-100 text-sm font-medium">{t('info_types.create.form_description')}</div>
-                    </div>
-                  </CardTitle>
-                </CardHeader>
-                
-                <CardContent className="p-8 space-y-8">
-                  {/* Name Field */}
-                  <div className="space-y-4">
-                    <Label htmlFor="name" className="text-lg font-semibold text-purple-800 flex items-center gap-2">
-                      <FileText className="h-4 w-4" />
-                      {t('info_types.create.name_label')} *
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="name"
-                        value={data.name}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('name', e.target.value)}
-                        required
-                        className="h-12 text-lg border-purple-200 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 to-white rounded-xl shadow-lg"
-                        placeholder={t('info_types.create.name_placeholder')}
-                      />
-                      {errors.name && (
-                        <div className="mt-2 flex items-center gap-2 text-red-600">
-                          <X className="h-4 w-4" />
-                          <p className="text-sm font-medium">{errors.name}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Code Field */}
-                  <div className="space-y-4">
-                    <Label htmlFor="code" className="text-lg font-semibold text-purple-800 flex items-center gap-2">
-                      <BarChart3 className="h-4 w-4" />
-                      {t('info_types.create.code_label')}
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="code"
-                        value={data.code}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('code', e.target.value)}
-                        className="h-12 text-lg border-purple-200 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 to-white rounded-xl shadow-lg"
-                        placeholder={t('info_types.create.code_placeholder')}
-                      />
-                      {errors.code && (
-                        <div className="mt-2 flex items-center gap-2 text-red-600">
-                          <X className="h-4 w-4" />
-                          <p className="text-sm font-medium">{errors.code}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Description Field */}
-                  <div className="space-y-4">
-                    <Label htmlFor="description" className="text-lg font-semibold text-purple-800 flex items-center gap-2">
-                      <FileText className="h-4 w-4" />
-                      {t('info_types.create.description_label')}
-                    </Label>
-                    <div className="relative">
-                      <Textarea
-                        id="description"
-                        value={data.description}
-                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setData('description', e.target.value)}
-                        rows={4}
-                        className="text-lg border-purple-200 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 to-white rounded-xl shadow-lg resize-none"
-                        placeholder={t('info_types.create.description_placeholder')}
-                      />
-                      {errors.description && (
-                        <div className="mt-2 flex items-center gap-2 text-red-600">
-                          <X className="h-4 w-4" />
-                          <p className="text-sm font-medium">{errors.description}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
               <Card className="shadow-2xl bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl overflow-hidden">
                 <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 text-white py-6">
                   <CardTitle className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
-                        <AlertTriangle className="h-6 w-6" />
+                        <Save className="h-6 w-6" />
                       </div>
                       <div>
-                        <div className="text-2xl font-bold">{t('info_types.stats.title')}</div>
-                        <div className="text-purple-100 text-sm font-medium">{t('info_types.stats.description')}</div>
+                        <div className="text-2xl font-bold">{t('info_types.manage_stats.form_title')}</div>
+                        <div className="text-purple-100 text-sm font-medium">{t('info_types.manage_stats.form_description')}</div>
                       </div>
                     </div>
                     <Badge variant="secondary" className="bg-white/20 text-white px-3 py-1">
-                      {statsCount} {t('info_types.stats.selected_count')}
+                      {statsCount} {t('info_types.manage_stats.selected_count')}
                     </Badge>
                   </CardTitle>
                 </CardHeader>
+                
                 <CardContent className="p-8 space-y-6">
                   <div className="mb-6">
                     <Label htmlFor="category-filter" className="text-base font-medium flex items-center gap-2 text-purple-700 text-right" dir="rtl">
-                      {t('info_types.stats.filter_by_category')}
+                      {t('info_types.manage_stats.filter_by_category')}
                       <Building2 className="h-4 w-4" />
                     </Label>
                     <Select
@@ -328,8 +281,8 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
                       <div className="p-4 bg-purple-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                         <AlertTriangle className="h-8 w-8 text-purple-400" />
                       </div>
-                      <p className="text-lg font-semibold text-purple-800 mb-2">{t('info_types.stats.no_items')}</p>
-                      <p className="text-purple-600">{t('info_types.stats.no_items_description')}</p>
+                      <p className="text-lg font-semibold text-purple-800 mb-2">{t('info_types.manage_stats.no_items')}</p>
+                      <p className="text-purple-600">{t('info_types.manage_stats.no_items_description')}</p>
                     </div>
                   )}
                 </CardContent>
@@ -341,10 +294,12 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => window.history.back()}
+                    asChild
                     className="h-12 px-6 shadow-lg border-purple-300 text-purple-700 hover:bg-purple-100 hover:border-purple-400 rounded-xl transition-all duration-300 hover:scale-105 text-lg font-semibold"
                   >
-                    {t('info_types.create.cancel_button')}
+                    <Link href={route('info-types.show', infoType.id)}>
+                      {t('info_types.manage_stats.cancel_button')}
+                    </Link>
                   </Button>
                   <Button 
                     type="submit" 
@@ -354,12 +309,12 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
                     {processing ? (
                       <div className="flex items-center gap-2">
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        {t('info_types.create.saving_button')}
+                        {t('info_types.manage_stats.saving_button')}
                       </div>
                     ) : (
                       <div className="flex items-center gap-2">
                         <Save className="h-5 w-5" />
-                        {t('info_types.create.save_button')}
+                        {t('info_types.manage_stats.save_button')}
                       </div>
                     )}
                   </Button>
@@ -367,7 +322,7 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
               </Card>
             </div>
           </form>
-        </CanCreate>
+        </CanUpdate>
       </div>
     </AppLayout>
   );

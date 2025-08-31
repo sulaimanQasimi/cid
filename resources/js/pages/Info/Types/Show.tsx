@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Pencil, Trash, ExternalLink, FileText, BarChart3, TrendingUp, AlertTriangle, Plus } from 'lucide-react';
+import { ArrowLeft, Pencil, Trash, ExternalLink, FileText, BarChart3, TrendingUp, AlertTriangle, Plus, Database, Settings } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -28,6 +28,7 @@ interface InfoType {
   created_at: string;
   updated_at: string;
   infos: Info[];
+  infoStats: any[]; // Added for stats
 }
 
 interface Props {
@@ -182,6 +183,99 @@ export default function ShowInfoType({ infoType }: Props) {
                   </p>
                 </div>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Stats Display Card */}
+        <Card className="shadow-2xl bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl overflow-hidden mb-8">
+          <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 text-white py-6">
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
+                  <Database className="h-6 w-6" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">{t('info_types.show.stats_title')}</div>
+                  <div className="text-purple-100 text-sm font-medium">{t('info_types.show.stats_description')}</div>
+                </div>
+              </div>
+              <CanUpdate model="info_type">
+                <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
+                  <Link href={route('info-types.stats', infoType.id)} className="flex items-center gap-3">
+                    <Settings className="h-5 w-5" />
+                    {t('info_types.show.manage_stats_button')}
+                  </Link>
+                </Button>
+              </CanUpdate>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-hidden rounded-b-3xl">
+              {infoType.infoStats && infoType.infoStats.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-gradient-to-l from-purple-100 to-purple-200 border-0">
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_types.show.stats_table.category')}</TableHead>
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_types.show.stats_table.item')}</TableHead>
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_types.show.stats_table.value')}</TableHead>
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_types.show.stats_table.notes')}</TableHead>
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_types.show.stats_table.created_at')}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {infoType.infoStats.map((stat) => (
+                      <TableRow key={stat.id} className="hover:bg-purple-50/50 transition-colors duration-300 border-b border-purple-100">
+                        <TableCell className="py-6 px-6">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="w-4 h-4 rounded-full"
+                              style={{ backgroundColor: stat.stat_category_item.category.color }}
+                            ></div>
+                            <span className="font-semibold text-purple-800">
+                              {stat.stat_category_item.category.label}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="font-semibold text-purple-900 py-6 px-6">
+                          {stat.stat_category_item.label}
+                        </TableCell>
+                        <TableCell className="py-6 px-6">
+                          <Badge variant="secondary" className="bg-green-100 text-green-800 px-3 py-1">
+                            {stat.integer_value !== null ? stat.integer_value : stat.string_value}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="py-6 px-6">
+                          <span className="text-purple-700">
+                            {stat.notes || '-'}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-purple-800 py-6 px-6 font-medium">
+                          {new Date(stat.created_at).toLocaleDateString()}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="h-32 flex items-center justify-center">
+                  <div className="flex flex-col items-center gap-4 text-purple-600">
+                    <div className="p-4 bg-purple-100 rounded-full">
+                      <Database className="h-16 w-16 text-purple-400" />
+                    </div>
+                    <p className="text-xl font-bold">{t('info_types.show.no_stats')}</p>
+                    <p className="text-purple-500">{t('info_types.show.no_stats_description')}</p>
+                    <CanUpdate model="info_type">
+                      <Button asChild className="bg-gradient-to-l from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
+                        <Link href={route('info-types.stats', infoType.id)} className="flex items-center gap-3">
+                          <Plus className="h-5 w-5" />
+                          {t('info_types.show.add_first_stat_button')}
+                        </Link>
+                      </Button>
+                    </CanUpdate>
+                  </div>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

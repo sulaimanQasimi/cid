@@ -21,7 +21,7 @@ class InfoTypeController extends Controller
         $this->authorize('viewAny', InfoType::class);
         
         $query = InfoType::with(['creator:id,name'])
-            ->withCount('infos');
+            ->withCount(['infos', 'infoStats']);
 
         // Apply search filter
         if ($request->has('search') && !empty($request->search)) {
@@ -287,12 +287,78 @@ class InfoTypeController extends Controller
      */
     public function destroy(InfoType $infoType)
     {
-        $this->authorize('delete', $infoType);
+        $this->authorize('delete', InfoType::class);
         
+        // Stats will be automatically deleted due to cascade delete in migration
         $infoType->delete();
 
         return redirect()->route('info-types.index')
             ->with('success', 'Info type deleted successfully.');
+    }
+
+    /**
+     * Manage stats for a specific info type.
+     */
+    public function manageStats(InfoType $infoType)
+    {
+        $this->authorize('update', $infoType);
+        
+        // Get active statistical categories
+        $statCategories = StatCategory::where('status', 'active')
+            ->orderBy('label')
+            ->get();
+
+        // Get active statistical category items
+        $statItems = StatCategoryItem::with(['category'])
+            ->whereHas('category', function ($query) {
+                $query->where('status', 'active');
+            })
+            ->where('status', 'active')
+            ->orderBy('order')
+            ->get();
+
+        // Load current stats with relationships
+        $infoType->load(['infoStats.statCategoryItem.category']);
+
+        return Inertia::render('Info/Types/ManageStats', [
+            'infoType' => $infoType,
+            'statItems' => $statItems,
+            'statCategories' => $statCategories,
+        ]);
+    }
+
+    /**
+     * Update stats for a specific info type.
+     */
+    public function updateStats(Request $request, InfoType $infoType)
+    {
+        $this->authorize('update', $infoType);
+        
+        $validated = $request->validate([
+            'stats' => 'nullable|array',
+            'stats.*.stat_category_item_id' => 'required|exists:stat_category_items,id',
+            'stats.*.value' => 'required',
+            'stats.*.notes' => 'nullable|string|max:1000',
+        ]);
+
+        // Delete existing stats
+        $infoType->infoStats()->delete();
+        
+        // Create new stats
+        if (!empty($validated['stats'])) {
+            foreach ($validated['stats'] as $stat) {
+                $infoStat = new InfoStat();
+                $infoStat->info_type_id = $infoType->id;
+                $infoStat->stat_category_item_id = $stat['stat_category_item_id'];
+                $infoStat->setValue($stat['value']);
+                $infoStat->notes = $stat['notes'] ?? null;
+                $infoStat->created_by = Auth::id();
+                $infoStat->save();
+            }
+        }
+
+        return redirect()->route('info-types.show', $infoType)
+            ->with('success', 'Stats updated successfully.');
     }
 
     /**

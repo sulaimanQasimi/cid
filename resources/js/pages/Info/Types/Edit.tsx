@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Save, FileText, BarChart3, Pencil, X } from 'lucide-react';
+import { ArrowLeft, Save, FileText, BarChart3, Pencil, X, Database, Settings, Plus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useTranslation } from '@/lib/i18n/translate';
 import { usePermissions } from '@/hooks/use-permissions';
 import { CanUpdate } from '@/components/ui/permission-guard';
+import { Badge } from '@/components/ui/badge';
 
 interface InfoType {
   id: number;
@@ -18,6 +19,23 @@ interface InfoType {
   description: string | null;
   created_at: string;
   updated_at: string;
+  infoStats?: {
+    id: number;
+    info_type_id: number;
+    stat_category_item_id: number;
+    integer_value: number | null;
+    string_value: string | null;
+    notes: string | null;
+    stat_category_item: {
+      id: number;
+      label: string;
+      category: {
+        id: number;
+        label: string;
+        color: string;
+      };
+    };
+  }[];
 }
 
 interface Props {
@@ -180,6 +198,89 @@ export default function EditInfoType({ infoType }: Props) {
             </form>
           </Card>
         </CanUpdate>
+
+        {/* Stats Management Card */}
+        <Card className="shadow-2xl bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl overflow-hidden mt-8">
+          <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 text-white py-6">
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
+                  <Database className="h-6 w-6" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">{t('info_types.edit.stats_title')}</div>
+                  <div className="text-purple-100 text-sm font-medium">{t('info_types.edit.stats_description')}</div>
+                </div>
+              </div>
+              <CanUpdate model="info_type">
+                <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
+                  <Link href={route('info-types.stats', infoType.id)} className="flex items-center gap-3">
+                    <Settings className="h-5 w-5" />
+                    {t('info_types.edit.manage_stats_button')}
+                  </Link>
+                </Button>
+              </CanUpdate>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-8">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-purple-800">{t('info_types.edit.current_stats')}</h3>
+                  <p className="text-purple-600">{t('info_types.edit.current_stats_description')}</p>
+                </div>
+                <Badge variant="secondary" className="bg-purple-100 text-purple-800 px-3 py-1">
+                  {infoType.infoStats?.length || 0} {t('info_types.edit.stats_count')}
+                </Badge>
+              </div>
+              
+              {infoType.infoStats && infoType.infoStats.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {infoType.infoStats.map((stat) => (
+                    <div key={stat.id} className="bg-gradient-to-l from-purple-50 to-white p-4 rounded-xl border border-purple-200">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: stat.stat_category_item.category.color }}
+                        ></div>
+                        <span className="text-sm font-medium text-purple-700">
+                          {stat.stat_category_item.category.label}
+                        </span>
+                      </div>
+                      <h4 className="font-semibold text-purple-900 mb-1">
+                        {stat.stat_category_item.label}
+                      </h4>
+                      <p className="text-lg font-bold text-green-600 mb-2">
+                        {stat.integer_value !== null ? stat.integer_value : stat.string_value}
+                      </p>
+                      {stat.notes && (
+                        <p className="text-sm text-purple-600 italic">
+                          {stat.notes}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <div className="p-4 bg-purple-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                    <Database className="h-8 w-8 text-purple-400" />
+                  </div>
+                  <p className="text-lg font-semibold text-purple-800 mb-2">{t('info_types.edit.no_stats')}</p>
+                  <p className="text-purple-600 mb-4">{t('info_types.edit.no_stats_description')}</p>
+                  <CanUpdate model="info_type">
+                    <Button asChild className="bg-gradient-to-l from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
+                      <Link href={route('info-types.stats', infoType.id)} className="flex items-center gap-3">
+                        <Plus className="h-5 w-5" />
+                        {t('info_types.edit.add_stats_button')}
+                      </Link>
+                    </Button>
+                  </CanUpdate>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </AppLayout>
   );

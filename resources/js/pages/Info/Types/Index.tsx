@@ -38,6 +38,8 @@ interface InfoType {
   description: string | null;
   created_at: string;
   updated_at: string;
+  infos_count?: number;
+  info_stats_count?: number;
 }
 
 interface PaginationLinks {
@@ -80,6 +82,8 @@ const sortOptions = [
   { value: 'description', label: 'Description' },
   { value: 'created_at', label: 'Created Date' },
   { value: 'updated_at', label: 'Updated Date' },
+  { value: 'infos_count', label: 'Infos Count' },
+  { value: 'info_stats_count', label: 'Stats Count' },
 ];
 
 const perPageOptions = [
@@ -137,7 +141,7 @@ export default function InfoTypesIndex({
   const goToPage = (page: number) => {
     router.get(route('info-types.index'),
       { ...filters, page },
-      { preserveState: true, preserveScroll: true }
+      { preserveState: true, preserveScroll: true, replace: true }
     );
   };
 
@@ -145,7 +149,7 @@ export default function InfoTypesIndex({
   const applyFilters = (newFilters: Partial<Props['filters']>) => {
     router.get(route('info-types.index'),
       { ...filters, ...newFilters, page: 1 },
-      { preserveState: true, preserveScroll: true }
+      { preserveState: true, preserveScroll: true, replace: true }
     );
   };
 
@@ -158,7 +162,7 @@ export default function InfoTypesIndex({
       direction: 'asc',
       per_page: 10,
       page: 1,
-    });
+    }, { replace: true });
   };
 
   // Open delete confirmation dialog
@@ -331,7 +335,7 @@ export default function InfoTypesIndex({
                   {/* Per Page Options */}
                   <div>
                     <Select
-                      value={filters.per_page.toString()}
+                      value={(filters.per_page || 10).toString()}
                       onValueChange={handlePerPageChange}
                     >
                       <SelectTrigger className="h-11 shadow-lg border-purple-200 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 to-white rounded-xl text-sm">
@@ -386,6 +390,8 @@ export default function InfoTypesIndex({
                       <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_types.table.id')}</TableHead>
                       <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_types.table.name')}</TableHead>
                       <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_types.table.description')}</TableHead>
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_types.table.infos_count')}</TableHead>
+                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_types.table.stats_count')}</TableHead>
                       <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_types.table.created_at')}</TableHead>
                       <TableHead className="text-purple-800 font-bold text-lg py-6 px-6 text-right">{t('info_types.table.actions')}</TableHead>
                     </TableRow>
@@ -402,6 +408,16 @@ export default function InfoTypesIndex({
                             ) : (
                               <span className="text-purple-600 font-medium">-</span>
                             )}
+                          </TableCell>
+                          <TableCell className="text-purple-800 py-6 px-6 font-medium text-center">
+                            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                              {infoType.infos_count || 0}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-purple-800 py-6 px-6 font-medium text-center">
+                            <Badge variant="secondary" className="bg-green-100 text-green-800">
+                              {infoType.info_stats_count || 0}
+                            </Badge>
                           </TableCell>
                           <TableCell className="text-purple-800 py-6 px-6 font-medium">
                             {new Date(infoType.created_at).toLocaleDateString()}
@@ -421,6 +437,19 @@ export default function InfoTypesIndex({
                                   </Link>
                                 </Button>
                               </CanView>
+                              <CanUpdate model="info_type">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  asChild
+                                  title={t('info_types.actions.manage_stats')}
+                                  className="h-10 w-10 rounded-xl hover:bg-purple-100 text-purple-600 hover:text-purple-700 transition-all duration-300 hover:scale-110"
+                                >
+                                  <Link href={route('info-types.stats', infoType.id)}>
+                                    <BarChart3 className="h-5 w-5" />
+                                  </Link>
+                                </Button>
+                              </CanUpdate>
                               <CanUpdate model="info_type">
                                 <Button
                                   variant="ghost"
@@ -451,7 +480,7 @@ export default function InfoTypesIndex({
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={5} className="h-32 text-center">
+                        <TableCell colSpan={7} className="h-32 text-center">
                           <div className="flex flex-col items-center gap-4 text-purple-600">
                             <div className="p-4 bg-purple-100 rounded-full">
                               <AlertTriangle className="h-16 w-16 text-purple-400" />
