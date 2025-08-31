@@ -382,5 +382,7 @@
     "info_types.manage_stats.no_items_description": "No statistical items are available for selection.",
     "info_types.manage_stats.cancel_button": "Cancel",
     "info_types.manage_stats.save_button": "Save Statistics",
-    "info_types.manage_stats.saving_button": "Saving..."
+    "info_types.manage_stats.saving_button": "Saving...",
+    "info_types.manage_stats.no_stats_error": "Please add at least one statistic before saving.",
+    "info_types.manage_stats.save_error": "Failed to save statistics. Please try again."
 }

@@ -273,6 +273,7 @@ class InfoTypeController extends Controller
                     $infoStat->setValue($stat['value']);
                     $infoStat->notes = $stat['notes'] ?? null;
                     $infoStat->created_by = Auth::id();
+                    $infoStat->updated_by = Auth::id();
                     $infoStat->save();
                 }
             }
@@ -337,28 +338,75 @@ class InfoTypeController extends Controller
         $validated = $request->validate([
             'stats' => 'nullable|array',
             'stats.*.stat_category_item_id' => 'required|exists:stat_category_items,id',
-            'stats.*.value' => 'required',
+            'stats.*.value' => 'required|string',
             'stats.*.notes' => 'nullable|string|max:1000',
         ]);
 
-        // Delete existing stats
-        $infoType->infoStats()->delete();
-        
-        // Create new stats
-        if (!empty($validated['stats'])) {
-            foreach ($validated['stats'] as $stat) {
-                $infoStat = new InfoStat();
-                $infoStat->info_type_id = $infoType->id;
-                $infoStat->stat_category_item_id = $stat['stat_category_item_id'];
-                $infoStat->setValue($stat['value']);
-                $infoStat->notes = $stat['notes'] ?? null;
-                $infoStat->created_by = Auth::id();
-                $infoStat->save();
-            }
-        }
+        try {
+            \Log::info('=== STATS UPDATE STARTED ===', [
+                'info_type_id' => $infoType->id,
+                'stats_count' => count($validated['stats'] ?? []),
+                'stats_data' => $validated['stats'] ?? []
+            ]);
+            
+            \DB::transaction(function () use ($validated, $infoType) {
+                // First, get all existing stats for this info type (including soft-deleted)
+                $existingStats = InfoStat::withTrashed()
+                    ->where('info_type_id', $infoType->id)
+                    ->get()
+                    ->keyBy('stat_category_item_id');
+                
+                $processedItemIds = [];
+                
+                // Process each stat in the request
+                if (!empty($validated['stats'])) {
+                    foreach ($validated['stats'] as $statData) {
+                        $itemId = $statData['stat_category_item_id'];
+                        $processedItemIds[] = $itemId;
+                        
+                        if (isset($existingStats[$itemId])) {
+                            // Update existing stat (restore if soft-deleted)
+                            $existingStat = $existingStats[$itemId];
+                            if ($existingStat->trashed()) {
+                                $existingStat->restore();
+                            }
+                            $existingStat->setValue($statData['value']);
+                            $existingStat->notes = $statData['notes'] ?? null;
+                            $existingStat->updated_by = Auth::id();
+                            $existingStat->save();
+                        } else {
+                            // Create new stat
+                            InfoStat::create([
+                                'info_type_id' => $infoType->id,
+                                'stat_category_item_id' => $itemId,
+                                'string_value' => $statData['value'],
+                                'notes' => $statData['notes'] ?? null,
+                                'created_by' => Auth::id(),
+                                'updated_by' => Auth::id(),
+                            ]);
+                        }
+                    }
+                }
+                
+                // Soft delete stats that are no longer in the request
+                $infoType->infoStats()
+                    ->whereNotIn('stat_category_item_id', $processedItemIds)
+                    ->delete();
+            });
 
-        return redirect()->route('info-types.show', $infoType)
-            ->with('success', 'Stats updated successfully.');
+            \Log::info('=== STATS UPDATE COMPLETED ===', [
+                'info_type_id' => $infoType->id
+            ]);
+
+            return redirect()->route('info-types.show', $infoType)
+                ->with('success', 'Stats updated successfully.');
+                
+        } catch (\Exception $e) {
+            \Log::error('Stats update failed: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('error', 'Failed to update stats. Please try again.')
+                ->withInput();
+        }
     }
 
     /**

@@ -1079,6 +1079,8 @@
     "info_types.manage_stats.cancel_button": "لغوه کړئ",
     "info_types.manage_stats.save_button": "احصائیه خوندي کړئ",
     "info_types.manage_stats.saving_button": "خوندي کول...",
+    "info_types.manage_stats.no_stats_error": "د خوندي کولو دمخه لږ تر لږه یوه احصائیه اضافه کړئ.",
+    "info_types.manage_stats.save_error": "د احصائیه خوندي کول ناکام شو. بیا هڅه وکړئ.",
     "info_types.sort_ascending": "صعودي ترتیب",
     "info_types.sort_descending": "نزولي ترتیب",
     "info_types.show.description": "د استخباراتو د ډول جزییات او معلومات دلته وګورئ.",

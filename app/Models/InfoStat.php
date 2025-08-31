@@ -12,7 +12,7 @@ use Spatie\Activitylog\Contracts\Activity;
 
 class InfoStat extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity;
 
     /**
      * The attributes that are mass assignable.

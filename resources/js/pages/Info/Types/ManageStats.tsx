@@ -100,13 +100,7 @@ export default function ManageStats({ infoType, statItems, statCategories }: Man
   // Add state for category filter
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
-  const { put, processing, errors, setData } = useForm({
-    stats: [] as Array<{
-      stat_category_item_id: number;
-      value: string;
-      notes?: string;
-    }>
-  });
+  const [processing, setProcessing] = useState(false);
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -127,21 +121,49 @@ export default function ManageStats({ infoType, statItems, statCategories }: Man
     },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (processing) return;
 
     // Prepare stats data for submission
     const stats = Object.entries(statsData)
       .filter(([_, { value }]) => value.trim() !== '')
       .map(([itemId, { value, notes }]) => ({
         stat_category_item_id: parseInt(itemId),
-        value,
-        notes: notes || undefined,
+        value: value.trim(),
+        notes: notes?.trim() || null,
       }));
 
-    // Update the form data and submit
-    setData('stats', stats);
-    put(route('info-types.stats.update', infoType.id));
+    if (stats.length === 0) {
+      alert(t('info_types.manage_stats.no_stats_error'));
+      return;
+    }
+
+    setProcessing(true);
+
+    try {
+      await router.put(route('info-types.stats.update', infoType.id), {
+        stats: stats
+      }, {
+        preserveScroll: true,
+        onSuccess: () => {
+          // Refresh the page data
+          router.reload({ only: ['infoType'] });
+        },
+        onError: (errors) => {
+          console.error('Save errors:', errors);
+          alert(t('info_types.manage_stats.save_error'));
+        },
+        onFinish: () => {
+          setProcessing(false);
+        }
+      });
+    } catch (error) {
+      console.error('Submit error:', error);
+      setProcessing(false);
+      alert(t('info_types.manage_stats.save_error'));
+    }
   };
 
   // Group stat items by category for the dropdown filter
