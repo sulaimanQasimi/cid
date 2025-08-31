@@ -15,6 +15,11 @@ class IncidentPolicy
      */
     public function viewAny(User $user): bool
     {
+        // Check if user has incident report access (for incidents only or full access)
+        if (!$user->hasIncidentReportAccess('incidents_only') && !$user->hasIncidentReportAccess('read_only')) {
+            return false;
+        }
+
         return $user->hasPermissionTo('incident.view_any');
     }
 
@@ -23,6 +28,11 @@ class IncidentPolicy
      */
     public function view(User $user, Incident $incident): bool
     {
+        // Check if user has incident report access (for incidents only or full access)
+        if (!$user->hasIncidentReportAccess('incidents_only') && !$user->hasIncidentReportAccess('read_only')) {
+            return false;
+        }
+
         return $user->hasPermissionTo('incident.view');
     }
 
@@ -31,6 +41,11 @@ class IncidentPolicy
      */
     public function create(User $user): bool
     {
+        // Check if user has incident report access with create permissions
+        if (!$user->canCreateIncidentReports()) {
+            return false;
+        }
+
         return $user->hasPermissionTo('incident.create');
     }
 
@@ -39,6 +54,11 @@ class IncidentPolicy
      */
     public function update(User $user, Incident $incident): bool
     {
+        // Check if user has incident report access with update permissions
+        if (!$user->canUpdateIncidentReports()) {
+            return false;
+        }
+
         // Check basic permission first
         if (!$user->hasPermissionTo('incident.update')) {
             return false;
@@ -53,6 +73,11 @@ class IncidentPolicy
      */
     public function delete(User $user, Incident $incident): bool
     {
+        // Check if user has incident report access with delete permissions
+        if (!$user->canDeleteIncidentReports()) {
+            return false;
+        }
+
         // Check basic permission first
         if (!$user->hasPermissionTo('incident.delete')) {
             return false;
@@ -67,6 +92,11 @@ class IncidentPolicy
      */
     public function confirm(User $user, Incident $incident): bool
     {
+        // Check if user has incident report access with update permissions
+        if (!$user->canUpdateIncidentReports()) {
+            return false;
+        }
+
         return $user->hasRole('admin') && $user->hasPermissionTo('incident.confirm');
     }
 
@@ -75,6 +105,11 @@ class IncidentPolicy
      */
     public function restore(User $user, Incident $incident): bool
     {
+        // Check if user has incident report access with update permissions
+        if (!$user->canUpdateIncidentReports()) {
+            return false;
+        }
+
         return $user->hasPermissionTo('incident.restore');
     }
 
@@ -83,6 +118,11 @@ class IncidentPolicy
      */
     public function forceDelete(User $user, Incident $incident): bool
     {
+        // Check if user has incident report access with delete permissions
+        if (!$user->canDeleteIncidentReports()) {
+            return false;
+        }
+
         return $user->hasPermissionTo('incident.force_delete');
     }
 }

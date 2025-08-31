@@ -112,6 +112,13 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
             icon: AlertCircle 
         });
     }
+    if (auth.is_admin) {
+        incidentItems.push({ 
+            title: t('incident_reports-access'), 
+            href: '/incident-report-access', 
+            icon: FileBarChart 
+        });
+    }
     if (auth.permissions.includes('incident_report.view_any')) {
         incidentItems.push({ 
             title: t('sidebar.incident_reports'), 

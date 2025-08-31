@@ -57,6 +57,15 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('report-stats', \App\Http\Controllers\ReportStatController::class)->only(['store', 'update', 'destroy']);
     Route::post('incident-reports/{incidentReport}/stats', [\App\Http\Controllers\ReportStatController::class, 'batchUpdate'])
         ->name('incident-reports.stats.batch-update');
+
+    // Incident Report Access Management (Super Admin Only)
+    Route::resource('incident-report-access', \App\Http\Controllers\IncidentReportAccessController::class);
+    Route::post('incident-report-access/{userId}/revoke', [\App\Http\Controllers\IncidentReportAccessController::class, 'revoke'])
+        ->name('incident-report-access.revoke');
+    Route::post('incident-report-access/{incidentReportAccess}/extend', [\App\Http\Controllers\IncidentReportAccessController::class, 'extend'])
+        ->name('incident-report-access.extend');
+    Route::get('incident-report-access/users/available', [\App\Http\Controllers\IncidentReportAccessController::class, 'getAvailableUsers'])
+        ->name('incident-report-access.available-users');
 });
 
 require __DIR__.'/settings.php';

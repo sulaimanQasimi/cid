@@ -15,6 +15,11 @@ class IncidentReportPolicy
      */
     public function viewAny(User $user): bool
     {
+        // Check if user has incident report access
+        if (!$user->canViewIncidentReports()) {
+            return false;
+        }
+
         return $user->hasPermissionTo('incident_report.view_any');
     }
 
@@ -23,6 +28,11 @@ class IncidentReportPolicy
      */
     public function view(User $user, IncidentReport $incidentReport): bool
     {
+        // Check if user has incident report access for this specific report
+        if (!$user->canViewIncidentReport($incidentReport->id)) {
+            return false;
+        }
+
         return $user->hasPermissionTo('incident_report.view');
     }
 

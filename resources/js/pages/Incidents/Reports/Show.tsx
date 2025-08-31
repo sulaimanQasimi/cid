@@ -26,6 +26,7 @@ import {
   AlertDialogTitle
 } from '@/components/ui/alert-dialog';
 import { Separator } from '@/components/ui/separator';
+import { useIncidentReportAccess } from '@/hooks/use-incident-report-access';
 
 interface StatCategory {
   id: number;
@@ -112,6 +113,7 @@ interface ShowProps {
 export default function Show({ report, incidents, reportStats, statCategories }: ShowProps) {
   const { t } = useTranslation();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const incidentReportAccess = useIncidentReportAccess();
 
   // Generate breadcrumbs
   const breadcrumbs: BreadcrumbItem[] = [
@@ -166,6 +168,44 @@ export default function Show({ report, incidents, reportStats, statCategories }:
     return stat.integer_value !== null ? stat.integer_value.toString() : (stat.string_value || '');
   }
 
+  // Show access warning if user doesn't have proper access or access is expired
+  if (!incidentReportAccess.hasIncidentReportAccessForReport || incidentReportAccess.isAccessExpired()) {
+    return (
+      <AppLayout breadcrumbs={breadcrumbs}>
+        <Head title={t('incident_reports.show.page_title', { number: report.report_number })} />
+        <div className="container px-0 py-6">
+          <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-red-50 to-red-100/30">
+            <CardHeader className="bg-gradient-to-l from-red-500 to-red-600 text-white border-b pb-4">
+              <CardTitle className="flex items-center gap-3 text-lg">
+                <div className="p-2 bg-white/20 rounded-lg">
+                  <Shield className="h-5 w-5" />
+                </div>
+                {t('incident_reports.access_denied.title')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="text-center py-8">
+                <Shield className="h-16 w-16 text-red-500 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-red-700 mb-2">
+                  {t('incident_reports.access_denied.message')}
+                </h3>
+                <p className="text-red-600 mb-6">
+                  {t('incident_reports.access_denied.description')}
+                </p>
+                <Button asChild className="bg-gradient-to-l from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white">
+                  <Link href={route('incident-reports.index')}>
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    {t('common.back_to_list')}
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </AppLayout>
+    );
+  }
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={t('incident_reports.show.page_title', { number: report.report_number })} />
@@ -192,43 +232,77 @@ export default function Show({ report, incidents, reportStats, statCategories }:
                   </div>
                   {t('incident_reports.show.report_date_label')}: {format(new Date(report.report_date), 'PPP')}
                 </p>
+                {incidentReportAccess.currentAccess && (
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="bg-white/20 backdrop-blur-sm border-white/30 text-white px-3 py-1 text-sm font-medium">
+                      <Shield className="h-3 w-3 mr-1" />
+                      {incidentReportAccess.currentAccess.access_type === 'full' && t('incident_reports.access.full')}
+                      {incidentReportAccess.currentAccess.access_type === 'read_only' && t('incident_reports.access.read_only')}
+                      {incidentReportAccess.currentAccess.access_type === 'incidents_only' && t('incident_reports.access.incidents_only')}
+                    </Badge>
+                    <Badge variant="outline" className="bg-white/20 backdrop-blur-sm border-white/30 text-white px-3 py-1 text-sm font-medium">
+                      <FileText className="h-3 w-3 mr-1" />
+                      {incidentReportAccess.isReportSpecific() ? t('incident_reports.access.report_specific') : t('incident_reports.access.global')}
+                    </Badge>
+                    {incidentReportAccess.currentAccess.expires_at && (
+                      <Badge 
+                        variant="outline" 
+                        className={cn(
+                          "backdrop-blur-sm text-white px-3 py-1 text-sm font-medium",
+                          new Date(incidentReportAccess.currentAccess.expires_at) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                            ? "bg-yellow-500/20 border-yellow-300/30"
+                            : "bg-white/20 border-white/30"
+                        )}
+                      >
+                        <Clock className="h-3 w-3 mr-1" />
+                        {t('incident_reports.access.expires')}: {format(new Date(incidentReportAccess.currentAccess.expires_at), 'PP')}
+                      </Badge>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
             
             <div className="flex items-center gap-3">
-              <Button
-                onClick={() => setIsDeleteDialogOpen(true)}
-                className="bg-red-500/20 backdrop-blur-md border-red-300/30 text-white hover:bg-red-500/30 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105"
-              >
-                <div className="flex items-center gap-2">
-                  <div className="p-1 bg-red-500/20 rounded-lg">
-                    <Trash className="h-4 w-4" />
-                  </div>
-                  {t('common.delete')}
-                </div>
-              </Button>
-              
-              <Button asChild className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105">
-                <Link href={route('incident-reports.edit', report.id)}>
+              {incidentReportAccess.canDeleteIncidentReport && (
+                <Button
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                  className="bg-red-500/20 backdrop-blur-md border-red-300/30 text-white hover:bg-red-500/30 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105"
+                >
                   <div className="flex items-center gap-2">
-                    <div className="p-1 bg-white/20 rounded-lg">
-                      <Pencil className="h-4 w-4" />
+                    <div className="p-1 bg-red-500/20 rounded-lg">
+                      <Trash className="h-4 w-4" />
                     </div>
-                    {t('incident_reports.actions.edit_report')}
+                    {t('common.delete')}
                   </div>
-                </Link>
-              </Button>
+                </Button>
+              )}
               
-              <Button asChild className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105">
-                <Link href={route('incident-reports.print', report.id)}>
-                  <div className="flex items-center gap-2">
-                    <div className="p-1 bg-white/20 rounded-lg">
-                      <Printer className="h-4 w-4" />
+              {incidentReportAccess.canUpdateIncidentReport && (
+                <Button asChild className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105">
+                  <Link href={route('incident-reports.edit', report.id)}>
+                    <div className="flex items-center gap-2">
+                      <div className="p-1 bg-white/20 rounded-lg">
+                        <Pencil className="h-4 w-4" />
+                      </div>
+                      {t('incident_reports.actions.edit_report')}
                     </div>
-                    {t('incident_reports.actions.print_report')}
-                  </div>
-                </Link>
-              </Button>
+                  </Link>
+                </Button>
+              )}
+              
+              {incidentReportAccess.canViewIncidentReport && (
+                <Button asChild className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105">
+                  <Link href={route('incident-reports.print', report.id)}>
+                    <div className="flex items-center gap-2">
+                      <div className="p-1 bg-white/20 rounded-lg">
+                        <Printer className="h-4 w-4" />
+                      </div>
+                      {t('incident_reports.actions.print_report')}
+                    </div>
+                  </Link>
+                </Button>
+              )}
               
               <Link href={route('incident-reports.index')} className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105 group/btn">
                 <div className="flex items-center gap-2">
@@ -537,24 +611,28 @@ export default function Show({ report, incidents, reportStats, statCategories }:
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="p-6">
-                  <div className="flex justify-end mb-4">
-                    <Button asChild className="bg-gradient-to-l from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg">
-                      <Link href={route('incident-reports.edit', report.id)}>
-                        <Edit className="mr-2 h-4 w-4" />
-                        {t('incident_reports.stats.edit')}
-                      </Link>
-                    </Button>
-                  </div>
+                  {incidentReportAccess.canUpdateIncidentReport && (
+                    <div className="flex justify-end mb-4">
+                      <Button asChild className="bg-gradient-to-l from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg">
+                        <Link href={route('incident-reports.edit', report.id)}>
+                          <Edit className="mr-2 h-4 w-4" />
+                          {t('incident_reports.stats.edit')}
+                        </Link>
+                      </Button>
+                    </div>
+                  )}
                   
                   {Object.keys(statsByCategory).length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-8 text-center">
                       <p className="text-green-600">{t('incident_reports.stats.empty')}</p>
-                      <Button variant="outline" asChild className="mt-4 border-green-300 text-green-700 hover:bg-green-50">
-                        <Link href={route('incident-reports.edit', report.id)}>
-                          <PlusCircle className="mr-2 h-4 w-4" />
-                          {t('incident_reports.stats.add_data')}
-                        </Link>
-                      </Button>
+                      {incidentReportAccess.canUpdateIncidentReport && (
+                        <Button variant="outline" asChild className="mt-4 border-green-300 text-green-700 hover:bg-green-50">
+                          <Link href={route('incident-reports.edit', report.id)}>
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            {t('incident_reports.stats.add_data')}
+                          </Link>
+                        </Button>
+                      )}
                     </div>
                   ) : (
                     <div className="space-y-6">

@@ -74,9 +74,32 @@ class IncidentReportController extends Controller
         $reports = $query->paginate(10)
                         ->withQueryString(); // Preserve the query parameters in pagination links
 
+        // Get incident report access information for the current user
+        $user = auth()->user();
+        $incidentReportAccess = null;
+        
+        if ($user) {
+            $incidentReportAccess = [
+                'canViewIncidentReports' => $user->canViewIncidentReports(),
+                'canCreateIncidentReports' => $user->canCreateIncidentReports(),
+                'canUpdateIncidentReports' => $user->canUpdateIncidentReports(),
+                'canDeleteIncidentReports' => $user->canDeleteIncidentReports(),
+                'canAccessIncidentsOnly' => $user->canAccessIncidentsOnly(),
+                'hasIncidentReportAccess' => $user->hasIncidentReportAccess(),
+                'currentAccess' => $user->getCurrentIncidentReportAccess() ? [
+                    'access_type' => $user->getCurrentIncidentReportAccess()->access_type,
+                    'expires_at' => $user->getCurrentIncidentReportAccess()->expires_at,
+                    'is_active' => $user->getCurrentIncidentReportAccess()->is_active,
+                    'is_global' => $user->getCurrentIncidentReportAccess()->isGlobal(),
+                    'incident_report_id' => $user->getCurrentIncidentReportAccess()->incident_report_id,
+                ] : null,
+            ];
+        }
+
         return Inertia::render('Incidents/Reports/Index', [
             'reports' => $reports,
             'filters' => $request->only(['search', 'status', 'security_level', 'sort_field', 'sort_direction']),
+            'incidentReportAccess' => $incidentReportAccess,
         ]);
     }
 
@@ -198,11 +221,46 @@ class IncidentReportController extends Controller
             ->with(['statCategoryItem.category'])
             ->get();
 
+        // Get incident report access information for the current user and specific report
+        $user = auth()->user();
+        $incidentReportAccess = null;
+        
+        if ($user) {
+            // Get report-specific access first, then fall back to global access
+            $reportSpecificAccess = $user->getCurrentIncidentReportAccessForReport($incidentReport->id);
+            $globalAccess = $user->getCurrentIncidentReportAccess();
+            
+            $currentAccess = $reportSpecificAccess ?: $globalAccess;
+            
+            $incidentReportAccess = [
+                'canViewIncidentReports' => $user->canViewIncidentReports(),
+                'canViewIncidentReport' => $user->canViewIncidentReport($incidentReport->id),
+                'canCreateIncidentReports' => $user->canCreateIncidentReports(),
+                'canUpdateIncidentReports' => $user->canUpdateIncidentReports(),
+                'canUpdateIncidentReport' => $user->canUpdateIncidentReport($incidentReport->id),
+                'canDeleteIncidentReports' => $user->canDeleteIncidentReports(),
+                'canDeleteIncidentReport' => $user->canDeleteIncidentReport($incidentReport->id),
+                'canAccessIncidentsOnly' => $user->canAccessIncidentsOnly(),
+                'canAccessIncidentsOnlyForReport' => $user->canAccessIncidentsOnlyForReport($incidentReport->id),
+                'hasIncidentReportAccess' => $user->hasIncidentReportAccess(),
+                'hasIncidentReportAccessForReport' => $user->hasIncidentReportAccessForReport($incidentReport->id),
+                'currentAccess' => $currentAccess ? [
+                    'access_type' => $currentAccess->access_type,
+                    'expires_at' => $currentAccess->expires_at,
+                    'is_active' => $currentAccess->is_active,
+                    'is_global' => $currentAccess->isGlobal(),
+                    'incident_report_id' => $currentAccess->incident_report_id,
+                    'is_report_specific' => $reportSpecificAccess ? true : false,
+                ] : null,
+            ];
+        }
+
         return Inertia::render('Incidents/Reports/Show', [
             'report' => $incidentReport,
             'incidents' => $incidents,
             'reportStats' => $reportStats,
             'statCategories' => $statCategories,
+            'incidentReportAccess' => $incidentReportAccess,
         ]);
     }
 
