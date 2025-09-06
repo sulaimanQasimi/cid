@@ -21,6 +21,25 @@ interface Info {
   updated_at: string;
 }
 
+interface InfoStat {
+  id: number;
+  stat_category_item: {
+    id: number;
+    name: string;
+    label: string;
+    category: {
+      id: number;
+      name: string;
+      label: string;
+      color: string;
+    };
+  };
+  integer_value: number | null;
+  string_value: string | null;
+  notes: string | null;
+  created_at: string;
+}
+
 interface InfoType {
   id: number;
   name: string;
@@ -28,7 +47,7 @@ interface InfoType {
   created_at: string;
   updated_at: string;
   infos: Info[];
-  infoStats: any[]; // Added for stats
+  infoStats: InfoStat[];
 }
 
 interface Props {
