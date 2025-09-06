@@ -110,33 +110,6 @@ class PermissionSeeder extends Seeder
             ['name' => 'language.restore', 'label' => 'بازیابی زبان'],
             ['name' => 'language.force_delete', 'label' => 'حذف دائمی زبان'],
 
-            // Meeting permissions
-            ['name' => 'meeting.view_any', 'label' => 'مشاهده همه جلسات'],
-            ['name' => 'meeting.view', 'label' => 'مشاهده جلسه'],
-            ['name' => 'meeting.create', 'label' => 'ایجاد جلسه'],
-            ['name' => 'meeting.update', 'label' => 'ویرایش جلسه'],
-            ['name' => 'meeting.delete', 'label' => 'حذف جلسه'],
-            ['name' => 'meeting.restore', 'label' => 'بازیابی جلسه'],
-            ['name' => 'meeting.force_delete', 'label' => 'حذف دائمی جلسه'],
-
-            // Meeting Message permissions
-            ['name' => 'meeting_message.view_any', 'label' => 'مشاهده همه پیام‌های جلسه'],
-            ['name' => 'meeting_message.view', 'label' => 'مشاهده پیام جلسه'],
-            ['name' => 'meeting_message.create', 'label' => 'ایجاد پیام جلسه'],
-            ['name' => 'meeting_message.update', 'label' => 'ویرایش پیام جلسه'],
-            ['name' => 'meeting_message.delete', 'label' => 'حذف پیام جلسه'],
-            ['name' => 'meeting_message.restore', 'label' => 'بازیابی پیام جلسه'],
-            ['name' => 'meeting_message.force_delete', 'label' => 'حذف دائمی پیام جلسه'],
-
-            // Meeting Session permissions
-            ['name' => 'meeting_session.view_any', 'label' => 'مشاهده همه نشست‌های جلسه'],
-            ['name' => 'meeting_session.view', 'label' => 'مشاهده نشست جلسه'],
-            ['name' => 'meeting_session.create', 'label' => 'ایجاد نشست جلسه'],
-            ['name' => 'meeting_session.update', 'label' => 'ویرایش نشست جلسه'],
-            ['name' => 'meeting_session.delete', 'label' => 'حذف نشست جلسه'],
-            ['name' => 'meeting_session.restore', 'label' => 'بازیابی نشست جلسه'],
-            ['name' => 'meeting_session.force_delete', 'label' => 'حذف دائمی نشست جلسه'],
-
             // Province permissions
             ['name' => 'province.view_any', 'label' => 'مشاهده همه ولایت‌ها'],
             ['name' => 'province.view', 'label' => 'مشاهده ولایت'],
@@ -200,6 +173,24 @@ class PermissionSeeder extends Seeder
             ['name' => 'user.restore', 'label' => 'بازیابی کاربر'],
             ['name' => 'user.force_delete', 'label' => 'حذف دائمی کاربر'],
 
+            // Role permissions
+            ['name' => 'role.view_any', 'label' => 'مشاهده همه نقش‌ها'],
+            ['name' => 'role.view', 'label' => 'مشاهده نقش'],
+            ['name' => 'role.create', 'label' => 'ایجاد نقش'],
+            ['name' => 'role.update', 'label' => 'ویرایش نقش'],
+            ['name' => 'role.delete', 'label' => 'حذف نقش'],
+            ['name' => 'role.restore', 'label' => 'بازیابی نقش'],
+            ['name' => 'role.force_delete', 'label' => 'حذف دائمی نقش'],
+
+            // Permission permissions
+            ['name' => 'permission.view_any', 'label' => 'مشاهده همه مجوزها'],
+            ['name' => 'permission.view', 'label' => 'مشاهده مجوز'],
+            ['name' => 'permission.create', 'label' => 'ایجاد مجوز'],
+            ['name' => 'permission.update', 'label' => 'ویرایش مجوز'],
+            ['name' => 'permission.delete', 'label' => 'حذف مجوز'],
+            ['name' => 'permission.restore', 'label' => 'بازیابی مجوز'],
+            ['name' => 'permission.force_delete', 'label' => 'حذف دائمی مجوز'],
+
             // Backup permissions
             ['name' => 'manage backups', 'label' => 'مدیریت پشتیبان‌گیری'],
         ];
@@ -215,9 +206,13 @@ class PermissionSeeder extends Seeder
         }
 
         // Create roles
+        $superadminRole = Role::firstOrCreate(['name' => 'superadmin', 'guard_name' => 'web']);
         $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
         $userRole = Role::firstOrCreate(['name' => 'user', 'guard_name' => 'web']);
         $managerRole = Role::firstOrCreate(['name' => 'manager', 'guard_name' => 'web']);
+
+        // Assign all permissions to superadmin role
+        $superadminRole->givePermissionTo(Permission::all());
 
         // Assign all permissions to admin role
         $adminRole->givePermissionTo(Permission::all());

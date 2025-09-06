@@ -10,11 +10,26 @@ use Inertia\Inertia;
 class RoleController extends Controller
 {
     /**
+     * Create a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            // Check if user has admin or superadmin role
+            if (!auth()->user()->hasAnyRole(['admin', 'superadmin'])) {
+                abort(403, 'Access denied. Admin privileges required.');
+            }
+            
+            return $next($request);
+        });
+    }
+
+    /**
      * Display a listing of the roles.
      */
     public function index()
     {
-        $this->authorize('viewAny', Role::class);
+          $this->authorize('viewAny', Role::class);
         
         $roles = Role::with('permissions')->paginate(10);
         $permissions = Permission::all();
@@ -66,9 +81,9 @@ class RoleController extends Controller
      */
     public function edit($id)
     {
-        $this->authorize('update', Role::class);
-        
         $role = Role::with('permissions')->findOrFail($id);
+        $this->authorize('update', $role);
+        
         $permissions = Permission::all();
 
         return Inertia::render('Role/Edit', [
@@ -82,9 +97,8 @@ class RoleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->authorize('update', Role::class);
-        
         $role = Role::findOrFail($id);
+        $this->authorize('update', $role);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:roles,name,' . $role->id,
@@ -106,14 +120,13 @@ class RoleController extends Controller
      */
     public function destroy($id)
     {
-        $this->authorize('delete', Role::class);
-        
         $role = Role::findOrFail($id);
+        $this->authorize('delete', $role);
 
-        // Don't allow deleting the admin role
-        if ($role->name === 'admin') {
+        // Don't allow deleting the admin or superadmin roles
+        if (in_array($role->name, ['admin', 'superadmin'])) {
             return redirect()->route('roles.index')
-                ->with('error', 'Cannot delete the admin role');
+                ->with('error', 'Cannot delete the ' . $role->name . ' role');
         }
 
         $role->delete();

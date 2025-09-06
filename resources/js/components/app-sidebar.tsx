@@ -211,6 +211,7 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
             icon: UserCog 
         });
     }
+    
     if (auth.permissions.includes('permission.view_any')) {
         adminItems.push({ 
             title: t('sidebar.security_permissions'), 

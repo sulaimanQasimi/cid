@@ -43,6 +43,10 @@ use App\Policies\StatCategoryPolicy;
 use App\Policies\TranslationPolicy;
 use App\Policies\UserPolicy;
 use App\Policies\BackupPolicy;
+use App\Policies\RolePolicy;
+use App\Policies\PermissionPolicy;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -73,6 +77,8 @@ class AuthServiceProvider extends ServiceProvider
         User::class => UserPolicy::class,
         Meeting::class => MeetingPolicy::class,
         MeetingMessage::class => MeetingMessagePolicy::class,
+        Role::class => RolePolicy::class,
+        Permission::class => PermissionPolicy::class,
     ];
 
     /**
