@@ -10,7 +10,7 @@
         </div>
     @else
         <div id="chat-footer" x-data="{ 'openEmojiPicker': false }"
-            class=" px-3 md:px-1 border-t shadow-sm bg-[var(--wc-light-secondary)]  dark:bg-[var(--wc-dark-secondary)]   z-50   border-[var(--wc-light-primary)] dark:border-[var(--wc-dark-primary)] flex flex-col gap-3 items-center  w-full   mx-auto">
+            class="px-4 md:px-6 border-t border-gray-200/50 dark:border-gray-700/50 shadow-lg bg-white/90 dark:bg-gray-900/90 backdrop-blur-md z-50 flex flex-col gap-3 items-center w-full mx-auto">
 
             {{-- Emoji section , we put it seperate to avoid interfering as overlay for form when opened --}}
             <section wire:ignore x-cloak x-show="openEmojiPicker" x-transition:enter="transition  ease-out duration-180 transform"
@@ -24,7 +24,7 @@
             </section>
             {{-- form and detail section  --}}
             <section
-                class=" py-2 sm:px-4 py-1.5    z-50  dark:bg-[var(--wc-dark-secondary)]  bg-[var(--wc-light-secondary)]   flex flex-col gap-3 items-center  w-full mx-auto">
+                class="py-3 z-50 flex flex-col gap-3 items-center w-full mx-auto">
 
                 {{-- Media preview section --}}
                 <section x-show="$wire.media.length>0 ||$wire.files.length>0" x-cloak
@@ -257,17 +257,17 @@
                         inputField.setSelectionRange(startPos + emoji.length, startPos + emoji.length);
                     });"
                     @submit.prevent="((body && body?.trim().length > 0) || ($wire.media && $wire.media.length > 0)|| ($wire.files && $wire.files.length > 0)) ? $wire.sendMessage() : null"
-                    method="POST" autocapitalize="off" @class(['flex items-center col-span-12 w-full  gap-2 gap-5'])>
+                    method="POST" autocapitalize="off" @class(['flex items-center col-span-12 w-full gap-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-3 shadow-sm'])">
                     @csrf
 
                     <input type="hidden" autocomplete="false" style="display: none">
 
 
                     {{-- Emoji Triggger icon --}}
-                    <div class="w-10 hidden sm:flex max-w-fit  items-center">
+                    <div class="w-10 hidden sm:flex max-w-fit items-center">
                         <button wire:loading.attr="disabled" type="button" dusk="emoji-trigger-button"
                             @click="openEmojiPicker = ! openEmojiPicker" x-ref="emojibutton"
-                            class="cursor-pointer hover:scale-105 transition-transform disabled:cursor-progress rounded-full p-px dark:border-gray-700">
+                            class="cursor-pointer hover:scale-105 transition-transform disabled:cursor-progress rounded-full p-2 hover:bg-gray-100 dark:hover:bg-gray-700">
                             <svg x-bind:style="openEmojiPicker && { color: 'var(--wc-brand-primary)' }"
                                 viewBox="0 0 24 24" height="24" width="24"
                                 preserveAspectRatio="xMidYMid meet"
@@ -392,7 +392,7 @@
                     {{-- TextArea Input --}}
                     {{-- --------------- --}}
 
-                    <div @class(['flex gap-2 sm:px-2 w-full'])>
+                    <div class="flex w-full">
                         <textarea @focus-input-field.window="$el.focus()" autocomplete="off" x-model='body' x-ref="body"
                             wire:loading.delay.longest.attr="disabled" wire:target="sendMessage" id="chat-input-field" autofocus
                             type="text" name="message" placeholder="{{ __('wirechat::chat.inputs.message.placeholder') }}" maxlength="1700" rows="1"
@@ -400,7 +400,7 @@
                             @keydown.shift.enter.prevent="insertNewLine($el)" {{-- @keydown.enter.prevent prevents the
                                default behavior of Enter key press only if Shift is not held down. --}} @keydown.enter.prevent=""
                             @keyup.enter.prevent="$event.shiftKey ? null : (((body && body?.trim().length > 0) || ($wire.media && $wire.media.length > 0)) ? $wire.sendMessage() : null)"
-                            class="w-full disabled:cursor-progress resize-none h-auto max-h-20  sm:max-h-72 flex grow border-0 outline-0 focus:border-0 focus:ring-0  hover:ring-0 rounded-lg   dark:text-white bg-none dark:bg-inherit  focus:outline-hidden   "
+                            class="w-full disabled:cursor-progress resize-none h-auto max-h-20 sm:max-h-72 flex grow border-0 outline-0 focus:border-0 focus:ring-0 hover:ring-0 rounded-lg dark:text-white bg-transparent focus:outline-hidden placeholder-gray-500 dark:placeholder-gray-400"
                             x-init="document.querySelector('emoji-picker')
                                 .addEventListener('emoji-click', event => {
                                     const emoji = event.detail['unicode'];
@@ -434,13 +434,13 @@
                     {{-- input Actions --}}
                     {{-- --------------- --}}
 
-                    <div x-cloak @class(['w-[5%] justify-end min-w-max  items-center gap-2 '])>
+                    <div x-cloak class="flex justify-end min-w-max items-center gap-2">
 
                         {{--  Submit button --}}
                         <button
                             x-show="((body?.trim()?.length>0) ||  $wire.media.length > 0 || $wire.files.length > 0 )"
                             wire:loading.attr="disabled" wire:target="sendMessage" type="submit"
-                            id="sendMessageButton" class="cursor-pointer hover:text-[var(--wc-brand-primary)] transition-color ml-auto disabled:cursor-progress cursor-pointer font-bold">
+                            id="sendMessageButton" class="cursor-pointer hover:scale-105 transition-all ml-auto disabled:cursor-progress p-2 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/30">
 
                             <svg class="w-7 h-7   dark:text-gray-200" xmlns="http://www.w3.org/2000/svg"
                                 width="36" height="36" viewBox="0 0 24 24" fill="none"
@@ -458,7 +458,7 @@
                         <button
                             x-show="!((body?.trim()?.length>0) || $wire.media.length > 0 || $wire.files.length > 0 )"
                             wire:loading.attr="disabled" wire:target="sendMessage" wire:click='sendLike()'
-                            type="button" class="hover:scale-105 transition-transform cursor-pointer group disabled:cursor-progress">
+                            type="button" class="hover:scale-105 transition-transform cursor-pointer group disabled:cursor-progress p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
 
                             <!-- outlined heart -->
                             <span class=" group-hover:hidden transition">

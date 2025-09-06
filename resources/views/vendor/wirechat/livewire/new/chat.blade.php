@@ -2,17 +2,17 @@
 <div id="new-chat-modal ">
 
     <div 
-    class="relative w-full h-96  border mx-auto border-[var(--wc-light-secondary)]  dark:border-[var(--wc-dark-secondary)] overflow-auto bg-[var(--wc-light-primary)] dark:bg-[var(--wc-dark-primary)] dark:text-white px-7 sm:max-w-lg sm:rounded-lg">
+    class="relative w-full h-96 border mx-auto border-gray-200 dark:border-gray-700 overflow-auto bg-white dark:bg-gray-900 dark:text-white px-7 sm:max-w-lg sm:rounded-xl shadow-xl">
 
-    <header class=" sticky top-0 bg-[var(--wc-light-primary)] dark:bg-[var(--wc-dark-primary)] z-10 py-2">
-        <div class="flex justify-between items-center justify-between pb-2">
+    <header class="sticky top-0 bg-white dark:bg-gray-900 z-10 py-4 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex justify-between items-center pb-2">
 
-            <h3 class="text-lg font-semibold">{{__('wirechat::new.chat.labels.heading') }}</h3>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{__('wirechat::new.chat.labels.heading') }}</h3>
 
             <x-wirechat::actions.close-modal>
             <button
              dusk="close_modal_button"
-                class="p-2  text-gray-600 hover:bg-[var(--wc-light-secondary)] dark:hover:bg-[var(--wc-dark-secondary)] dark:hover:text-white rounded-full hover:text-gray-800 ">
+                class="p-2 text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-white rounded-full hover:text-gray-800 transition-colors duration-200">
                 <svg class="w-5 h-5 cursor-pointer" xmlns="http://www.w3.org/2000/svg" fill="none"
                     viewBox="0 0 24 24" stroke-width="1.2" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -23,10 +23,10 @@
 
         </div>
         
-        <section class="flex flex-wrap items-center px-0 border-b border-[var(--wc-light-border)] dark:border-[var(--wc-dark-border)]">
+        <section class="flex flex-wrap items-center px-0 border-b border-gray-200 dark:border-gray-700 pb-3">
             <input  dusk="search_users_field" autofocus type="search" id="users-search-field"
                 wire:model.live.debounce='search' autocomplete="off"  placeholder="{{__('wirechat::new.chat.inputs.search.placeholder')}}"
-                class=" w-full border-0 w-auto px-0 dark:bg-[var(--wc-dark-primary)] outline-hidden focus:outline-hidden bg-[var(--wc-light-primary)] rounded-lg focus:ring-0 hover:ring-0">
+                class="w-full border-0 px-0 dark:bg-transparent outline-hidden focus:outline-hidden bg-transparent rounded-lg focus:ring-0 hover:ring-0 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400">
 
         </section>
     </header>

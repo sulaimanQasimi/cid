@@ -172,17 +172,17 @@
     x-data="ChatDrawer()" x-on:close.stop="setShowPropertyTo(false)"
          x-on:keydown.escape.stop="closeChatDrawerOnEscape({ modalType: 'ChatDrawer', event: $event }); "
          x-show="show"
-         class="fixed bg-[var(--wc-light-primary)] dark:bg-[var(--wc-dark-primary)]  dark:text-white opacity-100 inset-0 z-50 h-full overflow-y-auto" style="display: none;"
+         class="fixed bg-black/50 backdrop-blur-sm dark:text-white inset-0 z-50 h-full overflow-y-auto" style="display: none;"
          aria-modal="true"
          tabindex="0"
     
         >
-        <div class="justify-center text-center relative">
+        <div class="flex justify-end h-full">
             <div x-show="show && showActiveComponent" x-transition:enter="ease-out duration-300"
-                x-transition:enter-start="opacity-0 -translate-x-full" x-transition:enter-end="opacity-100 translate-x-0"
+                x-transition:enter-start="opacity-0 translate-x-full" x-transition:enter-end="opacity-100 translate-x-0"
                 x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-x-0"
-                x-transition:leave-end="opacity-0 -translate-x-full"
-                class="w-auto  transition-all " id="chatmodal-container"
+                x-transition:leave-end="opacity-0 translate-x-full"
+                class="w-full max-w-md bg-white dark:bg-gray-900 shadow-2xl transition-all" id="chatmodal-container"
                 x-trap.noscroll.inert="show && showActiveComponent" aria-modal="true">
                 @forelse($drawerComponents as $id => $component)
                     <div x-show.immediate="activeDrawerComponent == '{{ $id }}'" x-ref="{{ $id }}"

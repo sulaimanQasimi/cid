@@ -77,6 +77,31 @@
             --indicator-color: var(--wc-dark-accent);
             --button-hover-background: var(--wc-dark-accent);
         }
+
+        /* Message animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        /* Smooth transitions for message bubbles */
+        .message-bubble {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .message-bubble:hover {
+            transform: translateY(-1px);
+        }
     </style>
 
 @endassets

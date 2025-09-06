@@ -1,17 +1,18 @@
 @props(['src' => null, 'story' => null, 'group' => false, 'disappearing' => false])
 <div
     {{ $attributes->merge([
-            'class' => "shrink-0 inline-flex items-center justify-center   relative transition
-                          overflow-visible rounded-full border border-[var(--wc-light-secondary)] text-gray-300  bg-[var(--wc-light-secondary)] dark:bg-[var(--wc-dark-secondary)]
-                          dark:border-[var(--wc-dark-secondary)]  text-base ",
+            'class' => "shrink-0 inline-flex items-center justify-center relative transition-all duration-200
+                          overflow-visible rounded-full border-2 border-white dark:border-gray-800 text-gray-300  
+                          bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800
+                          shadow-sm hover:shadow-md text-base",
         ])->class(
-            $story ? 'bg-linear-to-r  p-[2px] ring-2 ring-white from-purple-400 via-pink-500 to-red-500 rounded-full' : ' ',
+            $story ? 'bg-gradient-to-r p-[2px] ring-2 ring-white from-purple-400 via-pink-500 to-red-500 rounded-full' : ' ',
         ) }}>
 
 
     @if ($src)
         <img loading="lazy" @class([
-            'shrink-0 w-full h-full object-cover object-center rounded-full',
+            'shrink-0 w-full h-full object-cover object-center rounded-full transition-transform duration-200 hover:scale-105',
         ]) src="{{ $src }}" alt="avatar" />
     @endif
 
@@ -24,14 +25,14 @@
             <path d="M8.5 4.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0ZM10.9 12.006c.11.542-.348.994-.9.994H2c-.553 0-1.01-.452-.902-.994a5.002 5.002 0 0 1 9.803 0ZM14.002 12h-1.59a2.556 2.556 0 0 0-.04-.29 6.476 6.476 0 0 0-1.167-2.603 3.002 3.002 0 0 1 3.633 1.911c.18.522-.283.982-.836.982ZM12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path>
           </svg> --}}
 
-        <svg class="shrink-0 p-px w-full h-full rounded-full text-gray-400 dark:text-gray-300 bg-gray-100 bg-[var(--wc-light-secondary)] dark:bg-[var(--wc-dark-secondary)]"
+        <svg class="shrink-0 p-2 w-full h-full rounded-full text-gray-400 dark:text-gray-300 transition-colors duration-200"
             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
             <path
                 d="M7 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM14.5 9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM1.615 16.428a1.224 1.224 0 0 1-.569-1.175 6.002 6.002 0 0 1 11.908 0c.058.467-.172.92-.57 1.174A9.953 9.953 0 0 1 7 18a9.953 9.953 0 0 1-5.385-1.572ZM14.5 16h-.106c.07-.297.088-.611.048-.933a7.47 7.47 0 0 0-1.588-3.755 4.502 4.502 0 0 1 5.874 2.636.818.818 0 0 1-.36.98A7.465 7.465 0 0 1 14.5 16Z">
             </path>
         </svg>
     @elseif(!$src)
-        <svg class="shrink-0 w-full h-full rounded-full" fill="currentColor" viewBox="0 0 24 24">
+        <svg class="shrink-0 p-2 w-full h-full rounded-full text-gray-400 dark:text-gray-300 transition-colors duration-200" fill="currentColor" viewBox="0 0 24 24">
             <path
                 d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
         </svg>
@@ -45,8 +46,8 @@
 
     @if ($disappearing)
         <span dusk="disappearing_messages_icon"
-            class="absolute z-50 -bottom-1 bg-white -right-2 dark:bg-gray-800 rounded-full p-px">
-            <svg class="w-5 h-5" viewBox="0 0 36 36" height="36" width="36" preserveAspectRatio="xMidYMid meet"
+            class="absolute z-50 -bottom-1 -right-2 bg-white dark:bg-gray-800 rounded-full p-1 shadow-sm border border-gray-200 dark:border-gray-700">
+            <svg class="w-4 h-4 text-orange-500" viewBox="0 0 36 36" height="36" width="36" preserveAspectRatio="xMidYMid meet"
                 fill="none">
                 <title>disappearing</title>
                 <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"

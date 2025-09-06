@@ -68,7 +68,7 @@
     
 
     x-cloak
-     class='flex flex-col h-full  relative gap-2 gap-y-4 p-4 md:p-5 lg:p-8  grow  overscroll-contain overflow-x-hidden w-full my-auto'
+     class='flex flex-col h-full relative gap-3 gap-y-4 p-4 md:p-6 lg:p-8 grow overscroll-contain overflow-x-hidden w-full my-auto bg-gradient-to-b from-transparent to-gray-50/30 dark:to-gray-900/30'
     style="contain: content" >
 
 
@@ -88,7 +88,7 @@
         @foreach ($loadedMessages as $date => $messageGroup)
 
             {{-- Date  --}}
-            <div  class="sticky top-0 uppercase p-2 shadow-xs px-2.5 z-50 rounded-xl border dark:border-[var(--wc-dark-primary)] border-[var(--wc-light-primary)] text-sm flex text-center justify-center  bg-[var(--wc-light-secondary)] dark:bg-[var(--wc-dark-secondary)] dark:text-white  w-28 mx-auto ">
+            <div  class="sticky top-0 uppercase p-2 px-3 z-50 rounded-full text-xs flex text-center justify-center bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 text-gray-600 dark:text-gray-400 w-fit mx-auto shadow-sm">
                 {{ $date }}
             </div>
 
@@ -113,7 +113,7 @@
                 @endphp
 
 
-                <div class="flex gap-2" wire:key="message-{{ $key }}"  >
+                <div class="flex gap-3 animate-fade-in" wire:key="message-{{ $key }}" style="animation: fadeInUp 0.3s ease-out;" >
 
                     {{-- Message user Avatar --}}
                     {{-- Hide avatar if message belongs to auth --}}

@@ -5,9 +5,9 @@
 @endphp
 
 <header
-    class="w-full  sticky inset-x-0 flex pb-[5px] pt-[7px] top-0 z-10 dark:bg-[var(--wc-dark-secondary)] bg-[var(--wc-light-secondary)] border-[var(--wc-light-primary)] dark:border-[var(--wc-dark-secondary)]   border-b">
+    class="w-full sticky inset-x-0 flex pb-[5px] pt-[7px] top-0 z-10 backdrop-blur-md bg-white/80 dark:bg-gray-900/80 border-b border-gray-200/50 dark:border-gray-700/50 shadow-sm">
 
-    <div class="  flex  w-full items-center   px-2 py-2   lg:px-4 gap-2 md:gap-5 ">
+    <div class="flex w-full items-center px-3 py-3 lg:px-6 gap-3 md:gap-5">
 
         {{-- Return --}}
         <a @if ($this->isWidget()) @click="$dispatch('close-chat',{conversation: {{json_encode($conversation->id)}} })"
@@ -16,11 +16,11 @@
             href="{{ route(WireChat::indexRouteName(), $conversation->id) }}"
             dusk="return_to_home_button_link" @endif
             @class([
-                'shrink-0  cursor-pointer dark:text-white',
+                'shrink-0 cursor-pointer p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200',
                 'lg:hidden' => !$this->isWidget(),
             ]) id="chatReturn">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6"
-                stroke="currentColor" class="w-6 h-6">
+                stroke="currentColor" class="w-5 h-5 text-gray-600 dark:text-gray-300">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
         </a>
@@ -33,28 +33,34 @@
                 @if ($conversation->isGroup())
                     <x-wirechat::actions.show-group-info conversation="{{ $conversation->id }}"
                         widget="{{ $this->isWidget() }}">
-                        <div class="flex items-center gap-2 cursor-pointer ">
+                        <div class="flex items-center gap-3 cursor-pointer group">
                             <x-wirechat::avatar disappearing="{{ $conversation->hasDisappearingTurnedOn() }}"
                                 :group="true" :src="$group?->cover_url ?? null "
-                                class="h-8 w-8 lg:w-10 lg:h-10 " />
-                            <h6 class="font-bold text-base text-gray-800 dark:text-white w-full truncate">
-                                {{ $group?->name }}
-                            </h6>
+                                class="h-10 w-10 lg:w-12 lg:h-12 ring-2 ring-white dark:ring-gray-800 shadow-md" />
+                            <div class="flex flex-col">
+                                <h6 class="font-semibold text-lg text-gray-900 dark:text-white w-full truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                    {{ $group?->name }}
+                                </h6>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Group chat</p>
+                            </div>
                         </div>
                     </x-wirechat::actions.show-group-info>
                 @else
                     {{-- Not Group --}}
                     <x-wirechat::actions.show-chat-info conversation="{{ $conversation->id }}"
                         widget="{{ $this->isWidget() }}">
-                        <div class="flex items-center gap-2 cursor-pointer ">
+                        <div class="flex items-center gap-3 cursor-pointer group">
                             <x-wirechat::avatar disappearing="{{ $conversation->hasDisappearingTurnedOn() }}"
                                 :group="false" :src="$receiver?->cover_url ?? null"
-                                class="h-8 w-8 lg:w-10 lg:h-10 " />
-                            <h6 class="font-bold text-base text-gray-800 dark:text-white w-full truncate">
-                                {{ $receiver?->display_name }} @if ($conversation->isSelfConversation())
-                                    ({{ __('wirechat::chat.labels.you') }})
-                                @endif
-                            </h6>
+                                class="h-10 w-10 lg:w-12 lg:h-12 ring-2 ring-white dark:ring-gray-800 shadow-md" />
+                            <div class="flex flex-col">
+                                <h6 class="font-semibold text-lg text-gray-900 dark:text-white w-full truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                    {{ $receiver?->display_name }} @if ($conversation->isSelfConversation())
+                                        ({{ __('wirechat::chat.labels.you') }})
+                                    @endif
+                                </h6>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Online</p>
+                            </div>
                         </div>
                     </x-wirechat::actions.show-chat-info>
                 @endif
@@ -63,12 +69,12 @@
             </div>
 
             {{-- Header Actions --}}
-            <div class="flex gap-2 items-center ml-auto col-span-1">
+            <div class="flex gap-1 items-center ml-auto col-span-1">
                 <x-wirechat::dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="cursor-pointer inline-flex px-0 text-gray-700 dark:text-gray-400">
+                        <button class="cursor-pointer inline-flex p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 text-gray-600 dark:text-gray-400">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke-width="1.9" stroke="currentColor" class="size-6 w-7 h-7">
+                                stroke-width="1.9" stroke="currentColor" class="size-5 w-5 h-5">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
                             </svg>
