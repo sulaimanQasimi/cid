@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Namu\WireChat\Traits\Chatable;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
@@ -16,7 +17,8 @@ class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasRoles, LogsActivity;
-    
+
+    use Chatable;    
     /**
      * The attributes that are mass assignable.
      *
@@ -37,6 +39,24 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+
+    public function canCreateChats(): bool
+    {
+        return $this->hasAnyRole(['superadmin', 'admin']);
+    }
+
+    public function canUpdateChats(): bool
+    {
+        return $this->hasAnyRole(['superadmin', 'admin']);
+    }
+    
+    
+
+    public function canCreateGroups(): bool
+    {
+        return $this->hasAnyRole(['superadmin', 'admin']);
+    }
 
     /**
      * Get the activity log options for the model.

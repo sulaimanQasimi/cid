@@ -160,3 +160,7 @@
         @apply bg-background text-foreground;
     }
 }
+
+
+@source '../../vendor/namu/wirechat/resources/views/**/*.blade.php';
+@source '../../vendor/namu/wirechat/src/Livewire/**/*.php';
