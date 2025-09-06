@@ -76,20 +76,26 @@ export default function UserIndex({ users, filters }: Props) {
   const [perPage, setPerPage] = useState(filters.per_page.toString());
   const [sort, setSort] = useState(filters.sort);
   const [direction, setDirection] = useState(filters.direction);
+  const [currentPage, setCurrentPage] = useState(users.current_page);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   const debouncedSearch = useDebounce(search, 300);
 
+  // Update current page when users data changes (e.g., from pagination)
+  React.useEffect(() => {
+    setCurrentPage(users.current_page);
+  }, [users.current_page]);
+
   // Update the URL when filters change
   React.useEffect(() => {
     router.get(
       route('users.index'),
-      { search: debouncedSearch, per_page: perPage, sort, direction },
+      { search: debouncedSearch, per_page: perPage, sort, direction, page: currentPage },
       { preserveState: true, replace: true }
     );
-  }, [debouncedSearch, perPage, sort, direction]);
+  }, [debouncedSearch, perPage, sort, direction, currentPage]);
 
   const handleSort = (column: string) => {
     if (sort === column) {
@@ -122,19 +128,22 @@ export default function UserIndex({ users, filters }: Props) {
     setPerPage('10');
     setSort('created_at');
     setDirection('desc');
+    setCurrentPage(1);
     router.get(route('users.index'), {
       search: '',
       per_page: 10,
       sort: 'created_at',
       direction: 'desc',
+      page: 1,
     });
   };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    setCurrentPage(1); // Reset to page 1 when searching
     router.get(
       route('users.index'),
-      { search, per_page: perPage, sort, direction },
+      { search, per_page: perPage, sort, direction, page: 1 },
       { preserveState: true, replace: true }
     );
   };

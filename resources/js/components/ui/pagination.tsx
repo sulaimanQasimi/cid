@@ -72,13 +72,13 @@ Pagination.Prev = function PaginationPrev({
     <li>
       {disabled ? (
         <Button variant="outline" className="h-9 w-9 p-0" disabled>
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronRight className="h-4 w-4" />
           <span className="sr-only">Previous</span>
         </Button>
       ) : (
         <Button asChild variant="outline" className="h-9 w-9 p-0">
           <Link href={href}>
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4" />
             <span className="sr-only">Previous</span>
           </Link>
         </Button>
@@ -98,13 +98,13 @@ Pagination.Next = function PaginationNext({
     <li>
       {disabled ? (
         <Button variant="outline" className="h-9 w-9 p-0" disabled>
-          <ChevronRight className="h-4 w-4" />
+          <ChevronLeft className="h-4 w-4" />
           <span className="sr-only">Next</span>
         </Button>
       ) : (
         <Button asChild variant="outline" className="h-9 w-9 p-0">
           <Link href={href}>
-            <ChevronRight className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4" />
             <span className="sr-only">Next</span>
           </Link>
         </Button>
