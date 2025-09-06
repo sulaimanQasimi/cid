@@ -26,6 +26,7 @@ import {
     BarChart3,
     Settings,
     Target,
+    MessageCircle,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/language-context';
 import { useTranslation } from '@/lib/i18n/translate';
@@ -43,6 +44,13 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
         title: t('sidebar.intelligence_dashboard'), 
         href: '/dashboard', 
         icon: LayoutGrid 
+    });
+    
+    // Chats - always visible for authenticated users
+    navigation.push({ 
+        title: t('sidebar.chats'), 
+        href: '/chats', 
+        icon: MessageCircle 
     });
     
     // Intelligence Operations

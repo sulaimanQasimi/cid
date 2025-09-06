@@ -42,6 +42,7 @@
     "analytics.common.percentage": "%",
     
     "sidebar.intelligence_dashboard": "Intelligence Dashboard",
+    "sidebar.chats": "Chats",
     "sidebar.active_cases": "Active Cases",
     "sidebar.surveillance": "Surveillance",
     "sidebar.intelligence_reports": "Intelligence Reports",
