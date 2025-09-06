@@ -149,9 +149,12 @@ return [
 
             /*
              * The disk names on which the backups will be stored.
+             * You can use multiple disks for redundancy.
              */
             'disks' => [
-                'backups',
+                'backups',  // Local storage
+                'ftp',      // FTP server
+                // 'sftp',   // SFTP server (uncomment if needed)
             ],
         ],
 
@@ -255,7 +258,7 @@ return [
     'monitor_backups' => [
         [
             'name' => env('APP_NAME', 'laravel-backup'),
-            'disks' => ['local'],
+            'disks' => ['backups', 'ftp'],
             'health_checks' => [
                 \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumAgeInDays::class => 1,
                 \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes::class => 5000,
