@@ -1,6 +1,6 @@
 import { useTranslation } from '@/lib/i18n/translate';
 import { Link } from '@inertiajs/react';
-import { FileText, Plus, Shield } from 'lucide-react';
+import { FileText, Plus, Shield, ArrowLeft } from 'lucide-react';
 import { Button } from '../ui/button';
 import { CanCreate } from '../ui/permission-guard';
 
@@ -54,9 +54,13 @@ interface HeaderProps {
     routeName: string;
     buttonText: string;
     theme?: ThemeKey;
+    buttonSize?: 'default' | 'sm' | 'lg' | 'icon';
+    showBackButton?: boolean;
+    backRouteName?: string;
+    backButtonText?: string;
 }
 
-export default function Header({ title, description, icon, model, routeName, buttonText, theme = 'purple' }: HeaderProps) {
+export default function Header({ title, description, icon, model, routeName, buttonText, theme = 'purple', buttonSize = 'default', showBackButton = false, backRouteName, backButtonText }: HeaderProps) {
     const currentTheme = themes[theme];
     return (
         <div className={`group relative mb-6 overflow-hidden rounded-xl bg-gradient-to-l ${currentTheme.gradient} p-4 text-white shadow-lg lg:p-6`}>
@@ -80,10 +84,25 @@ export default function Header({ title, description, icon, model, routeName, but
                 </div>
 
                 <div className="flex items-center gap-2">
+                    {showBackButton && backRouteName && (
+                        <Button
+                            asChild
+                            variant="outline"
+                            size={buttonSize}
+                            className={`group/btn rounded-lg border ${currentTheme.border} ${currentTheme.bg} px-4 py-2 text-sm font-medium text-white shadow-md backdrop-blur-md transition-all duration-300 hover:scale-105 ${currentTheme.hover}`}
+                        >
+                            <Link href={route(backRouteName)} className="flex items-center gap-2">
+                                <div className={`rounded ${currentTheme.bg} p-0.5 transition-transform duration-300 group-hover/btn:scale-110`}>
+                                    <ArrowLeft className="h-4 w-4" />
+                                </div>
+                                {backButtonText}
+                            </Link>
+                        </Button>
+                    )}
                     <CanCreate model={model}>
                         <Button
                             asChild
-                            size="default"
+                            size={buttonSize}
                             className={`group/btn rounded-lg border ${currentTheme.border} ${currentTheme.bg} px-4 py-2 text-sm font-medium text-white shadow-md backdrop-blur-md transition-all duration-300 hover:scale-105 ${currentTheme.hover}`}
                         >
                             <Link href={route(routeName)} className="flex items-center gap-2">
