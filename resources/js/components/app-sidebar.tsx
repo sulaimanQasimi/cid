@@ -370,16 +370,16 @@ export function AppSidebar() {
             collapsible="icon" 
             variant="sidebar" 
             side={sidebarSide} 
-            className="bg-slate-900 dark:bg-slate-950 border-r border-slate-800 dark:border-slate-700 shadow-2xl z-50"
+            className="bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-700 shadow-lg z-50"
         >
             {/* Clean Header */}
-            <SidebarHeader className="p-4 border-b border-slate-800 dark:border-slate-700">
+            <SidebarHeader className="p-4 border-b border-gray-200 dark:border-slate-700">
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton 
                             size="lg" 
                             asChild 
-                            className=" bg-blue-600 transition-colors justify-start text-white hover:text-blue-600 hover:bg-blue-700"
+                            className="bg-blue-600 hover:bg-blue-700 transition-colors justify-start text-white"
                         >
                             <Link href="/dashboard" prefetch>
                                 <div className="flex items-center gap-3 w-full">
@@ -406,14 +406,14 @@ export function AppSidebar() {
             </SidebarContent>
 
             {/* Footer */}
-            <SidebarFooter className="p-4 border-t border-slate-800 dark:border-slate-700 space-y-3">
+            <SidebarFooter className="p-4 border-t border-gray-200 dark:border-slate-700 space-y-3">
                 {/* Theme Toggle */}
                 <div className="flex justify-center">
                     <Button
                         variant="ghost"
                         size="sm"
                         onClick={toggleTheme}
-                        className="w-full flex items-center gap-2 text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+                        className="w-full flex items-center gap-2 text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
                     >
                         {appearance === 'light' ? (
                             <>
