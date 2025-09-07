@@ -10,6 +10,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('info-types', InfoTypeController::class);
     Route::get('info-types/{infoType}/stats', [InfoTypeController::class, 'manageStats'])->name('info-types.stats');
     Route::put('info-types/{infoType}/stats', [InfoTypeController::class, 'updateStats'])->name('info-types.stats.update');
+    Route::get('info-types/{infoType}/print', [InfoTypeController::class, 'print'])->name('info-types.print');
 
     // Info Categories routes
     Route::resource('info-categories', InfoCategoryController::class);

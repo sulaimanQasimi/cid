@@ -33,9 +33,9 @@ interface SearchFiltersProps {
         type?: string;
         category?: string;
         department?: string;
-        sort: string;
-        direction: 'asc' | 'desc';
-        per_page: number;
+        sort?: string;
+        direction?: 'asc' | 'desc';
+        per_page?: number;
     };
     
     // Filter handlers
@@ -174,7 +174,7 @@ export default function SearchFilters({
                         <div>
                             <FilterSelect
                                 placeholder={t('common.sort_by')}
-                                value={filters.sort}
+                                value={filters.sort || 'name'}
                                 onValueChange={onSortChange}
                                 options={sortOptions}
                             />
@@ -187,11 +187,11 @@ export default function SearchFilters({
                                 <Button
                                     variant="outline"
                                     onClick={onDirectionChange}
-                                    title={t(`common.sort_${filters.direction === 'asc' ? 'ascending' : 'descending'}`)}
+                                    title={t(`common.sort_${(filters.direction || 'asc') === 'asc' ? 'ascending' : 'descending'}`)}
                                     className="h-10 w-full border-gray-300 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                                 >
-                                    <ArrowUpDown className={`mr-2 h-4 w-4 ${filters.direction === 'asc' ? '' : 'rotate-180 transform'}`} />
-                                    {filters.direction === 'asc' ? t('common.sort_ascending') : t('common.sort_descending')}
+                                    <ArrowUpDown className={`mr-2 h-4 w-4 ${(filters.direction || 'asc') === 'asc' ? '' : 'rotate-180 transform'}`} />
+                                    {(filters.direction || 'asc') === 'asc' ? t('common.sort_ascending') : t('common.sort_descending')}
                                 </Button>
                             </div>
 
@@ -199,7 +199,7 @@ export default function SearchFilters({
                             <div>
                                 <FilterSelect
                                     placeholder={t('common.items_per_page')}
-                                    value={filters.per_page.toString()}
+                                    value={(filters.per_page || 10).toString()}
                                     onValueChange={onPerPageChange}
                                     options={perPageOptions.map(option => ({
                                         value: option.value.toString(),

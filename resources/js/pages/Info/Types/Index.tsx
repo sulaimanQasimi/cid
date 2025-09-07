@@ -31,6 +31,7 @@ import { cn } from '@/lib/utils';
 import { Pagination } from '@/components/pagination';
 import Header from '@/components/template/header';
 import SearchFilters from '@/components/template/SearchFilters';
+import { formatPersianDateOnly } from '@/lib/utils/date';
 
 interface InfoType {
   id: number;
@@ -295,7 +296,7 @@ export default function InfoTypesIndex({
                             </Badge>
                           </TableCell>
                           <TableCell className="text-purple-800 py-6 px-6 font-medium">
-                            {new Date(infoType.created_at).toLocaleDateString()}
+                            {formatPersianDateOnly(infoType.created_at)}
                           </TableCell>
                           <TableCell className="py-6 px-6">
                             <div className="flex items-center gap-2 justify-end">
