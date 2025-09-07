@@ -223,9 +223,7 @@ class PermissionSeeder extends Seeder
             'incident.view_any', 'incident.view',
             'incident_report.view_any', 'incident_report.view',
             'info.view_any', 'info.view', 'info.confirm',
-            'meeting.view_any', 'meeting.view',
-            'meeting_message.view_any', 'meeting_message.view', 'meeting_message.create',
-            'report.view_any', 'report.view',
+                  'report.view_any', 'report.view',
         ]);
 
         // Assign manager permissions

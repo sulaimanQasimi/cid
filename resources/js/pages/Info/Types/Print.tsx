@@ -88,6 +88,17 @@ export default function PrintInfoType({ infoType, infos, statCategories }: Props
   };
 
   const getStatusBadge = (status: string) => {
+    if (!status) {
+      return (
+        <Badge 
+          variant="outline" 
+          className="px-3 py-1 rounded-lg font-semibold bg-gray-100 text-gray-800 border-gray-300"
+        >
+          Unknown
+        </Badge>
+      );
+    }
+
     const statusConfig = {
       published: { bg: 'bg-green-100', text: 'text-green-800', border: 'border-green-300' },
       draft: { bg: 'bg-gray-100', text: 'text-gray-800', border: 'border-gray-300' },
@@ -108,7 +119,7 @@ export default function PrintInfoType({ infoType, infos, statCategories }: Props
 
   return (
     <>
-      <Head title={t('info_types.print.title', { name: infoType.name })} />
+      <Head title={t('info_types.print.title', { name: infoType.name || 'Info Type' })} />
       
       {/* Print Controls - Hidden when printing */}
       <div className="print:hidden bg-white border-b border-gray-200 p-4 sticky top-0 z-50">
@@ -123,7 +134,7 @@ export default function PrintInfoType({ infoType, infos, statCategories }: Props
               {t('info_types.print.back_button')}
             </Button>
             <h1 className="text-xl font-semibold text-gray-800">
-              {t('info_types.print.page_title', { name: infoType.name })}
+              {t('info_types.print.page_title', { name: infoType.name || 'Info Type' })}
             </h1>
           </div>
           <Button
@@ -145,7 +156,7 @@ export default function PrintInfoType({ infoType, infos, statCategories }: Props
               <FileText className="h-8 w-8 text-purple-600" />
             </div>
             <h1 className="text-3xl font-bold text-gray-900 print:text-2xl">
-              {infoType.name}
+              {infoType.name || 'Info Type'}
             </h1>
           </div>
           <div className="text-gray-600 text-lg print:text-base">
@@ -181,7 +192,7 @@ export default function PrintInfoType({ infoType, infos, statCategories }: Props
                     {t('info_types.print.name_label')}
                   </h3>
                   <p className="text-lg font-bold text-gray-900 print:text-base">
-                    {infoType.name}
+                    {infoType.name || 'Info Type'}
                   </p>
                 </div>
                 <div>
@@ -210,7 +221,7 @@ export default function PrintInfoType({ infoType, infos, statCategories }: Props
                     {formatDate(infoType.updated_at)}
                   </p>
                 </div>
-                {infoType.creator && (
+                {infoType.creator && infoType.creator.name && (
                   <div>
                     <h3 className="text-sm font-semibold text-gray-700 mb-1 print:text-xs">
                       {t('info_types.print.created_by_label')}
@@ -299,14 +310,14 @@ export default function PrintInfoType({ infoType, infos, statCategories }: Props
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
                         <h3 className="text-lg font-semibold text-gray-900 mb-1 print:text-base">
-                          {info.title}
+                          {info.title || 'Untitled'}
                         </h3>
                         <div className="flex items-center gap-4 text-sm text-gray-600 print:text-xs">
                           <div className="flex items-center gap-1">
                             <Calendar className="h-4 w-4" />
                             {formatDate(info.created_at)}
                           </div>
-                          {info.infoCategory && (
+                          {info.infoCategory && info.infoCategory.name && (
                             <div className="flex items-center gap-1">
                               <FileText className="h-4 w-4" />
                               {info.infoCategory.name}
@@ -320,7 +331,7 @@ export default function PrintInfoType({ infoType, infos, statCategories }: Props
                     </div>
                     <div className="text-gray-700 print:text-sm">
                       <p className="line-clamp-3 print:line-clamp-none">
-                        {info.content}
+                        {info.content || 'No content available'}
                       </p>
                     </div>
                   </div>
