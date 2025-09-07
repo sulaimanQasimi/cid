@@ -86,9 +86,9 @@ export default function SearchFilters({
     const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
     return (
-        <Card className={`border border-gray-200 bg-white shadow-sm ${className}`}>
+        <Card className={`border border-white bg-blue-50 shadow-sm ${className}`}>
             <CardHeader
-                className="cursor-pointer border-b border-gray-200 bg-gray-50 py-3"
+                className="cursor-pointer border-b border-gray-200 bg-blue-200 py-3"
                 onClick={() => setIsFiltersOpen(!isFiltersOpen)}
             >
                 <CardTitle className="flex items-center justify-between text-base font-medium text-gray-900">
