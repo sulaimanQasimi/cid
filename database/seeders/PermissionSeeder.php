@@ -234,8 +234,7 @@ class PermissionSeeder extends Seeder
             'info.view_any', 'info.view', 'info.create', 'info.update', 'info.confirm',
             'info_category.view_any', 'info_category.view', 'info_category.confirm',
             'info_type.view_any', 'info_type.view', 'info_type.confirm',
-            'meeting.view_any', 'meeting.view', 'meeting.create', 'meeting.update',
-            'meeting_message.view_any', 'meeting_message.view', 'meeting_message.create', 'meeting_message.update',
+           
             'report.view_any', 'report.view', 'report.create', 'report.update',
             'report_stat.view_any', 'report_stat.view', 'report_stat.create', 'report_stat.update',
         ]);
