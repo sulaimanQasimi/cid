@@ -1609,5 +1609,7 @@
   "permissions.direct_permissions": "مجوزهای مستقیم",
   "permissions.edit_permissions": "ویرایش مجوزها",
   "permissions.user_name": "نام کاربر",
-  "permissions.user_email": "ایمیل کاربر"
+  "permissions.user_email": "ایمیل کاربر",
+  "common.reset_filters": "بازنشانی فیلترها",
+  "common.sort_ascending": "به ترتیب صعودی"
 }

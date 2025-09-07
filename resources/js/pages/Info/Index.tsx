@@ -1,5 +1,6 @@
 import { Pagination } from '@/components/pagination';
 import Header from '@/components/template/header';
+import SearchFilters from '@/components/template/SearchFilters';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -13,16 +14,14 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { CanConfirm, CanDelete, CanUpdate, CanView } from '@/components/ui/permission-guard';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { usePermissions } from '@/hooks/use-permissions';
 import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/lib/i18n/translate';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { AlertTriangle, ArrowUpDown, BarChart3, Check, ChevronDown, Eye, FilterX, Pencil, Search, Shield, Trash, TrendingUp } from 'lucide-react';
+import { AlertTriangle, BarChart3, Check, Eye, Pencil, Shield, Trash, TrendingUp } from 'lucide-react';
 import React, { useState } from 'react';
 
 interface InfoRecord {
@@ -169,7 +168,6 @@ export default function InfoIndex({ infos, types = [], categories = [], departme
     const [selectedType, setSelectedType] = useState<string>(filters.type_id || '');
     const [selectedCategory, setSelectedCategory] = useState<string>(filters.category_id || '');
     const [selectedDepartment, setSelectedDepartment] = useState<string>(filters.department_id || '');
-    const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
     // Handle search form submission
     const handleSearch = (e: React.FormEvent) => {
@@ -305,179 +303,49 @@ export default function InfoIndex({ infos, types = [], categories = [], departme
                     theme="purple"
                 />
 
-                <Card className="overflow-hidden rounded-3xl border-0 bg-gradient-to-bl from-white to-purple-50/30 shadow-2xl">
-                    <CardHeader
-                        className="cursor-pointer bg-gradient-to-l from-purple-500 to-purple-600 py-4 text-white"
-                        onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-                    >
-                        <CardTitle className="flex items-center justify-between text-lg font-semibold">
-                            <div className="flex items-center gap-3">
-                                <div className="rounded-xl bg-white/20 p-2 shadow-lg backdrop-blur-sm">
-                                    <Search className="h-5 w-5" />
-                                </div>
-                                <div>
-                                    <div className="text-xl font-bold">{t('info.search_filters')}</div>
-                                    <div className="text-xs font-medium text-purple-100">{t('info.find_and_filter')}</div>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="rounded-xl text-white hover:bg-white/20"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        resetFilters();
-                                    }}
-                                >
-                                    <FilterX className="mr-1 h-4 w-4" />
-                                    {t('info.reset_filters')}
-                                </Button>
-                                <div className={`transition-transform duration-300 ${isFiltersOpen ? 'rotate-180' : ''}`}>
-                                    <ChevronDown className="h-5 w-5" />
-                                </div>
-                            </div>
-                        </CardTitle>
-                    </CardHeader>
-
-                    <div className={`overflow-hidden transition-all duration-300 ${isFiltersOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-                        <CardContent className="p-6">
-                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-                                {/* Search Bar */}
-                                <div className="md:col-span-2">
-                                    <form onSubmit={handleSearch} className="relative">
-                                        <div className="relative">
-                                            <Input
-                                                placeholder={t('info.search_placeholder')}
-                                                value={searchQuery}
-                                                onChange={(e) => setSearchQuery(e.target.value)}
-                                                className="h-11 w-full rounded-xl border-purple-200 bg-gradient-to-l from-purple-50 to-white pr-4 pl-20 text-base shadow-lg focus:border-purple-500 focus:ring-purple-500/20"
-                                            />
-                                            <Button
-                                                type="submit"
-                                                className="absolute top-1/2 left-1 h-9 -translate-y-1/2 rounded-lg bg-gradient-to-l from-purple-500 to-purple-600 px-4 text-sm text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl"
-                                            >
-                                                {t('common.search')}
-                                            </Button>
-                                            <Search className="absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-purple-400" />
-                                        </div>
-                                    </form>
-                                </div>
-
-                                {/* Type Filter */}
-                                <div>
-                                    <Select value={selectedType} onValueChange={handleTypeChange}>
-                                        <SelectTrigger className="h-11 rounded-xl border-purple-200 bg-gradient-to-l from-purple-50 to-white text-sm shadow-lg focus:border-purple-500 focus:ring-purple-500/20">
-                                            <SelectValue placeholder={t('info.filter_by_type')} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="_all">{t('info.all_types')}</SelectItem>
-                                            {types.map((type) => (
-                                                <SelectItem key={type.id} value={type.id.toString()}>
-                                                    {type.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-
-                                {/* Category Filter */}
-                                <div>
-                                    <Select value={selectedCategory} onValueChange={handleCategoryChange}>
-                                        <SelectTrigger className="h-11 rounded-xl border-purple-200 bg-gradient-to-l from-purple-50 to-white text-sm shadow-lg focus:border-purple-500 focus:ring-purple-500/20">
-                                            <SelectValue placeholder={t('info.filter_by_category')} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="_all">{t('info.all_categories')}</SelectItem>
-                                            {categories.map((category) => (
-                                                <SelectItem key={category.id} value={category.id.toString()}>
-                                                    {category.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-
-                                {/* Department Filter */}
-                                <div>
-                                    <Select value={selectedDepartment} onValueChange={handleDepartmentChange}>
-                                        <SelectTrigger className="h-11 rounded-xl border-purple-200 bg-gradient-to-l from-purple-50 to-white text-sm shadow-lg focus:border-purple-500 focus:ring-purple-500/20">
-                                            <SelectValue placeholder={t('info.filter_by_department')} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="_all">{t('info.all_departments')}</SelectItem>
-                                            {departments.map((department) => (
-                                                <SelectItem key={department.id} value={department.id.toString()}>
-                                                    {department.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-
-                                {/* Sort Options */}
-                                <div>
-                                    <Select value={filters.sort} onValueChange={handleSortChange}>
-                                        <SelectTrigger className="h-11 rounded-xl border-purple-200 bg-gradient-to-l from-purple-50 to-white text-sm shadow-lg focus:border-purple-500 focus:ring-purple-500/20">
-                                            <SelectValue placeholder={t('info.sort_by')} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {sortOptions.map((option) => (
-                                                <SelectItem key={option.value} value={option.value}>
-                                                    {t(`info.sort_options.${option.value}`)}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-
-                                {/* Direction & Per Page Row */}
-                                <div className="grid grid-cols-3 gap-3 md:col-span-2 lg:col-span-4">
-                                    {/* Direction Button */}
-                                    <div>
-                                        <Button
-                                            variant="outline"
-                                            onClick={handleDirectionChange}
-                                            title={t(`info.sort_${filters.direction === 'asc' ? 'ascending' : 'descending'}`)}
-                                            className="h-11 w-full rounded-xl border-purple-300 text-sm text-purple-700 shadow-lg transition-all duration-300 hover:scale-105 hover:border-purple-400 hover:bg-purple-100"
-                                        >
-                                            <ArrowUpDown className={`mr-2 h-4 w-4 ${filters.direction === 'asc' ? '' : 'rotate-180 transform'}`} />
-                                            {filters.direction === 'asc' ? t('info.sort_ascending') : t('info.sort_descending')}
-                                        </Button>
-                                    </div>
-
-                                    {/* Per Page Options */}
-                                    <div>
-                                        <Select value={filters.per_page.toString()} onValueChange={handlePerPageChange}>
-                                            <SelectTrigger className="h-11 rounded-xl border-purple-200 bg-gradient-to-l from-purple-50 to-white text-sm shadow-lg focus:border-purple-500 focus:ring-purple-500/20">
-                                                <SelectValue placeholder={t('info.items_per_page')} />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {perPageOptions.map((option) => (
-                                                    <SelectItem key={option.value} value={option.value.toString()}>
-                                                        {t('info.per_page_option', { count: option.value.toString() })}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    {/* Quick Actions */}
-                                    <div className="flex gap-2">
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={resetFilters}
-                                            className="h-11 rounded-xl border-purple-300 px-3 text-sm text-purple-700 shadow-lg transition-all duration-300 hover:scale-105 hover:border-purple-400 hover:bg-purple-100"
-                                        >
-                                            <FilterX className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </div>
-                </Card>
+                <SearchFilters
+                    searchQuery={searchQuery}
+                    onSearchChange={setSearchQuery}
+                    onSearchSubmit={handleSearch}
+                    searchPlaceholder={t('info.search_placeholder')}
+                    filters={{
+                        type: selectedType,
+                        category: selectedCategory,
+                        department: selectedDepartment,
+                        sort: filters.sort,
+                        direction: filters.direction as 'asc' | 'desc',
+                        per_page: filters.per_page
+                    }}
+                    onTypeChange={handleTypeChange}
+                    onCategoryChange={handleCategoryChange}
+                    onDepartmentChange={handleDepartmentChange}
+                    onSortChange={handleSortChange}
+                    onDirectionChange={handleDirectionChange}
+                    onPerPageChange={handlePerPageChange}
+                    onResetFilters={resetFilters}
+                    types={[
+                        { value: '_all', label: t('info.all_types') },
+                        ...types.map(type => ({ value: type.id.toString(), label: type.name }))
+                    ]}
+                    categories={[
+                        { value: '_all', label: t('info.all_categories') },
+                        ...categories.map(category => ({ value: category.id.toString(), label: category.name }))
+                    ]}
+                    departments={[
+                        { value: '_all', label: t('info.all_departments') },
+                        ...departments.map(department => ({ value: department.id.toString(), label: department.name }))
+                    ]}
+                    sortOptions={sortOptions.map(option => ({
+                        value: option.value,
+                        label: t(`info.sort_options.${option.value}`)
+                    }))}
+                    perPageOptions={perPageOptions.map(option => ({
+                        value: option.value,
+                        label: t('info.per_page_option', { count: option.value.toString() })
+                    }))}
+                    title={t('info.search_filters')}
+                    description={t('info.find_and_filter')}
+                />
 
                 {/* Results Table */}
                 <div className="mt-8">

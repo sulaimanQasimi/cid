@@ -31,15 +31,15 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   };
 
   return (
-    <div className={`relative flex items-center ${className}`}>
+    <div className={`relative ${className}`}>
       <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-        <Search className="w-4 h-4 text-gray-500" />
+        <Search className="h-4 w-4 text-gray-400" />
       </div>
       <input
         type="text"
         value={searchTerm}
         onChange={handleInputChange}
-        className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
+        className="h-10 w-full rounded-md border border-gray-300 bg-white pl-10 pr-10 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
         placeholder={placeholder}
       />
       {searchTerm && (
@@ -48,7 +48,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
           className="absolute inset-y-0 right-0 flex items-center pr-3"
           type="button"
         >
-          <X className="w-4 h-4 text-gray-500 hover:text-gray-700" />
+          <X className="h-4 w-4 text-gray-400 hover:text-gray-600" />
         </button>
       )}
     </div>
