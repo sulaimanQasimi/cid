@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
+import Header from '@/components/template/header';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -50,32 +51,16 @@ export default function DepartmentCreate({ auth }: Props) {
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={t('departments.create.page_title')} />
       <div className="container px-0 py-6">
-        {/* Header with gradient background */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-l from-blue-600 via-blue-700 to-indigo-700 p-8 text-white shadow-2xl mb-8">
-          <div className="absolute inset-0 bg-black/10"></div>
-          <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 -translate-x-32"></div>
-          <div className="absolute bottom-0 right-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 translate-x-24"></div>
-          
-          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
-            <div className="flex items-center gap-6">
-              <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl border border-white/30">
-                <Building2 className="h-8 w-8 text-white" />
-              </div>
-              <div>
-                <h2 className="text-3xl lg:text-4xl font-bold text-white drop-shadow-lg">{t('departments.create.title')}</h2>
-                <p className="text-white/90 flex items-center gap-2 mt-2 text-lg">
-                  <FileText className="h-5 w-5" />
-                  {t('departments.create.description')}
-                </p>
-              </div>
-            </div>
-            
-            <Link href={route('departments.index')} className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 rounded-full shadow-lg px-4 py-2 flex items-center gap-2">
-              <ArrowRight className="h-4 w-4" />
-              {t('departments.create.back_to_list')}
-            </Link>
-          </div>
-        </div>
+        {/* Header Component */}
+        <Header
+          title={t('departments.create.title')}
+          description={t('departments.create.description')}
+          icon={<Building2 className="h-6 w-6 text-white" />}
+          model="department"
+          routeName="departments.index"
+          buttonText={t('departments.create.back_to_list')}
+          theme="blue"
+        />
 
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-8">

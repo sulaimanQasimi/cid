@@ -1611,5 +1611,7 @@
   "permissions.user_name": "نام کاربر",
   "permissions.user_email": "ایمیل کاربر",
   "common.reset_filters": "بازنشانی فیلترها",
-  "common.sort_ascending": "به ترتیب صعودی"
+  "common.sort_ascending": "به ترتیب صعودی",
+  "common.sort_descending": "به ترتیب نزولی",
+  "departments.no_records": "معلومات ثبت شده نیست"
 }

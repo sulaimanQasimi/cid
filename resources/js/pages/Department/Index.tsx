@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
+import Header from '@/components/template/header';
+import SearchFilters from '@/components/template/SearchFilters';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Plus, Pencil, Trash, Search, ArrowUpDown, FilterX, Eye, BarChart3, Shield, Users, Building2, Calendar, FileText, AlertTriangle, TrendingUp, ChevronDown } from 'lucide-react';
@@ -12,8 +14,6 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -80,18 +80,18 @@ interface Props {
 }
 
 const sortOptions = [
-  { value: 'name', label: 'departments.sort_options.name' },
-  { value: 'code', label: 'departments.sort_options.code' },
-  { value: 'infos_count', label: 'departments.sort_options.infos_count' },
-  { value: 'created_at', label: 'departments.sort_options.created_at' },
-  { value: 'updated_at', label: 'departments.sort_options.updated_at' },
+  { value: 'name', label: 'Name' },
+  { value: 'code', label: 'Code' },
+  { value: 'infos_count', label: 'Info Count' },
+  { value: 'created_at', label: 'Created Date' },
+  { value: 'updated_at', label: 'Updated Date' },
 ];
 
 const perPageOptions = [
-  { value: 10, label: 'departments.per_page_option' },
-  { value: 25, label: 'departments.per_page_option' },
-  { value: 50, label: 'departments.per_page_option' },
-  { value: 100, label: 'departments.per_page_option' },
+  { value: 10, label: '10 per page' },
+  { value: 25, label: '25 per page' },
+  { value: 50, label: '50 per page' },
+  { value: 100, label: '100 per page' },
 ];
 
 export default function DepartmentIndex({
@@ -118,7 +118,6 @@ export default function DepartmentIndex({
   const [searchQuery, setSearchQuery] = useState(filters.search);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [departmentToDelete, setDepartmentToDelete] = useState<Department | null>(null);
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   // Handle search form submission
   const handleSearch = (e: React.FormEvent) => {
@@ -140,6 +139,21 @@ export default function DepartmentIndex({
   // Handle per page change
   const handlePerPageChange = (value: string) => {
     applyFilters({ per_page: parseInt(value) });
+  };
+
+  // Handle type filter change (not used for departments)
+  const handleTypeChange = (value: string) => {
+    // Not applicable for departments
+  };
+
+  // Handle category filter change (not used for departments)
+  const handleCategoryChange = (value: string) => {
+    // Not applicable for departments
+  };
+
+  // Handle department filter change (not used for departments)
+  const handleDepartmentChange = (value: string) => {
+    // Not applicable for departments
   };
 
 
@@ -185,161 +199,48 @@ export default function DepartmentIndex({
       <Head title={t('departments.page_title')} />
 
       <div className="container px-0 py-6">
-        {/* Modern Header with Glassmorphism */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-l from-blue-600 via-blue-700 to-indigo-700 p-8 lg:p-12 text-white shadow-2xl mb-8 group">
-          {/* Animated background elements */}
-          <div className="absolute inset-0 bg-black/5"></div>
-          <div className="absolute top-0 left-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 -translate-x-40 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
-          <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full translate-y-32 translate-x-32 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
-          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white/5 rounded-full -translate-x-16 -translate-y-16 blur-xl group-hover:scale-150 transition-transform duration-500"></div>
+        {/* Header Component */}
+        <Header
+          title={t('departments.page_title')}
+          description={t('departments.page_description')}
+          icon={<Building2 className="h-6 w-6 text-white" />}
+          model="department"
+          routeName="departments.create"
+          buttonText={t('departments.add_button')}
+          theme="blue"
+        />
 
-          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-8">
-            <div className="flex items-center gap-8">
-              <div className="p-6 bg-white/20 backdrop-blur-md rounded-3xl border border-white/30 shadow-2xl group-hover:scale-105 transition-transform duration-300">
-                <Building2 className="h-10 w-10 text-white" />
-              </div>
-              <div className="space-y-3">
-                <h2 className="text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight">{t('departments.page_title')}</h2>
-                <div className="text-white/90 flex items-center gap-3 text-xl font-medium">
-                  <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                    <FileText className="h-6 w-6" />
-                  </div>
-                  {t('departments.page_description')}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <CanCreate model="department">
-                <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-8 py-4 text-lg font-semibold transition-all duration-300 hover:scale-105 group/btn">
-                  <Link href={route('departments.create')} className="flex items-center gap-3">
-                    <div className="p-1 bg-white/20 rounded-lg group-hover/btn:scale-110 transition-transform duration-300">
-                      <Plus className="h-5 w-5" />
-                    </div>
-                    {t('departments.add_button')}
-                  </Link>
-                </Button>
-              </CanCreate>
-            </div>
-          </div>
-        </div>
-
-        <Card className="shadow-2xl bg-gradient-to-bl from-white to-blue-50/30 border-0 rounded-3xl overflow-hidden">
-          <CardHeader className="py-4 bg-gradient-to-l from-blue-500 to-blue-600 text-white cursor-pointer" onClick={() => setIsFiltersOpen(!isFiltersOpen)}>
-            <CardTitle className="text-lg font-semibold flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm shadow-lg">
-                  <Search className="h-5 w-5" />
-                </div>
-                <div>
-                  <div className="text-xl font-bold">{t('departments.search_filters')}</div>
-                  <div className="text-blue-100 text-xs font-medium">Find and filter department records</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-white hover:bg-white/20 rounded-xl"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    resetFilters();
-                  }}
-                >
-                  <FilterX className="h-4 w-4 mr-1" />
-                  Reset
-                </Button>
-                <div className={`transition-transform duration-300 ${isFiltersOpen ? 'rotate-180' : ''}`}>
-                  <ChevronDown className="h-5 w-5" />
-                </div>
-              </div>
-            </CardTitle>
-          </CardHeader>
-
-          <div className={`transition-all duration-300 overflow-hidden ${isFiltersOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* Search Bar */}
-                <div className="md:col-span-2">
-                  <form onSubmit={handleSearch} className="relative">
-                    <div className="relative">
-                      <Input
-                        placeholder={t('departments.search_placeholder')}
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full h-11 pl-20 pr-4 text-base border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white rounded-xl shadow-lg"
-                      />
-                      <Button type="submit" className="absolute left-1 top-1/2 -translate-y-1/2 h-9 px-4 bg-gradient-to-l from-blue-500 to-blue-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-sm">
-                        Search
-                      </Button>
-                      <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-400" />
-                    </div>
-                  </form>
-                </div>
-
-                {/* Sort Options */}
-                <div>
-                  <Select value={filters.sort} onValueChange={handleSortChange}>
-                    <SelectTrigger className="h-11 shadow-lg border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white rounded-xl text-sm">
-                      <SelectValue placeholder="Sort By" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {sortOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {t(option.label)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Direction & Per Page Row */}
-                <div className="md:col-span-2 lg:col-span-4 grid grid-cols-3 gap-3">
-                  {/* Direction Button */}
-                  <div>
-                    <Button
-                      variant="outline"
-                      onClick={handleDirectionChange}
-                      title={t(`departments.sort_${filters.direction === 'asc' ? 'descending' : 'ascending'}`)}
-                      className="h-11 w-full shadow-lg border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 rounded-xl transition-all duration-300 hover:scale-105 text-sm"
-                    >
-                      <ArrowUpDown className={`h-4 w-4 mr-2 ${filters.direction === 'desc' ? 'rotate-180' : ''}`} />
-                      {filters.direction === 'asc' ? 'Asc' : 'Desc'}
-                    </Button>
-                  </div>
-
-                  {/* Per Page Options */}
-                  <div>
-                    <Select value={filters.per_page.toString()} onValueChange={handlePerPageChange}>
-                      <SelectTrigger className="h-11 shadow-lg border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white rounded-xl text-sm">
-                        <SelectValue placeholder="Per Page" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {perPageOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value.toString()}>
-                            {t(option.label, { count: String(option.value) })}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Quick Actions */}
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={resetFilters}
-                      className="h-11 px-3 shadow-lg border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 rounded-xl transition-all duration-300 hover:scale-105 text-sm"
-                    >
-                      <FilterX className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </div>
-        </Card>
+        <SearchFilters
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onSearchSubmit={handleSearch}
+          searchPlaceholder={t('departments.search_placeholder')}
+          filters={{
+            sort: filters.sort,
+            direction: filters.direction as 'asc' | 'desc',
+            per_page: filters.per_page
+          }}
+          onTypeChange={handleTypeChange}
+          onCategoryChange={handleCategoryChange}
+          onDepartmentChange={handleDepartmentChange}
+          onSortChange={handleSortChange}
+          onDirectionChange={handleDirectionChange}
+          onPerPageChange={handlePerPageChange}
+          onResetFilters={resetFilters}
+          types={[]}
+          categories={[]}
+          departments={[]}
+          sortOptions={sortOptions.map(option => ({
+            value: option.value,
+            label: t(`departments.sort_options.${option.value}`)
+          }))}
+          perPageOptions={perPageOptions.map(option => ({
+            value: option.value,
+            label: option.value.toString()
+          }))}
+          title={t('departments.search_filters')}
+          description="Find and filter department records"
+        />
 
         {/* Results Table */}
         <div className="mt-8">

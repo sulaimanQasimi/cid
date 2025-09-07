@@ -201,7 +201,10 @@ export default function SearchFilters({
                                     placeholder={t('common.items_per_page')}
                                     value={filters.per_page.toString()}
                                     onValueChange={onPerPageChange}
-                                    options={perPageOptions}
+                                    options={perPageOptions.map(option => ({
+                                        value: option.value.toString(),
+                                        label: option.label
+                                    }))}
                                 />
                             </div>
 
