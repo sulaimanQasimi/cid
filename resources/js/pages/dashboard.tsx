@@ -7,7 +7,6 @@ import { useTranslation } from '@/lib/i18n/translate';
 import { useEffect, useRef } from 'react';
 import * as am5 from '@amcharts/amcharts5';
 import * as am5map from '@amcharts/amcharts5/map';
-import * as am5geodata from '@amcharts/amcharts5-geodata';
 
 interface DashboardProps {
     stats: {

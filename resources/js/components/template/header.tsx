@@ -1,8 +1,5 @@
 import { useTranslation } from '@/lib/i18n/translate';
-import { Link } from '@inertiajs/react';
-import { Plus, ArrowLeft } from 'lucide-react';
-import { Button } from '../ui/button';
-import { CanCreate } from '../ui/permission-guard';
+import ActionButtons from './ActionButtons';
 
 // Simplified theme configurations
 const themes = {
@@ -73,33 +70,16 @@ export default function Header({ title, description, icon, model, routeName, but
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex items-center gap-2">
-                        {showBackButton && backRouteName && (
-                            <Button
-                                asChild
-                                variant="outline"
-                                size={buttonSize}
-                                className="border-white/20 bg-white/10 text-white hover:bg-white/20"
-                            >
-                                <Link href={route(backRouteName)} className="flex items-center gap-2">
-                                    <ArrowLeft className="h-4 w-4" />
-                                    {backButtonText}
-                                </Link>
-                            </Button>
-                        )}
-                        <CanCreate model={model}>
-                            <Button
-                                asChild
-                                size={buttonSize}
-                                className="bg-white text-gray-900 hover:bg-white/90"
-                            >
-                                <Link href={route(routeName)} className="flex items-center gap-2">
-                                    <Plus className="h-4 w-4" />
-                                    {buttonText}
-                                </Link>
-                            </Button>
-                        </CanCreate>
-                    </div>
+                    <ActionButtons
+                        model={model}
+                        routeName={routeName}
+                        buttonText={buttonText}
+                        buttonSize={buttonSize}
+                        showBackButton={showBackButton}
+                        backRouteName={backRouteName}
+                        backButtonText={backButtonText}
+                        theme={theme}
+                    />
                 </div>
             </div>
         </div>
