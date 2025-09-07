@@ -25,12 +25,12 @@ export default function FilterSelect({
 
     return (
         <Select value={value} onValueChange={onValueChange}>
-            <SelectTrigger className={`h-10 rounded-md border-gray-300 bg-white text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${className}`}>
+            <SelectTrigger className={`h-10 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm shadow-sm focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 ${className}`}>
                 <SelectValue placeholder={placeholder} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
                 {options.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
+                    <SelectItem key={option.value} value={option.value} className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700">
                         {option.label}
                     </SelectItem>
                 ))}

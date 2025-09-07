@@ -50,7 +50,7 @@ export function AppContent({ variant = 'header', children, ...props }: AppConten
     if (variant === 'sidebar') {
         return (
             <SidebarInset 
-                className="ml-4 mr-4 mt-4 mb-4 rounded-xl bg-white shadow-sm border border-gray-200" 
+                className="ml-4 mr-4 mt-4 mb-4 rounded-xl bg-white dark:bg-gray-900 shadow-sm border border-gray-200 dark:border-gray-700" 
                 {...props}
             >
                 {children}
@@ -59,7 +59,7 @@ export function AppContent({ variant = 'header', children, ...props }: AppConten
     }
 
     return (
-        <main className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-4 rounded-xl" {...props}>
+        <main className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-4 rounded-xl bg-white dark:bg-gray-900" {...props}>
             {children}
         </main>
     );

@@ -86,26 +86,26 @@ export default function SearchFilters({
     const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
     return (
-        <Card className={`border border-white bg-blue-50 shadow-sm ${className}`}>
+        <Card className={`border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm ${className}`}>
             <CardHeader
-                className="cursor-pointer border-b border-gray-200 bg-blue-200 py-3"
+                className="cursor-pointer border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 py-3"
                 onClick={() => setIsFiltersOpen(!isFiltersOpen)}
             >
-                <CardTitle className="flex items-center justify-between text-base font-medium text-gray-900">
+                <CardTitle className="flex items-center justify-between text-base font-medium text-gray-900 dark:text-gray-100">
                     <div className="flex items-center gap-3">
-                        <div className="rounded-md bg-blue-100 p-2">
-                            <Search className="h-4 w-4 text-blue-600" />
+                        <div className="rounded-md bg-gray-100 dark:bg-gray-700 p-2">
+                            <Search className="h-4 w-4 text-gray-600 dark:text-gray-300" />
                         </div>
                         <div>
                             <div className="text-base font-medium">{title || t('common.search_filters')}</div>
-                            <div className="text-xs text-gray-500">{description || t('common.find_and_filter')}</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">{description || t('common.find_and_filter')}</div>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 text-gray-600 hover:bg-gray-200"
+                            className="h-8 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onResetFilters();
@@ -115,7 +115,7 @@ export default function SearchFilters({
                             {t('common.reset_filters')}
                         </Button>
                         <div className={`transition-transform duration-200 ${isFiltersOpen ? 'rotate-180' : ''}`}>
-                            <ChevronDown className="h-4 w-4 text-gray-500" />
+                            <ChevronDown className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                         </div>
                     </div>
                 </CardTitle>
@@ -188,7 +188,7 @@ export default function SearchFilters({
                                     variant="outline"
                                     onClick={onDirectionChange}
                                     title={t(`common.sort_${filters.direction === 'asc' ? 'ascending' : 'descending'}`)}
-                                    className="h-10 w-full border-gray-300 text-sm text-gray-700 hover:bg-gray-50"
+                                    className="h-10 w-full border-gray-300 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                                 >
                                     <ArrowUpDown className={`mr-2 h-4 w-4 ${filters.direction === 'asc' ? '' : 'rotate-180 transform'}`} />
                                     {filters.direction === 'asc' ? t('common.sort_ascending') : t('common.sort_descending')}
@@ -214,7 +214,7 @@ export default function SearchFilters({
                                     variant="outline"
                                     size="sm"
                                     onClick={onResetFilters}
-                                    className="h-10 border-gray-300 px-3 text-sm text-gray-700 hover:bg-gray-50"
+                                    className="h-10 border-gray-300 dark:border-gray-600 px-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                                 >
                                     <FilterX className="h-4 w-4" />
                                 </Button>

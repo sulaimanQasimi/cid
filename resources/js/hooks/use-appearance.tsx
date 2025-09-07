@@ -1,38 +1,46 @@
 import { useCallback, useEffect, useState } from 'react';
 
-export type Appearance = 'light';
+export type Appearance = 'light' | 'dark';
 
 const applyTheme = (appearance: Appearance) => {
-    // Force light mode only - remove dark class if present
-    document.documentElement.classList.remove('dark');
+    if (appearance === 'dark') {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
 };
 
 export function initializeTheme() {
-    // Always initialize with light mode
-    applyTheme('light');
+    // Get saved theme or default to light
+    const savedTheme = localStorage.getItem('appearance') as Appearance || 'light';
+    applyTheme(savedTheme);
 }
 
 export function useAppearance() {
-    const [appearance, setAppearance] = useState<Appearance>('light');
+    const [appearance, setAppearance] = useState<Appearance>(() => {
+        // Initialize with saved theme or default to light
+        if (typeof window !== 'undefined') {
+            return (localStorage.getItem('appearance') as Appearance) || 'light';
+        }
+        return 'light';
+    });
 
     const updateAppearance = useCallback((mode: Appearance) => {
-        // Only allow light mode
-        const lightMode: Appearance = 'light';
-        setAppearance(lightMode);
+        setAppearance(mode);
 
-        // Store in localStorage for client-side persistence...
-        localStorage.setItem('appearance', lightMode);
+        // Store in localStorage for client-side persistence
+        localStorage.setItem('appearance', mode);
 
-        // Store in cookie for SSR...
-        setCookie('appearance', lightMode);
+        // Store in cookie for SSR
+        setCookie('appearance', mode);
 
-        applyTheme(lightMode);
+        applyTheme(mode);
     }, []);
 
     useEffect(() => {
-        // Always set to light mode regardless of saved preference
-        updateAppearance('light');
-    }, [updateAppearance]);
+        // Apply the current theme on mount
+        applyTheme(appearance);
+    }, [appearance]);
 
     return { appearance, updateAppearance } as const;
 }

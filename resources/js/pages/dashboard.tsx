@@ -89,14 +89,14 @@ export default function Dashboard({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Intelligence Dashboard" />
-            <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-6">
+            <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-6 dark:bg-slate-900 dark:text-slate-100">
                 {/* Header Section */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-foreground">Intelligence Dashboard</h1>
-                        <p className="text-muted-foreground">Secure operations overview and system status</p>
+                        <h1 className="text-2xl font-bold text-foreground dark:text-slate-100">Intelligence Dashboard</h1>
+                        <p className="text-muted-foreground dark:text-slate-400">Secure operations overview and system status</p>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-slate-400">
                         <div className="flex items-center gap-1">
                             <div className="h-2 w-2 rounded-full bg-green-500"></div>
                             <span>System Status: Secure</span>
@@ -106,41 +106,41 @@ export default function Dashboard({
 
                 {/* Quick Stats Grid */}
                 <div className="grid auto-rows-min gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/50 p-4">
+                    <div className="border-sidebar-border/70 dark:border-slate-700 relative overflow-hidden rounded-xl border bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/50 p-4">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-medium text-muted-foreground">{t('dashboard.active_cases')}</p>
-                                <p className="text-2xl font-bold text-foreground">{stats.active_incidents}</p>
+                                <p className="text-sm font-medium text-muted-foreground dark:text-slate-400">{t('dashboard.active_cases')}</p>
+                                <p className="text-2xl font-bold text-foreground dark:text-slate-100">{stats.active_incidents}</p>
                             </div>
                             <Target className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                         </div>
                     </div>
                     
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950/50 dark:to-red-900/50 p-4">
+                    <div className="border-sidebar-border/70 dark:border-slate-700 relative overflow-hidden rounded-xl border bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950/50 dark:to-red-900/50 p-4">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-medium text-muted-foreground">{t('dashboard.active_incidents')}</p>
-                                <p className="text-2xl font-bold text-foreground">{stats.active_incidents}</p>
+                                <p className="text-sm font-medium text-muted-foreground dark:text-slate-400">{t('dashboard.active_incidents')}</p>
+                                <p className="text-2xl font-bold text-foreground dark:text-slate-100">{stats.active_incidents}</p>
                             </div>
                             <AlertTriangle className="h-8 w-8 text-red-600 dark:text-red-400" />
                         </div>
                     </div>
                     
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/50 dark:to-green-900/50 p-4">
+                    <div className="border-sidebar-border/70 dark:border-slate-700 relative overflow-hidden rounded-xl border bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/50 dark:to-green-900/50 p-4">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-medium text-muted-foreground">{t('dashboard.total_provinces')}</p>
-                                <p className="text-2xl font-bold text-foreground">{stats.total_provinces}</p>
+                                <p className="text-sm font-medium text-muted-foreground dark:text-slate-400">{t('dashboard.total_provinces')}</p>
+                                <p className="text-2xl font-bold text-foreground dark:text-slate-100">{stats.total_provinces}</p>
                             </div>
                             <MapPin className="h-8 w-8 text-green-600 dark:text-green-400" />
                         </div>
                     </div>
                     
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/50 dark:to-purple-900/50 p-4">
+                    <div className="border-sidebar-border/70 dark:border-slate-700 relative overflow-hidden rounded-xl border bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/50 dark:to-purple-900/50 p-4">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-medium text-muted-foreground">{t('dashboard.reports_generated')}</p>
-                                <p className="text-2xl font-bold text-foreground">{stats.total_reports}</p>
+                                <p className="text-sm font-medium text-muted-foreground dark:text-slate-400">{t('dashboard.reports_generated')}</p>
+                                <p className="text-2xl font-bold text-foreground dark:text-slate-100">{stats.total_reports}</p>
                             </div>
                             <FileText className="h-8 w-8 text-purple-600 dark:text-purple-400" />
                         </div>
@@ -150,57 +150,57 @@ export default function Dashboard({
                 {/* Location Statistics */}
                 <div className="grid gap-6 md:grid-cols-2">
                     {/* Province Statistics */}
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border">
-                        <div className="border-b border-border/50 bg-muted/20 px-6 py-4">
-                            <h3 className="font-semibold">{t('dashboard.province_statistics')}</h3>
+                    <div className="border-sidebar-border/70 dark:border-slate-700 relative overflow-hidden rounded-xl border dark:bg-slate-800">
+                        <div className="border-b border-border/50 bg-muted/20 px-6 py-4 dark:bg-slate-700 dark:border-slate-600">
+                            <h3 className="font-semibold dark:text-slate-100">{t('dashboard.province_statistics')}</h3>
                         </div>
-                        <div className="p-6">
+                        <div className="p-6 dark:bg-slate-800">
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
-                                    <span className="text-sm">{t('dashboard.total_provinces')}</span>
-                                    <span className="text-lg font-semibold text-blue-600">{locationStats.provinces.length}</span>
+                                    <span className="text-sm dark:text-slate-300">{t('dashboard.total_provinces')}</span>
+                                    <span className="text-lg font-semibold text-blue-600 dark:text-blue-400">{locationStats.provinces.length}</span>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-sm">{t('dashboard.total_districts')}</span>
-                                    <span className="text-lg font-semibold text-green-600">{locationStats.districts.length}</span>
+                                    <span className="text-sm dark:text-slate-300">{t('dashboard.total_districts')}</span>
+                                    <span className="text-lg font-semibold text-green-600 dark:text-green-400">{locationStats.districts.length}</span>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-sm">{t('dashboard.total_incidents')}</span>
-                                    <span className="text-lg font-semibold text-purple-600">{incidentStats.total_incidents}</span>
+                                    <span className="text-sm dark:text-slate-300">{t('dashboard.total_incidents')}</span>
+                                    <span className="text-lg font-semibold text-purple-600 dark:text-purple-400">{incidentStats.total_incidents}</span>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-sm">{t('dashboard.active_incidents')}</span>
-                                    <span className="text-lg font-semibold text-orange-600">{incidentStats.pending_incidents + incidentStats.investigating_incidents}</span>
+                                    <span className="text-sm dark:text-slate-300">{t('dashboard.active_incidents')}</span>
+                                    <span className="text-lg font-semibold text-orange-600 dark:text-orange-400">{incidentStats.pending_incidents + incidentStats.investigating_incidents}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* System Status */}
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border">
-                        <div className="border-b border-border/50 bg-muted/20 px-6 py-4">
-                            <h3 className="font-semibold">{t('dashboard.system_status')}</h3>
+                    <div className="border-sidebar-border/70 dark:border-slate-700 relative overflow-hidden rounded-xl border dark:bg-slate-800">
+                        <div className="border-b border-border/50 bg-muted/20 px-6 py-4 dark:bg-slate-700 dark:border-slate-600">
+                            <h3 className="font-semibold dark:text-slate-100">{t('dashboard.system_status')}</h3>
                         </div>
-                        <div className="p-6">
+                        <div className="p-6 dark:bg-slate-800">
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
-                                    <span className="text-sm">{t('dashboard.system_status')}</span>
+                                    <span className="text-sm dark:text-slate-300">{t('dashboard.system_status')}</span>
                                     <div className="flex items-center gap-1">
                                         <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                                        <span className="text-xs text-muted-foreground">{systemHealth.system_status}</span>
+                                        <span className="text-xs text-muted-foreground dark:text-slate-400">{systemHealth.system_status}</span>
                                     </div>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-sm">{t('dashboard.database_size')}</span>
-                                    <span className="text-xs text-muted-foreground">{systemHealth.database_size}</span>
+                                    <span className="text-sm dark:text-slate-300">{t('dashboard.database_size')}</span>
+                                    <span className="text-xs text-muted-foreground dark:text-slate-400">{systemHealth.database_size}</span>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-sm">{t('dashboard.storage_usage')}</span>
-                                    <span className="text-xs text-muted-foreground">{systemHealth.storage_usage.usage_percentage}%</span>
+                                    <span className="text-sm dark:text-slate-300">{t('dashboard.storage_usage')}</span>
+                                    <span className="text-xs text-muted-foreground dark:text-slate-400">{systemHealth.storage_usage.usage_percentage}%</span>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-sm">{t('dashboard.storage_free')}</span>
-                                    <span className="text-xs text-muted-foreground">{systemHealth.storage_usage.free}</span>
+                                    <span className="text-sm dark:text-slate-300">{t('dashboard.storage_free')}</span>
+                                    <span className="text-xs text-muted-foreground dark:text-slate-400">{systemHealth.storage_usage.free}</span>
                                 </div>
                             </div>
                         </div>
@@ -208,11 +208,11 @@ export default function Dashboard({
                 </div>
 
                 {/* AmCharts Map */}
-                <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[500px] overflow-hidden rounded-xl border">
-                    <div className="border-b border-border/50 bg-muted/20 px-6 py-4">
-                        <h3 className="font-semibold">{t('dashboard.location_map')}</h3>
+                <div className="border-sidebar-border/70 dark:border-slate-700 relative min-h-[500px] overflow-hidden rounded-xl border dark:bg-slate-800">
+                    <div className="border-b border-border/50 bg-muted/20 px-6 py-4 dark:bg-slate-700 dark:border-slate-600">
+                        <h3 className="font-semibold dark:text-slate-100">{t('dashboard.location_map')}</h3>
                     </div>
-                    <div className="p-6">
+                    <div className="p-6 dark:bg-slate-800">
                         <div id="mapChart" className="h-96 w-full"></div>
                     </div>
                 </div>

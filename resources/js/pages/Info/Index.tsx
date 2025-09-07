@@ -297,7 +297,7 @@ export default function InfoIndex({ infos, types = [], categories = [], departme
                     title={t('info.page_title')}
                     description={t('info.page_description')}
                     buttonText={t('info.add_button')}
-                    icon={<Shield className="h-10 w-10 text-white" />}
+                    icon={<Shield className="h-10 w-10 text-white dark:text-gray-100" />}
                     model="info"
                     routeName="infos.create"
                     theme="purple"
@@ -349,15 +349,15 @@ export default function InfoIndex({ infos, types = [], categories = [], departme
 
                 {/* Results Table */}
                 <div className="mt-8">
-                    <Card className="overflow-hidden rounded-3xl border-0 bg-gradient-to-bl from-white to-purple-50/30 shadow-2xl">
-                        <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 py-6 text-white">
+                    <Card className="overflow-hidden rounded-3xl border-0 bg-gradient-to-bl from-white to-purple-50/30 dark:from-gray-800 dark:to-purple-900/30 shadow-2xl">
+                        <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 dark:from-purple-600 dark:to-purple-700 py-6 text-white dark:text-gray-100">
                             <CardTitle className="flex items-center gap-4">
-                                <div className="rounded-2xl bg-white/20 p-3 shadow-lg backdrop-blur-sm">
+                                <div className="rounded-2xl bg-white/20 dark:bg-gray-800/20 p-3 shadow-lg backdrop-blur-sm">
                                     <TrendingUp className="h-6 w-6" />
                                 </div>
                                 <div>
                                     <div className="text-2xl font-bold">{t('info.table.title')}</div>
-                                    <div className="text-sm font-medium text-purple-100">{t('info.table.description')}</div>
+                                    <div className="text-sm font-medium text-purple-100 dark:text-purple-200">{t('info.table.description')}</div>
                                 </div>
                             </CardTitle>
                         </CardHeader>
@@ -365,21 +365,21 @@ export default function InfoIndex({ infos, types = [], categories = [], departme
                             <div className="overflow-hidden rounded-b-3xl">
                                 <Table>
                                     <TableHeader>
-                                        <TableRow className="border-0 bg-gradient-to-l from-purple-100 to-purple-200">
-                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800">{t('info.table.id')}</TableHead>
-                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800">{t('info.table.name')}</TableHead>
-                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800">{t('info.table.type')}</TableHead>
-                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800">{t('info.table.category')}</TableHead>
-                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800">
+                                        <TableRow className="border-0 bg-gradient-to-l from-purple-100 to-purple-200 dark:from-purple-800 dark:to-purple-900">
+                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800 dark:text-purple-200">{t('info.table.id')}</TableHead>
+                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800 dark:text-purple-200">{t('info.table.name')}</TableHead>
+                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800 dark:text-purple-200">{t('info.table.type')}</TableHead>
+                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800 dark:text-purple-200">{t('info.table.category')}</TableHead>
+                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800 dark:text-purple-200">
                                                 {t('info.table.department')}
                                             </TableHead>
-                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800">{t('info.table.owner')}</TableHead>
-                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800">{t('info.table.status')}</TableHead>
-                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800">{t('info.table.visits')}</TableHead>
-                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800">
+                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800 dark:text-purple-200">{t('info.table.owner')}</TableHead>
+                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800 dark:text-purple-200">{t('info.table.status')}</TableHead>
+                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800 dark:text-purple-200">{t('info.table.visits')}</TableHead>
+                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800 dark:text-purple-200">
                                                 {t('info.table.created_at')}
                                             </TableHead>
-                                            <TableHead className="px-6 py-6 text-right text-lg font-bold text-purple-800">
+                                            <TableHead className="px-6 py-6 text-right text-lg font-bold text-purple-800 dark:text-purple-200">
                                                 {t('info.table.actions')}
                                             </TableHead>
                                         </TableRow>
@@ -389,77 +389,77 @@ export default function InfoIndex({ infos, types = [], categories = [], departme
                                             infos.data.map((info: InfoRecord) => (
                                                 <TableRow
                                                     key={info.id}
-                                                    className="border-b border-purple-100 transition-colors duration-300 hover:bg-purple-50/50"
+                                                    className="border-b border-purple-100 dark:border-purple-800 transition-colors duration-300 hover:bg-purple-50/50 dark:hover:bg-purple-900/50"
                                                 >
-                                                    <TableCell className="px-6 py-6 text-lg font-bold text-purple-900">{info.id}</TableCell>
-                                                    <TableCell className="px-6 py-6 text-lg font-bold text-purple-900">{info.name}</TableCell>
+                                                    <TableCell className="px-6 py-6 text-lg font-bold text-purple-900 dark:text-purple-100">{info.id}</TableCell>
+                                                    <TableCell className="px-6 py-6 text-lg font-bold text-purple-900 dark:text-purple-100">{info.name}</TableCell>
                                                     <TableCell className="px-6 py-6">
                                                         {info.infoType ? (
                                                             <Badge
                                                                 variant="outline"
-                                                                className="rounded-xl border-purple-300 bg-gradient-to-l from-purple-100 to-purple-200 px-4 py-2 font-semibold text-purple-800"
+                                                                className="rounded-xl border-purple-300 dark:border-purple-600 bg-gradient-to-l from-purple-100 to-purple-200 dark:from-purple-800 dark:to-purple-900 px-4 py-2 font-semibold text-purple-800 dark:text-purple-200"
                                                             >
                                                                 {info.infoType.name}
                                                             </Badge>
                                                         ) : (
-                                                            <span className="font-medium text-purple-600">-</span>
+                                                            <span className="font-medium text-purple-600 dark:text-purple-400">-</span>
                                                         )}
                                                     </TableCell>
                                                     <TableCell className="px-6 py-6">
                                                         {info.infoCategory ? (
                                                             <Badge
                                                                 variant="outline"
-                                                                className="rounded-xl border-purple-300 bg-gradient-to-l from-purple-100 to-purple-200 px-4 py-2 font-semibold text-purple-800"
+                                                                className="rounded-xl border-purple-300 dark:border-purple-600 bg-gradient-to-l from-purple-100 to-purple-200 dark:from-purple-800 dark:to-purple-900 px-4 py-2 font-semibold text-purple-800 dark:text-purple-200"
                                                             >
                                                                 {info.infoCategory.name}
                                                             </Badge>
                                                         ) : (
-                                                            <span className="font-medium text-purple-600">-</span>
+                                                            <span className="font-medium text-purple-600 dark:text-purple-400">-</span>
                                                         )}
                                                     </TableCell>
                                                     <TableCell className="px-6 py-6">
                                                         {info.department ? (
                                                             <Badge
                                                                 variant="outline"
-                                                                className="rounded-xl border-purple-300 bg-gradient-to-l from-purple-100 to-purple-200 px-4 py-2 font-semibold text-purple-800"
+                                                                className="rounded-xl border-purple-300 dark:border-purple-600 bg-gradient-to-l from-purple-100 to-purple-200 dark:from-purple-800 dark:to-purple-900 px-4 py-2 font-semibold text-purple-800 dark:text-purple-200"
                                                             >
                                                                 {info.department.name}
                                                             </Badge>
                                                         ) : (
-                                                            <span className="font-medium text-purple-600">-</span>
+                                                            <span className="font-medium text-purple-600 dark:text-purple-400">-</span>
                                                         )}
                                                     </TableCell>
                                                     <TableCell className="px-6 py-6">
                                                         {info.user ? (
                                                             <Badge
                                                                 variant="outline"
-                                                                className="rounded-xl border-blue-300 bg-gradient-to-l from-blue-100 to-blue-200 px-4 py-2 font-semibold text-blue-800"
+                                                                className="rounded-xl border-blue-300 dark:border-blue-600 bg-gradient-to-l from-blue-100 to-blue-200 dark:from-blue-800 dark:to-blue-900 px-4 py-2 font-semibold text-blue-800 dark:text-blue-200"
                                                             >
                                                                 {info.user.name}
                                                             </Badge>
                                                         ) : info.creator ? (
                                                             <Badge
                                                                 variant="outline"
-                                                                className="rounded-xl border-green-300 bg-gradient-to-l from-green-100 to-green-200 px-4 py-2 font-semibold text-green-800"
+                                                                className="rounded-xl border-green-300 dark:border-green-600 bg-gradient-to-l from-green-100 to-green-200 dark:from-green-800 dark:to-green-900 px-4 py-2 font-semibold text-green-800 dark:text-green-200"
                                                             >
                                                                 {info.creator.name}
                                                             </Badge>
                                                         ) : (
-                                                            <span className="font-medium text-purple-600">-</span>
+                                                            <span className="font-medium text-purple-600 dark:text-purple-400">-</span>
                                                         )}
                                                     </TableCell>
                                                     <TableCell className="px-6 py-6">
                                                         {info.confirmed ? (
                                                             <Badge
                                                                 variant="outline"
-                                                                className="rounded-xl border-green-300 bg-gradient-to-l from-green-100 to-green-200 px-4 py-2 font-semibold text-green-800"
+                                                                className="rounded-xl border-green-300 dark:border-green-600 bg-gradient-to-l from-green-100 to-green-200 dark:from-green-800 dark:to-green-900 px-4 py-2 font-semibold text-green-800 dark:text-green-200"
                                                             >
                                                                 {t('info.status.confirmed')}
                                                             </Badge>
                                                         ) : (
                                                             <Badge
                                                                 variant="outline"
-                                                                className="rounded-xl border-yellow-300 bg-gradient-to-l from-yellow-100 to-yellow-200 px-4 py-2 font-semibold text-yellow-800"
+                                                                className="rounded-xl border-yellow-300 dark:border-yellow-600 bg-gradient-to-l from-yellow-100 to-yellow-200 dark:from-yellow-800 dark:to-yellow-900 px-4 py-2 font-semibold text-yellow-800 dark:text-yellow-200"
                                                             >
                                                                 {t('info.status.pending')}
                                                             </Badge>
@@ -467,11 +467,11 @@ export default function InfoIndex({ infos, types = [], categories = [], departme
                                                     </TableCell>
                                                     <TableCell className="px-6 py-6">
                                                         <div className="flex flex-col items-center gap-1">
-                                                            <div className="text-lg font-bold text-purple-600">{info.visits_count || 0}</div>
-                                                            <div className="text-xs text-purple-500">{t('info.table.visits_label')}</div>
+                                                            <div className="text-lg font-bold text-purple-600 dark:text-purple-400">{info.visits_count || 0}</div>
+                                                            <div className="text-xs text-purple-500 dark:text-purple-400">{t('info.table.visits_label')}</div>
                                                         </div>
                                                     </TableCell>
-                                                    <TableCell className="px-6 py-6 font-medium text-purple-800">
+                                                    <TableCell className="px-6 py-6 font-medium text-purple-800 dark:text-purple-200">
                                                         {new Date(info.created_at).toLocaleDateString()}
                                                     </TableCell>
                                                     <TableCell className="px-6 py-6">
@@ -482,7 +482,7 @@ export default function InfoIndex({ infos, types = [], categories = [], departme
                                                                     size="icon"
                                                                     asChild
                                                                     title={t('info.actions.view')}
-                                                                    className="h-10 w-10 rounded-xl text-blue-600 transition-all duration-300 hover:scale-110 hover:bg-blue-100 hover:text-blue-700"
+                                                                    className="h-10 w-10 rounded-xl text-blue-600 dark:text-blue-400 transition-all duration-300 hover:scale-110 hover:bg-blue-100 dark:hover:bg-blue-900 hover:text-blue-700 dark:hover:text-blue-300"
                                                                 >
                                                                     <Link href={route('infos.show', info.id)}>
                                                                         <Eye className="h-5 w-5" />
@@ -502,8 +502,8 @@ export default function InfoIndex({ infos, types = [], categories = [], departme
                                                                     }
                                                                     className={`h-10 w-10 rounded-xl transition-all duration-300 hover:scale-110 ${
                                                                         info.confirmed
-                                                                            ? 'cursor-not-allowed text-gray-400 opacity-50'
-                                                                            : 'text-green-600 hover:bg-green-100 hover:text-green-700'
+                                                                            ? 'cursor-not-allowed text-gray-400 dark:text-gray-500 opacity-50'
+                                                                            : 'text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900 hover:text-green-700 dark:hover:text-green-300'
                                                                     }`}
                                                                 >
                                                                     <Link href={route('infos.edit', info.id)}>
@@ -524,8 +524,8 @@ export default function InfoIndex({ infos, types = [], categories = [], departme
                                                                     }
                                                                     className={`h-10 w-10 rounded-xl transition-all duration-300 hover:scale-110 ${
                                                                         info.confirmed
-                                                                            ? 'cursor-not-allowed text-gray-400 opacity-50'
-                                                                            : 'text-red-600 hover:bg-red-100 hover:text-red-700'
+                                                                            ? 'cursor-not-allowed text-gray-400 dark:text-gray-500 opacity-50'
+                                                                            : 'text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900 hover:text-red-700 dark:hover:text-red-300'
                                                                     }`}
                                                                 >
                                                                     <Trash className="h-5 w-5" />
@@ -538,7 +538,7 @@ export default function InfoIndex({ infos, types = [], categories = [], departme
                                                                         size="icon"
                                                                         onClick={() => confirmInfo(info)}
                                                                         title={t('info.actions.confirm')}
-                                                                        className="h-10 w-10 rounded-xl text-green-600 transition-all duration-300 hover:scale-110 hover:bg-green-100 hover:text-green-700"
+                                                                        className="h-10 w-10 rounded-xl text-green-600 dark:text-green-400 transition-all duration-300 hover:scale-110 hover:bg-green-100 dark:hover:bg-green-900 hover:text-green-700 dark:hover:text-green-300"
                                                                     >
                                                                         <Check className="h-5 w-5" />
                                                                     </Button>
@@ -549,7 +549,7 @@ export default function InfoIndex({ infos, types = [], categories = [], departme
                                                                 size="icon"
                                                                 asChild
                                                                 title={t('criminal.analytics.view_analytics')}
-                                                                className="h-10 w-10 rounded-xl text-purple-600 transition-all duration-300 hover:scale-110 hover:bg-purple-100 hover:text-purple-700"
+                                                                className="h-10 w-10 rounded-xl text-purple-600 dark:text-purple-400 transition-all duration-300 hover:scale-110 hover:bg-purple-100 dark:hover:bg-purple-900 hover:text-purple-700 dark:hover:text-purple-300"
                                                             >
                                                                 <Link href={`/analytics/Info/${info.id}`}>
                                                                     <BarChart3 className="h-5 w-5" />
@@ -562,12 +562,12 @@ export default function InfoIndex({ infos, types = [], categories = [], departme
                                         ) : (
                                             <TableRow>
                                                 <TableCell colSpan={10} className="h-32 text-center">
-                                                    <div className="flex flex-col items-center gap-4 text-purple-600">
-                                                        <div className="rounded-full bg-purple-100 p-4">
-                                                            <AlertTriangle className="h-16 w-16 text-purple-400" />
+                                                    <div className="flex flex-col items-center gap-4 text-purple-600 dark:text-purple-400">
+                                                        <div className="rounded-full bg-purple-100 dark:bg-purple-900 p-4">
+                                                            <AlertTriangle className="h-16 w-16 text-purple-400 dark:text-purple-500" />
                                                         </div>
                                                         <p className="text-xl font-bold">{t('info.no_records')}</p>
-                                                        <p className="text-purple-500">{t('info.no_records_description')}</p>
+                                                        <p className="text-purple-500 dark:text-purple-400">{t('info.no_records_description')}</p>
                                                     </div>
                                                 </TableCell>
                                             </TableRow>
@@ -582,7 +582,7 @@ export default function InfoIndex({ infos, types = [], categories = [], departme
                 {/* Pagination */}
                 {infos && infos.links && infos.links.length > 0 && (
                     <div className="mt-8 flex justify-center">
-                        <div className="rounded-3xl border border-purple-200 bg-gradient-to-l from-purple-50 to-white p-4 shadow-2xl">
+                        <div className="rounded-3xl border border-purple-200 dark:border-purple-700 bg-gradient-to-l from-purple-50 to-white dark:from-purple-900 dark:to-gray-800 p-4 shadow-2xl">
                             <Pagination links={infos.links} />
                         </div>
                     </div>

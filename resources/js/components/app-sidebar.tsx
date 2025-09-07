@@ -27,10 +27,14 @@ import {
     Settings,
     Target,
     MessageCircle,
+    Sun,
+    Moon,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/language-context';
 import { useTranslation } from '@/lib/i18n/translate';
 import { hasPermission } from '@/lib/permissions';
+import { useAppearance } from '@/hooks/use-appearance';
+import { Button } from '@/components/ui/button';
 import React from 'react';
  
 
@@ -312,6 +316,11 @@ export function AppSidebar() {
     const { t } = useTranslation();
     const { direction } = useLanguage();
     const { auth } = usePage().props as any;
+    const { appearance, updateAppearance } = useAppearance();
+
+    const toggleTheme = () => {
+        updateAppearance(appearance === 'light' ? 'dark' : 'light');
+    };
     // Determine sidebar side based on current language direction
     const sidebarSide = direction === 'rtl' ? 'right' : 'left';
 
@@ -397,7 +406,28 @@ export function AppSidebar() {
             </SidebarContent>
 
             {/* Footer */}
-            <SidebarFooter className="p-4 border-t border-slate-800 dark:border-slate-700">
+            <SidebarFooter className="p-4 border-t border-slate-800 dark:border-slate-700 space-y-3">
+                {/* Theme Toggle */}
+                <div className="flex justify-center">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={toggleTheme}
+                        className="w-full flex items-center gap-2 text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+                    >
+                        {appearance === 'light' ? (
+                            <>
+                                <Moon className="h-4 w-4" />
+                                <span className="group-data-[collapsible=icon]:hidden">{t('common.dark_mode')}</span>
+                            </>
+                        ) : (
+                            <>
+                                <Sun className="h-4 w-4" />
+                                <span className="group-data-[collapsible=icon]:hidden">{t('common.light_mode')}</span>
+                            </>
+                        )}
+                    </Button>
+                </div>
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

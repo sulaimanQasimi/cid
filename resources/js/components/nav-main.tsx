@@ -46,16 +46,16 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                         asChild
                         tooltip={{ children: item.title }}
                         isActive={isActive}
-                        className="mx-3 my-1 text-blue-900 hover:text-blue-900 hover:bg-blue-200 data-[active=true]:bg-blue-400 data-[active=true]:text-white transition-colors rounded-md"
+                        className="mx-3 my-1 text-blue-900 dark:text-blue-300 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 data-[active=true]:bg-blue-400 dark:data-[active=true]:bg-blue-600 data-[active=true]:text-white dark:data-[active=true]:text-white transition-colors rounded-md"
                     >
                         <Link href={item.href || '#'} prefetch>
                             <div className="flex items-center gap-3 w-full">
-                                {item.icon && <item.icon className="h-4 w-4 text-blue-900 group-hover:text-blue-900 group-data-[active=true]:text-black" />}
+                                {item.icon && <item.icon className="h-4 w-4 text-blue-900 dark:text-blue-300 group-hover:text-blue-900 dark:group-hover:text-blue-200 group-data-[active=true]:text-black dark:group-data-[active=true]:text-white" />}
                                 {!isCollapsed && <span className="text-sm font-medium">{item.title}</span>}
                             </div>
                             {!isCollapsed && item.items && item.items.length > 0 && (
                                 <ChevronDown 
-                                    className={`ml-10 h-4 w-4 text-blue-900 group-hover:text-blue-900 group-data-[active=true]:text-black transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                                    className={`ml-10 h-4 w-4 text-blue-900 dark:text-blue-300 group-hover:text-blue-900 dark:group-hover:text-blue-200 group-data-[active=true]:text-black dark:group-data-[active=true]:text-white transition-transform ${isOpen ? 'rotate-180' : ''}`}
                                     onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
@@ -77,11 +77,11 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                         (subItem.href !== '/' && !subItem.href.startsWith('#') && page.url.startsWith(subItem.href + '/'))
                                     ))}
                                     tooltip={{ children: subItem.title }}
-                                    className="mx-3 text-blue-900 hover:text-blue-900 hover:bg-blue-200 data-[active=true]:bg-blue-400 data-[active=true]:text-white transition-colors rounded-md"
+                                    className="mx-3 text-blue-900 dark:text-blue-300 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 data-[active=true]:bg-blue-400 dark:data-[active=true]:bg-blue-600 data-[active=true]:text-white dark:data-[active=true]:text-white transition-colors rounded-md"
                                 >
                                     <Link href={subItem.href || '#'} prefetch>
                                         <div className="flex items-center gap-3 w-full pl-4">
-                                            {subItem.icon && <subItem.icon className="h-3 w-3 text-blue-900 group-hover:text-blue-900 group-data-[active=true]:text-black" />}
+                                            {subItem.icon && <subItem.icon className="h-3 w-3 text-blue-900 dark:text-blue-300 group-hover:text-blue-900 dark:group-hover:text-blue-200 group-data-[active=true]:text-black dark:group-data-[active=true]:text-white" />}
                                             <span className="text-xs">{subItem.title}</span>
                                         </div>
                                     </Link>
@@ -99,11 +99,11 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                     asChild
                     isActive={isActive}
                     tooltip={{ children: item.title }}
-                    className="mx-3 my-1 text-blue-900 hover:text-blue-900 hover:bg-blue-200 data-[active=true]:bg-blue-600 data-[active=true]:text-white transition-colors rounded-md"
+                    className="mx-3 my-1 text-blue-900 dark:text-blue-300 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 data-[active=true]:bg-blue-600 dark:data-[active=true]:bg-blue-700 data-[active=true]:text-white dark:data-[active=true]:text-white transition-colors rounded-md"
                 >
                     <Link href={item.href || '#'} prefetch>
                         <div className="flex items-center gap-3 w-full">
-                            {item.icon && <item.icon className="h-4 w-4 text-blue-900 group-hover:text-blue-900 group-data-[active=true]:text-black" />}
+                            {item.icon && <item.icon className="h-4 w-4 text-blue-900 dark:text-blue-300 group-hover:text-blue-900 dark:group-hover:text-blue-200 group-data-[active=true]:text-black dark:group-data-[active=true]:text-white" />}
                             {!isCollapsed && <span className="text-sm font-medium">{item.title}</span>}
                         </div>
                     </Link>

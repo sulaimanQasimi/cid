@@ -11,7 +11,9 @@ export default function AppSidebarLayout({ children, breadcrumbs = [] }: PropsWi
             <AppSidebar />
             <AppContent variant="sidebar">
                 <AppSidebarHeader breadcrumbs={breadcrumbs} />
-                {children}
+                <div className="bg-white dark:bg-gray-900 min-h-screen">
+                    {children}
+                </div>
             </AppContent>
         </AppShell>
     );

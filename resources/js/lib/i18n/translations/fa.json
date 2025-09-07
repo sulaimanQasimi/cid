@@ -1616,5 +1616,7 @@
   "departments.no_records": "معلومات ثبت شده نیست",
   "info_types.no_records_description" : "هیڅ معلومات ثبت شده نیست",
   "common.sort_by": "به ترتیب",
-  "info_types.search_placeholder": "جستجوی "
+  "info_types.search_placeholder": "جستجوی",
+  "common.dark_mode": "حالت تاریک",
+  "common.light_mode": "حالت روشن"
 }
