@@ -1643,7 +1643,6 @@
   "criminal.show.description": "د مجرم جزییات",
   "criminal.create.persian_date_label": "تاریخ فارسی",
   "criminal.edit.description": "د مجرم جزییات تازه کړئ",
-
   "info_types.show.print_button": "چاپ کړئ",
   "info_types.show.title": "جزییات استخباراتي",
   "info_types.show.create_first_info_button": "نوی استخباراتي ریکارډ اضافه کړئ",
@@ -1651,5 +1650,6 @@
   "info_types.show.table.title": "عنوان",
   "info_types.show.table.status": "وضعیت",
   "info_types.show.table.created_at": "تاریخ ثبت",
-  "info_types.show.table.actions": "عملیات"
+  "info_types.show.table.actions": "عملیات",
+  "criminal.no_records_description":"هیڅ مجرمینو ثبتونه ونه موندل شول"
 }
