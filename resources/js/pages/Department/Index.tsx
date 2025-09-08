@@ -267,129 +267,113 @@ export default function DepartmentIndex({
             icon={<TrendingUp className="h-6 w-6 text-white" />}
             model="department"
             routeName="departments.create"
-            theme="blue"
             buttonText={t('departments.add_button')}
+            theme="blue"
           />
-          
-          <Card className="overflow-hidden rounded-lg border dark:border-gray-700 dark:bg-gray-800 shadow-sm">
+          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-blue-50/30 dark:to-blue-900/20 border-0 rounded-3xl">
             <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/50 dark:bg-muted/30">
-                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('departments.table.id')}</TableHead>
-                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('departments.table.name')}</TableHead>
-                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('departments.table.code')}</TableHead>
-                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('departments.table.info_count')}</TableHead>
-                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('departments.table.created_at')}</TableHead>
-                    <TableHead className="px-6 py-4 text-right font-semibold text-foreground dark:text-foreground">
-                      {t('departments.table.actions')}
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {departments.data && departments.data.length > 0 ? (
-                    departments.data.map((department) => (
-                      <TableRow
-                        key={department.id}
-                        className="hover:bg-muted/50 dark:hover:bg-muted/30 border-b border-border dark:border-border"
-                      >
-                        <TableCell className="px-6 py-4 font-medium text-foreground dark:text-foreground">{department.id}</TableCell>
-                        <TableCell className="px-6 py-4 font-medium text-foreground dark:text-foreground">{department.name}</TableCell>
-                        <TableCell className="px-6 py-4">
-                          <Badge variant="secondary" className="bg-secondary text-secondary-foreground dark:bg-secondary dark:text-secondary-foreground">
-                            {department.code}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="px-6 py-4">
-                          <div className="text-center">
-                            <div className="font-semibold text-foreground dark:text-foreground">{department.infos_count || 0}</div>
-                            <div className="text-xs text-muted-foreground dark:text-muted-foreground">{t('departments.table.info_records')}</div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-6 py-4 text-muted-foreground dark:text-muted-foreground">
-                          {department.created_at ? (
-                            formatPersianDate(department.created_at)
-                          ) : (
-                            <span className="text-muted-foreground dark:text-muted-foreground">-</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="px-6 py-4">
-                          <div className="flex items-center justify-end gap-1">
-                            <CanView model="department">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                asChild
-                                title={t('departments.actions.view')}
-                                className="h-8 w-8"
-                              >
-                                <Link href={route('departments.show', department.id)}>
-                                  <Eye className="h-4 w-4" />
-                                </Link>
-                              </Button>
-                            </CanView>
-                            <CanUpdate model="department">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                asChild
-                                title={t('departments.actions.edit')}
-                                className="h-8 w-8"
-                              >
-                                <Link href={route('departments.edit', department.id)}>
-                                  <Pencil className="h-4 w-4" />
-                                </Link>
-                              </Button>
-                            </CanUpdate>
-                            <CanDelete model="department">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => openDeleteDialog(department)}
-                                title={t('departments.actions.delete')}
-                                className="h-8 w-8"
-                              >
-                                <Trash className="h-4 w-4" />
-                              </Button>
-                            </CanDelete>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              asChild
-                              title={t('departments.analytics.view_analytics')}
-                              className="h-8 w-8"
-                            >
-                              <Link href={`/analytics/Department/${department.id}`}>
-                                <BarChart3 className="h-4 w-4" />
-                              </Link>
-                            </Button>
+              <div className="overflow-hidden rounded-b-3xl">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-gradient-to-l from-blue-100 dark:from-blue-900 to-blue-200 dark:to-blue-800 border-0">
+                      <TableHead className="text-blue-800 dark:text-blue-200 font-bold text-lg py-6 px-6">{t('departments.table.name')}</TableHead>
+                      <TableHead className="text-blue-800 dark:text-blue-200 font-bold text-lg py-6 px-6">{t('departments.table.code')}</TableHead>
+                      <TableHead className="text-blue-800 dark:text-blue-200 font-bold text-lg py-6 px-6">{t('departments.table.info_count')}</TableHead>
+                      <TableHead className="text-blue-800 dark:text-blue-200 font-bold text-lg py-6 px-6">{t('departments.table.created_at')}</TableHead>
+                      <TableHead className="text-blue-800 dark:text-blue-200 font-bold text-lg py-6 px-6">{t('departments.table.actions')}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {departments.data && departments.data.length > 0 ? (
+                      departments.data.map((department) => (
+                        <TableRow key={department.id} className="hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-colors duration-300 border-b border-blue-100 dark:border-blue-800">
+                          <TableCell className="font-bold text-blue-900 dark:text-blue-100 py-6 px-6 text-lg">{department.name}</TableCell>
+                          <TableCell className="text-blue-800 dark:text-blue-200 py-6 px-6">
+                            <Badge variant="outline" className="bg-gradient-to-l from-blue-100 dark:from-blue-800 to-blue-200 dark:to-blue-700 text-blue-800 dark:text-blue-200 border-blue-300 dark:border-blue-600 px-4 py-2 rounded-xl font-semibold">
+                              {department.code}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-orange-800 dark:text-orange-200 py-6 px-6 font-medium">
+                            <Badge variant="outline" className="bg-gradient-to-l from-blue-100 dark:from-blue-800 to-blue-200 dark:to-blue-700 text-blue-800 dark:text-blue-200 border-blue-300 dark:border-blue-600 px-4 py-2 rounded-xl font-semibold">
+                              {department.infos_count} {t('departments.info_records')}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-blue-800 dark:text-blue-200 py-6 px-6 font-medium">
+                            {department.created_at ? (
+                              format(new Date(department.created_at), 'MMM d, yyyy')
+                            ) : (
+                              <span className="text-blue-600 dark:text-blue-400">{t('departments.na')}</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="py-6 px-6">
+                            <div className="flex items-center gap-2">
+                              <CanView model="department">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  asChild
+                                  title={t('departments.actions.view')}
+                                  className="h-10 w-10 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-800 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-300 hover:scale-110"
+                                >
+                                  <Link href={route('departments.show', department.id)}>
+                                    <Eye className="h-5 w-5" />
+                                  </Link>
+                                </Button>
+                              </CanView>
+                              <CanUpdate model="department">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  asChild
+                                  title={t('departments.actions.edit')}
+                                  className="h-10 w-10 rounded-xl hover:bg-green-100 dark:hover:bg-green-800 text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-all duration-300 hover:scale-110"
+                                >
+                                  <Link href={route('departments.edit', department.id)}>
+                                    <Pencil className="h-5 w-5" />
+                                  </Link>
+                                </Button>
+                              </CanUpdate>
+                              <CanDelete model="department">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => openDeleteDialog(department)}
+                                  title={t('departments.actions.delete')}
+                                  className="h-10 w-10 rounded-xl text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-100 dark:hover:bg-red-800 transition-all duration-300 hover:scale-110"
+                                >
+                                  <Trash className="h-5 w-5" />
+                                </Button>
+                              </CanDelete>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={5} className="h-32 text-center">
+                          <div className="flex flex-col items-center gap-4 text-blue-600 dark:text-blue-400">
+                            <div className="p-4 bg-blue-100 dark:bg-blue-800 rounded-full">
+                              <AlertTriangle className="h-16 w-16 text-blue-400 dark:text-blue-300" />
+                            </div>
+                            <p className="text-xl font-bold">{t('departments.no_records')}</p>
+                            <p className="text-blue-500 dark:text-blue-400">No department records found</p>
                           </div>
                         </TableCell>
                       </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={6} className="h-32 text-center">
-                        <div className="flex flex-col items-center gap-4 text-muted-foreground dark:text-muted-foreground">
-                          <div className="rounded-full bg-muted dark:bg-black p-4">
-                            <AlertTriangle className="h-8 w-8 text-muted-foreground dark:text-muted-foreground dark:bg-black" />
-                          </div>
-                          <p className="text-lg font-semibold text-foreground dark:text-foreground">{t('departments.no_records')}</p>
-                          <p className="text-sm text-muted-foreground dark:text-muted-foreground">{t('departments.no_records_description')}</p>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Pagination */}
-        {departments && departments.links && departments.links.length > 0 && (
-          <div className="mt-6 flex justify-center">
-            <Pagination links={departments.links} />
+                {/* Pagination */}
+        {departments.links && departments.links.length > 0 && (
+          <div className="mt-8 flex justify-center">
+            <div className="bg-gradient-to-l from-blue-50 dark:from-blue-900/20 to-white dark:to-gray-800 p-4 rounded-3xl shadow-2xl border border-blue-200 dark:border-blue-700">
+              <Pagination links={departments.links} />
+            </div>
           </div>
         )}
       </div>
