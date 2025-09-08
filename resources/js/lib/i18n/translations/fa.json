@@ -1622,9 +1622,9 @@
   "info_categories.search_placeholder": "جستجوی کټه ګوري",
   "info_categories.no_records_description": "هیڅ ګزارشاتو کټګوری ونه موندل شو",
   "info_types.print.back_button": "بازگشت",
-  "info_types.print.page_title": "گزارش عملیات استخباراتي",
+  "info_types.print.page_title": "گزارشات تحلیلی او تفضیلی ",
   "info_types.print.print_button": "چاپ",
-  "info_types.print.report_title": "گزارش عملیات استخباراتي",
+  "info_types.print.report_title": "گزارشات تحلیلی او تفضیلی ",
   "info_types.print.generated_on": "تاریخ چاپ",
   "info_types.print.details_title": "جزئیات",
   "info_types.print.details_description": "توضیحات",
@@ -1652,9 +1652,16 @@
   "info_types.show.table.status": "وضعیت",
   "info_types.show.table.created_at": "تاریخ ثبت",
   "info_types.show.table.actions": "عملیات",
-  
-"info.create.sections.selection":"انتخاب",
-"info.create.sections.required":"* "
-
+  "info.create.sections.selection": "انتخاب",
+  "info.create.sections.required": "* ",
+  "info.create.sections.basic_info": "اطلاعات پایه",
+  "info.create.sections.content": "محتوا",
+  "info.create.subtitle": "ایجاد رکورد اطلاعاتی جدید",
+  "info.create.location_title": "انتخاب موقعیت مکانی",
+  "info.create.placeholders.name": "نام رکورد اطلاعاتی را وارد کنید",
+  "info.create.placeholders.description": "توضیحات رکورد اطلاعاتی را وارد کنید",
+  "info_types.print.associated_info_title":"معلومات مرتبط",
+  "info_types.print.associated_info_description":"معلومات مرتبط",
+  "info_types.print.records_count":"تعداد رکوردها"
 
 }

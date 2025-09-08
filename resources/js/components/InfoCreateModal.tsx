@@ -118,25 +118,66 @@ export default function InfoCreateModal({
                     minHeight: '98vh'
                 }}
             >
-                <DialogHeader className="relative pb-8">
-                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 via-purple-500/20 via-pink-500/20 to-orange-400/20 rounded-t-lg"></div>
-                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-300/10 via-purple-400/10 via-pink-400/10 to-orange-300/10 rounded-t-lg animate-pulse"></div>
-                    <DialogTitle className="relative flex items-center gap-6 text-3xl font-bold">
-                        <div className="relative">
-                            <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-purple-500 via-pink-500 to-orange-400 rounded-2xl blur-lg opacity-40 animate-pulse"></div>
-                            <div className="relative rounded-2xl bg-gradient-to-r from-cyan-400 via-purple-500 via-pink-500 to-orange-400 p-4 shadow-2xl">
-                                <Sparkles className="h-8 w-8 text-white animate-pulse" />
+                <DialogHeader className="relative pb-12 overflow-hidden">
+                    {/* Animated Background Layers */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/30 via-purple-500/30 via-pink-500/30 to-orange-400/30 rounded-t-3xl"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-300/20 via-purple-400/20 via-pink-400/20 to-orange-300/20 rounded-t-3xl animate-pulse"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-transparent rounded-t-3xl"></div>
+                    
+                    {/* Floating Particles Effect */}
+                    <div className="absolute top-4 left-8 w-2 h-2 bg-cyan-400 rounded-full animate-bounce opacity-60"></div>
+                    <div className="absolute top-8 right-12 w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce opacity-50" style={{animationDelay: '0.5s'}}></div>
+                    <div className="absolute top-12 left-1/4 w-1 h-1 bg-pink-400 rounded-full animate-bounce opacity-40" style={{animationDelay: '1s'}}></div>
+                    <div className="absolute top-6 right-1/3 w-1.5 h-1.5 bg-orange-400 rounded-full animate-bounce opacity-55" style={{animationDelay: '1.5s'}}></div>
+                    
+                    <div className="relative px-8 py-6">
+                        <DialogTitle className="flex items-center gap-8 text-4xl font-bold">
+                            {/* Enhanced Icon with Multiple Layers */}
+                            <div className="relative group">
+                                {/* Outer Glow Ring */}
+                                <div className="absolute -inset-4 bg-gradient-to-r from-cyan-400 via-purple-500 via-pink-500 to-orange-400 rounded-3xl blur-xl opacity-30 group-hover:opacity-50 transition-opacity duration-500 animate-pulse"></div>
+                                
+                                {/* Middle Ring */}
+                                <div className="absolute -inset-2 bg-gradient-to-r from-cyan-500 via-purple-600 via-pink-600 to-orange-500 rounded-2xl blur-lg opacity-40 group-hover:opacity-60 transition-opacity duration-500"></div>
+                                
+                                {/* Main Icon Container */}
+                                <div className="relative rounded-2xl bg-gradient-to-r from-cyan-500 via-purple-600 via-pink-600 to-orange-500 p-5 shadow-2xl group-hover:shadow-3xl transition-all duration-500 group-hover:scale-110">
+                                    <Sparkles className="h-10 w-10 text-white animate-pulse group-hover:animate-spin transition-all duration-500" />
+                                </div>
+                                
+                                {/* Sparkle Effects */}
+                                <div className="absolute -top-2 -right-2 w-3 h-3 bg-yellow-300 rounded-full animate-ping opacity-70"></div>
+                                <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-cyan-300 rounded-full animate-ping opacity-60" style={{animationDelay: '0.3s'}}></div>
                             </div>
-                        </div>
-                        <div className="flex flex-col">
-                            <span className="bg-gradient-to-r from-cyan-600 via-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent text-4xl font-extrabold">
-                                {t('info.create.title')}
-                            </span>
-                            <span className="text-lg font-medium text-gray-700 dark:text-gray-300 bg-gradient-to-r from-cyan-500/80 via-purple-500/80 via-pink-500/80 to-orange-500/80 bg-clip-text text-transparent">
-                                {t('info.create.subtitle')}
-                            </span>
-                        </div>
-                    </DialogTitle>
+                            
+                            {/* Enhanced Title Section */}
+                            <div className="flex flex-col gap-2">
+                                <div className="relative">
+                                    {/* Text Shadow Effect */}
+                                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 via-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent blur-sm opacity-50"></div>
+                                    
+                                    {/* Main Title */}
+                                    <span className="relative bg-gradient-to-r from-cyan-600 via-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent text-5xl font-black tracking-tight">
+                                        {t('info.create.title')}
+                                    </span>
+                                </div>
+                                
+                                {/* Enhanced Subtitle */}
+                                <div className="relative">
+                                    <span className="text-xl font-semibold text-gray-700 dark:text-gray-300 bg-gradient-to-r from-cyan-500/90 via-purple-500/90 via-pink-500/90 to-orange-500/90 bg-clip-text text-transparent">
+                                        {t('info.create.subtitle')}
+                                    </span>
+                                    
+                                    {/* Decorative Line */}
+                                    <div className="absolute -bottom-2 left-0 w-24 h-1 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 rounded-full opacity-60"></div>
+                                </div>
+                            </div>
+                        </DialogTitle>
+                        
+                        {/* Decorative Elements */}
+                        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-400/50 via-purple-500/50 via-pink-500/50 to-transparent"></div>
+                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-orange-400/50 via-pink-500/50 via-purple-500/50 to-transparent"></div>
+                    </div>
                 </DialogHeader>
 
                 <div className="overflow-y-auto max-h-[calc(98vh-200px)] px-4">
