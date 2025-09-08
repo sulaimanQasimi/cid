@@ -26,6 +26,7 @@ import { Separator } from '@/components/ui/separator';
 import { useTranslation } from '@/lib/i18n/translate';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import Header from '@/components/template/header';
 
 interface CreateIncidentProps {
   districts: Array<{
@@ -103,34 +104,18 @@ export default function Create({ districts, categories, reports }: CreateInciden
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={t('incidents.create_title')} />
       <div className="container px-0 py-6">
-        {/* Header with gradient background */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-l from-blue-600 via-indigo-600 to-purple-600 p-8 text-white shadow-2xl mb-8">
-          <div className="absolute inset-0 bg-black/10"></div>
-          <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 -translate-x-32"></div>
-          <div className="absolute bottom-0 right-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 translate-x-24"></div>
-          
-          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
-            <div className="flex items-center gap-6">
-              <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl border border-white/30">
-                <Shield className="h-8 w-8 text-white" />
-              </div>
-              <div>
-                <h2 className="text-3xl lg:text-4xl font-bold text-white drop-shadow-lg">{t('incidents.create_title')}</h2>
-                <p className="text-white/90 flex items-center gap-2 mt-2 text-lg">
-                  <AlertTriangle className="h-5 w-5" />
-                  {t('incidents.create_description')}
-                </p>
-              </div>
-            </div>
-            
-            <Button asChild className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 rounded-full shadow-lg">
-              <Link href={route('incidents.index')}>
-                <ArrowRight className="ml-2 h-4 w-4" />
-                {t('incidents.back_to_list')}
-              </Link>
-            </Button>
-          </div>
-        </div>
+        {/* Header Component */}
+        <Header
+          title={t('incidents.create_title')}
+          description={t('incidents.create_description')}
+          icon={<Shield className="h-6 w-6" />}
+          model="incident"
+          routeName="incidents.index"
+          buttonText={t('incidents.back_to_list')}
+          theme="blue"
+          buttonSize="default"
+          showBackButton={true}
+        />
 
         <form onSubmit={submit}>
         <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30">

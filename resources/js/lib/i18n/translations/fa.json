@@ -320,6 +320,8 @@
   "common.save": "ثبت جوړول",
   "common.saving": "جوړیدل...",
   "incidents.search_filters": "لټون او فلټرونه",
+  "incidents.find_and_filter": "پېښې ومومئ او فیلتر کړئ",
+  "incidents.table.description": "د پېښو د ثبتونو عمومي کتنه",
   "criminal.show.back_button": "بېرته جزییاتو ته",
   "criminal.show.edit_button": "سمول",
   "criminal.show.print_button": "چاپ کړئ",
@@ -1643,7 +1645,6 @@
   "criminal.show.description": "د مجرم جزییات",
   "criminal.create.persian_date_label": "تاریخ فارسی",
   "criminal.edit.description": "د مجرم جزییات تازه کړئ",
-
   "info_types.show.print_button": "چاپ کړئ",
   "info_types.show.title": "جزییات استخباراتي",
   "info_types.show.create_first_info_button": "نوی استخباراتي ریکارډ اضافه کړئ",
@@ -1662,6 +1663,7 @@
   "info.create.placeholders.description": "توضیحات رکورد اطلاعاتی را وارد کنید",
   "info_types.print.associated_info_title":"معلومات مرتبط",
   "info_types.print.associated_info_description":"معلومات مرتبط",
-  "info_types.print.records_count":"تعداد رکوردها"
-
+  "info_types.print.records_count":"تعداد رکوردها",
+  "criminal.no_records_description":"هیڅ مجرمینو ثبتونه ونه موندل شول",
+  "incidents.table.confirmation":"تأیید"
 }
