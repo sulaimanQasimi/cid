@@ -147,7 +147,7 @@ class InfoTypeController extends Controller
         ]);
 
         $infos = $infoType->infos()
-            ->with(['infoType:id,name', 'infoCategory:id,name,color'])
+            ->with(['infoType:id,name', 'infoCategory:id,name'])
             ->orderBy('created_at', 'desc')
             ->paginate(5);
 
@@ -324,13 +324,45 @@ class InfoTypeController extends Controller
         $infoType->load(['creator:id,name']);
         
         $infos = $infoType->infos()
-            ->with(['infoType:id,name', 'infoCategory:id,name,color'])
+            ->with(['infoType:id,name', 'infoCategory:id,name'])
             ->orderBy('created_at', 'desc')
             ->get();
 
         return Inertia::render('Info/Types/Infos', [
             'infoType' => $infoType,
             'infos' => $infos,
+        ]);
+    }
+
+    /**
+     * Display the print view for a specific info type.
+     */
+    public function print(InfoType $infoType): Response
+    {
+        $this->authorize('view', $infoType);
+        
+        // Load the info type with all necessary relationships
+        $infoType->load([
+            'creator:id,name',
+            'infoStats' => function($query) {
+                $query->with(['statCategoryItem.category'])
+                      ->orderBy('created_at', 'desc');
+            }
+        ]);
+
+        $infos = $infoType->infos()
+            ->with(['infoType:id,name', 'infoCategory:id,name'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $statCategories = StatCategory::where('status', 'active')
+            ->orderBy('label')
+            ->get();
+
+        return Inertia::render('Info/Types/Print', [
+            'infoType' => $infoType,
+            'infos' => $infos,
+            'statCategories' => $statCategories,
         ]);
     }
 

@@ -1614,11 +1614,26 @@
   "common.sort_ascending": "به ترتیب صعودی",
   "common.sort_descending": "به ترتیب نزولی",
   "departments.no_records": "معلومات ثبت شده نیست",
-  "info_types.no_records_description" : "هیڅ معلومات ثبت شده نیست",
+  "info_types.no_records_description": "هیڅ معلومات ثبت شده نیست",
   "common.sort_by": "به ترتیب",
   "info_types.search_placeholder": "جستجوی",
   "common.dark_mode": "حالت تاریک",
   "common.light_mode": "حالت روشن",
   "info_categories.search_placeholder": "جستجوی کټه ګوري",
   "info_categories.no_records_description": "هیڅ ګزارشاتو کټګوری ونه موندل شو"
+
+  "info_types.print.back_button": "بازگشت",
+  "info_types.print.page_title": "گزارش عملیات استخباراتي",
+  "info_types.print.print_button": "چاپ",
+  "info_types.print.report_title": "گزارش عملیات استخباراتي",
+  "info_types.print.generated_on": "تاریخ چاپ",
+  "info_types.print.details_title": "جزئیات",
+  "info_types.print.details_description": "توضیحات",
+  "info_types.print.name_label": "نام",
+  "info_types.print.description_label": "توضیحات",
+  "info_types.print.description_label": "توضیحات",
+  "info_types.print.created_at_label": "تاریخ ثبت",
+  "info_types.print.updated_at_label": "تاریخ بدلول",
+  "info_types.print.footer_text": "توضیحات",
+  "info_types.print.generated_by": "توسط"
 }

@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Pencil, Trash, ExternalLink, FileText, BarChart3, TrendingUp, AlertTriangle, Plus, Database, Settings } from 'lucide-react';
+import { ArrowLeft, Pencil, Trash, ExternalLink, FileText, BarChart3, TrendingUp, AlertTriangle, Plus, Database, Settings, Printer } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { useTranslation } from '@/lib/i18n/translate';
 import { usePermissions } from '@/hooks/use-permissions';
 import { CanCreate, CanView, CanUpdate, CanDelete } from '@/components/ui/permission-guard';
+import { formatPersianDateOnly } from '@/lib/utils/date';
 
 interface Info {
   id: number;
@@ -136,6 +137,12 @@ export default function ShowInfoType({ infoType }: Props) {
                   {t('info_types.show.back_button')}
                 </Link>
               </Button>
+              <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
+                <Link href={route('info-types.print', infoType.id)} className="flex items-center gap-3">
+                  <Printer className="h-5 w-5" />
+                  {t('info_types.show.print_button')}
+                </Link>
+              </Button>
               <CanUpdate model="info_type">
                 <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
                   <Link href={route('info-types.edit', infoType.id)} className="flex items-center gap-3">
@@ -192,13 +199,13 @@ export default function ShowInfoType({ infoType }: Props) {
                 <div>
                   <h3 className="text-lg font-semibold text-purple-800 mb-2">{t('info_types.show.created_at_label')}</h3>
                   <p className="text-purple-800 bg-gradient-to-l from-purple-50 to-white p-4 rounded-xl border border-purple-200">
-                    {new Date(infoType.created_at).toLocaleString()}
+                    {formatPersianDateOnly(infoType.created_at)}
                   </p>
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-purple-800 mb-2">{t('info_types.show.updated_at_label')}</h3>
                   <p className="text-purple-800 bg-gradient-to-l from-purple-50 to-white p-4 rounded-xl border border-purple-200">
-                    {new Date(infoType.updated_at).toLocaleString()}
+                    {formatPersianDateOnly(infoType.updated_at)}
                   </p>
                 </div>
               </div>
@@ -270,7 +277,7 @@ export default function ShowInfoType({ infoType }: Props) {
                           </span>
                         </TableCell>
                         <TableCell className="text-purple-800 py-6 px-6 font-medium">
-                          {new Date(stat.created_at).toLocaleDateString()}
+                          {formatPersianDateOnly(stat.created_at)}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -355,7 +362,7 @@ export default function ShowInfoType({ infoType }: Props) {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-purple-800 py-6 px-6 font-medium">
-                          {new Date(info.created_at).toLocaleDateString()}
+                          {formatPersianDateOnly(info.created_at)}
                         </TableCell>
                         <TableCell className="py-6 px-6">
                           <div className="flex items-center gap-2 justify-end">
