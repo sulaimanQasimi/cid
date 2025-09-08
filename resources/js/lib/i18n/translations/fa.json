@@ -1618,5 +1618,7 @@
   "common.sort_by": "به ترتیب",
   "info_types.search_placeholder": "جستجوی",
   "common.dark_mode": "حالت تاریک",
-  "common.light_mode": "حالت روشن"
+  "common.light_mode": "حالت روشن",
+  "info_categories.search_placeholder": "جستجوی کټه ګوري",
+  "info_categories.no_records_description": "هیڅ ګزارشاتو کټګوری ونه موندل شو"
 }

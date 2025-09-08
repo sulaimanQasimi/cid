@@ -201,17 +201,6 @@ export default function InfoCategoriesIndex({
       </AlertDialog>
 
       <div className="container px-0 py-6">
-        <Header
-          title={t('info_categories.page_title')}
-          description={t('info_categories.page_description')}
-          icon={<FileText className="h-6 w-6 text-white" />}
-          model="info_category"
-          routeName="info-categories.create"
-          buttonText={t('info_categories.add_button')}
-          theme="purple"
-          buttonSize="lg"
-        />
-
         <SearchFilters
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -236,49 +225,48 @@ export default function InfoCategoriesIndex({
           perPageOptions={perPageOptions}
           title={t('info_categories.search_filters')}
           description={t('info_categories.find_and_filter')}
-          className="shadow-2xl bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl overflow-hidden"
+          className="shadow-2xl bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 rounded-3xl overflow-hidden"
         />
 
         {/* Results Table */}
         <div className="mt-8">
-          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl">
-            <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 text-white py-6">
-              <CardTitle className="flex items-center gap-4">
-                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
-                  <TrendingUp className="h-6 w-6" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold">{t('info_categories.table.title')}</div>
-                  <div className="text-purple-100 text-sm font-medium">{t('info_categories.table.description')}</div>
-                </div>
-              </CardTitle>
-            </CardHeader>
+          <Header
+            title={t('info_categories.table.title')}
+            description={t('info_categories.table.description')}
+            icon={<TrendingUp className="h-6 w-6 text-white" />}
+            model="info_category"
+            routeName="info-categories.create"
+            buttonText={t('info_categories.add_button')}
+            theme="purple"
+            buttonSize="lg"
+          />
+          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 rounded-3xl">
             <CardContent className="p-0">
               <div className="overflow-hidden rounded-b-3xl">
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-gradient-to-l from-purple-100 to-purple-200 border-0">
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_categories.table.id')}</TableHead>
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_categories.table.name')}</TableHead>
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_categories.table.description')}</TableHead>
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_categories.table.created_at')}</TableHead>
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6 text-right">{t('info_categories.table.actions')}</TableHead>
+                    <TableRow className="bg-gradient-to-l from-purple-100 dark:from-purple-900 to-purple-200 dark:to-purple-800 border-0">
+                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('info_categories.table.id')}</TableHead>
+                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('info_categories.table.name')}</TableHead>
+                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('info_categories.table.description')}</TableHead>
+                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('info_categories.table.created_at')}</TableHead>
+                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6 text-right">{t('info_categories.table.actions')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {categories?.data && categories.data.length > 0 ? (
                       categories.data.map((category: InfoCategory) => (
-                        <TableRow key={category.id} className="hover:bg-purple-50/50 transition-colors duration-300 border-b border-purple-100">
-                          <TableCell className="font-bold text-purple-900 py-6 px-6 text-lg">{category.id}</TableCell>
-                          <TableCell className="font-bold text-purple-900 py-6 px-6 text-lg">{category.name}</TableCell>
+                        <TableRow key={category.id} className="hover:bg-purple-50/50 dark:hover:bg-purple-900/30 transition-colors duration-300 border-b border-purple-100 dark:border-purple-800">
+                          <TableCell className="font-bold text-purple-900 dark:text-purple-100 py-6 px-6 text-lg">{category.id}</TableCell>
+                          <TableCell className="font-bold text-purple-900 dark:text-purple-100 py-6 px-6 text-lg">{category.name}</TableCell>
                           <TableCell className="py-6 px-6">
                             {category.description ? (
-                              <span className="text-purple-800 font-medium">{category.description}</span>
+                              <span className="text-purple-800 dark:text-purple-200 font-medium">{category.description}</span>
                             ) : (
-                              <span className="text-purple-600 font-medium">-</span>
+                              <span className="text-purple-600 dark:text-purple-400 font-medium">-</span>
                             )}
                           </TableCell>
-                          <TableCell className="text-purple-800 py-6 px-6 font-medium">
+                          <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6 font-medium">
                             {new Date(category.created_at).toLocaleDateString()}
                           </TableCell>
                           <TableCell className="py-6 px-6">
@@ -289,7 +277,7 @@ export default function InfoCategoriesIndex({
                                   size="icon"
                                   asChild
                                   title={t('info_categories.actions.view')}
-                                  className="h-10 w-10 rounded-xl hover:bg-blue-100 text-blue-600 hover:text-blue-700 transition-all duration-300 hover:scale-110"
+                                  className="h-10 w-10 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-300 hover:scale-110"
                                 >
                                   <Link href={route('info-categories.show', category.id)}>
                                     <Eye className="h-5 w-5" />
@@ -302,7 +290,7 @@ export default function InfoCategoriesIndex({
                                   size="icon"
                                   asChild
                                   title={t('info_categories.actions.edit')}
-                                  className="h-10 w-10 rounded-xl hover:bg-green-100 text-green-600 hover:text-green-700 transition-all duration-300 hover:scale-110"
+                                  className="h-10 w-10 rounded-xl hover:bg-green-100 dark:hover:bg-green-900/30 text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-all duration-300 hover:scale-110"
                                 >
                                   <Link href={route('info-categories.edit', category.id)}>
                                     <Pencil className="h-5 w-5" />
@@ -315,7 +303,7 @@ export default function InfoCategoriesIndex({
                                   size="icon"
                                   onClick={() => openDeleteDialog(category)}
                                   title={t('info_categories.actions.delete')}
-                                  className="h-10 w-10 rounded-xl text-red-600 hover:text-red-700 hover:bg-red-100 transition-all duration-300 hover:scale-110"
+                                  className="h-10 w-10 rounded-xl text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/30 transition-all duration-300 hover:scale-110"
                                 >
                                   <Trash className="h-5 w-5" />
                                 </Button>
@@ -327,12 +315,12 @@ export default function InfoCategoriesIndex({
                     ) : (
                       <TableRow>
                         <TableCell colSpan={5} className="h-32 text-center">
-                          <div className="flex flex-col items-center gap-4 text-purple-600">
-                            <div className="p-4 bg-purple-100 rounded-full">
-                              <AlertTriangle className="h-16 w-16 text-purple-400" />
+                          <div className="flex flex-col items-center gap-4 text-purple-600 dark:text-purple-400">
+                            <div className="p-4 bg-purple-100 dark:bg-purple-900/50 rounded-full">
+                              <AlertTriangle className="h-16 w-16 text-purple-400 dark:text-purple-500" />
                             </div>
                             <p className="text-xl font-bold">{t('info_categories.no_records')}</p>
-                            <p className="text-purple-500">{t('info_categories.no_records_description')}</p>
+                            <p className="text-purple-500 dark:text-purple-400">{t('info_categories.no_records_description')}</p>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -347,7 +335,7 @@ export default function InfoCategoriesIndex({
         {/* Pagination */}
         {categories?.links && categories.links.length > 0 && (
           <div className="mt-8 flex justify-center">
-            <div className="bg-gradient-to-l from-purple-50 to-white p-4 rounded-3xl shadow-2xl border border-purple-200">
+            <div className="bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 p-4 rounded-3xl shadow-2xl border border-purple-200 dark:border-purple-800">
               <Pagination links={categories.links} />
             </div>
           </div>

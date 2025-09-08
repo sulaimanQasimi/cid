@@ -93,7 +93,7 @@ export default function SearchFilters({
             >
                 <CardTitle className="flex items-center justify-between text-base font-medium text-gray-900 dark:text-gray-100">
                     <div className="flex items-center gap-3">
-                        <div className="rounded-md bg-gray-100 dark:bg-gray-700 p-2">
+                        <div className=" bg-gray-100 dark:bg-gray-700 p-2">
                             <Search className="h-4 w-4 text-gray-600 dark:text-gray-300" />
                         </div>
                         <div>

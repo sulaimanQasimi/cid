@@ -27,12 +27,12 @@ export default function SearchBar({
                     placeholder={placeholder || t('common.search_placeholder')}
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
-                    className="h-10 w-full border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 pr-10 pl-4 text-sm shadow-sm focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+                    className="h-10 w-full border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 pr-10 pl-4 text-sm shadow-sm focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 rounded-none"
                 />
                 <Button
                     type="submit"
                     size="sm"
-                    className="absolute top-1/2 right-1 h-8 -translate-y-1/2 bg-blue-600 dark:bg-blue-700 px-3 text-xs text-white dark:text-gray-100 hover:bg-blue-700 dark:hover:bg-blue-600"
+                    className="absolute top-1/2 right-1 h-8 -translate-y-1/2 bg-blue-600 dark:bg-blue-700 px-3 text-xs text-white dark:text-gray-100 hover:bg-blue-700 dark:hover:bg-blue-600 rounded-none"
                 >
                     {t('common.search')}
                 </Button>
