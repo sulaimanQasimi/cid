@@ -320,6 +320,8 @@
   "common.save": "ثبت جوړول",
   "common.saving": "جوړیدل...",
   "incidents.search_filters": "لټون او فلټرونه",
+  "incidents.find_and_filter": "پېښې ومومئ او فیلتر کړئ",
+  "incidents.table.description": "د پېښو د ثبتونو عمومي کتنه",
   "criminal.show.back_button": "بېرته جزییاتو ته",
   "criminal.show.edit_button": "سمول",
   "criminal.show.print_button": "چاپ کړئ",
@@ -1651,5 +1653,6 @@
   "info_types.show.table.status": "وضعیت",
   "info_types.show.table.created_at": "تاریخ ثبت",
   "info_types.show.table.actions": "عملیات",
-  "criminal.no_records_description":"هیڅ مجرمینو ثبتونه ونه موندل شول"
+  "criminal.no_records_description":"هیڅ مجرمینو ثبتونه ونه موندل شول",
+  "incidents.table.confirmation":"تأیید"
 }
