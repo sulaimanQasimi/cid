@@ -59,13 +59,6 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
 
     // Intelligence Operations
     const intelligenceItems: NavItem[] = [];
-    if (auth.permissions.includes('info.view_any')) {
-        intelligenceItems.push({
-            title: t('sidebar.active_cases'),
-            href: '/infos',
-            icon: Target
-        });
-    }
     if (auth.permissions.includes('info_type.view_any')) {
         intelligenceItems.push({
             title: t('sidebar.intelligence_reports'),
