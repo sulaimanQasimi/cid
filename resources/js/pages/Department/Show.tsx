@@ -15,6 +15,8 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
+import Header from '@/components/template/header';
+import { formatPersianDate } from '@/lib/utils/date';
 
 interface Info {
   id: number;
@@ -68,38 +70,19 @@ export default function DepartmentShow({ department, auth }: Props) {
       <Head title={t('departments.show.page_title', { name: department.name })} />
       <div className="container px-0 py-6">
         {/* Header with gradient background */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-l from-blue-600 via-blue-700 to-indigo-700 p-8 text-white shadow-2xl mb-8">
-          <div className="absolute inset-0 bg-black/10"></div>
-          <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 -translate-x-32"></div>
-          <div className="absolute bottom-0 right-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 translate-x-24"></div>
-          
-          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
-            <div className="flex items-center gap-6">
-              <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl border border-white/30">
-                <Building2 className="h-8 w-8 text-white" />
-              </div>
-              <div>
-                <h2 className="text-3xl lg:text-4xl font-bold text-white drop-shadow-lg">{t('departments.show.title', { name: department.name })}</h2>
-                <p className="text-white/90 flex items-center gap-2 mt-2 text-lg">
-                  <FileText className="h-5 w-5" />
-                  {t('departments.show.description')}
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <Link href={route('departments.index')} className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 rounded-full shadow-lg px-4 py-2 flex items-center gap-2">
-                <ArrowRight className="h-4 w-4" />
-                {t('departments.show.back_to_list')}
-              </Link>
-              <Link href={route('departments.edit', department.id)} className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 rounded-full shadow-lg px-4 py-2 flex items-center gap-2">
-                <Edit className="h-4 w-4" />
-                {t('departments.show.edit')}
-              </Link>
-            </div>
-          </div>
-        </div>
-
+ 
+        <Header
+          title={t('departments.show.details.title')}
+          description={t('departments.show.details.description')}
+          theme="blue"
+          icon={<Building2 className="h-5 w-5" />}
+          model="department"
+          routeName={() => route("departments.edit", department.id)}
+          buttonText={t('departments.show.edit')}
+          showBackButton={true}
+          backRouteName={() => route("departments.index")}
+          backButtonText={t('departments.show.back_to_list')}
+        />
         <div className="grid gap-8">
           {/* Department Details Card */}
           <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30">
@@ -148,11 +131,9 @@ export default function DepartmentShow({ department, auth }: Props) {
                   </div>
                   <div className="p-4 bg-gradient-to-l from-blue-50 to-white border border-blue-200 rounded-xl text-right">
                     <p className="text-lg font-semibold text-blue-900">
-                      {new Date(department.created_at).toLocaleDateString()}
+                      {department.created_at ? formatPersianDate(department.created_at) : '-'}
                     </p>
-                    <p className="text-sm text-blue-600">
-                      {new Date(department.created_at).toLocaleTimeString()}
-                    </p>
+
                   </div>
                 </div>
 
@@ -164,11 +145,9 @@ export default function DepartmentShow({ department, auth }: Props) {
                   </div>
                   <div className="p-4 bg-gradient-to-l from-blue-50 to-white border border-blue-200 rounded-xl text-right">
                     <p className="text-lg font-semibold text-blue-900">
-                      {new Date(department.updated_at).toLocaleDateString()}
+                      {department.updated_at ? formatPersianDate(department.updated_at) : '-'}
                     </p>
-                    <p className="text-sm text-blue-600">
-                      {new Date(department.updated_at).toLocaleTimeString()}
-                    </p>
+
                   </div>
                 </div>
 

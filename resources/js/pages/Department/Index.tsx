@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { format } from 'date-fns';
 import { useTranslation } from '@/lib/i18n/translate';
+import { formatPersianDate } from '@/lib/utils/date';
 import { usePermissions } from '@/hooks/use-permissions';
 import { CanCreate, CanView, CanUpdate, CanDelete } from '@/components/ui/permission-guard';
 import { Pagination } from '@/components/pagination';
@@ -193,10 +194,26 @@ export default function DepartmentIndex({
       });
     }
   };
-  console.log(departments);
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={t('departments.page_title')} />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('departments.delete_dialog.title')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('departments.delete_dialog.description', { name: departmentToDelete?.name || '' })}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>{t('departments.delete_dialog.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
+              {t('departments.delete_dialog.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <div className="container px-0 py-6">
         {/* Header Component */}
@@ -239,7 +256,7 @@ export default function DepartmentIndex({
             label: option.value.toString()
           }))}
           title={t('departments.search_filters')}
-          description="Find and filter department records"
+          description={t('departments.table.description')}
         />
 
         {/* Results Table */}
@@ -360,21 +377,6 @@ export default function DepartmentIndex({
           </div>
         )}
       </div>
-
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t('common.confirm')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('departments.delete_confirm', { name: departmentToDelete?.name || '' })}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>{t('common.delete')}</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </AppLayout>
   );
 }
