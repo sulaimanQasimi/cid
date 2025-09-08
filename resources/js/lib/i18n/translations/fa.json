@@ -1651,5 +1651,10 @@
   "info_types.show.table.title": "عنوان",
   "info_types.show.table.status": "وضعیت",
   "info_types.show.table.created_at": "تاریخ ثبت",
-  "info_types.show.table.actions": "عملیات"
+  "info_types.show.table.actions": "عملیات",
+  
+"info.create.sections.selection":"انتخاب",
+"info.create.sections.required":"* "
+
+
 }

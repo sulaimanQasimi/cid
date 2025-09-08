@@ -107,7 +107,17 @@ export default function InfoCreateModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-12xl max-h-[98vh] overflow-hidden bg-gradient-to-br from-white via-cyan-50/40 via-purple-50/40 to-pink-50/40 dark:from-slate-900 dark:via-cyan-900/20 dark:via-purple-900/20 dark:to-pink-900/20 border-0 shadow-2xl backdrop-blur-xl">
+            <DialogContent 
+                className="!max-w-[95vw] !max-h-[98vh] !w-[95vw] !h-[98vh] !min-w-[95vw] !min-h-[98vh] overflow-hidden bg-gradient-to-br from-white via-cyan-50/40 via-purple-50/40 to-pink-50/40 dark:from-slate-900 dark:via-cyan-900/20 dark:via-purple-900/20 dark:to-pink-900/20 border-0 shadow-2xl backdrop-blur-xl"
+                style={{ 
+                    maxWidth: '95vw', 
+                    maxHeight: '98vh', 
+                    width: '95vw', 
+                    height: '98vh',
+                    minWidth: '95vw',
+                    minHeight: '98vh'
+                }}
+            >
                 <DialogHeader className="relative pb-8">
                     <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 via-purple-500/20 via-pink-500/20 to-orange-400/20 rounded-t-lg"></div>
                     <div className="absolute inset-0 bg-gradient-to-r from-cyan-300/10 via-purple-400/10 via-pink-400/10 to-orange-300/10 rounded-t-lg animate-pulse"></div>
@@ -129,7 +139,7 @@ export default function InfoCreateModal({
                     </DialogTitle>
                 </DialogHeader>
 
-                <div className="overflow-y-auto max-h-[calc(98vh-250px)] px-2">
+                <div className="overflow-y-auto max-h-[calc(98vh-200px)] px-4">
                     <form onSubmit={handleSubmit} className="space-y-10">
                         {/* Main Form Card */}
                         <Card className="border-0 shadow-2xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl rounded-3xl overflow-hidden">
@@ -151,7 +161,7 @@ export default function InfoCreateModal({
                                         </Badge>
                                     </div>
 
-                                    <div className="grid grid-cols-1 gap-8 xl:grid-cols-3">
+                                    <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                                         <div className="space-y-4 group">
                                             <Label htmlFor="info_type_id" className="flex items-center gap-3 text-base font-semibold text-gray-800 dark:text-gray-200">
                                                 <div className="relative">
@@ -267,7 +277,7 @@ export default function InfoCreateModal({
                                         </h3>
                                     </div>
 
-                                    <div className="grid grid-cols-1 gap-8 xl:grid-cols-2">
+                                    <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 xl:grid-cols-3">
                                         <div className="space-y-4 group">
                                             <Label htmlFor="name" className="flex items-center gap-3 text-base font-semibold text-gray-800 dark:text-gray-200">
                                                 <div className="relative">
