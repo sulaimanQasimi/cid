@@ -86,18 +86,18 @@ export default function SearchFilters({
     const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
     return (
-        <Card className={`border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm ${className}`}>
+        <Card className={`shadow-sm ${className}`}>
             <CardHeader
-                className="cursor-pointer border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 py-3"
+                className="cursor-pointer border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 py-3 hover:from-gray-100 hover:to-gray-150 dark:hover:from-gray-700 dark:hover:to-gray-800 transition-all duration-200"
                 onClick={() => setIsFiltersOpen(!isFiltersOpen)}
             >
                 <CardTitle className="flex items-center justify-between text-base font-medium text-gray-900 dark:text-gray-100">
                     <div className="flex items-center gap-3">
-                        <div className=" bg-gray-100 dark:bg-gray-700 p-2">
-                            <Search className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                        <div className="bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 p-2 rounded-lg shadow-sm">
+                            <Search className="h-4 w-4 text-blue-600 dark:text-blue-300" />
                         </div>
                         <div>
-                            <div className="text-base font-medium">{title || t('common.search_filters')}</div>
+                            <div className="text-base font-medium text-gray-900 dark:text-gray-100">{title || t('common.search_filters')}</div>
                             <div className="text-xs text-gray-500 dark:text-gray-400">{description || t('common.find_and_filter')}</div>
                         </div>
                     </div>
@@ -105,7 +105,7 @@ export default function SearchFilters({
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                            className="h-8 text-gray-600 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-all duration-200"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onResetFilters();
@@ -122,7 +122,7 @@ export default function SearchFilters({
             </CardHeader>
 
             <div className={`overflow-hidden transition-all duration-200 ${isFiltersOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-                <CardContent className="p-4">
+                <CardContent className="p-4 bg-gradient-to-br from-white/50 to-gray-50/50 dark:from-gray-800/50 dark:to-gray-900/50">
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
                         {/* Search Bar */}
                         <div className="md:col-span-2">
@@ -188,7 +188,7 @@ export default function SearchFilters({
                                     variant="outline"
                                     onClick={onDirectionChange}
                                     title={t(`common.sort_${(filters.direction || 'asc') === 'asc' ? 'ascending' : 'descending'}`)}
-                                    className="h-10 w-full border-gray-300 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                                    className="h-10 w-full border-gray-300 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-200"
                                 >
                                     <ArrowUpDown className={`mr-2 h-4 w-4 ${(filters.direction || 'asc') === 'asc' ? '' : 'rotate-180 transform'}`} />
                                     {(filters.direction || 'asc') === 'asc' ? t('common.sort_ascending') : t('common.sort_descending')}
@@ -214,7 +214,7 @@ export default function SearchFilters({
                                     variant="outline"
                                     size="sm"
                                     onClick={onResetFilters}
-                                    className="h-10 border-gray-300 dark:border-gray-600 px-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                                    className="h-10 border-gray-300 dark:border-gray-600 px-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/30 hover:border-red-400 dark:hover:border-red-500 hover:text-red-700 dark:hover:text-red-300 transition-all duration-200"
                                 >
                                     <FilterX className="h-4 w-4" />
                                 </Button>

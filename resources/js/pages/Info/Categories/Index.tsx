@@ -224,7 +224,7 @@ export default function InfoCategoriesIndex({
           perPageOptions={perPageOptions}
           title={t('info_categories.search_filters')}
           description={t('info_categories.find_and_filter')}
-          className="shadow-2xl bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 rounded-3xl overflow-hidden"
+          className="shadow-2xl bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-3xl overflow-hidden"
         />
 
         {/* Results Table */}
