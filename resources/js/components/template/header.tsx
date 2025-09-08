@@ -43,11 +43,12 @@ interface HeaderProps {
     showBackButton?: boolean;
     backRouteName?: string | (() => string);
     backButtonText?: string;
+    showButton?: boolean;
 }
 
-export default function Header({ title, description, icon, model, routeName, buttonText, theme = 'purple', buttonSize = 'default', showBackButton = false, backRouteName, backButtonText }: HeaderProps) {
+export default function Header({ title, description, icon, model, routeName, buttonText, theme = 'purple', buttonSize = 'default', showBackButton = false, backRouteName, backButtonText, showButton = true }: HeaderProps) {
     const currentTheme = themes[theme];
-    
+
     return (
         <div className={`mb-6 ${currentTheme.bg} shadow-sm`}>
             <div className="px-6 py-4">
@@ -70,16 +71,18 @@ export default function Header({ title, description, icon, model, routeName, but
                     </div>
 
                     {/* Action Buttons */}
-                    <ActionButtons
-                        model={model}
-                        routeName={routeName}
-                        buttonText={buttonText}
-                        buttonSize={buttonSize}
-                        showBackButton={showBackButton}
-                        backRouteName={backRouteName}
-                        backButtonText={backButtonText}
-                        theme={theme}
-                    />
+                    {showButton && (
+                        <ActionButtons
+                            model={model}
+                            routeName={routeName}
+                            buttonText={buttonText}
+                            buttonSize={buttonSize}
+                            showBackButton={showBackButton}
+                            backRouteName={backRouteName}
+                            backButtonText={backButtonText}
+                            theme={theme}
+                        />
+                    )}
                 </div>
             </div>
         </div>

@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown } from 'lucide-react';
+import Header from '@/components/template/header';
 
 interface User {
   id: number;
@@ -142,41 +143,19 @@ export default function UserEdit({ user, roles = [], userRoles = [], userPermiss
       
       <div className="container px-0 py-6">
         {/* Modern Header with Glassmorphism */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-l from-blue-600 via-indigo-600 to-purple-600 p-8 lg:p-12 text-white shadow-2xl mb-8 group">
-          {/* Animated background elements */}
-          <div className="absolute inset-0 bg-black/5"></div>
-          <div className="absolute top-0 left-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 -translate-x-40 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
-          <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full translate-y-32 translate-x-32 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
-          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white/5 rounded-full -translate-x-16 -translate-y-16 blur-xl group-hover:scale-150 transition-transform duration-500"></div>
-          
-          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-8">
-            <div className="flex items-center gap-8">
-              <div className="p-6 bg-white/20 backdrop-blur-md rounded-3xl border border-white/30 shadow-2xl group-hover:scale-105 transition-transform duration-300">
-                <User className="h-10 w-10 text-white" />
-              </div>
-              <div className="space-y-3">
-                <h2 className="text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight">{t('users.edit.title')}</h2>
-                <div className="text-white/90 flex items-center gap-3 text-xl font-medium">
-                  <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                    <FileText className="h-6 w-6" />
-                  </div>
-                  {t('users.edit.description', { name: user.name })}
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <Button 
-                variant="outline" 
-                onClick={() => window.history.back()}
-                className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105"
-              >
-                <ArrowLeft className="mr-2 h-5 w-5" />
-                {t('common.back')}
-              </Button>
-            </div>
-          </div>
-        </div>
+        <Header
+          title={t('users.edit.title')}
+          description={t('users.edit.description', { name: user.name })}
+          icon={<User className="h-6 w-6 text-white" />}
+          model="user"
+          routeName={() => route('users.edit', user.id)}
+          theme="blue"
+          buttonText={t('common.edit')}
+          showBackButton={true}
+          backRouteName={() => route('users.index')}
+          backButtonText={t('common.back_to_list')}
+          showButton={false}
+        />
 
         <Card className="shadow-2xl bg-gradient-to-bl from-white to-blue-50/30 border-0 rounded-3xl overflow-hidden">
           <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 text-white py-6">
