@@ -1620,8 +1620,7 @@
   "common.dark_mode": "حالت تاریک",
   "common.light_mode": "حالت روشن",
   "info_categories.search_placeholder": "جستجوی کټه ګوري",
-  "info_categories.no_records_description": "هیڅ ګزارشاتو کټګوری ونه موندل شو"
-
+  "info_categories.no_records_description": "هیڅ ګزارشاتو کټګوری ونه موندل شو",
   "info_types.print.back_button": "بازگشت",
   "info_types.print.page_title": "گزارش عملیات استخباراتي",
   "info_types.print.print_button": "چاپ",
