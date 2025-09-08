@@ -42,7 +42,7 @@ export default function ShowInfoCategory({ infoCategory }: Props) {
   const breadcrumbs: BreadcrumbItem[] = [
     {
       title: t('info.page_title'),
-      href: route('infos.index'),
+      href: route('info-types.index'),
     },
     {
       title: t('info_categories.page_title'),
@@ -189,7 +189,7 @@ export default function ShowInfoCategory({ infoCategory }: Props) {
                 </div>
                 <CanCreate model="info">
                   <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105 group/btn">
-                    <Link href={route('infos.create', { category_id: infoCategory.id })} className="flex items-center gap-3">
+                    <Link href={route('info-types.index')} className="flex items-center gap-3">
                       <div className="p-1 bg-white/20 rounded-lg group-hover/btn:scale-110 transition-transform duration-300">
                         <Plus className="h-5 w-5" />
                       </div>
@@ -266,7 +266,7 @@ export default function ShowInfoCategory({ infoCategory }: Props) {
                     <p className="text-purple-500">{t('info_categories.show.no_info_records_description')}</p>
                     <CanCreate model="info">
                       <Button asChild className="mt-4 bg-gradient-to-l from-purple-500 to-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                        <Link href={route('infos.create', { category_id: infoCategory.id })}>
+                        <Link href={route('info-types.index')}>
                           <Plus className="h-5 w-5 mr-2" />
                           {t('info_categories.show.create_first_info_button')}
                         </Link>

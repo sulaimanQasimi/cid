@@ -76,7 +76,7 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
   const breadcrumbs: BreadcrumbItem[] = [
     {
       title: t('info.page_title'),
-      href: route('infos.index'),
+      href: route('info-types.index'),
     },
     {
       title: t('info_types.page_title'),

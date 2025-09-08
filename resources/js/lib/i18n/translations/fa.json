@@ -1630,7 +1630,6 @@
   "info_types.print.details_description": "توضیحات",
   "info_types.print.name_label": "نام",
   "info_types.print.description_label": "توضیحات",
-  "info_types.print.description_label": "توضیحات",
   "info_types.print.created_at_label": "تاریخ ثبت",
   "info_types.print.updated_at_label": "تاریخ بدلول",
   "info_types.print.footer_text": "توضیحات",
@@ -1638,5 +1637,19 @@
   "departments.table.info_records": "معلومات ثبت شده",
   "departments.table.description": "د څانګې ثبتونه لیست",
   "departments.table.id": "آی ډی",
-  "users.table.id": "آی ډی"
+  "users.table.id": "آی ډی",
+  "common.table.id": "آی ډی",
+  "criminal.show.title": "جزییات مجرم",
+  "criminal.show.description": "د مجرم جزییات",
+  "criminal.create.persian_date_label": "تاریخ فارسی",
+  "criminal.edit.description": "د مجرم جزییات تازه کړئ",
+
+  "info_types.show.print_button": "چاپ کړئ",
+  "info_types.show.title": "جزییات استخباراتي",
+  "info_types.show.create_first_info_button": "نوی استخباراتي ریکارډ اضافه کړئ",
+  "info_types.show.table.id": "آی ډی",
+  "info_types.show.table.title": "عنوان",
+  "info_types.show.table.status": "وضعیت",
+  "info_types.show.table.created_at": "تاریخ ثبت",
+  "info_types.show.table.actions": "عملیات"
 }

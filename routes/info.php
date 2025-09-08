@@ -15,7 +15,7 @@ Route::middleware(['auth'])->group(function () {
     // Info Categories routes
     Route::resource('info-categories', InfoCategoryController::class);
 
-    // Info routes
-    Route::resource('infos', InfoController::class);
+    // Info routes (without index and create)
+    Route::resource('infos', InfoController::class)->except(['index', 'create']);
     Route::patch('infos/{info}/confirm', [InfoController::class, 'confirm'])->name('infos.confirm');
 });

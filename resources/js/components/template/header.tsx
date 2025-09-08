@@ -44,9 +44,10 @@ interface HeaderProps {
     backRouteName?: string | (() => string);
     backButtonText?: string;
     showButton?: boolean;
+    actionButtons?: React.ReactNode;
 }
 
-export default function Header({ title, description, icon, model, routeName, buttonText, theme = 'purple', buttonSize = 'default', showBackButton = false, backRouteName, backButtonText, showButton = true }: HeaderProps) {
+export default function Header({ title, description, icon, model, routeName, buttonText, theme = 'purple', buttonSize = 'default', showBackButton = false, backRouteName, backButtonText, showButton = true, actionButtons }: HeaderProps) {
     const currentTheme = themes[theme];
 
     return (
@@ -82,6 +83,11 @@ export default function Header({ title, description, icon, model, routeName, but
                             backButtonText={backButtonText}
                             theme={theme}
                         />
+                    )}
+                    {actionButtons && (
+                        <div className="flex items-center gap-2">
+                            {actionButtons}
+                        </div>
                     )}
                 </div>
             </div>

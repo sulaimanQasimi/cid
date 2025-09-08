@@ -95,10 +95,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
 
 // Custom hook to use the language context
 export const useLanguage = () => {
-  console.log('useLanguage: Hook called');
   const context = useContext(LanguageContext);
-  console.log('useLanguage: Context value:', context);
-  
   if (context === undefined) {
     console.error('useLanguage called outside of LanguageProvider. Component tree:', {
       documentTitle: document.title,

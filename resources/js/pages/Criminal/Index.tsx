@@ -28,9 +28,12 @@ import {
 } from '@/components/ui/alert-dialog';
 import { format } from 'date-fns';
 import { useTranslation } from '@/lib/i18n/translate';
+import { formatPersianDate } from '@/lib/utils/date';
 import { usePermissions } from '@/hooks/use-permissions';
 import { CanCreate, CanView, CanUpdate, CanDelete } from '@/components/ui/permission-guard';
 import { Pagination } from '@/components/pagination';
+import Header from '@/components/template/header';
+import SearchFilters from '@/components/template/SearchFilters';
 
 interface Criminal {
   id: number;
@@ -144,7 +147,7 @@ export default function CriminalIndex({
 }: Props) {
   const { canCreate, canView, canUpdate, canDelete } = usePermissions();
   const { t } = useTranslation();
-  
+
   const breadcrumbs: BreadcrumbItem[] = [
     {
       title: t('criminal.page_title'),
@@ -237,242 +240,126 @@ export default function CriminalIndex({
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={t('criminal.page_title')} />
 
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('criminal.delete_dialog.title')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('criminal.delete_dialog.description', { name: criminalToDelete?.name || '' })}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>{t('criminal.delete_dialog.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
+              {t('criminal.delete_dialog.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <div className="container px-0 py-6">
         {/* Modern Header with Glassmorphism */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-l from-red-600 via-orange-600 to-amber-600 p-8 lg:p-12 text-white shadow-2xl mb-8 group">
-          {/* Animated background elements */}
-          <div className="absolute inset-0 bg-black/5"></div>
-          <div className="absolute top-0 left-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 -translate-x-40 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
-          <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full translate-y-32 translate-x-32 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
-          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white/5 rounded-full -translate-x-16 -translate-y-16 blur-xl group-hover:scale-150 transition-transform duration-500"></div>
-          
-          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-8">
-            <div className="flex items-center gap-8">
-              <div className="p-6 bg-white/20 backdrop-blur-md rounded-3xl border border-white/30 shadow-2xl group-hover:scale-105 transition-transform duration-300">
-                <Shield className="h-10 w-10 text-white" />
-              </div>
-              <div className="space-y-3">
-                <h2 className="text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight">{t('criminal.page_title')}</h2>
-                <div className="text-white/90 flex items-center gap-3 text-xl font-medium">
-                  <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                    <FileText className="h-6 w-6" />
-                  </div>
-                  {t('criminal.page_description')}
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <CanCreate model="criminal">
-                <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-8 py-4 text-lg font-semibold transition-all duration-300 hover:scale-105 group/btn">
-                  <Link href={route('criminals.create')} className="flex items-center gap-3">
-                    <div className="p-1 bg-white/20 rounded-lg group-hover/btn:scale-110 transition-transform duration-300">
-                      <Plus className="h-5 w-5" />
-                    </div>
-                    {t('criminal.add_button')}
-                  </Link>
-                </Button>
-              </CanCreate>
-            </div>
-          </div>
-        </div>
-
-        <Card className="shadow-2xl bg-gradient-to-bl from-white to-orange-50/30 border-0 rounded-3xl overflow-hidden">
-          <CardHeader className="py-4 bg-gradient-to-l from-orange-500 to-orange-600 text-white cursor-pointer" onClick={() => setIsFiltersOpen(!isFiltersOpen)}>
-            <CardTitle className="text-lg font-semibold flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm shadow-lg">
-                  <Search className="h-5 w-5" />
-                </div>
-                <div>
-                  <div className="text-xl font-bold">{t('criminal.search_filters')}</div>
-                  <div className="text-orange-100 text-xs font-medium">Find and filter criminal records</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-white hover:bg-white/20 rounded-xl"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    resetFilters();
-                  }}
-                >
-                  <FilterX className="h-4 w-4 mr-1" />
-                  Reset
-                </Button>
-                <div className={`transition-transform duration-300 ${isFiltersOpen ? 'rotate-180' : ''}`}>
-                  <ChevronDown className="h-5 w-5" />
-                </div>
-              </div>
-            </CardTitle>
-          </CardHeader>
-          
-          <div className={`transition-all duration-300 overflow-hidden ${isFiltersOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* Search Bar */}
-                <div className="md:col-span-2">
-                  <form onSubmit={handleSearch} className="relative">
-                    <div className="relative">
-                      <Input
-                        placeholder={t('criminal.search_placeholder')}
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full h-11 pl-20 pr-4 text-base border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white rounded-xl shadow-lg"
-                      />
-                      <Button type="submit" className="absolute left-1 top-1/2 -translate-y-1/2 h-9 px-4 bg-gradient-to-l from-orange-500 to-orange-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-sm">
-                        Search
-                      </Button>
-                      <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-orange-400" />
-                    </div>
-                  </form>
-                </div>
-
-                {/* Department Filter */}
-                <div>
-                  <Select value={selectedDepartment} onValueChange={handleDepartmentChange}>
-                    <SelectTrigger className="h-11 shadow-lg border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white rounded-xl text-sm">
-                      <SelectValue placeholder="Department" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="_all">{t('criminal.all_departments')}</SelectItem>
-                      {departments.map((department) => (
-                        <SelectItem key={department.id} value={department.id.toString()}>
-                          {department.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Sort Options */}
-                <div>
-                  <Select value={filters.sort} onValueChange={handleSortChange}>
-                    <SelectTrigger className="h-11 shadow-lg border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white rounded-xl text-sm">
-                      <SelectValue placeholder="Sort By" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {sortOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {t(option.label)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Direction & Per Page Row */}
-                <div className="md:col-span-2 lg:col-span-4 grid grid-cols-3 gap-3">
-                  {/* Direction Button */}
-                  <div>
-                    <Button
-                      variant="outline"
-                      onClick={handleDirectionChange}
-                      title={t(`criminal.sort_${filters.direction === 'asc' ? 'descending' : 'ascending'}`)}
-                      className="h-11 w-full shadow-lg border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400 rounded-xl transition-all duration-300 hover:scale-105 text-sm"
-                    >
-                      <ArrowUpDown className={`h-4 w-4 mr-2 ${filters.direction === 'desc' ? 'rotate-180' : ''}`} />
-                      {filters.direction === 'asc' ? 'Asc' : 'Desc'}
-                    </Button>
-                  </div>
-
-                  {/* Per Page Options */}
-                  <div>
-                    <Select value={filters.per_page.toString()} onValueChange={handlePerPageChange}>
-                      <SelectTrigger className="h-11 shadow-lg border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white rounded-xl text-sm">
-                        <SelectValue placeholder="Per Page" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {perPageOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value.toString()}>
-                            {t(option.label, { count: String(option.value) })}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Quick Actions */}
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={resetFilters}
-                      className="h-11 px-3 shadow-lg border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400 rounded-xl transition-all duration-300 hover:scale-105 text-sm"
-                    >
-                      <FilterX className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </div>
-        </Card>
-
+        <Header
+          title={t('criminal.page_title')}
+          description={t('criminal.page_description')}
+          icon={<TrendingUp className="h-6 w-6 text-white" />}
+          model="criminal"
+          routeName="criminals.create"
+          theme="orange"
+          buttonText={t('criminal.add_button')}
+          showBackButton={true}
+          backRouteName={() => route('criminals.index')}
+          backButtonText={t('common.back_to_list')}
+        />
+        <SearchFilters
+          title={t('criminal.search_filters')}
+          description={t('criminal.table.description')}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onSearchSubmit={handleSearch}
+          filters={{
+            sort: filters.sort,
+            direction: filters.direction as 'asc' | 'desc',
+            per_page: filters.per_page,
+          }}
+          onTypeChange={() => { }}
+          onCategoryChange={() => { }}
+          onDepartmentChange={() => { }}
+          onSortChange={handleSortChange}
+          onDirectionChange={handleDirectionChange}
+          onPerPageChange={handlePerPageChange}
+          onResetFilters={resetFilters}
+          types={[]}
+          categories={[]}
+          departments={[]}
+          sortOptions={sortOptions}
+          perPageOptions={perPageOptions}
+        />
         {/* Results Table */}
         <div className="mt-8">
-          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-orange-50/30 border-0 rounded-3xl">
-            <CardHeader className="bg-gradient-to-l from-orange-500 to-orange-600 text-white py-6">
-              <CardTitle className="flex items-center gap-4">
-                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
-                  <TrendingUp className="h-6 w-6" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold">{t('criminal.table.title')}</div>
-                  <div className="text-orange-100 text-sm font-medium">Criminal records overview</div>
-                </div>
-              </CardTitle>
-            </CardHeader>
+
+          <Card className="overflow-hidden rounded-lg border dark:border-gray-700 dark:bg-gray-800 shadow-sm">
             <CardContent className="p-0">
-              <div className="overflow-hidden rounded-b-3xl">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-gradient-to-l from-orange-100 to-orange-200 border-0">
-                      <TableHead className="text-orange-800 font-bold text-lg py-6 px-6">{t('criminal.table.name')}</TableHead>
-                      <TableHead className="text-orange-800 font-bold text-lg py-6 px-6">{t('criminal.table.number')}</TableHead>
-                      <TableHead className="text-orange-800 font-bold text-lg py-6 px-6">{t('criminal.table.crime_type')}</TableHead>
-                      <TableHead className="text-orange-800 font-bold text-lg py-6 px-6">{t('criminal.table.department')}</TableHead>
-                      <TableHead className="text-orange-800 font-bold text-lg py-6 px-6">{t('criminal.table.arrest_date')}</TableHead>
-                      <TableHead className="text-orange-800 font-bold text-lg py-6 px-6">{t('criminal.table.actions')}</TableHead>
-                    </TableRow>
-                  </TableHeader>
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/50 dark:bg-muted/30">
+                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('common.table.id')}</TableHead>
+                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('criminal.table.name')}</TableHead>
+                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('criminal.table.number')}</TableHead>
+                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('criminal.table.crime_type')}</TableHead>
+                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('criminal.table.department')}</TableHead>
+                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('criminal.table.arrest_date')}</TableHead>
+                    <TableHead className="px-6 py-4 text-right font-semibold text-foreground dark:text-foreground">
+                      {t('criminal.table.actions')}
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
                 <TableBody>
                   {criminals.data && criminals.data.length > 0 ? (
                     criminals.data.map((criminal) => (
-                      <TableRow key={criminal.id} className="hover:bg-orange-50/50 transition-colors duration-300 border-b border-orange-100">
-                        <TableCell className="font-bold text-orange-900 py-6 px-6 text-lg">{criminal.name}</TableCell>
-                        <TableCell className="text-orange-800 py-6 px-6">{criminal.number || t('criminal.na')}</TableCell>
-                        <TableCell className="text-orange-800 py-6 px-6">{criminal.crime_type || t('criminal.na')}</TableCell>
-                        <TableCell className="py-6 px-6">
+                      <TableRow
+                        key={criminal.id}
+                        className="hover:bg-muted/50 dark:hover:bg-muted/30 border-b border-border dark:border-border"
+                      >
+                        <TableCell className="px-6 py-4 font-medium text-foreground dark:text-foreground">{criminal.id}</TableCell>
+                        <TableCell className="px-6 py-4 font-medium text-foreground dark:text-foreground">{criminal.name}</TableCell>
+                        <TableCell className="px-6 py-4 text-foreground dark:text-foreground">{criminal.number || '-'}</TableCell>
+                        <TableCell className="px-6 py-4">
+                          {criminal.crime_type ? (
+                            <Badge variant="secondary" className="bg-secondary text-secondary-foreground dark:bg-secondary dark:text-secondary-foreground">
+                              {criminal.crime_type}
+                            </Badge>
+                          ) : (
+                            <span className="text-muted-foreground dark:text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="px-6 py-4">
                           {criminal.department ? (
-                            <Badge variant="outline" className="bg-gradient-to-l from-orange-100 to-orange-200 text-orange-800 border-orange-300 px-4 py-2 rounded-xl font-semibold">
+                            <Badge variant="secondary" className="bg-secondary text-secondary-foreground dark:bg-secondary dark:text-secondary-foreground">
                               {criminal.department.name}
                             </Badge>
                           ) : (
-                            <span className="text-orange-600 font-medium">{t('criminal.na')}</span>
+                            <span className="text-muted-foreground dark:text-muted-foreground">-</span>
                           )}
                         </TableCell>
-                        <TableCell className="text-orange-800 py-6 px-6 font-medium">
+                        <TableCell className="px-6 py-4 text-muted-foreground dark:text-muted-foreground">
                           {criminal.arrest_date ? (
-                            format(new Date(criminal.arrest_date), 'MMM d, yyyy')
+                            formatPersianDate(criminal.arrest_date)
                           ) : (
-                            <span className="text-orange-600">{t('criminal.na')}</span>
+                            <span className="text-muted-foreground dark:text-muted-foreground">-</span>
                           )}
                         </TableCell>
-                        <TableCell className="py-6 px-6">
-                          <div className="flex items-center gap-2">
+                        <TableCell className="px-6 py-4">
+                          <div className="flex items-center justify-end gap-1">
                             <CanView model="criminal">
                               <Button
                                 variant="ghost"
                                 size="icon"
                                 asChild
                                 title={t('criminal.actions.view')}
-                                className="h-10 w-10 rounded-xl hover:bg-blue-100 text-blue-600 hover:text-blue-700 transition-all duration-300 hover:scale-110"
+                                className="h-8 w-8"
                               >
                                 <Link href={route('criminals.show', criminal.id)}>
-                                  <Eye className="h-5 w-5" />
+                                  <Eye className="h-4 w-4" />
                                 </Link>
                               </Button>
                             </CanView>
@@ -482,10 +369,10 @@ export default function CriminalIndex({
                                 size="icon"
                                 asChild
                                 title={t('criminal.actions.edit')}
-                                className="h-10 w-10 rounded-xl hover:bg-green-100 text-green-600 hover:text-green-700 transition-all duration-300 hover:scale-110"
+                                className="h-8 w-8"
                               >
                                 <Link href={route('criminals.edit', criminal.id)}>
-                                  <Pencil className="h-5 w-5" />
+                                  <Pencil className="h-4 w-4" />
                                 </Link>
                               </Button>
                             </CanUpdate>
@@ -495,9 +382,9 @@ export default function CriminalIndex({
                                 size="icon"
                                 onClick={() => openDeleteDialog(criminal)}
                                 title={t('criminal.actions.delete')}
-                                className="h-10 w-10 rounded-xl text-red-600 hover:text-red-700 hover:bg-red-100 transition-all duration-300 hover:scale-110"
+                                className="h-8 w-8"
                               >
-                                <Trash className="h-5 w-5" />
+                                <Trash className="h-4 w-4" />
                               </Button>
                             </CanDelete>
                             <Button
@@ -505,10 +392,10 @@ export default function CriminalIndex({
                               size="icon"
                               asChild
                               title={t('criminal.analytics.view_analytics')}
-                              className="h-10 w-10 rounded-xl hover:bg-purple-100 text-purple-600 hover:text-purple-700 transition-all duration-300 hover:scale-110"
+                              className="h-8 w-8"
                             >
                               <Link href={`/analytics/Criminal/${criminal.id}`}>
-                                <BarChart3 className="h-5 w-5" />
+                                <BarChart3 className="h-4 w-4" />
                               </Link>
                             </Button>
                           </div>
@@ -517,51 +404,30 @@ export default function CriminalIndex({
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={6} className="h-32 text-center">
-                        <div className="flex flex-col items-center gap-4 text-orange-600">
-                          <div className="p-4 bg-orange-100 rounded-full">
-                            <AlertTriangle className="h-16 w-16 text-orange-400" />
+                      <TableCell colSpan={7} className="h-32 text-center">
+                        <div className="flex flex-col items-center gap-4 text-muted-foreground dark:text-muted-foreground">
+                          <div className="rounded-full bg-muted dark:bg-black p-4">
+                            <AlertTriangle className="h-8 w-8 text-muted-foreground dark:text-muted-foreground dark:bg-black" />
                           </div>
-                          <p className="text-xl font-bold">{t('criminal.no_records')}</p>
-                          <p className="text-orange-500">No criminal records found</p>
+                          <p className="text-lg font-semibold text-foreground dark:text-foreground">{t('criminal.no_records')}</p>
+                          <p className="text-sm text-muted-foreground dark:text-muted-foreground">{t('criminal.no_records_description')}</p>
                         </div>
                       </TableCell>
                     </TableRow>
                   )}
                 </TableBody>
               </Table>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Pagination */}
         {criminals && criminals.links && criminals.links.length > 0 && (
-          <div className="mt-8 flex justify-center">
-            <div className="bg-gradient-to-l from-orange-50 to-white p-4 rounded-3xl shadow-2xl border border-orange-200">
-              <Pagination links={criminals.links} />
-            </div>
+          <div className="mt-6 flex justify-center">
+            <Pagination links={criminals.links} />
           </div>
         )}
       </div>
-
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent className="max-w-md">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl">{t('criminal.delete_dialog.title')}</AlertDialogTitle>
-            <AlertDialogDescription className="mt-2">
-              {t('criminal.delete_dialog.description', { name: criminalToDelete?.name || '' })}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="mt-6">
-            <AlertDialogCancel className="shadow-sm">{t('criminal.delete_dialog.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground shadow-sm">
-              {t('criminal.delete_dialog.confirm')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </AppLayout>
   );
 }

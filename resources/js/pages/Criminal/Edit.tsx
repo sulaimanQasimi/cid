@@ -13,6 +13,7 @@ import { ArrowRight, Camera, Calendar, UserRound, FileText, BookText, Shield, Us
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/i18n/translate';
+import Header from '@/components/template/header';
 
 interface Criminal {
   id: number;
@@ -145,39 +146,22 @@ export default function CriminalEdit({ criminal, departments = [], auth }: Props
       <Head title={t('criminal.edit.page_title', { name: criminal.name })} />
       <div className="container px-0 py-6">
         {/* Modern Header with Glassmorphism */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-l from-amber-600 via-orange-600 to-red-600 p-8 lg:p-12 text-white shadow-2xl mb-8 group">
-          {/* Animated background elements */}
-          <div className="absolute inset-0 bg-black/5"></div>
-          <div className="absolute top-0 left-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 -translate-x-40 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
-          <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full translate-y-32 translate-x-32 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
-          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white/5 rounded-full -translate-x-16 -translate-y-16 blur-xl group-hover:scale-150 transition-transform duration-500"></div>
-          
-          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-8">
-            <div className="flex items-center gap-8">
-              <div className="p-6 bg-white/20 backdrop-blur-md rounded-3xl border border-white/30 shadow-2xl group-hover:scale-105 transition-transform duration-300">
-                <Shield className="h-10 w-10 text-white" />
-              </div>
-              <div className="space-y-3">
-                <h2 className="text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight">{t('criminal.edit.title')}</h2>
-                <p className="text-white/90 flex items-center gap-3 text-xl font-medium">
-                  <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                    <Clock className="h-6 w-6" />
-                  </div>
-                  {t('criminal.edit.created_on', { date: formattedCreatedAt })}
-                </p>
-              </div>
-            </div>
-            
-            <Link href={route('criminals.show', criminal.id)} className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 rounded-2xl shadow-2xl px-8 py-4 text-lg font-semibold transition-all duration-300 hover:scale-105 group/btn">
-              <div className="flex items-center gap-3">
-                <div className="p-1 bg-white/20 rounded-lg group-hover/btn:scale-110 transition-transform duration-300">
-                  <ArrowRight className="h-5 w-5" />
-                </div>
-                {t('criminal.edit.back_button')}
-              </div>
-            </Link>
-          </div>
-        </div>
+        <Header
+          title={t('criminal.edit.title')}
+          description={t('criminal.edit.description')}
+          icon={<Shield className="h-6 w-6 text-white" />}
+          model="criminal"
+          routeName={route('criminals.show', criminal.id)}
+          theme="orange"
+          buttonText={(t('common.edit'))}
+          showBackButton={true}
+          backRouteName={() => route('criminals.index')}
+          backButtonText={t('common.back_to_list')}
+          showButton={true}
+          actionButtons={
+              <>  </>
+          }
+        />
 
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">

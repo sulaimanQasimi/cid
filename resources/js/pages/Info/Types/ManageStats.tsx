@@ -322,7 +322,7 @@ export default function ManageStats({ infoType, statItems, statCategories }: Man
 
   // Breadcrumbs
   const breadcrumbs: BreadcrumbItem[] = [
-    { title: t('info.page_title'), href: route('infos.index') },
+    { title: t('info_types.page_title'), href: route('info-types.index') },
     { title: t('info_types.page_title'), href: route('info-types.index') },
     { title: infoType.name, href: route('info-types.show', infoType.id) },
     { title: t('info_types.manage_stats.page_title'), href: '#' }

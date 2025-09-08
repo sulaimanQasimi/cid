@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Pencil, Trash, UserRound, MapPin, FileText, Calendar, Building2, Phone, IdCard, Printer, BarChart3, Eye, Clock, Users, Shield, Home, Gavel, FileCheck, BookText, AlertTriangle } from 'lucide-react';
+import { ArrowRight, Pencil, Trash, UserRound, MapPin, FileText, Calendar, Building2, Phone, IdCard, Printer, BarChart3, Eye, Clock, Users, Shield, Home, Gavel, FileCheck, BookText, AlertTriangle, User } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import {
   AlertDialog,
@@ -20,6 +20,7 @@ import { Separator } from '@/components/ui/separator';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/i18n/translate';
+import Header from '@/components/template/header';
 
 interface Criminal {
   id: number;
@@ -96,33 +97,24 @@ export default function CriminalShow({ criminal, auth }: Props) {
 
       <div className="container px-0 py-6">
         {/* Modern Header with Glassmorphism */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-l from-red-600 via-orange-600 to-amber-600 p-8 lg:p-12 text-white shadow-2xl mb-8 group">
-          {/* Animated background elements */}
-          <div className="absolute inset-0 bg-black/5"></div>
-          <div className="absolute top-0 left-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 -translate-x-40 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
-          <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full translate-y-32 translate-x-32 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
-          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white/5 rounded-full -translate-x-16 -translate-y-16 blur-xl group-hover:scale-150 transition-transform duration-500"></div>
-          
-          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-8">
-            <div className="flex items-center gap-8">
-              <div className="p-6 bg-white/20 backdrop-blur-md rounded-3xl border border-white/30 shadow-2xl group-hover:scale-105 transition-transform duration-300">
-                <Shield className="h-10 w-10 text-white" />
-              </div>
-              <div className="space-y-3">
-                <h2 className="text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight">{criminal.name}</h2>
-                <div className="text-white/90 flex items-center gap-3 text-xl font-medium">
-                  <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                    <FileText className="h-6 w-6" />
-                  </div>
-                  {criminal.number
-                    ? t('criminal.show.id_number', { number: criminal.number })
-                    : t('criminal.show.no_id')}
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <Link href={route('criminals.index')} className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105 group/btn">
+        <Header
+          title={t('criminal.show.title', { name: criminal.name })}
+          description={t('criminal.show.description', { number: criminal.number || '' })}
+          icon={<User className="h-6 w-6 text-white" />}
+          model="criminal"
+          routeName={() => route('criminals.show', criminal.id)}
+          theme="orange"
+          buttonText={t('common.edit', { name: criminal.name })}
+          showBackButton={true}
+          backRouteName={() => route('criminals.index')}
+          backButtonText={t('common.back_to_list')}
+          showButton={false}
+          actionButtons={
+            <>
+              <Link
+                href={route('criminals.index')}
+                className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105 group/btn"
+              >
                 <div className="flex items-center gap-2">
                   <div className="p-1 bg-white/20 rounded-lg group-hover/btn:scale-110 transition-transform duration-300">
                     <ArrowRight className="h-4 w-4" />
@@ -130,7 +122,7 @@ export default function CriminalShow({ criminal, auth }: Props) {
                   {t('criminal.show.back_button')}
                 </div>
               </Link>
-              
+
               {auth.permissions.includes('criminal.update') && (
                 <Button asChild className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105">
                   <Link href={route('criminals.edit', criminal.id)}>
@@ -143,7 +135,7 @@ export default function CriminalShow({ criminal, auth }: Props) {
                   </Link>
                 </Button>
               )}
-              
+
               {auth.permissions.includes('criminal.view') && (
                 <Button asChild className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105">
                   <Link href={route('criminals.print', criminal.id)} target="_blank">
@@ -156,7 +148,7 @@ export default function CriminalShow({ criminal, auth }: Props) {
                   </Link>
                 </Button>
               )}
-              
+
               {auth.permissions.includes('criminal.delete') && (
                 <Button
                   onClick={() => setIsDeleteDialogOpen(true)}
@@ -170,10 +162,9 @@ export default function CriminalShow({ criminal, auth }: Props) {
                   </div>
                 </Button>
               )}
-            </div>
-          </div>
-        </div>
-
+            </>
+          }
+        />
         <div className="grid grid-cols-1 gap-8 md:grid-cols-12">
           {/* Photo and Basic Details */}
           <Card className="md:col-span-4 border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-red-50/30">
@@ -278,37 +269,37 @@ export default function CriminalShow({ criminal, auth }: Props) {
                 </div>
 
                 {(criminal.original_residence || criminal.current_residence) && (
-                                  <div>
-                  <h3 className="text-sm font-medium text-red-600 mb-3 flex items-center gap-2" dir="rtl">
-                    {t('criminal.show.residence_info')}
-                    <MapPin className="h-4 w-4" />
-                  </h3>
-                  <div className="rounded-xl border border-red-100 bg-gradient-to-l from-red-50 to-white p-4 space-y-3">
-                    {criminal.original_residence && (
-                      <div>
-                        <span className="text-sm text-red-700 font-medium flex items-center gap-2" dir="rtl">
-                          {t('criminal.show.original_residence')}:
-                          <Home className="h-4 w-4" />
-                        </span>
-                        <p className="mt-2 text-sm text-red-900">{criminal.original_residence}</p>
-                      </div>
-                    )}
+                  <div>
+                    <h3 className="text-sm font-medium text-red-600 mb-3 flex items-center gap-2" dir="rtl">
+                      {t('criminal.show.residence_info')}
+                      <MapPin className="h-4 w-4" />
+                    </h3>
+                    <div className="rounded-xl border border-red-100 bg-gradient-to-l from-red-50 to-white p-4 space-y-3">
+                      {criminal.original_residence && (
+                        <div>
+                          <span className="text-sm text-red-700 font-medium flex items-center gap-2" dir="rtl">
+                            {t('criminal.show.original_residence')}:
+                            <Home className="h-4 w-4" />
+                          </span>
+                          <p className="mt-2 text-sm text-red-900">{criminal.original_residence}</p>
+                        </div>
+                      )}
 
-                    {criminal.original_residence && criminal.current_residence && (
-                      <Separator className="my-3" />
-                    )}
+                      {criminal.original_residence && criminal.current_residence && (
+                        <Separator className="my-3" />
+                      )}
 
-                    {criminal.current_residence && (
-                      <div>
-                        <span className="text-sm text-red-700 font-medium flex items-center gap-2" dir="rtl">
-                          {t('criminal.show.current_residence')}:
-                          <MapPin className="h-4 w-4" />
-                        </span>
-                        <p className="mt-2 text-sm text-red-900">{criminal.current_residence}</p>
-                      </div>
-                    )}
+                      {criminal.current_residence && (
+                        <div>
+                          <span className="text-sm text-red-700 font-medium flex items-center gap-2" dir="rtl">
+                            {t('criminal.show.current_residence')}:
+                            <MapPin className="h-4 w-4" />
+                          </span>
+                          <p className="mt-2 text-sm text-red-900">{criminal.current_residence}</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
                 )}
               </div>
             </CardContent>

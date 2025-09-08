@@ -18,113 +18,7 @@ use Illuminate\Support\Facades\Log;
 
 class InfoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
-    {
-        $this->authorize('viewAny', Info::class);
-        
-        // Validate query parameters
-        $validated = $request->validate([
-            'per_page' => 'nullable|integer|min:5|max:100',
-            'search' => 'nullable|string|max:100',
-            'sort' => [
-                'nullable',
-                'string',
-                Rule::in(['name', 'code', 'description', 'created_at', 'updated_at', 'info_type_id', 'info_category_id', 'department_id'])
-            ],
-            'direction' => ['nullable', 'string', Rule::in(['asc', 'desc'])],
-            'type_id' => 'nullable|integer|exists:info_types,id',
-            'category_id' => 'nullable|integer|exists:info_categories,id',
-            'department_id' => 'nullable|integer|exists:departments,id',
-            'page' => 'nullable|integer|min:1',
-        ]);
 
-        $perPage = $validated['per_page'] ?? 10;
-        $search = $validated['search'] ?? '';
-        $sort = $validated['sort'] ?? 'name';
-        $direction = $validated['direction'] ?? 'asc';
-        $typeFilter = $validated['type_id'] ?? null;
-        $categoryFilter = $validated['category_id'] ?? null;
-        $departmentFilter = $validated['department_id'] ?? null;
-
-        // Apply search and filters
-        $query = Info::with(['infoType', 'infoCategory', 'department', 'user', 'creator']);
-
-        // Filter by user ownership - regular users can only see their own infos
-        if (!auth()->user()->hasAnyRole(['admin', 'superadmin', 'manager'])) {
-            $query->where(function ($q) {
-                $q->where('user_id', auth()->id())
-                  ->orWhere('created_by', auth()->id());
-            });
-        }
-
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('code', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
-            });
-        }
-
-        if ($typeFilter) {
-            $query->where('info_type_id', $typeFilter);
-        }
-
-        if ($categoryFilter) {
-            $query->where('info_category_id', $categoryFilter);
-        }
-
-        if ($departmentFilter) {
-            $query->where('department_id', $departmentFilter);
-        }
-
-        $query->orderBy($sort, $direction);
-
-        // Get paginated results
-        $infos = $query->paginate($perPage)->withQueryString();
-
-        // Get all types, categories, and departments for filtering
-        $types = InfoType::orderBy('name')->get();
-        $categories = InfoCategory::orderBy('name')->get();
-        $departments = Department::orderBy('name')->get();
-
-        return Inertia::render('Info/Index', [
-            'infos' => $infos,
-            'types' => $types,
-            'categories' => $categories,
-            'departments' => $departments,
-            'filters' => [
-                'search' => $search,
-                'sort' => $sort,
-                'direction' => $direction,
-                'per_page' => $perPage,
-                'type_id' => $typeFilter,
-                'category_id' => $categoryFilter,
-                'department_id' => $departmentFilter,
-            ],
-        ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        $this->authorize('create', Info::class);
-
-        // Get data for dropdowns without caching
-        $infoTypes = InfoType::orderBy('name')->get();
-        $infoCategories = InfoCategory::orderBy('name')->get();
-        $departments = Department::orderBy('name')->get();
-
-        return Inertia::render('Info/Create', [
-            'infoTypes' => $infoTypes,
-            'infoCategories' => $infoCategories,
-            'departments' => $departments,
-        ]);
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -209,7 +103,11 @@ class InfoController extends Controller
             $info = Info::create($validated);
             DB::commit();
 
-            return Redirect::route('infos.index')->with('success', 'Info created successfully.');
+            // Redirect to the info type show page if type_id is provided, otherwise to info-types index
+            if ($validated['info_type_id']) {
+                return Redirect::route('info-types.show', $validated['info_type_id'])->with('success', 'Info created successfully.');
+            }
+            return Redirect::route('info-types.index')->with('success', 'Info created successfully.');
         } catch (\Exception $e) {
             Log::error('Error creating info: ' . $e->getMessage());
             DB::rollBack();
@@ -345,7 +243,11 @@ class InfoController extends Controller
             $info->update($validated);
             DB::commit();
 
-            return Redirect::route('infos.index')->with('success', 'Info updated successfully.');
+            // Redirect to the info type show page if type_id is provided, otherwise to info-types index
+            if ($validated['info_type_id']) {
+                return Redirect::route('info-types.show', $validated['info_type_id'])->with('success', 'Info updated successfully.');
+            }
+            return Redirect::route('info-types.index')->with('success', 'Info updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
             return Redirect::back()->with('error', 'An error occurred while updating the info: ' . $e->getMessage())->withInput();
@@ -369,7 +271,11 @@ class InfoController extends Controller
             
             DB::commit();
 
-            return Redirect::route('infos.index')->with('success', __('info.confirmation.success'));
+            // Redirect to the info type show page if type_id is available, otherwise to info-types index
+            if ($info->info_type_id) {
+                return Redirect::route('info-types.show', $info->info_type_id)->with('success', __('info.confirmation.success'));
+            }
+            return Redirect::route('info-types.index')->with('success', __('info.confirmation.success'));
         } catch (\Exception $e) {
             DB::rollBack();
             return Redirect::back()->with('error', 'An error occurred while confirming the info: ' . $e->getMessage());
@@ -388,7 +294,11 @@ class InfoController extends Controller
             $info->delete();
             DB::commit();
 
-            return Redirect::route('infos.index')->with('success', 'Info deleted successfully.');
+            // Redirect to the info type show page if type_id is available, otherwise to info-types index
+            if ($info->info_type_id) {
+                return Redirect::route('info-types.show', $info->info_type_id)->with('success', 'Info deleted successfully.');
+            }
+            return Redirect::route('info-types.index')->with('success', 'Info deleted successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
             return Redirect::back()->with('error', 'An error occurred while deleting the info: ' . $e->getMessage());

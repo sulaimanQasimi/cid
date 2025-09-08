@@ -57,8 +57,8 @@ export default function ShowInfo({ info }: Props) {
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
-      title: t('info.page_title'),
-      href: route('infos.index'),
+      title: t('info_types.page_title'),
+      href: route('info-types.index'),
     },
     {
       title: t('info.show.breadcrumb'),
@@ -145,7 +145,7 @@ export default function ShowInfo({ info }: Props) {
             
             <div className="flex items-center gap-3">
               <Button variant="outline" asChild className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20 shadow-lg rounded-lg px-4 py-2 font-medium transition-all duration-200">
-                <Link href={route('infos.index')} className="flex items-center gap-2">
+                <Link href={route('info-types.index')} className="flex items-center gap-2">
                   <ArrowLeft className="h-4 w-4" />
                   {t('info.show.back_to_list')}
                 </Link>

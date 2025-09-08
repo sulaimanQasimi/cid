@@ -7,6 +7,8 @@ use App\Models\Info;
 use App\Models\InfoStat;
 use App\Models\StatCategory;
 use App\Models\StatCategoryItem;
+use App\Models\InfoCategory;
+use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -155,10 +157,16 @@ class InfoTypeController extends Controller
             ->orderBy('label')
             ->get();
 
+        // Get data for the create modal
+        $infoCategories = InfoCategory::orderBy('name')->get();
+        $departments = Department::orderBy('name')->get();
+
         return Inertia::render('Info/Types/Show', [
             'infoType' => $infoType,
             'infos' => $infos,
             'statCategories' => $statCategories,
+            'infoCategories' => $infoCategories,
+            'departments' => $departments,
         ]);
     }
 

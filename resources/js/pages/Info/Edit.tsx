@@ -45,8 +45,8 @@ export default function InfoEdit({ info, infoTypes = [], infoCategories = [], de
   
   const breadcrumbs: BreadcrumbItem[] = [
     {
-      title: t('info.page_title'),
-      href: route('infos.index'),
+      title: t('info_types.page_title'),
+      href: route('info-types.index'),
     },
     {
       title: t('info.edit.breadcrumb'),
@@ -143,7 +143,7 @@ export default function InfoEdit({ info, infoTypes = [], infoCategories = [], de
             </div>
             
             <Button variant="outline" asChild className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 rounded-full shadow-lg">
-              <Link href={route('infos.index')}>
+              <Link href={route('info-types.index')}>
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 {t('info.edit.back_to_list')}
               </Link>
