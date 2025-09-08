@@ -36,12 +36,12 @@ interface HeaderProps {
     description: string;
     icon: React.ReactNode;
     model: string;
-    routeName: string;
+    routeName: string | (() => string);
     buttonText: string;
     theme?: ThemeKey;
     buttonSize?: 'default' | 'sm' | 'lg' | 'icon';
     showBackButton?: boolean;
-    backRouteName?: string;
+    backRouteName?: string | (() => string);
     backButtonText?: string;
 }
 

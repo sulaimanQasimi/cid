@@ -1632,5 +1632,8 @@
   "info_types.print.created_at_label": "تاریخ ثبت",
   "info_types.print.updated_at_label": "تاریخ بدلول",
   "info_types.print.footer_text": "توضیحات",
-  "info_types.print.generated_by": "توسط"
+  "info_types.print.generated_by": "توسط",
+  "departments.table.info_records": "معلومات ثبت شده",
+  "departments.table.description": "د څانګې ثبتونه لیست",
+  "departments.table.id": "آی ډی"
 }

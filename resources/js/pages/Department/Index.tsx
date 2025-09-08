@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { format } from 'date-fns';
 import { useTranslation } from '@/lib/i18n/translate';
+import { formatPersianDate } from '@/lib/utils/date';
 import { usePermissions } from '@/hooks/use-permissions';
 import { CanCreate, CanView, CanUpdate, CanDelete } from '@/components/ui/permission-guard';
 import { Pagination } from '@/components/pagination';
@@ -193,10 +194,26 @@ export default function DepartmentIndex({
       });
     }
   };
-  console.log(departments);
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={t('departments.page_title')} />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('departments.delete_dialog.title')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('departments.delete_dialog.description', { name: departmentToDelete?.name || '' })}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>{t('departments.delete_dialog.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
+              {t('departments.delete_dialog.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <div className="container px-0 py-6">
         {/* Header Component */}
@@ -239,144 +256,143 @@ export default function DepartmentIndex({
             label: option.value.toString()
           }))}
           title={t('departments.search_filters')}
-          description="Find and filter department records"
+          description={t('departments.table.description')}
         />
 
         {/* Results Table */}
         <div className="mt-8">
-          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30 border-0 rounded-3xl">
-            <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 text-white py-6">
-              <CardTitle className="flex items-center gap-4">
-                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
-                  <TrendingUp className="h-6 w-6" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold">{t('departments.table.title')}</div>
-                  <div className="text-blue-100 text-sm font-medium">Department records overview</div>
-                </div>
-              </CardTitle>
-            </CardHeader>
+          <Header
+            title={t('departments.table.title')}
+            description={t('departments.table.description')}
+            icon={<TrendingUp className="h-6 w-6 text-white" />}
+            model="department"
+            routeName="departments.create"
+            theme="blue"
+            buttonText={t('departments.add_button')}
+          />
+          
+          <Card className="overflow-hidden rounded-lg border dark:border-gray-700 dark:bg-gray-800 shadow-sm">
             <CardContent className="p-0">
-              <div className="overflow-hidden rounded-b-3xl">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-gradient-to-l from-blue-100 to-blue-200 border-0">
-                      <TableHead className="text-blue-800 font-bold text-lg py-6 px-6">{t('departments.table.name')}</TableHead>
-                      <TableHead className="text-blue-800 font-bold text-lg py-6 px-6">{t('departments.table.code')}</TableHead>
-                      <TableHead className="text-blue-800 font-bold text-lg py-6 px-6">{t('departments.table.info_count')}</TableHead>
-                      <TableHead className="text-blue-800 font-bold text-lg py-6 px-6">{t('departments.table.created_at')}</TableHead>
-                      <TableHead className="text-blue-800 font-bold text-lg py-6 px-6">{t('departments.table.actions')}</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {departments.data && departments.data.length > 0 ? (
-                      departments.data.map((department) => (
-                        <TableRow key={department.id} className="hover:bg-blue-50/50 transition-colors duration-300 border-b border-blue-100">
-                          <TableCell className="font-bold text-blue-900 py-6 px-6 text-lg">{department.name}</TableCell>
-                          <TableCell className="text-blue-800 py-6 px-6">
-                            <Badge variant="outline" className="bg-gradient-to-l from-blue-100 to-blue-200 text-blue-800 border-blue-300 px-4 py-2 rounded-xl font-semibold">
-                              {department.code}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-orange-800 py-6 px-6 font-medium">
-                            <Badge variant="outline" className="bg-gradient-to-l from-blue-100 to-blue-200 text-blue-800 border-blue-300 px-4 py-2 rounded-xl font-semibold">
-                              {department.infos_count} {t('departments.info_records')}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-blue-800 py-6 px-6 font-medium">
-                            {department.created_at ? (
-                              format(new Date(department.created_at), 'MMM d, yyyy')
-                            ) : (
-                              <span className="text-blue-600">{t('departments.na')}</span>
-                            )}
-                          </TableCell>
-                          <TableCell className="py-6 px-6">
-                            <div className="flex items-center gap-2">
-                              <CanView model="department">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  asChild
-                                  title={t('departments.actions.view')}
-                                  className="h-10 w-10 rounded-xl hover:bg-blue-100 text-blue-600 hover:text-blue-700 transition-all duration-300 hover:scale-110"
-                                >
-                                  <Link href={route('departments.show', department.id)}>
-                                    <Eye className="h-5 w-5" />
-                                  </Link>
-                                </Button>
-                              </CanView>
-                              <CanUpdate model="department">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  asChild
-                                  title={t('departments.actions.edit')}
-                                  className="h-10 w-10 rounded-xl hover:bg-green-100 text-green-600 hover:text-green-700 transition-all duration-300 hover:scale-110"
-                                >
-                                  <Link href={route('departments.edit', department.id)}>
-                                    <Pencil className="h-5 w-5" />
-                                  </Link>
-                                </Button>
-                              </CanUpdate>
-                              <CanDelete model="department">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => openDeleteDialog(department)}
-                                  title={t('departments.actions.delete')}
-                                  className="h-10 w-10 rounded-xl text-red-600 hover:text-red-700 hover:bg-red-100 transition-all duration-300 hover:scale-110"
-                                >
-                                  <Trash className="h-5 w-5" />
-                                </Button>
-                              </CanDelete>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={5} className="h-32 text-center">
-                          <div className="flex flex-col items-center gap-4 text-blue-600">
-                            <div className="p-4 bg-blue-100 rounded-full">
-                              <AlertTriangle className="h-16 w-16 text-blue-400" />
-                            </div>
-                            <p className="text-xl font-bold">{t('departments.no_records')}</p>
-                            <p className="text-blue-500">No department records found</p>
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/50 dark:bg-muted/30">
+                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('departments.table.id')}</TableHead>
+                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('departments.table.name')}</TableHead>
+                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('departments.table.code')}</TableHead>
+                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('departments.table.info_count')}</TableHead>
+                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('departments.table.created_at')}</TableHead>
+                    <TableHead className="px-6 py-4 text-right font-semibold text-foreground dark:text-foreground">
+                      {t('departments.table.actions')}
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {departments.data && departments.data.length > 0 ? (
+                    departments.data.map((department) => (
+                      <TableRow
+                        key={department.id}
+                        className="hover:bg-muted/50 dark:hover:bg-muted/30 border-b border-border dark:border-border"
+                      >
+                        <TableCell className="px-6 py-4 font-medium text-foreground dark:text-foreground">{department.id}</TableCell>
+                        <TableCell className="px-6 py-4 font-medium text-foreground dark:text-foreground">{department.name}</TableCell>
+                        <TableCell className="px-6 py-4">
+                          <Badge variant="secondary" className="bg-secondary text-secondary-foreground dark:bg-secondary dark:text-secondary-foreground">
+                            {department.code}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="px-6 py-4">
+                          <div className="text-center">
+                            <div className="font-semibold text-foreground dark:text-foreground">{department.infos_count || 0}</div>
+                            <div className="text-xs text-muted-foreground dark:text-muted-foreground">{t('departments.table.info_records')}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="px-6 py-4 text-muted-foreground dark:text-muted-foreground">
+                          {department.created_at ? (
+                            formatPersianDate(department.created_at)
+                          ) : (
+                            <span className="text-muted-foreground dark:text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="px-6 py-4">
+                          <div className="flex items-center justify-end gap-1">
+                            <CanView model="department">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                asChild
+                                title={t('departments.actions.view')}
+                                className="h-8 w-8"
+                              >
+                                <Link href={route('departments.show', department.id)}>
+                                  <Eye className="h-4 w-4" />
+                                </Link>
+                              </Button>
+                            </CanView>
+                            <CanUpdate model="department">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                asChild
+                                title={t('departments.actions.edit')}
+                                className="h-8 w-8"
+                              >
+                                <Link href={route('departments.edit', department.id)}>
+                                  <Pencil className="h-4 w-4" />
+                                </Link>
+                              </Button>
+                            </CanUpdate>
+                            <CanDelete model="department">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => openDeleteDialog(department)}
+                                title={t('departments.actions.delete')}
+                                className="h-8 w-8"
+                              >
+                                <Trash className="h-4 w-4" />
+                              </Button>
+                            </CanDelete>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              asChild
+                              title={t('departments.analytics.view_analytics')}
+                              className="h-8 w-8"
+                            >
+                              <Link href={`/analytics/Department/${department.id}`}>
+                                <BarChart3 className="h-4 w-4" />
+                              </Link>
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={6} className="h-32 text-center">
+                        <div className="flex flex-col items-center gap-4 text-muted-foreground dark:text-muted-foreground">
+                          <div className="rounded-full bg-muted dark:bg-black p-4">
+                            <AlertTriangle className="h-8 w-8 text-muted-foreground dark:text-muted-foreground dark:bg-black" />
+                          </div>
+                          <p className="text-lg font-semibold text-foreground dark:text-foreground">{t('departments.no_records')}</p>
+                          <p className="text-sm text-muted-foreground dark:text-muted-foreground">{t('departments.no_records_description')}</p>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
         </div>
 
-                {/* Pagination */}
-        {departments.links && departments.links.length > 0 && (
-          <div className="mt-8 flex justify-center">
-            <div className="bg-gradient-to-l from-blue-50 to-white p-4 rounded-3xl shadow-2xl border border-blue-200">
-              <Pagination links={departments.links} />
-            </div>
+        {/* Pagination */}
+        {departments && departments.links && departments.links.length > 0 && (
+          <div className="mt-6 flex justify-center">
+            <Pagination links={departments.links} />
           </div>
         )}
       </div>
-
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t('common.confirm')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('departments.delete_confirm', { name: departmentToDelete?.name || '' })}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>{t('common.delete')}</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </AppLayout>
   );
 }
