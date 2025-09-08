@@ -241,61 +241,59 @@ export default function InfoTypesIndex({
           perPageOptions={perPageOptions}
           title={t('info_types.search_filters')}
           description={t('info_types.find_and_filter')}
-          className="shadow-2xl bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl overflow-hidden"
+          className="shadow-2xl bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 overflow-hidden"
         />
 
                 {/* Results Table */}
         <div className="mt-8">
-          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl">
-            <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 text-white py-6">
-              <CardTitle className="flex items-center gap-4">
-                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
-                  <TrendingUp className="h-6 w-6" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold">{t('info_types.table.title')}</div>
-                  <div className="text-purple-100 text-sm font-medium">{t('info_types.table.description')}</div>
-                </div>
-              </CardTitle>
-            </CardHeader>
+          <Header
+            title={t('info_types.table.title')}
+            description={t('info_types.table.description')}
+            icon={<TrendingUp className="h-6 w-6 text-white" />}
+            model="info_type"
+            routeName="info-types.create"
+            buttonText={t('info_types.add_button')}
+            theme="purple"
+          />
+          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 rounded-3xl">
             <CardContent className="p-0">
               <div className="overflow-hidden rounded-b-3xl">
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-gradient-to-l from-purple-100 to-purple-200 border-0">
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_types.table.id')}</TableHead>
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_types.table.name')}</TableHead>
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_types.table.description')}</TableHead>
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_types.table.infos_count')}</TableHead>
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_types.table.stats_count')}</TableHead>
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_types.table.created_at')}</TableHead>
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6 text-right">{t('info_types.table.actions')}</TableHead>
+                    <TableRow className="bg-gradient-to-l from-purple-100 dark:from-purple-900 to-purple-200 dark:to-purple-800 border-0">
+                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('info_types.table.id')}</TableHead>
+                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('info_types.table.name')}</TableHead>
+                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('info_types.table.description')}</TableHead>
+                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('info_types.table.infos_count')}</TableHead>
+                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('info_types.table.stats_count')}</TableHead>
+                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('info_types.table.created_at')}</TableHead>
+                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6 text-right">{t('info_types.table.actions')}</TableHead>
                     </TableRow>
                   </TableHeader>
                                      <TableBody>
                      {infoTypes?.data && infoTypes.data.length > 0 ? (
                        infoTypes.data.map((infoType: InfoType) => (
-                        <TableRow key={infoType.id} className="hover:bg-purple-50/50 transition-colors duration-300 border-b border-purple-100">
-                          <TableCell className="font-bold text-purple-900 py-6 px-6 text-lg">{infoType.id}</TableCell>
-                          <TableCell className="font-bold text-purple-900 py-6 px-6 text-lg">{infoType.name}</TableCell>
+                        <TableRow key={infoType.id} className="hover:bg-purple-50/50 dark:hover:bg-purple-900/20 transition-colors duration-300 border-b border-purple-100 dark:border-purple-800">
+                          <TableCell className="font-bold text-purple-900 dark:text-purple-100 py-6 px-6 text-lg">{infoType.id}</TableCell>
+                          <TableCell className="font-bold text-purple-900 dark:text-purple-100 py-6 px-6 text-lg">{infoType.name}</TableCell>
                           <TableCell className="py-6 px-6">
                             {infoType.description ? (
-                              <span className="text-purple-800 font-medium">{infoType.description}</span>
+                              <span className="text-purple-800 dark:text-purple-200 font-medium">{infoType.description}</span>
                             ) : (
-                              <span className="text-purple-600 font-medium">-</span>
+                              <span className="text-purple-600 dark:text-purple-400 font-medium">-</span>
                             )}
                           </TableCell>
-                          <TableCell className="text-purple-800 py-6 px-6 font-medium text-center">
-                            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                          <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6 font-medium text-center">
+                            <Badge variant="secondary" className="bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200">
                               {infoType.infos_count || 0}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-purple-800 py-6 px-6 font-medium text-center">
-                            <Badge variant="secondary" className="bg-green-100 text-green-800">
+                          <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6 font-medium text-center">
+                            <Badge variant="secondary" className="bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200">
                               {infoType.info_stats_count || 0}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-purple-800 py-6 px-6 font-medium">
+                          <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6 font-medium">
                             {formatPersianDateOnly(infoType.created_at)}
                           </TableCell>
                           <TableCell className="py-6 px-6">
@@ -306,7 +304,7 @@ export default function InfoTypesIndex({
                                   size="icon"
                                   asChild
                                   title={t('info_types.actions.view')}
-                                  className="h-10 w-10 rounded-xl hover:bg-blue-100 text-blue-600 hover:text-blue-700 transition-all duration-300 hover:scale-110"
+                                  className="h-10 w-10 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-800 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-300 hover:scale-110"
                                 >
                                   <Link href={route('info-types.show', infoType.id)}>
                                     <Eye className="h-5 w-5" />
@@ -319,7 +317,7 @@ export default function InfoTypesIndex({
                                   size="icon"
                                   asChild
                                   title={t('info_types.actions.manage_stats')}
-                                  className="h-10 w-10 rounded-xl hover:bg-purple-100 text-purple-600 hover:text-purple-700 transition-all duration-300 hover:scale-110"
+                                  className="h-10 w-10 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-800 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-300 hover:scale-110"
                                 >
                                   <Link href={route('info-types.stats', infoType.id)}>
                                     <BarChart3 className="h-5 w-5" />
@@ -332,7 +330,7 @@ export default function InfoTypesIndex({
                                   size="icon"
                                   asChild
                                   title={t('info_types.actions.edit')}
-                                  className="h-10 w-10 rounded-xl hover:bg-green-100 text-green-600 hover:text-green-700 transition-all duration-300 hover:scale-110"
+                                  className="h-10 w-10 rounded-xl hover:bg-green-100 dark:hover:bg-green-800 text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-all duration-300 hover:scale-110"
                                 >
                                   <Link href={route('info-types.edit', infoType.id)}>
                                     <Pencil className="h-5 w-5" />
@@ -345,7 +343,7 @@ export default function InfoTypesIndex({
                                   size="icon"
                                   onClick={() => openDeleteDialog(infoType)}
                                   title={t('info_types.actions.delete')}
-                                  className="h-10 w-10 rounded-xl text-red-600 hover:text-red-700 hover:bg-red-100 transition-all duration-300 hover:scale-110"
+                                  className="h-10 w-10 rounded-xl text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-100 dark:hover:bg-red-800 transition-all duration-300 hover:scale-110"
                                 >
                                   <Trash className="h-5 w-5" />
                                 </Button>
@@ -357,12 +355,12 @@ export default function InfoTypesIndex({
                     ) : (
                       <TableRow>
                         <TableCell colSpan={7} className="h-32 text-center">
-                          <div className="flex flex-col items-center gap-4 text-purple-600">
-                            <div className="p-4 bg-purple-100 rounded-full">
-                              <AlertTriangle className="h-16 w-16 text-purple-400" />
+                          <div className="flex flex-col items-center gap-4 text-purple-600 dark:text-purple-400">
+                            <div className="p-4 bg-purple-100 dark:bg-purple-800 rounded-full">
+                              <AlertTriangle className="h-16 w-16 text-purple-400 dark:text-purple-300" />
                             </div>
                             <p className="text-xl font-bold">{t('info_types.no_records')}</p>
-                            <p className="text-purple-500">{t('info_types.no_records_description')}</p>
+                            <p className="text-purple-500 dark:text-purple-400">{t('info_types.no_records_description')}</p>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -377,7 +375,7 @@ export default function InfoTypesIndex({
                  {/* Pagination */}
          {infoTypes?.links && infoTypes.links.length > 0 && (
           <div className="mt-8 flex justify-center">
-            <div className="bg-gradient-to-l from-purple-50 to-white p-4 rounded-3xl shadow-2xl border border-purple-200">
+            <div className="bg-gradient-to-l from-purple-50 dark:from-purple-900/20 to-white dark:to-gray-800 p-4 rounded-3xl shadow-2xl border border-purple-200 dark:border-purple-700">
               <Pagination links={infoTypes.links} />
             </div>
           </div>
