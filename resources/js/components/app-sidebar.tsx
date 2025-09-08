@@ -4,22 +4,22 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarSeparator } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { 
-    Database, 
-    Folder, 
+import {
+    Database,
+    Folder,
     LayoutGrid,
-    Tag, 
-    Users, 
-    Shield, 
-    UserCog, 
-    Building, 
-    FileText, 
-    QrCode, 
-    Globe, 
-    AlertTriangle, 
-    AlertCircle, 
-    FileBarChart, 
-    Map, 
+    Tag,
+    Users,
+    Shield,
+    UserCog,
+    Building,
+    FileText,
+    QrCode,
+    Globe,
+    AlertTriangle,
+    AlertCircle,
+    FileBarChart,
+    Map,
     MapPin,
     ShieldCheck,
     Eye,
@@ -36,7 +36,7 @@ import { hasPermission } from '@/lib/permissions';
 import { useAppearance } from '@/hooks/use-appearance';
 import { Button } from '@/components/ui/button';
 import React from 'react';
- 
+
 
 const footerNavItems: NavItem[] = [
 ];
@@ -44,50 +44,43 @@ const footerNavItems: NavItem[] = [
 function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
     const navigation: NavItem[] = []
     // Dashboard - always visible
-    navigation.push({ 
-        title: t('sidebar.intelligence_dashboard'), 
-        href: '/dashboard', 
-        icon: LayoutGrid 
+    navigation.push({
+        title: t('sidebar.intelligence_dashboard'),
+        href: '/dashboard',
+        icon: LayoutGrid
     });
-    
+
     // Chats - always visible for authenticated users
-    navigation.push({ 
-        title: t('sidebar.chats'), 
-        href: '/chats', 
-        icon: MessageCircle 
+    navigation.push({
+        title: t('sidebar.chats'),
+        href: '/chats',
+        icon: MessageCircle
     });
-    
+
     // Intelligence Operations
     const intelligenceItems: NavItem[] = [];
     if (auth.permissions.includes('info.view_any')) {
-        intelligenceItems.push({ 
-            title: t('sidebar.active_cases'), 
-            href: '/infos', 
-            icon: Target 
-        });
-    }
-    if (auth.permissions.includes('department.view_any')) {
-        intelligenceItems.push({ 
-            title: t('sidebar.surveillance'), 
-            href: '/departments', 
-            icon: Eye 
+        intelligenceItems.push({
+            title: t('sidebar.active_cases'),
+            href: '/infos',
+            icon: Target
         });
     }
     if (auth.permissions.includes('info_type.view_any')) {
-        intelligenceItems.push({ 
-            title: t('sidebar.intelligence_reports'), 
-            href: '/info-types', 
-            icon: FileBarChart 
+        intelligenceItems.push({
+            title: t('sidebar.intelligence_reports'),
+            href: '/info-types',
+            icon: FileBarChart
         });
     }
     if (auth.permissions.includes('info_category.view_any')) {
-        intelligenceItems.push({ 
-            title: t('sidebar.case_categories'), 
-            href: '/info-categories', 
-            icon: Folder 
+        intelligenceItems.push({
+            title: t('sidebar.case_categories'),
+            href: '/info-categories',
+            icon: Folder
         });
     }
-    
+
     if (intelligenceItems.length > 0) {
         navigation.push({
             title: t('sidebar.intelligence_operations'),
@@ -96,14 +89,14 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
             items: intelligenceItems
         });
     }
-    
+
     // Criminal Database
     const criminalItems: NavItem[] = [];
     if (auth.permissions.includes('criminal.view_any')) {
-        criminalItems.push({ 
-            title: t('sidebar.criminal_records'), 
-            href: '/criminals', 
-            icon: FileText 
+        criminalItems.push({
+            title: t('sidebar.criminal_records'),
+            href: '/criminals',
+            icon: FileText
         });
     }
     if (criminalItems.length > 0) {
@@ -114,38 +107,38 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
             items: criminalItems
         });
     }
-    
+
     // Incident Management
     const incidentItems: NavItem[] = [];
     if (auth.permissions.includes('incident.view_any')) {
-        incidentItems.push({ 
-            title: t('sidebar.active_incidents'), 
-            href: '/incidents', 
-            icon: AlertCircle 
+        incidentItems.push({
+            title: t('sidebar.active_incidents'),
+            href: '/incidents',
+            icon: AlertCircle
         });
     }
     if (auth.is_admin) {
-        incidentItems.push({ 
-            title: t('incident_reports-access'), 
-            href: '/incident-report-access', 
-            icon: FileBarChart 
+        incidentItems.push({
+            title: t('incident_reports-access'),
+            href: '/incident-report-access',
+            icon: FileBarChart
         });
     }
     if (auth.permissions.includes('incident_report.view_any')) {
-        incidentItems.push({ 
-            title: t('sidebar.incident_reports'), 
-            href: '/incident-reports', 
-            icon: FileBarChart 
+        incidentItems.push({
+            title: t('sidebar.incident_reports'),
+            href: '/incident-reports',
+            icon: FileBarChart
         });
     }
     if (auth.permissions.includes('incident_category.view_any')) {
-        incidentItems.push({ 
-            title: t('sidebar.incident_categories'), 
-            href: '/incident-categories', 
-            icon: Tag 
+        incidentItems.push({
+            title: t('sidebar.incident_categories'),
+            href: '/incident-categories',
+            icon: Tag
         });
     }
-    
+
     if (incidentItems.length > 0) {
         navigation.push({
             title: t('sidebar.incident_management'),
@@ -154,17 +147,17 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
             items: incidentItems
         });
     }
-    
+
     // Analysis Reports
     const analysisItems: NavItem[] = [];
     if (auth.permissions.includes('report.view_any')) {
-        analysisItems.push({ 
-            title: t('sidebar.report_scanner'), 
-            href: '/reports/scan', 
-            icon: QrCode 
+        analysisItems.push({
+            title: t('sidebar.report_scanner'),
+            href: '/reports/scan',
+            icon: QrCode
         });
     }
-    
+
     if (analysisItems.length > 0) {
         navigation.push({
             title: t('sidebar.analysis_reports'),
@@ -173,24 +166,24 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
             items: analysisItems
         });
     }
-    
+
     // Geographic Intelligence
     const geographicItems: NavItem[] = [];
     if (auth.permissions.includes('province.view_any')) {
-        geographicItems.push({ 
-            title: t('sidebar.provinces'), 
-            href: '/provinces', 
-            icon: Map 
+        geographicItems.push({
+            title: t('sidebar.provinces'),
+            href: '/provinces',
+            icon: Map
         });
     }
     if (auth.permissions.includes('district.view_any')) {
-        geographicItems.push({ 
-            title: t('sidebar.districts'), 
-            href: '/districts', 
-            icon: MapPin 
+        geographicItems.push({
+            title: t('sidebar.districts'),
+            href: '/districts',
+            icon: MapPin
         });
     }
-    
+
     if (geographicItems.length > 0) {
         navigation.push({
             title: t('sidebar.geographic_intelligence'),
@@ -199,55 +192,55 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
             items: geographicItems
         });
     }
-    
+
     // System Administration
     const adminItems: NavItem[] = [];
     if (auth.permissions.includes('user.view_any')) {
-        adminItems.push({ 
-            title: t('sidebar.user_management'), 
-            href: '/users', 
-            icon: Users 
+        adminItems.push({
+            title: t('sidebar.user_management'),
+            href: '/users',
+            icon: Users
         });
     }
-        if (auth.permissions.includes('department.view_any')) {
-        adminItems.push({ 
-            title: t('sidebar.department_management'), 
-            href: '/departments', 
-            icon: Building 
+    if (auth.permissions.includes('department.view_any')) {
+        adminItems.push({
+            title: t('sidebar.department_management'),
+            href: '/departments',
+            icon: Building
         });
     }
     if (auth.permissions.includes('role.view_any')) {
-        adminItems.push({ 
-            title: t('sidebar.role_management'), 
-            href: '/roles', 
-            icon: UserCog 
+        adminItems.push({
+            title: t('sidebar.role_management'),
+            href: '/roles',
+            icon: UserCog
         });
     }
-    
+
     if (auth.permissions.includes('permission.view_any')) {
-        adminItems.push({ 
-            title: t('sidebar.security_permissions'), 
-            href: '/permissions', 
-            icon: Shield 
+        adminItems.push({
+            title: t('sidebar.security_permissions'),
+            href: '/permissions',
+            icon: Shield
         });
     }
-    
+
     // Analytics - accessible to all authenticated users
-    adminItems.push({ 
-        title: t('sidebar.visitor_analytics'), 
-        href: '/analytics', 
-        icon: BarChart3 
+    adminItems.push({
+        title: t('sidebar.visitor_analytics'),
+        href: '/analytics',
+        icon: BarChart3
     });
-    
+
     // Backup Management - admin only
     if (auth.permissions.includes('manage backups')) {
-        adminItems.push({ 
-            title: t('sidebar.backup_management'), 
-            href: '/backup', 
-            icon: Database 
+        adminItems.push({
+            title: t('sidebar.backup_management'),
+            href: '/backup',
+            icon: Database
         });
     }
-    
+
     if (adminItems.length > 0) {
         navigation.push({
             title: t('sidebar.system_administration'),
@@ -256,24 +249,24 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
             items: adminItems
         });
     }
-    
+
     // Multilingual Support
     const languageItems: NavItem[] = [];
     if (auth.permissions.includes('language.view_any')) {
-        languageItems.push({ 
-            title: t('sidebar.language_management'), 
-            href: route('languages.index'), 
-            icon: Globe 
+        languageItems.push({
+            title: t('sidebar.language_management'),
+            href: route('languages.index'),
+            icon: Globe
         });
     }
     if (auth.permissions.includes('translation.view_any')) {
-        languageItems.push({ 
-            title: t('sidebar.translations'), 
-            href: route('translations.index'), 
-            icon: Tag 
+        languageItems.push({
+            title: t('sidebar.translations'),
+            href: route('translations.index'),
+            icon: Tag
         });
     }
-    
+
     if (languageItems.length > 0) {
         navigation.push({
             title: t('sidebar.multilingual_support'),
@@ -282,24 +275,24 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
             items: languageItems
         });
     }
-    
+
     // Data Configuration
     const dataItems: NavItem[] = [];
     if (auth.permissions.includes('stat_category.view_any')) {
-        dataItems.push({ 
-            title: t('sidebar.stat_categories'), 
-            href: route('stat-categories.index'), 
-            icon: Database 
+        dataItems.push({
+            title: t('sidebar.stat_categories'),
+            href: route('stat-categories.index'),
+            icon: Database
         });
     }
     if (auth.permissions.includes('stat_category_item.view_any')) {
-        dataItems.push({ 
-            title: t('sidebar.stat_items'), 
-            href: route('stat-category-items.index'), 
-            icon: Tag 
+        dataItems.push({
+            title: t('sidebar.stat_items'),
+            href: route('stat-category-items.index'),
+            icon: Tag
         });
     }
-    
+
     if (dataItems.length > 0) {
         navigation.push({
             title: t('sidebar.data_configuration'),
@@ -308,7 +301,7 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
             items: dataItems
         });
     }
-    
+
     return navigation;
 }
 
@@ -366,19 +359,19 @@ export function AppSidebar() {
     }, [direction]);
 
     return (
-        <Sidebar 
-            collapsible="icon" 
-            variant="sidebar" 
-            side={sidebarSide} 
+        <Sidebar
+            collapsible="icon"
+            variant="sidebar"
+            side={sidebarSide}
             className="bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-700 shadow-lg z-50"
         >
             {/* Clean Header */}
             <SidebarHeader className="p-4 border-b border-gray-200 dark:border-slate-700">
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton 
-                            size="lg" 
-                            asChild 
+                        <SidebarMenuButton
+                            size="lg"
+                            asChild
                             className="bg-blue-600 hover:bg-blue-700 transition-colors justify-start text-white"
                         >
                             <Link href="/dashboard" prefetch>
