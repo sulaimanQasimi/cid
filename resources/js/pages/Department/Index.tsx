@@ -244,50 +244,48 @@ export default function DepartmentIndex({
 
         {/* Results Table */}
         <div className="mt-8">
-          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30 border-0 rounded-3xl">
-            <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 text-white py-6">
-              <CardTitle className="flex items-center gap-4">
-                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
-                  <TrendingUp className="h-6 w-6" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold">{t('departments.table.title')}</div>
-                  <div className="text-blue-100 text-sm font-medium">Department records overview</div>
-                </div>
-              </CardTitle>
-            </CardHeader>
+          <Header
+            title={t('departments.table.title')}
+            description={t('departments.table.description')}
+            icon={<TrendingUp className="h-6 w-6 text-white" />}
+            model="department"
+            routeName="departments.create"
+            buttonText={t('departments.add_button')}
+            theme="blue"
+          />
+          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-blue-50/30 dark:to-blue-900/20 border-0 rounded-3xl">
             <CardContent className="p-0">
               <div className="overflow-hidden rounded-b-3xl">
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-gradient-to-l from-blue-100 to-blue-200 border-0">
-                      <TableHead className="text-blue-800 font-bold text-lg py-6 px-6">{t('departments.table.name')}</TableHead>
-                      <TableHead className="text-blue-800 font-bold text-lg py-6 px-6">{t('departments.table.code')}</TableHead>
-                      <TableHead className="text-blue-800 font-bold text-lg py-6 px-6">{t('departments.table.info_count')}</TableHead>
-                      <TableHead className="text-blue-800 font-bold text-lg py-6 px-6">{t('departments.table.created_at')}</TableHead>
-                      <TableHead className="text-blue-800 font-bold text-lg py-6 px-6">{t('departments.table.actions')}</TableHead>
+                    <TableRow className="bg-gradient-to-l from-blue-100 dark:from-blue-900 to-blue-200 dark:to-blue-800 border-0">
+                      <TableHead className="text-blue-800 dark:text-blue-200 font-bold text-lg py-6 px-6">{t('departments.table.name')}</TableHead>
+                      <TableHead className="text-blue-800 dark:text-blue-200 font-bold text-lg py-6 px-6">{t('departments.table.code')}</TableHead>
+                      <TableHead className="text-blue-800 dark:text-blue-200 font-bold text-lg py-6 px-6">{t('departments.table.info_count')}</TableHead>
+                      <TableHead className="text-blue-800 dark:text-blue-200 font-bold text-lg py-6 px-6">{t('departments.table.created_at')}</TableHead>
+                      <TableHead className="text-blue-800 dark:text-blue-200 font-bold text-lg py-6 px-6">{t('departments.table.actions')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {departments.data && departments.data.length > 0 ? (
                       departments.data.map((department) => (
-                        <TableRow key={department.id} className="hover:bg-blue-50/50 transition-colors duration-300 border-b border-blue-100">
-                          <TableCell className="font-bold text-blue-900 py-6 px-6 text-lg">{department.name}</TableCell>
-                          <TableCell className="text-blue-800 py-6 px-6">
-                            <Badge variant="outline" className="bg-gradient-to-l from-blue-100 to-blue-200 text-blue-800 border-blue-300 px-4 py-2 rounded-xl font-semibold">
+                        <TableRow key={department.id} className="hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-colors duration-300 border-b border-blue-100 dark:border-blue-800">
+                          <TableCell className="font-bold text-blue-900 dark:text-blue-100 py-6 px-6 text-lg">{department.name}</TableCell>
+                          <TableCell className="text-blue-800 dark:text-blue-200 py-6 px-6">
+                            <Badge variant="outline" className="bg-gradient-to-l from-blue-100 dark:from-blue-800 to-blue-200 dark:to-blue-700 text-blue-800 dark:text-blue-200 border-blue-300 dark:border-blue-600 px-4 py-2 rounded-xl font-semibold">
                               {department.code}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-orange-800 py-6 px-6 font-medium">
-                            <Badge variant="outline" className="bg-gradient-to-l from-blue-100 to-blue-200 text-blue-800 border-blue-300 px-4 py-2 rounded-xl font-semibold">
+                          <TableCell className="text-orange-800 dark:text-orange-200 py-6 px-6 font-medium">
+                            <Badge variant="outline" className="bg-gradient-to-l from-blue-100 dark:from-blue-800 to-blue-200 dark:to-blue-700 text-blue-800 dark:text-blue-200 border-blue-300 dark:border-blue-600 px-4 py-2 rounded-xl font-semibold">
                               {department.infos_count} {t('departments.info_records')}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-blue-800 py-6 px-6 font-medium">
+                          <TableCell className="text-blue-800 dark:text-blue-200 py-6 px-6 font-medium">
                             {department.created_at ? (
                               format(new Date(department.created_at), 'MMM d, yyyy')
                             ) : (
-                              <span className="text-blue-600">{t('departments.na')}</span>
+                              <span className="text-blue-600 dark:text-blue-400">{t('departments.na')}</span>
                             )}
                           </TableCell>
                           <TableCell className="py-6 px-6">
@@ -298,7 +296,7 @@ export default function DepartmentIndex({
                                   size="icon"
                                   asChild
                                   title={t('departments.actions.view')}
-                                  className="h-10 w-10 rounded-xl hover:bg-blue-100 text-blue-600 hover:text-blue-700 transition-all duration-300 hover:scale-110"
+                                  className="h-10 w-10 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-800 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-300 hover:scale-110"
                                 >
                                   <Link href={route('departments.show', department.id)}>
                                     <Eye className="h-5 w-5" />
@@ -311,7 +309,7 @@ export default function DepartmentIndex({
                                   size="icon"
                                   asChild
                                   title={t('departments.actions.edit')}
-                                  className="h-10 w-10 rounded-xl hover:bg-green-100 text-green-600 hover:text-green-700 transition-all duration-300 hover:scale-110"
+                                  className="h-10 w-10 rounded-xl hover:bg-green-100 dark:hover:bg-green-800 text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-all duration-300 hover:scale-110"
                                 >
                                   <Link href={route('departments.edit', department.id)}>
                                     <Pencil className="h-5 w-5" />
@@ -324,7 +322,7 @@ export default function DepartmentIndex({
                                   size="icon"
                                   onClick={() => openDeleteDialog(department)}
                                   title={t('departments.actions.delete')}
-                                  className="h-10 w-10 rounded-xl text-red-600 hover:text-red-700 hover:bg-red-100 transition-all duration-300 hover:scale-110"
+                                  className="h-10 w-10 rounded-xl text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-100 dark:hover:bg-red-800 transition-all duration-300 hover:scale-110"
                                 >
                                   <Trash className="h-5 w-5" />
                                 </Button>
@@ -336,12 +334,12 @@ export default function DepartmentIndex({
                     ) : (
                       <TableRow>
                         <TableCell colSpan={5} className="h-32 text-center">
-                          <div className="flex flex-col items-center gap-4 text-blue-600">
-                            <div className="p-4 bg-blue-100 rounded-full">
-                              <AlertTriangle className="h-16 w-16 text-blue-400" />
+                          <div className="flex flex-col items-center gap-4 text-blue-600 dark:text-blue-400">
+                            <div className="p-4 bg-blue-100 dark:bg-blue-800 rounded-full">
+                              <AlertTriangle className="h-16 w-16 text-blue-400 dark:text-blue-300" />
                             </div>
                             <p className="text-xl font-bold">{t('departments.no_records')}</p>
-                            <p className="text-blue-500">No department records found</p>
+                            <p className="text-blue-500 dark:text-blue-400">No department records found</p>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -356,7 +354,7 @@ export default function DepartmentIndex({
                 {/* Pagination */}
         {departments.links && departments.links.length > 0 && (
           <div className="mt-8 flex justify-center">
-            <div className="bg-gradient-to-l from-blue-50 to-white p-4 rounded-3xl shadow-2xl border border-blue-200">
+            <div className="bg-gradient-to-l from-blue-50 dark:from-blue-900/20 to-white dark:to-gray-800 p-4 rounded-3xl shadow-2xl border border-blue-200 dark:border-blue-700">
               <Pagination links={departments.links} />
             </div>
           </div>
