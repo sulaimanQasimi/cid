@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Criminal;
 use App\Models\Department;
+use App\Models\User;
 use App\Services\VisitorTrackingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -51,6 +52,14 @@ class CriminalController extends Controller
         // Apply search and filters
         $query = Criminal::with(['department', 'creator']);
 
+        // Filter by access permissions - user can only see criminals they created or have access to
+        $query->where(function ($q) {
+            $q->where('created_by', Auth::id())
+              ->orWhereHas('accesses', function ($accessQuery) {
+                  $accessQuery->where('user_id', Auth::id());
+              });
+        });
+
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
@@ -66,7 +75,6 @@ class CriminalController extends Controller
         }
 
         $query->orderBy($sort, $direction);
-
         // Get paginated results with visitor statistics
         $criminals = $query->paginate($perPage)->withQueryString();
         
@@ -106,9 +114,11 @@ class CriminalController extends Controller
         $this->authorize('create', Criminal::class);
         
         $departments = Department::orderBy('name')->get();
+        $users = User::orderBy('name')->get();
 
         return Inertia::render('Criminal/Create', [
             'departments' => $departments,
+            'users' => $users,
         ]);
     }
 
@@ -137,6 +147,8 @@ class CriminalController extends Controller
             'final_verdict' => 'nullable|string',
             'notes' => 'nullable|string',
             'department_id' => 'nullable|string',
+            'access_users' => 'nullable|array',
+            'access_users.*' => 'integer|exists:users,id',
         ]);
 
         // Handle 'none' value for department_id
@@ -159,6 +171,16 @@ class CriminalController extends Controller
 
         // Create the criminal record
         $criminal = Criminal::create($validated);
+
+        // Handle access permissions
+        if (isset($validated['access_users']) && is_array($validated['access_users'])) {
+            foreach ($validated['access_users'] as $userId) {
+                // Don't create access for the creator (they already have access)
+                if ($userId != Auth::id()) {
+                    $criminal->accesses()->create(['user_id' => $userId]);
+                }
+            }
+        }
 
         return Redirect::route('criminals.index')
             ->with('success', 'Criminal record created successfully.');
@@ -192,10 +214,15 @@ class CriminalController extends Controller
         $this->authorize('update', $criminal);
         
         $departments = Department::orderBy('name')->get();
+        $users = User::orderBy('name')->get();
+        
+        // Load current access permissions
+        $criminal->load('accesses.user');
 
         return Inertia::render('Criminal/Edit', [
             'criminal' => $criminal,
             'departments' => $departments,
+            'users' => $users,
         ]);
     }
 
@@ -224,6 +251,10 @@ class CriminalController extends Controller
             'final_verdict' => 'nullable|string',
             'notes' => 'nullable|string',
             'department_id' => 'nullable|string',
+            'access_users' => 'nullable|array',
+            'access_users.*' => 'integer|exists:users,id',
+            'deleted_users' => 'nullable|array',
+            'deleted_users.*' => 'integer|exists:users,id',
         ]);
 
         // Handle 'none' value for department_id
@@ -245,8 +276,41 @@ class CriminalController extends Controller
             $validated['photo'] = $request->file('photo')->store('photos', 'public');
         }
 
+        // Debug: Check if deleted_users is received
+        \Log::info('Received request data:', [
+            'access_users' => $request->get('access_users'),
+            'deleted_users' => $request->get('deleted_users'),
+            'all_request_data' => $request->all()
+        ]);
+        
         // Update the criminal record
         $criminal->update($validated);
+        // Handle access permissions update
+        if (isset($validated['access_users'])) {
+            // Remove all existing access permissions
+            $criminal->accesses()->delete();
+            
+            // Add new access permissions
+            if (is_array($validated['access_users'])) {
+                foreach ($validated['access_users'] as $userId) {
+                    // Don't create access for the creator (they already have access)
+                    if ($userId != $criminal->created_by) {
+                        $criminal->accesses()->create(['user_id' => $userId]);
+                    }
+                }
+            }
+        }
+
+        // Handle deleted users (for logging/audit purposes)
+        if (isset($validated['deleted_users']) && is_array($validated['deleted_users'])) {
+            // Log the deleted users for audit purposes
+            \Log::info('Users removed from criminal access', [
+                'criminal_id' => $criminal->id,
+                'deleted_user_ids' => $validated['deleted_users'],
+                'deleted_by' => auth()->id(),
+                'timestamp' => now()
+            ]);
+        }
 
         return Redirect::route('criminals.index')
             ->with('success', 'Criminal record updated successfully.');

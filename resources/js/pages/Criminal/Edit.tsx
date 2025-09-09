@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowRight, Camera, Calendar, UserRound, FileText, BookText, Shield, Users, MapPin, Phone, IdCard, Home, Building2, Clock, Gavel, FileCheck, AlertTriangle } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ArrowRight, Camera, Calendar, UserRound, FileText, BookText, Shield, Users, MapPin, Phone, IdCard, Home, Building2, Clock, Gavel, FileCheck, AlertTriangle, Trash } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/i18n/translate';
@@ -54,21 +55,44 @@ interface Department {
   code: string;
 }
 
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+interface CriminalAccess {
+  id: number;
+  user_id: number;
+  user: User;
+}
+
 interface Props {
-  criminal: Criminal;
+  criminal: Criminal & {
+    accesses?: CriminalAccess[];
+  };
   departments: Department[];
+  users: User[];
   auth: {
     permissions: string[];
   };
 }
 
-export default function CriminalEdit({ criminal, departments = [], auth }: Props) {
+export default function CriminalEdit({ criminal, departments = [], users = [], auth }: Props) {
   const { t } = useTranslation();
   // Content tabs state
   const [activeTab, setActiveTab] = useState<string>('other');
   const [photoPreview, setPhotoPreview] = useState<string | null>(
     criminal.photo ? `/storage/${criminal.photo}` : null
   );
+  const [selectedUsers, setSelectedUsers] = useState<number[]>(
+    criminal.accesses?.map(access => access.user_id) || []
+  );
+  const [userSearchTerm, setUserSearchTerm] = useState<string>('');
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
+  const [isRemoveUserDialogOpen, setIsRemoveUserDialogOpen] = useState<boolean>(false);
+  const [userToRemove, setUserToRemove] = useState<{ id: number; name: string } | null>(null);
+  const [deletedUsers, setDeletedUsers] = useState<number[]>([]);
 
   const { data, setData, post, processing, errors } = useForm({
     _method: 'PUT', // For method spoofing in Laravel
@@ -89,7 +113,10 @@ export default function CriminalEdit({ criminal, departments = [], auth }: Props
     final_verdict: criminal.final_verdict || '',
     notes: criminal.notes || '',
     department_id: criminal.department_id ? criminal.department_id.toString() : 'none',
+    access_users: criminal.accesses?.map(access => access.user_id) || [],
+    deleted_users: [] as number[],
   });
+
 
   // Generate breadcrumbs
   const breadcrumbs: BreadcrumbItem[] = [
@@ -112,6 +139,52 @@ export default function CriminalEdit({ criminal, departments = [], auth }: Props
     setActiveTab(value);
   };
 
+  // Handle user selection
+  const handleUserSelect = (userId: number) => {
+    const newSelectedUsers = [...selectedUsers, userId];
+    setSelectedUsers(newSelectedUsers);
+    setData('access_users', newSelectedUsers);
+    setUserSearchTerm('');
+  };
+
+  // Handle user removal confirmation
+  const handleUserRemoveClick = (userId: number) => {
+    // Don't allow removing the creator
+    if (userId === criminal.created_by) {
+      return;
+    }
+    
+    const user = users.find(u => u.id === userId);
+    if (user) {
+      setUserToRemove({ id: userId, name: user.name });
+      setIsRemoveUserDialogOpen(true);
+    }
+  };
+
+  // Confirm user removal
+  const confirmUserRemove = () => {
+    if (userToRemove) {
+      const newSelectedUsers = selectedUsers.filter(id => id !== userToRemove.id);
+      setSelectedUsers(newSelectedUsers);
+      
+      // Add user to deletedUsers array
+      setDeletedUsers(prev => {
+        const newDeletedUsers = [...prev, userToRemove.id];
+        console.log('User removed, deletedUsers updated:', newDeletedUsers);
+        return newDeletedUsers;
+      });
+      
+      setIsRemoveUserDialogOpen(false);
+      setUserToRemove(null);
+    }
+  };
+
+  // Filter users based on search term
+  const filteredUsers = users.filter(user => 
+    user.name.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(userSearchTerm.toLowerCase())
+  ).filter(user => !selectedUsers.includes(user.id));
+
   // Handle photo change
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -129,10 +202,39 @@ export default function CriminalEdit({ criminal, departments = [], auth }: Props
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    post(route('criminals.update', criminal.id), {
+    
+    // Debug: Log the data being sent
+    console.log('Form data being sent:', {
+      access_users: selectedUsers,
+      deleted_users: deletedUsers,
+      currentFormData: data
+    });
+    
+    // Create the complete form data object
+    const completeFormData = {
+      ...data,
+      access_users: selectedUsers,
+      deleted_users: deletedUsers,
+    };
+    
+    // Use router.post directly with the complete data
+    router.post(route('criminals.update', criminal.id), completeFormData, {
       forceFormData: true,
       onSuccess: () => {
         // Redirect happens automatically from the controller
+      }
+    });
+  };
+
+  // Handle delete confirmation
+  const handleDelete = () => {
+    router.delete(route('criminals.destroy', criminal.id), {
+      onSuccess: () => {
+        setIsDeleteDialogOpen(false);
+        // Redirect happens automatically from the controller
+      },
+      onError: () => {
+        setIsDeleteDialogOpen(false);
       }
     });
   };
@@ -159,7 +261,21 @@ export default function CriminalEdit({ criminal, departments = [], auth }: Props
           backButtonText={t('common.back_to_list')}
           showButton={true}
           actionButtons={
-              <>  </>
+              <>
+                {auth.permissions.includes('criminal.delete') && (
+                  <Button
+                    onClick={() => setIsDeleteDialogOpen(true)}
+                    className="bg-red-500/20 backdrop-blur-md border-red-300/30 text-white hover:bg-red-500/30 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="p-1 bg-red-500/20 rounded-lg">
+                        <Trash className="h-4 w-4" />
+                      </div>
+                      {t('criminal.show.delete_button')}
+                    </div>
+                  </Button>
+                )}
+              </>
           }
         />
 
@@ -247,7 +363,7 @@ export default function CriminalEdit({ criminal, departments = [], auth }: Props
               </CardHeader>
               <CardContent className="p-6">
                 <Tabs defaultValue="other" value={activeTab} onValueChange={handleTabChange} className="w-full">
-                  <TabsList className="grid w-full grid-cols-3 mb-6 rounded-xl p-1 bg-gradient-to-l from-orange-100 to-orange-200 shadow-lg">
+                  <TabsList className="grid w-full grid-cols-4 mb-6 rounded-xl p-1 bg-gradient-to-l from-orange-100 to-orange-200 shadow-lg">
                     <TabsTrigger
                       value="other"
                       className={cn(
@@ -277,6 +393,16 @@ export default function CriminalEdit({ criminal, departments = [], auth }: Props
                     >
                       <UserRound className="h-4 w-4" />
                       <span>{t('criminal.create.tabs.personal')}</span>
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="access"
+                      className={cn(
+                        "data-[state=active]:bg-gradient-to-l data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
+                        "transition-all duration-300 rounded-lg"
+                      )}
+                    >
+                      <Shield className="h-4 w-4" />
+                      <span>{t('criminal.access.tab')}</span>
                     </TabsTrigger>
                   </TabsList>
 
@@ -590,6 +716,217 @@ export default function CriminalEdit({ criminal, departments = [], auth }: Props
                       </p>
                     </div>
                   </TabsContent>
+
+                  {/* Access Control Tab */}
+                  <TabsContent value="access" className="space-y-6 pt-2">
+                    <div className="space-y-6">
+                      <div className="bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800 rounded-lg p-6 border border-orange-200 dark:border-orange-700">
+                        <div className="flex items-center gap-2 mb-4">
+                          <Shield className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                          <h3 className="text-lg font-semibold text-orange-700 dark:text-orange-300">
+                            {t('criminal.access.title')}
+                          </h3>
+                        </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6 text-right">
+                          {t('criminal.access.description')}
+                        </p>
+
+                        {/* User Search */}
+                        <div className="space-y-4">
+                          <Label className="text-base font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300 text-right" dir="rtl">
+                            <Users className="h-4 w-4" />
+                            {t('criminal.access.select_users')}
+                          </Label>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 text-right">
+                            {t('criminal.access.select_users_description')}
+                          </p>
+                          
+                          <div className="relative">
+                            <Input
+                              type="text"
+                              value={userSearchTerm}
+                              onChange={(e) => setUserSearchTerm(e.target.value)}
+                              placeholder={t('criminal.access.search_users')}
+                              className="text-right border-orange-200 dark:border-orange-700 focus:border-orange-500 dark:focus:border-orange-400 focus:ring-orange-500/20 dark:focus:ring-orange-400/20 bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800"
+                            />
+                          </div>
+
+                          {/* User Search Results */}
+                          {userSearchTerm && filteredUsers.length > 0 && (
+                            <div className="border border-orange-200 dark:border-orange-700 rounded-xl bg-white dark:bg-gray-800 max-h-48 overflow-y-auto shadow-lg">
+                              {filteredUsers.map((user) => (
+                                <div
+                                  key={user.id}
+                                  onClick={() => handleUserSelect(user.id)}
+                                  className="p-4 hover:bg-gradient-to-r hover:from-orange-50 hover:to-amber-50 dark:hover:from-orange-900/20 dark:hover:to-amber-900/20 cursor-pointer border-b border-orange-100 dark:border-orange-800 last:border-b-0 transition-all duration-200 hover:shadow-sm"
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3 text-right">
+                                      <div className="p-2 bg-orange-100 dark:bg-orange-800 rounded-full">
+                                        <Users className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                                      </div>
+                                      <div>
+                                        <p className="font-semibold text-gray-900 dark:text-gray-100">{user.name}</p>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
+                                      </div>
+                                    </div>
+                                    <div className="text-orange-500 dark:text-orange-400">
+                                      <ArrowRight className="h-4 w-4" />
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          {userSearchTerm && filteredUsers.length === 0 && (
+                            <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
+                              {t('criminal.access.no_users_found')}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Selected Users */}
+                        <div className="mt-6">
+                          <div className="flex items-center justify-between mb-4">
+                            <Label className="text-base font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300 text-right" dir="rtl">
+                              <Users className="h-4 w-4" />
+                              {t('criminal.access.selected_users')}
+                              {selectedUsers.length > 0 && (
+                                <span className="px-2 py-1 text-xs bg-orange-100 dark:bg-orange-800 text-orange-800 dark:text-orange-200 rounded-full">
+                                  {selectedUsers.length}
+                                </span>
+                              )}
+                            </Label>
+                            {selectedUsers.length > 0 && selectedUsers.some(id => id !== criminal.created_by) && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  const nonCreatorUsers = selectedUsers.filter(id => id !== criminal.created_by);
+                                  if (nonCreatorUsers.length > 0) {
+                                    // Add all non-creator users to deletedUsers array
+                                    setDeletedUsers(prev => {
+                                      const newDeletedUsers = [...prev, ...nonCreatorUsers];
+                                      console.log('Remove all clicked, deletedUsers updated:', newDeletedUsers);
+                                      return newDeletedUsers;
+                                    });
+                                    setSelectedUsers([criminal.created_by]);
+                                  }
+                                }}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20 border-red-200 dark:border-red-700"
+                              >
+                                <Trash className="h-3 w-3 mr-1" />
+                                {t('criminal.access.remove_all')}
+                              </Button>
+                            )}
+                          </div>
+                          
+                          {selectedUsers.length === 0 ? (
+                            <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                              {t('criminal.access.no_users_selected')}
+                            </p>
+                          ) : (
+                            <div className="space-y-3">
+                              {selectedUsers.map((userId) => {
+                                const user = users.find(u => u.id === userId);
+                                const isCreator = userId === criminal.created_by;
+                                return user ? (
+                                  <div
+                                    key={userId}
+                                    className={`group flex items-center justify-between p-4 rounded-xl border transition-all duration-300 hover:shadow-md ${
+                                      isCreator 
+                                        ? 'bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700 hover:border-green-300 dark:hover:border-green-600' 
+                                        : 'bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 border-orange-200 dark:border-orange-700 hover:border-orange-300 dark:hover:border-orange-600'
+                                    }`}
+                                  >
+                                    <div className="flex items-center gap-3 text-right">
+                                      <div className={`p-2 rounded-full ${
+                                        isCreator 
+                                          ? 'bg-green-100 dark:bg-green-800' 
+                                          : 'bg-orange-100 dark:bg-orange-800'
+                                      }`}>
+                                        <Users className={`h-4 w-4 ${
+                                          isCreator 
+                                            ? 'text-green-600 dark:text-green-400' 
+                                            : 'text-orange-600 dark:text-orange-400'
+                                        }`} />
+                                      </div>
+                                      <div>
+                                        <div className="flex items-center gap-2">
+                                          <p className="font-semibold text-gray-900 dark:text-gray-100">{user.name}</p>
+                                          {isCreator && (
+                                            <span className="px-2 py-1 text-xs bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 rounded-full font-medium">
+                                              {t('criminal.access.creator')}
+                                            </span>
+                                          )}
+                                        </div>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
+                                      </div>
+                                    </div>
+                                    {!isCreator ? (
+                                      <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                          handleUserRemoveClick(userId);
+                                        }}
+                                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20 border-red-200 dark:border-red-700 hover:border-red-300 dark:hover:border-red-600"
+                                      >
+                                        <Trash className="h-3 w-3 mr-1" />
+                                        {t('criminal.access.remove_user')}
+                                      </Button>
+                                    ) : (
+                                      <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400 font-medium">
+                                        <Shield className="h-4 w-4" />
+                                        {t('criminal.access.cannot_remove_creator')}
+                                      </div>
+                                    )}
+                                  </div>
+                                ) : null;
+                              })}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Debug Info - Remove this in production */}
+                        {deletedUsers.length > 0 && (
+                          <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-700">
+                            <div className="flex items-start gap-2">
+                              <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mt-0.5" />
+                              <div className="text-right">
+                                <p className="text-sm text-yellow-800 dark:text-yellow-200 font-medium mb-1">
+                                  Debug: Deleted Users
+                                </p>
+                                <p className="text-xs text-yellow-600 dark:text-yellow-300">
+                                  User IDs to be removed: {deletedUsers.join(', ')}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Notes */}
+                        <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+                          <div className="flex items-start gap-2">
+                            <AlertTriangle className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5" />
+                            <div className="text-right">
+                              <p className="text-sm text-blue-800 dark:text-blue-200 font-medium mb-1">
+                                {t('criminal.access.creator_note')}
+                              </p>
+                              <p className="text-xs text-blue-600 dark:text-blue-300">
+                                {t('criminal.access.permissions_note')}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </TabsContent>
                 </Tabs>
               </CardContent>
 
@@ -614,6 +951,69 @@ export default function CriminalEdit({ criminal, departments = [], auth }: Props
             </Card>
           </div>
         </form>
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-red-600">
+                <AlertTriangle className="h-5 w-5" />
+                {t('criminal.delete.confirm_title')}
+              </DialogTitle>
+              <DialogDescription className="text-right">
+                {t('criminal.delete.confirm_message', { name: criminal.name })}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="flex gap-2 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setIsDeleteDialogOpen(false)}
+                className="border-gray-300 text-gray-700 hover:bg-gray-50"
+              >
+                {t('common.cancel')}
+              </Button>
+              <Button
+                onClick={handleDelete}
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                {t('criminal.delete.confirm_button')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Remove User Confirmation Dialog */}
+        <Dialog open={isRemoveUserDialogOpen} onOpenChange={setIsRemoveUserDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-orange-600">
+                <Users className="h-5 w-5" />
+                {t('criminal.access.remove_user_confirm_title')}
+              </DialogTitle>
+              <DialogDescription className="text-right">
+                {t('criminal.access.remove_user_confirm_message', { name: userToRemove?.name || '' })}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="flex gap-2 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsRemoveUserDialogOpen(false);
+                  setUserToRemove(null);
+                }}
+                className="border-gray-300 text-gray-700 hover:bg-gray-50"
+              >
+                {t('common.cancel')}
+              </Button>
+              <Button
+                onClick={confirmUserRemove}
+                className="bg-orange-600 hover:bg-orange-700 text-white"
+              >
+                {t('criminal.access.remove_user_confirm_button')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </AppLayout>
   );
