@@ -216,7 +216,6 @@ export default function InfoTypesIndex({
           theme="purple"
           buttonSize="lg"
         />
-
         <SearchFilters
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -246,15 +245,7 @@ export default function InfoTypesIndex({
 
                 {/* Results Table */}
         <div className="mt-8">
-          <Header
-            title={t('info_types.table.title')}
-            description={t('info_types.table.description')}
-            icon={<TrendingUp className="h-6 w-6 text-white" />}
-            model="info_type"
-            routeName="info-types.create"
-            buttonText={t('info_types.add_button')}
-            theme="purple"
-          />
+        
           <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 rounded-3xl">
             <CardContent className="p-0">
               <div className="overflow-hidden rounded-b-3xl">

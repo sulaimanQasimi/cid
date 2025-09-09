@@ -16,6 +16,7 @@ import TreeViewStatSelector from '@/components/reports/TreeViewStatSelector';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import Header from '@/components/template/header';
+import FooterButtons from '@/components/template/FooterButtons';
 
 interface StatCategory {
   id: number;
@@ -173,7 +174,7 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
         <CanCreate model="info_type">
           <form onSubmit={handleSubmit}>
             <div className="grid gap-8">
-              <Card className="shadow-2xl bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl overflow-hidden">
+              <Card className="shadow-2xl bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 rounded-3xl overflow-hidden">
                 <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 text-white py-6">
                   <CardTitle className="flex items-center gap-4">
                     <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
@@ -189,7 +190,7 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
                 <CardContent className="p-8 space-y-8">
                   {/* Name Field */}
                   <div className="space-y-4">
-                    <Label htmlFor="name" className="text-lg font-semibold text-purple-800 flex items-center gap-2">
+                    <Label htmlFor="name" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
                       <FileText className="h-4 w-4" />
                       {t('info_types.create.name_label')} *
                     </Label>
@@ -199,7 +200,7 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
                         value={data.name}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('name', e.target.value)}
                         required
-                        className="h-12 text-lg border-purple-200 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 to-white rounded-xl shadow-lg"
+                        className="h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg"
                         placeholder={t('info_types.create.name_placeholder')}
                       />
                       {errors.name && (
@@ -213,7 +214,7 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
 
                   {/* Code Field */}
                   <div className="space-y-4">
-                    <Label htmlFor="code" className="text-lg font-semibold text-purple-800 flex items-center gap-2">
+                    <Label htmlFor="code" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
                       <BarChart3 className="h-4 w-4" />
                       {t('info_types.create.code_label')}
                     </Label>
@@ -222,7 +223,7 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
                         id="code"
                         value={data.code}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('code', e.target.value)}
-                        className="h-12 text-lg border-purple-200 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 to-white rounded-xl shadow-lg"
+                        className="h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg"
                         placeholder={t('info_types.create.code_placeholder')}
                       />
                       {errors.code && (
@@ -236,7 +237,7 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
 
                   {/* Description Field */}
                   <div className="space-y-4">
-                    <Label htmlFor="description" className="text-lg font-semibold text-purple-800 flex items-center gap-2">
+                    <Label htmlFor="description" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
                       <FileText className="h-4 w-4" />
                       {t('info_types.create.description_label')}
                     </Label>
@@ -246,7 +247,7 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
                         value={data.description}
                         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setData('description', e.target.value)}
                         rows={4}
-                        className="text-lg border-purple-200 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 to-white rounded-xl shadow-lg resize-none"
+                        className="text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg resize-none"
                         placeholder={t('info_types.create.description_placeholder')}
                       />
                       {errors.description && (
@@ -260,7 +261,7 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
                 </CardContent>
               </Card>
 
-              <Card className="shadow-2xl bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl overflow-hidden">
+              <Card className="shadow-2xl bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 rounded-3xl overflow-hidden">
                 <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 text-white py-6">
                   <CardTitle className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
@@ -279,7 +280,7 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
                 </CardHeader>
                 <CardContent className="p-8 space-y-6">
                   <div className="mb-6">
-                    <Label htmlFor="category-filter" className="text-base font-medium flex items-center gap-2 text-purple-700 text-right" dir="rtl">
+                    <Label htmlFor="category-filter" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right" dir="rtl">
                       {t('info_types.stats.filter_by_category')}
                       <Building2 className="h-4 w-4" />
                     </Label>
@@ -287,7 +288,7 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
                       value={selectedCategory?.toString() || 'all'}
                       onValueChange={(value) => setSelectedCategory(value !== 'all' ? parseInt(value) : null)}
                     >
-                      <SelectTrigger id="category-filter" className="h-12 border-purple-200 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 to-white text-right">
+                      <SelectTrigger id="category-filter" className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right">
                         <SelectValue placeholder={t('incidents.filters.all_categories')} />
                       </SelectTrigger>
                       <SelectContent>
@@ -316,11 +317,11 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
                     />
                   ) : (
                     <div className="text-center py-8">
-                      <div className="p-4 bg-purple-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                        <AlertTriangle className="h-8 w-8 text-purple-400" />
+                      <div className="p-4 bg-purple-100 dark:bg-purple-800/30 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                        <AlertTriangle className="h-8 w-8 text-purple-400 dark:text-purple-500" />
                       </div>
-                      <p className="text-lg font-semibold text-purple-800 mb-2">{t('info_types.stats.no_items')}</p>
-                      <p className="text-purple-600">{t('info_types.stats.no_items_description')}</p>
+                      <p className="text-lg font-semibold text-purple-800 dark:text-purple-200 mb-2">{t('info_types.stats.no_items')}</p>
+                      <p className="text-purple-600 dark:text-purple-400">{t('info_types.stats.no_items_description')}</p>
                     </div>
                   )}
                 </CardContent>
