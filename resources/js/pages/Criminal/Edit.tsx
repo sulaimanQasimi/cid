@@ -168,11 +168,7 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
       setSelectedUsers(newSelectedUsers);
       
       // Add user to deletedUsers array
-      setDeletedUsers(prev => {
-        const newDeletedUsers = [...prev, userToRemove.id];
-        console.log('User removed, deletedUsers updated:', newDeletedUsers);
-        return newDeletedUsers;
-      });
+      setDeletedUsers(prev => [...prev, userToRemove.id]);
       
       setIsRemoveUserDialogOpen(false);
       setUserToRemove(null);
@@ -202,13 +198,6 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Debug: Log the data being sent
-    console.log('Form data being sent:', {
-      access_users: selectedUsers,
-      deleted_users: deletedUsers,
-      currentFormData: data
-    });
     
     // Create the complete form data object
     const completeFormData = {
@@ -803,18 +792,14 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                                 type="button"
                                 variant="outline"
                                 size="sm"
-                                onClick={() => {
-                                  const nonCreatorUsers = selectedUsers.filter(id => id !== criminal.created_by);
-                                  if (nonCreatorUsers.length > 0) {
-                                    // Add all non-creator users to deletedUsers array
-                                    setDeletedUsers(prev => {
-                                      const newDeletedUsers = [...prev, ...nonCreatorUsers];
-                                      console.log('Remove all clicked, deletedUsers updated:', newDeletedUsers);
-                                      return newDeletedUsers;
-                                    });
-                                    setSelectedUsers([criminal.created_by]);
-                                  }
-                                }}
+            onClick={() => {
+              const nonCreatorUsers = selectedUsers.filter(id => id !== criminal.created_by);
+              if (nonCreatorUsers.length > 0) {
+                // Add all non-creator users to deletedUsers array
+                setDeletedUsers(prev => [...prev, ...nonCreatorUsers]);
+                setSelectedUsers([criminal.created_by]);
+              }
+            }}
                                 className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20 border-red-200 dark:border-red-700"
                               >
                                 <Trash className="h-3 w-3 mr-1" />
@@ -893,22 +878,6 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                           )}
                         </div>
 
-                        {/* Debug Info - Remove this in production */}
-                        {deletedUsers.length > 0 && (
-                          <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-700">
-                            <div className="flex items-start gap-2">
-                              <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mt-0.5" />
-                              <div className="text-right">
-                                <p className="text-sm text-yellow-800 dark:text-yellow-200 font-medium mb-1">
-                                  Debug: Deleted Users
-                                </p>
-                                <p className="text-xs text-yellow-600 dark:text-yellow-300">
-                                  User IDs to be removed: {deletedUsers.join(', ')}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        )}
 
                         {/* Notes */}
                         <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
