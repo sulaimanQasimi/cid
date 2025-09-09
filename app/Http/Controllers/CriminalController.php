@@ -136,12 +136,17 @@ class CriminalController extends Controller
             'referred_to' => 'nullable|string|max:255',
             'final_verdict' => 'nullable|string',
             'notes' => 'nullable|string',
-            'department_id' => 'nullable|string|exists:departments,id|not_in:none',
+            'department_id' => 'nullable|string',
         ]);
 
         // Handle 'none' value for department_id
         if (isset($validated['department_id']) && $validated['department_id'] === 'none') {
             $validated['department_id'] = null;
+        } elseif (isset($validated['department_id']) && $validated['department_id'] !== null) {
+            // Validate that the department exists if it's not 'none'
+            $request->validate([
+                'department_id' => 'exists:departments,id'
+            ]);
         }
 
         // Handle photo upload
@@ -218,12 +223,17 @@ class CriminalController extends Controller
             'referred_to' => 'nullable|string|max:255',
             'final_verdict' => 'nullable|string',
             'notes' => 'nullable|string',
-            'department_id' => 'nullable|string|exists:departments,id|not_in:none',
+            'department_id' => 'nullable|string',
         ]);
 
         // Handle 'none' value for department_id
         if (isset($validated['department_id']) && $validated['department_id'] === 'none') {
             $validated['department_id'] = null;
+        } elseif (isset($validated['department_id']) && $validated['department_id'] !== null) {
+            // Validate that the department exists if it's not 'none'
+            $request->validate([
+                'department_id' => 'exists:departments,id'
+            ]);
         }
 
         // Handle photo upload
