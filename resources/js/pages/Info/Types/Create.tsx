@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, FileText, BarChart3, Save, X, AlertTriangle, Building2 } from 'lucide-react';
+import { ArrowLeft, FileText, BarChart3, Save, X, AlertTriangle, Building2, Users, Search, ArrowRight, Trash, User } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/translate';
 import { usePermissions } from '@/hooks/use-permissions';
 import { CanCreate } from '@/components/ui/permission-guard';
@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import Header from '@/components/template/header';
 import FooterButtons from '@/components/template/FooterButtons';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface StatCategory {
   id: number;
@@ -40,9 +41,16 @@ interface StatCategoryItem {
   };
 }
 
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
 interface CreateProps {
   statItems: StatCategoryItem[];
   statCategories: StatCategory[];
+  users: User[];
 }
 
 type InfoTypeFormData = {
@@ -56,7 +64,7 @@ type InfoTypeFormData = {
   }>;
 };
 
-export default function InfoTypesCreate({ statItems, statCategories }: CreateProps) {
+export default function InfoTypesCreate({ statItems, statCategories, users }: CreateProps) {
   const { t } = useTranslation();
   const { canCreate } = usePermissions();
 
@@ -64,6 +72,7 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
     name: '',
     code: '',
     description: '',
+    access_users: [] as number[],
   });
 
   // State for managing statistical data
@@ -73,6 +82,10 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
 
   // Add state for category filter
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+
+  // Access control state
+  const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
+  const [userSearchTerm, setUserSearchTerm] = useState<string>('');
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -140,6 +153,26 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
 
   const statsCount = Object.keys(statsData).length;
 
+  // Access control functions
+  const handleUserSelect = (userId: number) => {
+    if (!selectedUsers.includes(userId)) {
+      setSelectedUsers(prev => [...prev, userId]);
+      setData('access_users', [...selectedUsers, userId]);
+    }
+  };
+
+  const handleUserRemove = (userId: number) => {
+    const newSelectedUsers = selectedUsers.filter(id => id !== userId);
+    setSelectedUsers(newSelectedUsers);
+    setData('access_users', newSelectedUsers);
+  };
+
+  // Filter users based on search term
+  const filteredUsers = users.filter(user => 
+    user.name.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(userSearchTerm.toLowerCase())
+  );
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={t('info_types.create.page_title')} />
@@ -187,77 +220,222 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
                   </CardTitle>
                 </CardHeader>
 
-                <CardContent className="p-8 space-y-8">
-                  {/* Name Field */}
-                  <div className="space-y-4">
-                    <Label htmlFor="name" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
-                      <FileText className="h-4 w-4" />
-                      {t('info_types.create.name_label')} *
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="name"
-                        value={data.name}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('name', e.target.value)}
-                        required
-                        className="h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg"
-                        placeholder={t('info_types.create.name_placeholder')}
-                      />
-                      {errors.name && (
-                        <div className="mt-2 flex items-center gap-2 text-red-600">
-                          <X className="h-4 w-4" />
-                          <p className="text-sm font-medium">{errors.name}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                <CardContent className="p-8">
+                  <Tabs defaultValue="basic" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2 mb-8 bg-purple-100 dark:bg-purple-900/30 rounded-xl p-1">
+                      <TabsTrigger 
+                        value="basic" 
+                        className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-lg rounded-lg font-medium transition-all duration-300"
+                      >
+                        <FileText className="h-4 w-4" />
+                        {t('info_types.create.basic_info')}
+                      </TabsTrigger>
+                      <TabsTrigger 
+                        value="access" 
+                        className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-lg rounded-lg font-medium transition-all duration-300"
+                      >
+                        <Users className="h-4 w-4" />
+                        {t('info_type.access.tab')}
+                      </TabsTrigger>
+                    </TabsList>
 
-                  {/* Code Field */}
-                  <div className="space-y-4">
-                    <Label htmlFor="code" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
-                      <BarChart3 className="h-4 w-4" />
-                      {t('info_types.create.code_label')}
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="code"
-                        value={data.code}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('code', e.target.value)}
-                        className="h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg"
-                        placeholder={t('info_types.create.code_placeholder')}
-                      />
-                      {errors.code && (
-                        <div className="mt-2 flex items-center gap-2 text-red-600">
-                          <X className="h-4 w-4" />
-                          <p className="text-sm font-medium">{errors.code}</p>
+                    <TabsContent value="basic" className="space-y-8">
+                      {/* Name Field */}
+                      <div className="space-y-4">
+                        <Label htmlFor="name" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
+                          <FileText className="h-4 w-4" />
+                          {t('info_types.create.name_label')} *
+                        </Label>
+                        <div className="relative">
+                          <Input
+                            id="name"
+                            value={data.name}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('name', e.target.value)}
+                            required
+                            className="h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg"
+                            placeholder={t('info_types.create.name_placeholder')}
+                          />
+                          {errors.name && (
+                            <div className="mt-2 flex items-center gap-2 text-red-600">
+                              <X className="h-4 w-4" />
+                              <p className="text-sm font-medium">{errors.name}</p>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  </div>
+                      </div>
 
-                  {/* Description Field */}
-                  <div className="space-y-4">
-                    <Label htmlFor="description" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
-                      <FileText className="h-4 w-4" />
-                      {t('info_types.create.description_label')}
-                    </Label>
-                    <div className="relative">
-                      <Textarea
-                        id="description"
-                        value={data.description}
-                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setData('description', e.target.value)}
-                        rows={4}
-                        className="text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg resize-none"
-                        placeholder={t('info_types.create.description_placeholder')}
-                      />
-                      {errors.description && (
-                        <div className="mt-2 flex items-center gap-2 text-red-600">
-                          <X className="h-4 w-4" />
-                          <p className="text-sm font-medium">{errors.description}</p>
+                      {/* Code Field */}
+                      <div className="space-y-4">
+                        <Label htmlFor="code" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
+                          <BarChart3 className="h-4 w-4" />
+                          {t('info_types.create.code_label')}
+                        </Label>
+                        <div className="relative">
+                          <Input
+                            id="code"
+                            value={data.code}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('code', e.target.value)}
+                            className="h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg"
+                            placeholder={t('info_types.create.code_placeholder')}
+                          />
+                          {errors.code && (
+                            <div className="mt-2 flex items-center gap-2 text-red-600">
+                              <X className="h-4 w-4" />
+                              <p className="text-sm font-medium">{errors.code}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Description Field */}
+                      <div className="space-y-4">
+                        <Label htmlFor="description" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
+                          <FileText className="h-4 w-4" />
+                          {t('info_types.create.description_label')}
+                        </Label>
+                        <div className="relative">
+                          <Textarea
+                            id="description"
+                            value={data.description}
+                            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setData('description', e.target.value)}
+                            rows={4}
+                            className="text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg resize-none"
+                            placeholder={t('info_types.create.description_placeholder')}
+                          />
+                          {errors.description && (
+                            <div className="mt-2 flex items-center gap-2 text-red-600">
+                              <X className="h-4 w-4" />
+                              <p className="text-sm font-medium">{errors.description}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="access" className="space-y-6">
+                      <div className="text-center mb-6">
+                        <h3 className="text-xl font-bold text-purple-800 dark:text-purple-200 mb-2">
+                          {t('info_type.access.title')}
+                        </h3>
+                        <p className="text-purple-600 dark:text-purple-300">
+                          {t('info_type.access.description')}
+                        </p>
+                      </div>
+
+                      {/* User Search */}
+                      <div className="space-y-4">
+                        <Label className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
+                          <Search className="h-4 w-4" />
+                          {t('info_type.access.search_users')}
+                        </Label>
+                        <div className="relative">
+                          <Input
+                            value={userSearchTerm}
+                            onChange={(e) => setUserSearchTerm(e.target.value)}
+                            placeholder={t('info_type.access.search_users')}
+                            className="h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg"
+                          />
+                          <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-purple-400" />
+                        </div>
+                      </div>
+
+                      {/* User Search Results */}
+                      {userSearchTerm && (
+                        <div className="space-y-2">
+                          <h4 className="text-md font-semibold text-purple-800 dark:text-purple-200">
+                            {t('info_type.access.select_users')}
+                          </h4>
+                          <div className="max-h-48 overflow-y-auto space-y-2 border border-purple-200 dark:border-purple-700 rounded-xl p-4 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800">
+                            {filteredUsers
+                              .filter(user => !selectedUsers.includes(user.id))
+                              .map(user => (
+                                <div
+                                  key={user.id}
+                                  onClick={() => handleUserSelect(user.id)}
+                                  className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg border border-purple-100 dark:border-purple-700 hover:bg-purple-50 dark:hover:bg-purple-900/30 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md"
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-800 dark:to-purple-900 rounded-lg">
+                                      <User className="h-4 w-4 text-purple-600 dark:text-purple-300" />
+                                    </div>
+                                    <div>
+                                      <p className="font-medium text-purple-900 dark:text-purple-100">{user.name}</p>
+                                      <p className="text-sm text-purple-600 dark:text-purple-400">{user.email}</p>
+                                    </div>
+                                  </div>
+                                  <ArrowRight className="h-4 w-4 text-purple-500" />
+                                </div>
+                              ))}
+                            {filteredUsers.filter(user => !selectedUsers.includes(user.id)).length === 0 && (
+                              <p className="text-center text-purple-600 dark:text-purple-400 py-4">
+                                {t('info_type.access.no_users_found')}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       )}
-                    </div>
-                  </div>
+
+                      {/* Selected Users */}
+                      <div className="space-y-4">
+                        <h4 className="text-md font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
+                          <Users className="h-4 w-4" />
+                          {t('info_type.access.selected_users')}
+                        </h4>
+                        {selectedUsers.length > 0 ? (
+                          <div className="space-y-2">
+                            {selectedUsers.map(userId => {
+                              const user = users.find(u => u.id === userId);
+                              return user ? (
+                                <div
+                                  key={userId}
+                                  className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-100 to-purple-200 dark:from-purple-800 dark:to-purple-900 rounded-lg border border-purple-200 dark:border-purple-700"
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-gradient-to-br from-purple-200 to-purple-300 dark:from-purple-700 dark:to-purple-800 rounded-lg">
+                                      <User className="h-4 w-4 text-purple-700 dark:text-purple-200" />
+                                    </div>
+                                    <div>
+                                      <p className="font-medium text-purple-900 dark:text-purple-100">{user.name}</p>
+                                      <p className="text-sm text-purple-600 dark:text-purple-400">{user.email}</p>
+                                    </div>
+                                  </div>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleUserRemove(userId)}
+                                    className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20 border-red-200 dark:border-red-700"
+                                  >
+                                    <Trash className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                              ) : null;
+                            })}
+                          </div>
+                        ) : (
+                          <div className="text-center py-8 text-purple-600 dark:text-purple-400">
+                            <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                            <p>{t('info_type.access.no_users_selected')}</p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Notes */}
+                      <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+                        <div className="flex items-start gap-2">
+                          <AlertTriangle className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5" />
+                          <div className="text-right">
+                            <p className="text-sm text-blue-800 dark:text-blue-200 font-medium mb-1">
+                              {t('info_type.access.creator_note')}
+                            </p>
+                            <p className="text-xs text-blue-600 dark:text-blue-300">
+                              {t('info_type.access.permissions_note')}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </TabsContent>
+                  </Tabs>
                 </CardContent>
               </Card>
 

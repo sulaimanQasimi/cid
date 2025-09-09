@@ -88,4 +88,36 @@ class InfoType extends Model
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
+
+    /**
+     * Get the access permissions for this info type.
+     */
+    public function accesses(): HasMany
+    {
+        return $this->hasMany(InfoTypeAccess::class);
+    }
+
+    /**
+     * Get the users who have access to this info type.
+     */
+    public function accessibleUsers(): HasMany
+    {
+        return $this->hasMany(User::class, 'id', 'user_id')
+            ->join('info_type_accesses', 'users.id', '=', 'info_type_accesses.user_id')
+            ->where('info_type_accesses.info_type_id', $this->id);
+    }
+
+    /**
+     * Check if a user has access to this info type.
+     */
+    public function hasAccess(User $user): bool
+    {
+        // Creator always has access
+        if ($this->created_by === $user->id) {
+            return true;
+        }
+
+        // Check if user has explicit access
+        return $this->accesses()->where('user_id', $user->id)->exists();
+    }
 }

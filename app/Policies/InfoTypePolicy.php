@@ -23,7 +23,8 @@ class InfoTypePolicy
      */
     public function view(User $user, InfoType $infoType): bool
     {
-        return $user->hasPermissionTo('info_type.view');
+        return $user->hasPermissionTo('info_type.view') && 
+               ($infoType->created_by === $user->id || $infoType->hasAccess($user));
     }
 
     /**
@@ -39,7 +40,8 @@ class InfoTypePolicy
      */
     public function update(User $user, InfoType $infoType): bool
     {
-        return $user->hasPermissionTo('info_type.update');
+        return $user->hasPermissionTo('info_type.update') && 
+               $infoType->created_by === $user->id;
     }
 
     /**
@@ -47,7 +49,8 @@ class InfoTypePolicy
      */
     public function delete(User $user, InfoType $infoType): bool
     {
-        return $user->hasPermissionTo('info_type.delete');
+        return $user->hasPermissionTo('info_type.delete') && 
+               $infoType->created_by === $user->id;
     }
 
     /**
@@ -63,7 +66,8 @@ class InfoTypePolicy
      */
     public function restore(User $user, InfoType $infoType): bool
     {
-        return $user->hasPermissionTo('info_type.restore');
+        return $user->hasPermissionTo('info_type.restore') && 
+               $infoType->created_by === $user->id;
     }
 
     /**
@@ -71,6 +75,7 @@ class InfoTypePolicy
      */
     public function forceDelete(User $user, InfoType $infoType): bool
     {
-        return $user->hasPermissionTo('info_type.force_delete');
+        return $user->hasPermissionTo('info_type.force_delete') && 
+               $infoType->created_by === $user->id;
     }
 }

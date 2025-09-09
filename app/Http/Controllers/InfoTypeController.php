@@ -9,6 +9,7 @@ use App\Models\StatCategory;
 use App\Models\StatCategoryItem;
 use App\Models\InfoCategory;
 use App\Models\Department;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -38,7 +39,13 @@ class InfoTypeController extends Controller
         ]);
 
         $query = InfoType::with(['creator:id,name'])
-            ->withCount(['infos', 'infoStats']);
+            ->withCount(['infos', 'infoStats'])
+            ->where(function($q) {
+                $q->where('created_by', Auth::id())
+                  ->orWhereHas('accesses', function($accessQuery) {
+                      $accessQuery->where('user_id', Auth::id());
+                  });
+            });
 
         // Apply search filter
         if (!empty($validated['search'])) {
@@ -77,8 +84,11 @@ class InfoTypeController extends Controller
         $this->authorize('create', InfoType::class);
         
         $statData = $this->getStatisticalData();
+        $users = User::orderBy('name')->get(['id', 'name', 'email']);
 
-        return Inertia::render('Info/Types/Create', $statData);
+        return Inertia::render('Info/Types/Create', array_merge($statData, [
+            'users' => $users,
+        ]));
     }
 
     /**
@@ -96,6 +106,8 @@ class InfoTypeController extends Controller
             'stats.*.stat_category_item_id' => 'required|exists:stat_category_items,id',
             'stats.*.value' => 'required|string|max:255',
             'stats.*.notes' => 'nullable|string|max:1000',
+            'access_users' => 'nullable|array',
+            'access_users.*' => 'integer|exists:users,id',
         ]);
 
         try {
@@ -110,6 +122,16 @@ class InfoTypeController extends Controller
                 // Create associated stats
                 if (!empty($validated['stats'])) {
                     $this->createInfoStats($infoType, $validated['stats']);
+                }
+
+                // Create access permissions
+                if (isset($validated['access_users']) && is_array($validated['access_users'])) {
+                    foreach ($validated['access_users'] as $userId) {
+                        // Don't create access for the creator
+                        if ($userId != Auth::id()) {
+                            $infoType->accesses()->create(['user_id' => $userId]);
+                        }
+                    }
                 }
 
                 return $infoType;
@@ -177,12 +199,14 @@ class InfoTypeController extends Controller
     {
         $this->authorize('update', $infoType);
         
-        $infoType->load(['infoStats.statCategoryItem.category']);
+        $infoType->load(['infoStats.statCategoryItem.category', 'accesses.user:id,name,email']);
+        $users = User::orderBy('name')->get(['id', 'name', 'email']);
         
         $statData = $this->getStatisticalData();
 
         return Inertia::render('Info/Types/Edit', array_merge($statData, [
             'infoType' => $infoType,
+            'users' => $users,
         ]));
     }
 
@@ -201,6 +225,10 @@ class InfoTypeController extends Controller
             'stats.*.stat_category_item_id' => 'required|exists:stat_category_items,id',
             'stats.*.value' => 'required|string|max:255',
             'stats.*.notes' => 'nullable|string|max:1000',
+            'access_users' => 'nullable|array',
+            'access_users.*' => 'integer|exists:users,id',
+            'deleted_users' => 'nullable|array',
+            'deleted_users.*' => 'integer|exists:users,id',
         ]);
 
         try {
@@ -215,6 +243,30 @@ class InfoTypeController extends Controller
                 // Update stats if provided
                 if (isset($validated['stats'])) {
                     $this->updateInfoStats($infoType, $validated['stats']);
+                }
+
+                // Handle access permissions update
+                if (isset($validated['access_users'])) {
+                    // Remove all existing access permissions
+                    $infoType->accesses()->delete();
+                    
+                    // Add new access permissions
+                    foreach ($validated['access_users'] as $userId) {
+                        // Don't create access for the creator
+                        if ($userId != Auth::id()) {
+                            $infoType->accesses()->create(['user_id' => $userId]);
+                        }
+                    }
+                }
+
+                // Handle deleted users (for logging/audit purposes)
+                if (isset($validated['deleted_users']) && is_array($validated['deleted_users'])) {
+                    \Log::info('Users removed from info type access', [
+                        'info_type_id' => $infoType->id,
+                        'deleted_user_ids' => $validated['deleted_users'],
+                        'deleted_by' => Auth::id(),
+                        'timestamp' => now()
+                    ]);
                 }
             });
 
