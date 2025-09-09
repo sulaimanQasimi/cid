@@ -253,6 +253,8 @@ class CriminalController extends Controller
             'department_id' => 'nullable|string',
             'access_users' => 'nullable|array',
             'access_users.*' => 'integer|exists:users,id',
+            'deleted_users' => 'nullable|array',
+            'deleted_users.*' => 'integer|exists:users,id',
         ]);
 
         // Handle 'none' value for department_id
@@ -274,9 +276,15 @@ class CriminalController extends Controller
             $validated['photo'] = $request->file('photo')->store('photos', 'public');
         }
 
+        // Debug: Check if deleted_users is received
+        \Log::info('Received request data:', [
+            'access_users' => $request->get('access_users'),
+            'deleted_users' => $request->get('deleted_users'),
+            'all_request_data' => $request->all()
+        ]);
+        
         // Update the criminal record
         $criminal->update($validated);
-
         // Handle access permissions update
         if (isset($validated['access_users'])) {
             // Remove all existing access permissions
@@ -291,6 +299,17 @@ class CriminalController extends Controller
                     }
                 }
             }
+        }
+
+        // Handle deleted users (for logging/audit purposes)
+        if (isset($validated['deleted_users']) && is_array($validated['deleted_users'])) {
+            // Log the deleted users for audit purposes
+            \Log::info('Users removed from criminal access', [
+                'criminal_id' => $criminal->id,
+                'deleted_user_ids' => $validated['deleted_users'],
+                'deleted_by' => auth()->id(),
+                'timestamp' => now()
+            ]);
         }
 
         return Redirect::route('criminals.index')

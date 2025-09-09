@@ -1681,5 +1681,12 @@
   "criminal.no_records_description":"هیڅ مجرمینو ثبتونه ونه موندل شول",
   "incidents.table.confirmation":"تأیید",
   "provinces.create.title":"ایجاد ولایت",
-  "provinces.no_records_description":"هیڅ ولایتی ثبتونه ونه موندل شول"
+  "provinces.no_records_description":"هیڅ ولایتی ثبتونه ونه موندل شول",
+  "criminal.delete.confirm_title":"تأیید حذف",
+  "criminal.delete.confirm_message":"آیا مطمئن هستید که می‌خواهید پرونده جنایی \"{name}\" را حذف کنید؟ این عمل قابل بازگشت نیست.",
+  "criminal.delete.confirm_button":"حذف پرونده",
+  "criminal.access.remove_user_confirm_title":"حذف دسترسی کاربر",
+  "criminal.access.remove_user_confirm_message":"آیا مطمئن هستید که می‌خواهید دسترسی کاربر \"{name}\" را به این پرونده حذف کنید؟",
+  "criminal.access.remove_user_confirm_button":"حذف دسترسی",
+  "criminal.access.remove_all":"حذف همه"
 }
