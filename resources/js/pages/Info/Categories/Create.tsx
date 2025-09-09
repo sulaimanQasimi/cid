@@ -61,7 +61,6 @@ export default function InfoCategoriesCreate() {
           backRouteName="info-categories.index"
           backButtonText={t('common.back')}
         />
-
         <CanCreate model="info_category">
           <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0">
             <form onSubmit={handleSubmit}>
