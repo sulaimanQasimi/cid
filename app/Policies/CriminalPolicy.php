@@ -23,7 +23,13 @@ class CriminalPolicy
      */
     public function view(User $user, Criminal $criminal): bool
     {
-        return $user->hasPermissionTo('criminal.view');
+        // Check if user has the general permission
+        if (!$user->hasPermissionTo('criminal.view')) {
+            return false;
+        }
+
+        // Check if user has access to this specific criminal
+        return $criminal->hasAccess($user);
     }
 
     /**
@@ -39,7 +45,13 @@ class CriminalPolicy
      */
     public function update(User $user, Criminal $criminal): bool
     {
-        return $user->hasPermissionTo('criminal.update');
+        // Check if user has the general permission
+        if (!$user->hasPermissionTo('criminal.update')) {
+            return false;
+        }
+
+        // Check if user has access to this specific criminal
+        return $criminal->hasAccess($user);
     }
 
     /**
@@ -47,7 +59,13 @@ class CriminalPolicy
      */
     public function delete(User $user, Criminal $criminal): bool
     {
-        return $user->hasPermissionTo('criminal.delete');
+        // Check if user has the general permission
+        if (!$user->hasPermissionTo('criminal.delete')) {
+            return false;
+        }
+
+        // Check if user has access to this specific criminal
+        return $criminal->hasAccess($user);
     }
 
     /**

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use App\Models\Traits\HasVisitors;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -136,5 +137,37 @@ class Criminal extends Model
     public function reports(): MorphMany
     {
         return $this->morphMany(Report::class, 'reportable');
+    }
+
+    /**
+     * Get the access records for this criminal.
+     */
+    public function accesses(): HasMany
+    {
+        return $this->hasMany(CriminalAccess::class);
+    }
+
+    /**
+     * Get the users who have access to this criminal.
+     */
+    public function accessibleUsers(): HasMany
+    {
+        return $this->hasMany(User::class, 'id', 'user_id')
+            ->join('criminal_accesses', 'users.id', '=', 'criminal_accesses.user_id')
+            ->where('criminal_accesses.criminal_id', $this->id);
+    }
+
+    /**
+     * Check if a user has access to this criminal.
+     */
+    public function hasAccess(User $user): bool
+    {
+        // Creator always has access
+        if ($this->created_by === $user->id) {
+            return true;
+        }
+
+        // Check if user has explicit access
+        return $this->accesses()->where('user_id', $user->id)->exists();
     }
 }

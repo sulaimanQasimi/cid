@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Criminal;
 use App\Models\Department;
+use App\Models\User;
 use App\Services\VisitorTrackingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -50,6 +51,14 @@ class CriminalController extends Controller
 
         // Apply search and filters
         $query = Criminal::with(['department', 'creator']);
+
+        // Filter by access permissions - user can only see criminals they created or have access to
+        $query->where(function ($q) {
+            $q->where('created_by', Auth::id())
+              ->orWhereHas('accesses', function ($accessQuery) {
+                  $accessQuery->where('user_id', Auth::id());
+              });
+        });
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -106,9 +115,11 @@ class CriminalController extends Controller
         $this->authorize('create', Criminal::class);
         
         $departments = Department::orderBy('name')->get();
+        $users = User::orderBy('name')->get();
 
         return Inertia::render('Criminal/Create', [
             'departments' => $departments,
+            'users' => $users,
         ]);
     }
 
@@ -137,6 +148,8 @@ class CriminalController extends Controller
             'final_verdict' => 'nullable|string',
             'notes' => 'nullable|string',
             'department_id' => 'nullable|string',
+            'access_users' => 'nullable|array',
+            'access_users.*' => 'integer|exists:users,id',
         ]);
 
         // Handle 'none' value for department_id
@@ -159,6 +172,16 @@ class CriminalController extends Controller
 
         // Create the criminal record
         $criminal = Criminal::create($validated);
+
+        // Handle access permissions
+        if (isset($validated['access_users']) && is_array($validated['access_users'])) {
+            foreach ($validated['access_users'] as $userId) {
+                // Don't create access for the creator (they already have access)
+                if ($userId != Auth::id()) {
+                    $criminal->accesses()->create(['user_id' => $userId]);
+                }
+            }
+        }
 
         return Redirect::route('criminals.index')
             ->with('success', 'Criminal record created successfully.');
@@ -192,10 +215,15 @@ class CriminalController extends Controller
         $this->authorize('update', $criminal);
         
         $departments = Department::orderBy('name')->get();
+        $users = User::orderBy('name')->get();
+        
+        // Load current access permissions
+        $criminal->load('accesses.user');
 
         return Inertia::render('Criminal/Edit', [
             'criminal' => $criminal,
             'departments' => $departments,
+            'users' => $users,
         ]);
     }
 
@@ -224,6 +252,8 @@ class CriminalController extends Controller
             'final_verdict' => 'nullable|string',
             'notes' => 'nullable|string',
             'department_id' => 'nullable|string',
+            'access_users' => 'nullable|array',
+            'access_users.*' => 'integer|exists:users,id',
         ]);
 
         // Handle 'none' value for department_id
@@ -247,6 +277,22 @@ class CriminalController extends Controller
 
         // Update the criminal record
         $criminal->update($validated);
+
+        // Handle access permissions update
+        if (isset($validated['access_users'])) {
+            // Remove all existing access permissions
+            $criminal->accesses()->delete();
+            
+            // Add new access permissions
+            if (is_array($validated['access_users'])) {
+                foreach ($validated['access_users'] as $userId) {
+                    // Don't create access for the creator (they already have access)
+                    if ($userId != $criminal->created_by) {
+                        $criminal->accesses()->create(['user_id' => $userId]);
+                    }
+                }
+            }
+        }
 
         return Redirect::route('criminals.index')
             ->with('success', 'Criminal record updated successfully.');
