@@ -347,7 +347,7 @@ export default function Index({ incidents, filters = {}, categories, canConfirm 
             description={t('incidents.table.description')}
             icon={<TrendingUp className="h-6 w-6" />}
             model="incident"
-            routeName=""
+            routeName={() => ''}
             buttonText=""
             theme="blue"
             showButton={false}

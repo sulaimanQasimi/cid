@@ -357,7 +357,7 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                         onChange={(e) => setData('original_residence', e.target.value)}
                         rows={2}
                         placeholder={t('criminal.create.placeholders.original_residence')}
-                        className="min-h-[80px] resize-none border-orange-200 dark:border-orange-700 dark:border-orange-700 focus:border-orange-500 dark:focus:border-orange-400 focus:ring-orange-500/20 dark:focus:ring-orange-400/20 bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800 text-right"
+                        className="min-h-[80px] resize-none border-orange-200 dark:border-orange-700 focus:border-orange-500 dark:focus:border-orange-400 focus:ring-orange-500/20 dark:focus:ring-orange-400/20 bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800 text-right text-gray-900 dark:text-gray-100"
                       />
                       {errors.original_residence && <p className="text-sm text-red-500 dark:text-red-400 font-medium bg-red-50 dark:bg-red-900/20 p-2 rounded-lg border border-red-200 dark:border-red-700 flex items-center gap-2 text-right">
                         <AlertTriangle className="h-4 w-4" />
@@ -376,7 +376,7 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                         onChange={(e) => setData('current_residence', e.target.value)}
                         rows={2}
                         placeholder={t('criminal.create.placeholders.current_residence')}
-                        className="min-h-[80px] resize-none border-orange-200 dark:border-orange-700 dark:border-orange-700 focus:border-orange-500 dark:focus:border-orange-400 focus:ring-orange-500/20 dark:focus:ring-orange-400/20 bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800 text-right"
+                        className="min-h-[80px] resize-none border-orange-200 dark:border-orange-700 focus:border-orange-500 dark:focus:border-orange-400 focus:ring-orange-500/20 dark:focus:ring-orange-400/20 bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800 text-right text-gray-900 dark:text-gray-100"
                       />
                       {errors.current_residence && <p className="text-sm text-red-500 dark:text-red-400 font-medium bg-red-50 dark:bg-red-900/20 p-2 rounded-lg border border-red-200 dark:border-red-700 flex items-center gap-2 text-right">
                         <AlertTriangle className="h-4 w-4" />
@@ -534,7 +534,7 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                         onChange={(e) => setData('final_verdict', e.target.value)}
                         rows={3}
                         placeholder={t('criminal.create.placeholders.final_verdict')}
-                        className="min-h-[120px] resize-none text-right "
+                        className="min-h-[120px] resize-none text-right border-orange-200 dark:border-orange-700 focus:border-orange-500 dark:focus:border-orange-400 focus:ring-orange-500/20 dark:focus:ring-orange-400/20 bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800 text-gray-900 dark:text-gray-100"
                       />
                       {errors.final_verdict && <p className="text-sm text-red-500 dark:text-red-400 font-medium text-right">{errors.final_verdict}</p>}
                     </div>
@@ -553,7 +553,7 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                         onChange={(e) => setData('notes', e.target.value)}
                         rows={8}
                         placeholder={t('criminal.create.placeholders.notes')}
-                        className="min-h-[240px] text-right dark:bg-gray-700"
+                        className="min-h-[240px] dark:bg-gray-700 text-right border-orange-200 dark:border-orange-700 focus:border-orange-500 dark:focus:border-orange-400 focus:ring-orange-500/20 dark:focus:ring-orange-400/20 bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800 text-gray-900 dark:text-gray-100"
                       />
                       {errors.notes && <p className="text-sm text-red-500 dark:text-red-400 font-medium text-right">{errors.notes}</p>}
 
