@@ -276,13 +276,6 @@ class CriminalController extends Controller
             $validated['photo'] = $request->file('photo')->store('photos', 'public');
         }
 
-        // Debug: Check if deleted_users is received
-        \Log::info('Received request data:', [
-            'access_users' => $request->get('access_users'),
-            'deleted_users' => $request->get('deleted_users'),
-            'all_request_data' => $request->all()
-        ]);
-        
         // Update the criminal record
         $criminal->update($validated);
         // Handle access permissions update
