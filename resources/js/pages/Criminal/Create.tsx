@@ -84,11 +84,6 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
 
   // Handle user selection
   const handleUserSelect = (userId: number) => {
-    // Don't allow adding the current user (creator) to access list
-    if (userId === auth.user?.id) {
-      return;
-    }
-    
     const newSelectedUsers = [...selectedUsers, userId];
     setSelectedUsers(newSelectedUsers);
     setData('access_users', newSelectedUsers);

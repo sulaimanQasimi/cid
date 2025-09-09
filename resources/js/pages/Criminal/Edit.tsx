@@ -111,6 +111,7 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
     access_users: criminal.accesses?.map(access => access.user_id) || [],
   });
 
+
   // Generate breadcrumbs
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -149,7 +150,7 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
     
     const newSelectedUsers = selectedUsers.filter(id => id !== userId);
     setSelectedUsers(newSelectedUsers);
-    setData('access_users', newSelectedUsers);
+    // Don't update form data here - let it be updated on form submit
   };
 
   // Filter users based on search term
@@ -175,6 +176,10 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Update the form data with current selectedUsers before submitting
+    setData('access_users', selectedUsers);
+    
     post(route('criminals.update', criminal.id), {
       forceFormData: true,
       onSuccess: () => {
@@ -750,7 +755,11 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                                         type="button"
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => handleUserRemove(userId)}
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                          handleUserRemove(userId);
+                                        }}
                                         className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
                                       >
                                         {t('criminal.access.remove_user')}
