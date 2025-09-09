@@ -33,19 +33,28 @@ interface Department {
   code: string;
 }
 
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
 interface Props {
   departments?: Department[];
+  users?: User[];
   auth: {
     permissions: string[];
   };
 }
 
-export default function CriminalCreate({ departments = [], auth }: Props) {
+export default function CriminalCreate({ departments = [], users = [], auth }: Props) {
   const { t } = useTranslation();
   // Content tabs state
   const [activeTab, setActiveTab] = useState<string>('other');
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [persianDateDisplay, setPersianDateDisplay] = useState<string>('');
+  const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
+  const [userSearchTerm, setUserSearchTerm] = useState<string>('');
 
   const { data, setData, post, processing, errors, reset } = useForm({
     photo: null as File | null,
@@ -65,12 +74,39 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
     final_verdict: '',
     notes: '',
     department_id: 'none',
+    access_users: [] as number[],
   });
 
   // Handle tab change
   const handleTabChange = (value: string) => {
     setActiveTab(value);
   };
+
+  // Handle user selection
+  const handleUserSelect = (userId: number) => {
+    // Don't allow adding the current user (creator) to access list
+    if (userId === auth.user?.id) {
+      return;
+    }
+    
+    const newSelectedUsers = [...selectedUsers, userId];
+    setSelectedUsers(newSelectedUsers);
+    setData('access_users', newSelectedUsers);
+    setUserSearchTerm('');
+  };
+
+  // Handle user removal
+  const handleUserRemove = (userId: number) => {
+    const newSelectedUsers = selectedUsers.filter(id => id !== userId);
+    setSelectedUsers(newSelectedUsers);
+    setData('access_users', newSelectedUsers);
+  };
+
+  // Filter users based on search term
+  const filteredUsers = users.filter(user => 
+    user.name.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(userSearchTerm.toLowerCase())
+  ).filter(user => !selectedUsers.includes(user.id));
 
   // Handle photo change
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -213,7 +249,7 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
               <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-orange-50/30 dark:to-orange-900/20">
               <CardContent className="p-6">
                 <Tabs defaultValue="other" value={activeTab} onValueChange={handleTabChange} className="w-full">
-                  <TabsList className="grid w-full grid-cols-3 mb-6 rounded-xl p-1 bg-gradient-to-l from-orange-100 dark:from-orange-900/30 to-orange-200 dark:to-orange-800/30 shadow-lg">
+                  <TabsList className="grid w-full grid-cols-4 mb-6 rounded-xl p-1 bg-gradient-to-l from-orange-100 dark:from-orange-900/30 to-orange-200 dark:to-orange-800/30 shadow-lg">
                     <TabsTrigger
                       value="other"
                       className={cn(
@@ -243,6 +279,16 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                     >
                       <UserRound className="h-4 w-4" />
                       <span>{t('criminal.create.tabs.personal')}</span>
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="access"
+                      className={cn(
+                        "data-[state=active]:bg-gradient-to-l data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
+                        "transition-all duration-300 rounded-lg"
+                      )}
+                    >
+                      <Shield className="h-4 w-4" />
+                      <span>{t('criminal.access.tab')}</span>
                     </TabsTrigger>
                   </TabsList>
 
@@ -560,6 +606,126 @@ export default function CriminalCreate({ departments = [], auth }: Props) {
                       <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2 text-right">
                         {t('criminal.create.notes_helper')}
                       </p>
+                    </div>
+                  </TabsContent>
+
+                  {/* Access Control Tab */}
+                  <TabsContent value="access" className="space-y-6 pt-2">
+                    <div className="space-y-6">
+                      <div className="bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800 rounded-lg p-6 border border-orange-200 dark:border-orange-700">
+                        <div className="flex items-center gap-2 mb-4">
+                          <Shield className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                          <h3 className="text-lg font-semibold text-orange-700 dark:text-orange-300">
+                            {t('criminal.access.title')}
+                          </h3>
+                        </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6 text-right">
+                          {t('criminal.access.description')}
+                        </p>
+
+                        {/* User Search */}
+                        <div className="space-y-4">
+                          <Label className="text-base font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300 text-right" dir="rtl">
+                            <Users className="h-4 w-4" />
+                            {t('criminal.access.select_users')}
+                          </Label>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 text-right">
+                            {t('criminal.access.select_users_description')}
+                          </p>
+                          
+                          <div className="relative">
+                            <Input
+                              type="text"
+                              value={userSearchTerm}
+                              onChange={(e) => setUserSearchTerm(e.target.value)}
+                              placeholder={t('criminal.access.search_users')}
+                              className="text-right border-orange-200 dark:border-orange-700 focus:border-orange-500 dark:focus:border-orange-400 focus:ring-orange-500/20 dark:focus:ring-orange-400/20 bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800"
+                            />
+                          </div>
+
+                          {/* User Search Results */}
+                          {userSearchTerm && filteredUsers.length > 0 && (
+                            <div className="border border-orange-200 dark:border-orange-700 rounded-lg bg-white dark:bg-gray-800 max-h-48 overflow-y-auto">
+                              {filteredUsers.map((user) => (
+                                <div
+                                  key={user.id}
+                                  onClick={() => handleUserSelect(user.id)}
+                                  className="p-3 hover:bg-orange-50 dark:hover:bg-orange-900/20 cursor-pointer border-b border-orange-100 dark:border-orange-800 last:border-b-0"
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <div className="text-right">
+                                      <p className="font-medium text-gray-900 dark:text-gray-100">{user.name}</p>
+                                      <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
+                                    </div>
+                                    <Users className="h-4 w-4 text-orange-500" />
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          {userSearchTerm && filteredUsers.length === 0 && (
+                            <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
+                              {t('criminal.access.no_users_found')}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Selected Users */}
+                        <div className="mt-6">
+                          <Label className="text-base font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300 text-right mb-4" dir="rtl">
+                            <Users className="h-4 w-4" />
+                            {t('criminal.access.selected_users')}
+                          </Label>
+                          
+                          {selectedUsers.length === 0 ? (
+                            <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                              {t('criminal.access.no_users_selected')}
+                            </p>
+                          ) : (
+                            <div className="space-y-2">
+                              {selectedUsers.map((userId) => {
+                                const user = users.find(u => u.id === userId);
+                                return user ? (
+                                  <div
+                                    key={userId}
+                                    className="flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-700"
+                                  >
+                                    <div className="text-right">
+                                      <p className="font-medium text-gray-900 dark:text-gray-100">{user.name}</p>
+                                      <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
+                                    </div>
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => handleUserRemove(userId)}
+                                      className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
+                                    >
+                                      {t('criminal.access.remove_user')}
+                                    </Button>
+                                  </div>
+                                ) : null;
+                              })}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Notes */}
+                        <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+                          <div className="flex items-start gap-2">
+                            <AlertTriangle className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5" />
+                            <div className="text-right">
+                              <p className="text-sm text-blue-800 dark:text-blue-200 font-medium mb-1">
+                                {t('criminal.access.creator_note')}
+                              </p>
+                              <p className="text-xs text-blue-600 dark:text-blue-300">
+                                {t('criminal.access.permissions_note')}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </TabsContent>
                 </Tabs>

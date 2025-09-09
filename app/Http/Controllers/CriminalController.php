@@ -75,7 +75,6 @@ class CriminalController extends Controller
         }
 
         $query->orderBy($sort, $direction);
-
         // Get paginated results with visitor statistics
         $criminals = $query->paginate($perPage)->withQueryString();
         

@@ -956,4 +956,132 @@ class CriminalControllerTest extends TestCase
 
         $response->assertSessionHasErrors(['access_users.0']);
     }
+
+    /** @test */
+    public function only_creator_can_update_criminal()
+    {
+        $user1 = User::factory()->create();
+        $user1->assignRole('admin');
+        $user1->givePermissionTo([
+            'criminal.view_any',
+            'criminal.view',
+            'criminal.create',
+            'criminal.update',
+            'criminal.delete'
+        ]);
+
+        $user2 = User::factory()->create();
+        $user2->assignRole('admin');
+        $user2->givePermissionTo([
+            'criminal.view_any',
+            'criminal.view',
+            'criminal.create',
+            'criminal.update',
+            'criminal.delete'
+        ]);
+
+        $criminal = Criminal::factory()->create(['created_by' => $user1->id]);
+
+        // Give user2 access to the criminal
+        $criminal->accesses()->create(['user_id' => $user2->id]);
+
+        // User2 should be able to view the criminal
+        $response = $this->actingAs($user2)->get(route('criminals.show', $criminal));
+        $response->assertStatus(200);
+
+        // But user2 should NOT be able to update the criminal
+        $updateData = [
+            'name' => 'Updated Criminal Name',
+            'access_users' => []
+        ];
+
+        $response = $this->actingAs($user2)->put(route('criminals.update', $criminal), $updateData);
+        $response->assertStatus(403);
+
+        // Only user1 (creator) should be able to update
+        $response = $this->actingAs($user1)->put(route('criminals.update', $criminal), $updateData);
+        $response->assertRedirect(route('criminals.index'));
+    }
+
+    /** @test */
+    public function only_creator_can_delete_criminal()
+    {
+        $user1 = User::factory()->create();
+        $user1->assignRole('admin');
+        $user1->givePermissionTo([
+            'criminal.view_any',
+            'criminal.view',
+            'criminal.create',
+            'criminal.update',
+            'criminal.delete'
+        ]);
+
+        $user2 = User::factory()->create();
+        $user2->assignRole('admin');
+        $user2->givePermissionTo([
+            'criminal.view_any',
+            'criminal.view',
+            'criminal.create',
+            'criminal.update',
+            'criminal.delete'
+        ]);
+
+        $criminal = Criminal::factory()->create(['created_by' => $user1->id]);
+
+        // Give user2 access to the criminal
+        $criminal->accesses()->create(['user_id' => $user2->id]);
+
+        // User2 should be able to view the criminal
+        $response = $this->actingAs($user2)->get(route('criminals.show', $criminal));
+        $response->assertStatus(200);
+
+        // But user2 should NOT be able to delete the criminal
+        $response = $this->actingAs($user2)->delete(route('criminals.destroy', $criminal));
+        $response->assertStatus(403);
+
+        // Only user1 (creator) should be able to delete
+        $response = $this->actingAs($user1)->delete(route('criminals.destroy', $criminal));
+        $response->assertRedirect(route('criminals.index'));
+    }
+
+    /** @test */
+    public function only_creator_can_access_edit_form()
+    {
+        $user1 = User::factory()->create();
+        $user1->assignRole('admin');
+        $user1->givePermissionTo([
+            'criminal.view_any',
+            'criminal.view',
+            'criminal.create',
+            'criminal.update',
+            'criminal.delete'
+        ]);
+
+        $user2 = User::factory()->create();
+        $user2->assignRole('admin');
+        $user2->givePermissionTo([
+            'criminal.view_any',
+            'criminal.view',
+            'criminal.create',
+            'criminal.update',
+            'criminal.delete'
+        ]);
+
+        $criminal = Criminal::factory()->create(['created_by' => $user1->id]);
+
+        // Give user2 access to the criminal
+        $criminal->accesses()->create(['user_id' => $user2->id]);
+
+        // User2 should be able to view the criminal
+        $response = $this->actingAs($user2)->get(route('criminals.show', $criminal));
+        $response->assertStatus(200);
+
+        // But user2 should NOT be able to access the edit form
+        $response = $this->actingAs($user2)->get(route('criminals.edit', $criminal));
+        $response->assertStatus(403);
+
+        // Only user1 (creator) should be able to access edit form
+        $response = $this->actingAs($user1)->get(route('criminals.edit', $criminal));
+        $response->assertStatus(200);
+    }
 }

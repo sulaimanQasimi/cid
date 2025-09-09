@@ -23,13 +23,8 @@ class CriminalPolicy
      */
     public function view(User $user, Criminal $criminal): bool
     {
-        // Check if user has the general permission
-        if (!$user->hasPermissionTo('criminal.view')) {
-            return false;
-        }
-
-        // Check if user has access to this specific criminal
-        return $criminal->hasAccess($user);
+        // Only the creator can view the criminal
+        return $user->hasPermissionTo('criminal.view') && ($criminal->created_by === $user->id || $criminal->hasAccess($user));
     }
 
     /**
@@ -45,13 +40,8 @@ class CriminalPolicy
      */
     public function update(User $user, Criminal $criminal): bool
     {
-        // Check if user has the general permission
-        if (!$user->hasPermissionTo('criminal.update')) {
-            return false;
-        }
-
-        // Check if user has access to this specific criminal
-        return $criminal->hasAccess($user);
+        // Only the creator can update the criminal
+        return $user->hasPermissionTo('criminal.update') && $criminal->created_by === $user->id;
     }
 
     /**
@@ -59,13 +49,9 @@ class CriminalPolicy
      */
     public function delete(User $user, Criminal $criminal): bool
     {
-        // Check if user has the general permission
-        if (!$user->hasPermissionTo('criminal.delete')) {
-            return false;
-        }
-
-        // Check if user has access to this specific criminal
-        return $criminal->hasAccess($user);
+        // Check if user has the general permission and has access to the criminal
+        // Only the creator can delete the criminal
+        return $user->hasPermissionTo('criminal.delete') && ($criminal->created_by === $user->id);
     }
 
     /**
@@ -73,7 +59,7 @@ class CriminalPolicy
      */
     public function restore(User $user, Criminal $criminal): bool
     {
-        return $user->hasPermissionTo('criminal.restore');
+        return $user->hasPermissionTo('criminal.restore') && ($criminal->created_by === $user->id);
     }
 
     /**
@@ -81,6 +67,6 @@ class CriminalPolicy
      */
     public function forceDelete(User $user, Criminal $criminal): bool
     {
-        return $user->hasPermissionTo('criminal.force_delete');
+        return $user->hasPermissionTo('criminal.force_delete') && ($criminal->created_by === $user->id);
     }
 }
