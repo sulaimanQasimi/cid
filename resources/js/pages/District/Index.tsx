@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash, Search, ArrowUpDown, FilterX, ChevronLeft, ChevronRight, Eye, BarChart3, Shield, Users, Building2, Calendar, FileText, AlertTriangle, TrendingUp, ChevronDown, MapPin } from 'lucide-react';
+import Header from '@/components/template/header';
+import SearchFilters from '@/components/template/SearchFilters';
+import { Plus, Pencil, Trash, Eye, AlertTriangle, TrendingUp, MapPin } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -12,8 +14,6 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -29,8 +29,8 @@ import {
 import { useTranslation } from '@/lib/i18n/translate';
 import { usePermissions } from '@/hooks/use-permissions';
 import { CanCreate, CanView, CanUpdate, CanDelete, CanConfirm } from '@/components/ui/permission-guard';
-import { cn } from '@/lib/utils';
 import { Pagination } from '@/components/pagination';
+import { useState, useEffect, useRef } from 'react';
 
 interface DistrictData {
   id: number;
@@ -79,6 +79,8 @@ interface PaginationMeta {
   total: number;
 }
 
+type SortDirection = 'asc' | 'desc';
+
 interface Props {
   districts?: {
     data?: DistrictData[];
@@ -87,21 +89,25 @@ interface Props {
   };
   provinces?: ProvinceData[];
   filters?: {
-    search: string;
-    sort: string;
-    direction: string;
-    per_page: number;
-    province_id: string;
+    search?: string;
+    sort_field?: string;
+    sort_direction?: SortDirection;
+    per_page?: number;
+    province_id?: string;
   };
 }
 
 const sortOptions = [
-  { value: 'name', label: 'Name' },
-  { value: 'code', label: 'Code' },
-  { value: 'province', label: 'Province' },
-  { value: 'status', label: 'Status' },
-  { value: 'created_at', label: 'Created Date' },
-  { value: 'updated_at', label: 'Updated Date' },
+  { value: 'name:asc', label: 'Name (A-Z)' },
+  { value: 'name:desc', label: 'Name (Z-A)' },
+  { value: 'code:asc', label: 'Code (A-Z)' },
+  { value: 'code:desc', label: 'Code (Z-A)' },
+  { value: 'province:asc', label: 'Province (A-Z)' },
+  { value: 'province:desc', label: 'Province (Z-A)' },
+  { value: 'status:asc', label: 'Status (A-Z)' },
+  { value: 'status:desc', label: 'Status (Z-A)' },
+  { value: 'created_at:desc', label: 'Created Date (Newest)' },
+  { value: 'created_at:asc', label: 'Created Date (Oldest)' },
 ];
 
 const perPageOptions = [
@@ -114,7 +120,7 @@ const perPageOptions = [
 export default function DistrictIndex({
   districts = { data: [], links: [], meta: undefined },
   provinces = [],
-  filters = { search: '', sort: 'name', direction: 'asc', per_page: 10, province_id: 'all' }
+  filters = {}
 }: Props) {
   const { canCreate, canView, canUpdate, canDelete, canConfirm } = usePermissions();
   const { t } = useTranslation();
@@ -129,65 +135,156 @@ export default function DistrictIndex({
       href: '#',
     },
   ];
-  const [searchQuery, setSearchQuery] = useState(filters.search);
+  
+  const [search, setSearch] = useState(filters.search || '');
+  const [sortField, setSortField] = useState(filters.sort_field || 'name');
+  const [sortDirection, setSortDirection] = useState<SortDirection>(filters.sort_direction || 'asc');
+  const [provinceId, setProvinceId] = useState(filters.province_id || 'all');
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [districtToDelete, setDistrictToDelete] = useState<DistrictData | null>(null);
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const isInitialMount = useRef(true);
+  const prevFilters = useRef({
+    sortField: filters.sort_field,
+    sortDirection: filters.sort_direction,
+    provinceId: filters.province_id
+  });
 
-  // Handle search form submission
-  const handleSearch = (e: React.FormEvent) => {
+  // Province options for SearchFilters component
+  const provinceOptions = [
+    { value: 'all', label: t('districts.all_provinces') },
+    ...provinces.map(province => ({
+      value: province.id.toString(),
+      label: province.name
+    }))
+  ];
+
+  // Apply search function (only for search)
+  const applySearch = () => {
+    try {
+      const params = {
+        search: search,
+        sort_field: sortField,
+        sort_direction: sortDirection,
+        province_id: provinceId === 'all' ? '' : provinceId,
+      };
+
+      const routeUrl = route('districts.index');
+      const options = {
+        preserveState: true,
+        replace: true,
+      };
+
+      setTimeout(() => {
+        router.get(routeUrl, params, options);
+      }, 0);
+    } catch (error) {
+      console.error('Error applying search:', error);
+    }
+  };
+
+  // Apply other filters (sort, province) without search
+  const applyOtherFilters = () => {
+    try {
+      const params = {
+        search: filters.search || '', // Keep current search from URL
+        sort_field: sortField,
+        sort_direction: sortDirection,
+        province_id: provinceId === 'all' ? '' : provinceId,
+      };
+
+      const routeUrl = route('districts.index');
+      const options = {
+        preserveState: true,
+        replace: true,
+      };
+
+      setTimeout(() => {
+        router.get(routeUrl, params, options);
+      }, 0);
+    } catch (error) {
+      console.error('Error applying filters:', error);
+    }
+  };
+
+  // Apply filters when sort or other non-search filters change
+  useEffect(() => {
+    // Skip on initial mount to prevent unnecessary requests
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    // Check if there's an actual change compared to previous values
+    const hasSortFieldChange = sortField !== prevFilters.current.sortField;
+    const hasSortDirectionChange = sortDirection !== prevFilters.current.sortDirection;
+    const hasProvinceChange = provinceId !== prevFilters.current.provinceId;
+
+    if (hasSortFieldChange || hasSortDirectionChange || hasProvinceChange) {
+      // Update the previous values
+      prevFilters.current = {
+        sortField,
+        sortDirection,
+        provinceId
+      };
+      
+      applyOtherFilters();
+    }
+  }, [sortField, sortDirection, provinceId]);
+
+  // Handler functions for SearchFilters component
+  const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    applyFilters({ search: searchQuery });
+    applySearch();
   };
 
-  // Handle sort change
   const handleSortChange = (value: string) => {
-    applyFilters({ sort: value });
+    const [field, direction] = value.split(':');
+    setSortField(field);
+    setSortDirection(direction as SortDirection);
   };
 
-  // Handle direction change
   const handleDirectionChange = () => {
-    const newDirection = filters.direction === 'asc' ? 'desc' : 'asc';
-    applyFilters({ direction: newDirection });
+    setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
   };
 
-  // Handle per page change
   const handlePerPageChange = (value: string) => {
-    applyFilters({ per_page: parseInt(value) });
+    // For now, we'll keep the default pagination
+    // This can be implemented later if needed
+    console.log('Per page changed to:', value);
   };
 
-  // Handle province filter change
   const handleProvinceChange = (value: string) => {
-    applyFilters({ province_id: value });
+    setProvinceId(value === 'all' ? '' : value);
   };
 
-  // Navigate to page
-  const goToPage = (page: number) => {
-    router.get(route('districts.index'),
-      { ...filters, page },
-      { preserveState: true, preserveScroll: true }
-    );
-  };
+  // Clear all filters
+  const clearFilters = () => {
+    setSearch('');
+    setSortField('name');
+    setSortDirection('asc');
+    setProvinceId('all');
+    
+    // Apply the cleared filters immediately
+    try {
+      const params = {
+        search: '',
+        sort_field: 'name',
+        sort_direction: 'asc',
+        province_id: '',
+      };
 
-  // Apply filters to the URL
-  const applyFilters = (newFilters: Partial<Props['filters']>) => {
-    router.get(route('districts.index'),
-      { ...filters, ...newFilters, page: 1 },
-      { preserveState: true, preserveScroll: true }
-    );
-  };
+      const routeUrl = route('districts.index');
+      const options = {
+        preserveState: true,
+        replace: true,
+      };
 
-  // Reset all filters
-  const resetFilters = () => {
-    setSearchQuery('');
-    router.get(route('districts.index'), {
-      search: '',
-      sort: 'name',
-      direction: 'asc',
-      per_page: 10,
-      province_id: 'all',
-      page: 1,
-    });
+      setTimeout(() => {
+        router.get(routeUrl, params, options);
+      }, 0);
+    } catch (error) {
+      console.error('Error clearing filters:', error);
+    }
   };
 
   // Open delete confirmation dialog
@@ -231,308 +328,157 @@ export default function DistrictIndex({
       </AlertDialog>
 
       <div className="container px-0 py-6">
-        {/* Modern Header with Glassmorphism */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-l from-purple-600 via-indigo-600 to-blue-600 p-8 lg:p-12 text-white shadow-2xl mb-8 group">
-          {/* Animated background elements */}
-          <div className="absolute inset-0 bg-black/5"></div>
-          <div className="absolute top-0 left-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 -translate-x-40 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
-          <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full translate-y-32 translate-x-32 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
-          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white/5 rounded-full -translate-x-16 -translate-y-16 blur-xl group-hover:scale-150 transition-transform duration-500"></div>
-          
-          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-8">
-            <div className="flex items-center gap-8">
-              <div className="p-6 bg-white/20 backdrop-blur-md rounded-3xl border border-white/30 shadow-2xl group-hover:scale-105 transition-transform duration-300">
-                <MapPin className="h-10 w-10 text-white" />
-              </div>
-              <div className="space-y-3">
-                <h2 className="text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight">{t('districts.page_title')}</h2>
-                <div className="text-white/90 flex items-center gap-3 text-xl font-medium">
-                  <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                    <BarChart3 className="h-6 w-6" />
-                  </div>
-                  {t('districts.page_description')}
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <CanCreate model="district">
-                <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-8 py-4 text-lg font-semibold transition-all duration-300 hover:scale-105 group/btn">
-                  <Link href={route('districts.create')} className="flex items-center gap-3">
-                    <div className="p-1 bg-white/20 rounded-lg group-hover/btn:scale-110 transition-transform duration-300">
-                      <Plus className="h-5 w-5" />
-                    </div>
-                    {t('districts.add_button')}
-                  </Link>
-                </Button>
-              </CanCreate>
-            </div>
-          </div>
-        </div>
+        {/* Custom Header Component */}
+        <Header
+          title={t('districts.page_title')}
+          description={t('districts.page_description')}
+          icon={<MapPin className="h-6 w-6" />}
+          model="district"
+          routeName={() => route('districts.create')}
+          buttonText={t('districts.add_button')}
+          theme="purple"
+          buttonSize="lg"
+        />
 
-        <Card className="shadow-2xl bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl overflow-hidden">
-          <CardHeader className="py-4 bg-gradient-to-l from-purple-500 to-purple-600 text-white cursor-pointer" onClick={() => setIsFiltersOpen(!isFiltersOpen)}>
-            <CardTitle className="text-lg font-semibold flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm shadow-lg">
-                  <Search className="h-5 w-5" />
-                </div>
-                <div>
-                  <div className="text-xl font-bold">{t('districts.search_filters')}</div>
-                  <div className="text-purple-100 text-xs font-medium">{t('districts.find_and_filter')}</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-white hover:bg-white/20 rounded-xl"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    resetFilters();
-                  }}
-                >
-                  <FilterX className="h-4 w-4 mr-1" />
-                  {t('districts.reset_filters')}
-                </Button>
-                <div className={`transition-transform duration-300 ${isFiltersOpen ? 'rotate-180' : ''}`}>
-                  <ChevronDown className="h-5 w-5" />
-                </div>
-              </div>
-            </CardTitle>
-          </CardHeader>
-          
-          <div className={`transition-all duration-300 overflow-hidden ${isFiltersOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* Search Bar */}
-                <div className="md:col-span-2">
-                  <form onSubmit={handleSearch} className="relative">
-                    <div className="relative">
-                      <Input
-                        placeholder={t('districts.search_placeholder')}
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full h-11 pl-20 pr-4 text-base border-purple-200 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 to-white rounded-xl shadow-lg"
-                      />
-                      <Button type="submit" className="absolute left-1 top-1/2 -translate-y-1/2 h-9 px-4 bg-gradient-to-l from-purple-500 to-purple-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-sm">
-                        {t('common.search')}
-                      </Button>
-                      <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-400" />
-                    </div>
-                  </form>
-                </div>
-
-                {/* Sort Options */}
-                <div>
-                  <Select
-                    value={filters.sort}
-                    onValueChange={handleSortChange}
-                  >
-                    <SelectTrigger className="h-11 shadow-lg border-purple-200 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 to-white rounded-xl text-sm">
-                      <SelectValue placeholder={t('districts.sort_by')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {sortOptions.map(option => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {t(`districts.sort_options.${option.value}`)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Direction & Per Page Row */}
-                <div className="md:col-span-2 lg:col-span-4 grid grid-cols-4 gap-3">
-                  {/* Direction Button */}
-                  <div>
-                    <Button
-                      variant="outline"
-                      onClick={handleDirectionChange}
-                      title={t(`districts.sort_${filters.direction === 'asc' ? 'ascending' : 'descending'}`)}
-                      className="h-11 w-full shadow-lg border-purple-300 text-purple-700 hover:bg-purple-100 hover:border-purple-400 rounded-xl transition-all duration-300 hover:scale-105 text-sm"
-                    >
-                      <ArrowUpDown className={`h-4 w-4 mr-2 ${filters.direction === 'asc' ? '' : 'transform rotate-180'}`} />
-                      {filters.direction === 'asc' ? t('districts.sort_ascending') : t('districts.sort_descending')}
-                    </Button>
-                  </div>
-
-                  {/* Per Page Options */}
-                  <div>
-                    <Select
-                      value={filters.per_page.toString()}
-                      onValueChange={handlePerPageChange}
-                    >
-                      <SelectTrigger className="h-11 shadow-lg border-purple-200 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 to-white rounded-xl text-sm">
-                        <SelectValue placeholder={t('districts.per_page_option')} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {perPageOptions.map(option => (
-                          <SelectItem key={option.value} value={option.value.toString()}>
-                            {option.value.toString()}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Province Filter */}
-                  <div>
-                    <Select
-                      value={filters.province_id}
-                      onValueChange={handleProvinceChange}
-                    >
-                      <SelectTrigger className="h-11 shadow-lg border-purple-200 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 to-white rounded-xl text-sm">
-                        <SelectValue placeholder={t('districts.filter_by_province')} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">{t('districts.all_provinces')}</SelectItem>
-                        {provinces.map(province => (
-                          <SelectItem key={province.id} value={province.id.toString()}>
-                            {province.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Quick Actions */}
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={resetFilters}
-                      className="h-11 px-3 shadow-lg border-purple-300 text-purple-700 hover:bg-purple-100 hover:border-purple-400 rounded-xl transition-all duration-300 hover:scale-105 text-sm"
-                    >
-                      <FilterX className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </div>
-        </Card>
+        <SearchFilters
+          searchQuery={search}
+          onSearchChange={setSearch}
+          onSearchSubmit={handleSearchSubmit}
+          searchPlaceholder={t('districts.search_placeholder')}
+          filters={{
+            sort: `${sortField}:${sortDirection}`,
+            direction: sortDirection,
+            per_page: 10
+          }}
+          onTypeChange={() => {}} // Not used for districts
+          onCategoryChange={() => {}} // Not used for districts
+          onDepartmentChange={handleProvinceChange}
+          onSortChange={handleSortChange}
+          onDirectionChange={handleDirectionChange}
+          onPerPageChange={handlePerPageChange}
+          onResetFilters={clearFilters}
+          types={[]} // No types for districts
+          categories={[]} // No categories for districts
+          departments={provinceOptions}
+          sortOptions={sortOptions}
+          perPageOptions={perPageOptions}
+          title={t('districts.search_filters')}
+          description={t('districts.find_and_filter')}
+          className="shadow-2xl bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 overflow-hidden"
+        />
 
         {/* Results Table */}
         <div className="mt-8">
-          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl">
-            <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 text-white py-6">
-              <CardTitle className="flex items-center gap-4">
-                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
-                  <TrendingUp className="h-6 w-6" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold">{t('districts.table.title')}</div>
-                  <div className="text-purple-100 text-sm font-medium">{t('districts.table.description')}</div>
-                </div>
-              </CardTitle>
-            </CardHeader>
+          <Header
+            title={t('districts.table.title')}
+            description={t('districts.table.description')}
+            icon={<TrendingUp className="h-6 w-6" />}
+            model="district"
+            routeName={() => ''}
+            buttonText=""
+            theme="purple"
+            showButton={false}
+          />
+          <Card className="shadow-lg">
             <CardContent className="p-0">
-              <div className="overflow-hidden rounded-b-3xl">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-gradient-to-l from-purple-100 to-purple-200 border-0">
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('districts.table.name')}</TableHead>
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('districts.table.code')}</TableHead>
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('districts.table.province')}</TableHead>
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('districts.table.status')}</TableHead>
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('districts.table.created_by')}</TableHead>
-                      <TableHead className="text-purple-800 font-bold text-lg py-6 px-6 text-right">{t('districts.table.actions')}</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {districts?.data && districts.data.length > 0 ? (
-                      districts.data.map((district: DistrictData) => (
-                        <TableRow key={district.id} className="hover:bg-purple-50/50 transition-colors duration-300 border-b border-purple-100">
-                          <TableCell className="py-6 px-6">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-gradient-to-l from-purple-100 to-purple-200 border-0">
+                    <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('districts.table.name')}</TableHead>
+                    <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('districts.table.code')}</TableHead>
+                    <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('districts.table.province')}</TableHead>
+                    <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('districts.table.status')}</TableHead>
+                    <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('districts.table.created_by')}</TableHead>
+                    <TableHead className="text-purple-800 font-bold text-lg py-6 px-6 text-right">{t('districts.table.actions')}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {districts?.data && districts.data.length > 0 ? (
+                    districts.data.map((district: DistrictData) => (
+                      <TableRow key={district.id}>
+                        <TableCell>
+                          <Link
+                            href={route('districts.show', district.id)}
+                            className="font-bold hover:underline flex items-center gap-2"
+                          >
+                            <MapPin className="h-4 w-4" />
+                            {district.name}
+                          </Link>
+                        </TableCell>
+                        <TableCell className="font-bold">{district.code}</TableCell>
+                        <TableCell>
+                          {district.province ? (
                             <Link
-                              href={route('districts.show', district.id)}
-                              className="font-bold text-purple-900 hover:text-purple-700 transition-colors duration-300 flex items-center gap-2 text-lg"
+                              href={route('provinces.show', district.province.id)}
+                              className="hover:underline"
                             >
-                              <MapPin className="h-5 w-5" />
-                              {district.name}
+                              {district.province.name}
                             </Link>
-                          </TableCell>
-                          <TableCell className="font-bold text-purple-900 py-6 px-6 text-lg">{district.code}</TableCell>
-                          <TableCell className="text-purple-800 py-6 px-6 font-medium">
-                            {district.province ? (
-                              <Link
-                                href={route('provinces.show', district.province.id)}
-                                className="hover:text-purple-700 transition-colors duration-300"
+                          ) : (
+                            '-'
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={district.status === 'active' ? 'default' : 'secondary'}>
+                            {district.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {district.creator?.name || '-'}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2 justify-end">
+                            <CanView model="district">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                asChild
+                                title={t('districts.actions.view')}
                               >
-                                {district.province.name}
-                              </Link>
-                            ) : (
-                              '-'
-                            )}
-                          </TableCell>
-                          <TableCell className="py-6 px-6">
-                            <Badge variant={district.status === 'active' ? 'default' : 'secondary'} className="text-sm font-semibold">
-                              {district.status}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-purple-800 py-6 px-6 font-medium">
-                            {district.creator?.name || '-'}
-                          </TableCell>
-                          <TableCell className="py-6 px-6">
-                            <div className="flex items-center gap-2 justify-end">
-                              <CanView model="district">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  asChild
-                                  title={t('districts.actions.view')}
-                                  className="h-10 w-10 rounded-xl hover:bg-blue-100 text-blue-600 hover:text-blue-700 transition-all duration-300 hover:scale-110"
-                                >
-                                  <Link href={route('districts.show', district.id)}>
-                                    <Eye className="h-5 w-5" />
-                                  </Link>
-                                </Button>
-                              </CanView>
-                              <CanUpdate model="district">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  asChild
-                                  title={t('districts.actions.edit')}
-                                  className="h-10 w-10 rounded-xl hover:bg-green-100 text-green-600 hover:text-green-700 transition-all duration-300 hover:scale-110"
-                                >
-                                  <Link href={route('districts.edit', district.id)}>
-                                    <Pencil className="h-5 w-5" />
-                                  </Link>
-                                </Button>
-                              </CanUpdate>
-                              <CanDelete model="district">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => openDeleteDialog(district)}
-                                  title={t('districts.actions.delete')}
-                                  className="h-10 w-10 rounded-xl text-red-600 hover:text-red-700 hover:bg-red-100 transition-all duration-300 hover:scale-110"
-                                >
-                                  <Trash className="h-5 w-5" />
-                                </Button>
-                              </CanDelete>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={6} className="h-32 text-center">
-                          <div className="flex flex-col items-center gap-4 text-purple-600">
-                            <div className="p-4 bg-purple-100 rounded-full">
-                              <AlertTriangle className="h-16 w-16 text-purple-400" />
-                            </div>
-                            <p className="text-xl font-bold">{t('districts.no_records')}</p>
-                            <p className="text-purple-500">{t('districts.no_records_description')}</p>
+                                <Link href={route('districts.show', district.id)}>
+                                  <Eye className="h-4 w-4" />
+                                </Link>
+                              </Button>
+                            </CanView>
+                            <CanUpdate model="district">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                asChild
+                                title={t('districts.actions.edit')}
+                              >
+                                <Link href={route('districts.edit', district.id)}>
+                                  <Pencil className="h-4 w-4" />
+                                </Link>
+                              </Button>
+                            </CanUpdate>
+                            <CanDelete model="district">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => openDeleteDialog(district)}
+                                title={t('districts.actions.delete')}
+                              >
+                                <Trash className="h-4 w-4" />
+                              </Button>
+                            </CanDelete>
                           </div>
                         </TableCell>
                       </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={6} className="h-32 text-center">
+                        <div className="flex flex-col items-center gap-4 text-muted-foreground">
+                          <AlertTriangle className="h-16 w-16" />
+                          <p className="text-xl font-bold">{t('districts.no_records')}</p>
+                          <p>{t('districts.no_records_description')}</p>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
         </div>
