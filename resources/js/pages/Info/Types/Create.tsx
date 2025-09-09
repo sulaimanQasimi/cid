@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -156,6 +156,17 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
           showBackButton={true}
           backRouteName="info-types.index"
           backButtonText={t('info_types.create.back_button')}
+          showButton={false}
+          actionButtons={
+            <>
+              <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
+                <Link href={route('info-types.index')} className="flex items-center gap-3">
+                  <ArrowLeft className="h-5 w-5" />
+                  {t('info_types.create.back_button')}
+                </Link>
+              </Button>
+            </>
+          }
         />
 
         {/* Create Form Card */}
