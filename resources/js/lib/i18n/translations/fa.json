@@ -1665,5 +1665,7 @@
   "info_types.print.associated_info_description":"معلومات مرتبط",
   "info_types.print.records_count":"تعداد رکوردها",
   "criminal.no_records_description":"هیڅ مجرمینو ثبتونه ونه موندل شول",
-  "incidents.table.confirmation":"تأیید"
+  "incidents.table.confirmation":"تأیید",
+  "provinces.create.title":"ایجاد ولایت",
+  "provinces.no_records_description":"هیڅ ولایتی ثبتونه ونه موندل شول"
 }
