@@ -94,8 +94,8 @@ export default function Dashboard({
     
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Intelligence Dashboard" />
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+            <Head title={t('dashboard.page_title')} />
+            <div className="dashboard-font min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
                 <div className="flex h-full flex-1 flex-col gap-6 p-4 sm:gap-8 sm:p-6">
                     {/* Enhanced Header Section */}
                     <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 p-6 text-white shadow-2xl sm:p-8">
@@ -110,8 +110,8 @@ export default function Dashboard({
                                         <Shield className="h-6 w-6 text-white sm:h-8 sm:w-8" />
                                     </div>
                                     <div>
-                                        <h1 className="text-2xl font-black tracking-tight sm:text-3xl lg:text-4xl">Intelligence Dashboard</h1>
-                                        <p className="text-blue-100 text-sm font-medium sm:text-base lg:text-lg">Secure operations overview and system status</p>
+                                        <h1 className="text-2xl font-black tracking-tight sm:text-3xl lg:text-4xl">{t('dashboard.page_title')}</h1>
+                                        <p className="text-blue-100 text-sm font-medium sm:text-base lg:text-lg">{t('dashboard.page_description')}</p>
                                     </div>
                                 </div>
                             </div>
@@ -120,17 +120,17 @@ export default function Dashboard({
                                 <div className="rounded-xl bg-white/20 p-3 backdrop-blur-sm sm:p-4">
                                     <div className="flex items-center gap-2">
                                         <div className="h-3 w-3 rounded-full bg-green-400 animate-pulse"></div>
-                                        <span className="font-semibold text-sm sm:text-base">System Secure</span>
+                                        <span className="font-semibold text-sm sm:text-base">{t('dashboard.system_secure')}</span>
                                     </div>
                                     <div className="text-blue-100 text-xs mt-1 sm:text-sm">
-                                        Last updated: {new Date().toLocaleTimeString()}
+                                        {t('dashboard.last_updated')}: {new Date().toLocaleTimeString()}
                                     </div>
                                 </div>
                                 
                                 <div className="rounded-xl bg-white/20 p-3 backdrop-blur-sm sm:p-4">
                                     <div className="text-center">
                                         <div className="text-xl font-bold sm:text-2xl">{stats.total_incidents}</div>
-                                        <div className="text-blue-100 text-xs sm:text-sm">Total Incidents</div>
+                                        <div className="text-blue-100 text-xs sm:text-sm">{t('dashboard.total_incidents')}</div>
                                     </div>
                                 </div>
                             </div>
@@ -158,7 +158,7 @@ export default function Dashboard({
                                 <div className="space-y-1">
                                     <p className="text-blue-100 text-sm font-medium">{t('dashboard.active_cases')}</p>
                                     <p className="text-3xl font-black">{stats.active_incidents}</p>
-                                    <p className="text-blue-200 text-xs">Currently monitoring</p>
+                                    <p className="text-blue-200 text-xs">{t('dashboard.currently_monitoring')}</p>
                                 </div>
                             </div>
                         </div>
@@ -182,7 +182,7 @@ export default function Dashboard({
                                 <div className="space-y-1">
                                     <p className="text-red-100 text-sm font-medium">{t('dashboard.active_incidents')}</p>
                                     <p className="text-3xl font-black">{stats.active_incidents}</p>
-                                    <p className="text-red-200 text-xs">Require attention</p>
+                                    <p className="text-red-200 text-xs">{t('dashboard.require_attention')}</p>
                                 </div>
                             </div>
                         </div>
@@ -206,7 +206,7 @@ export default function Dashboard({
                                 <div className="space-y-1">
                                     <p className="text-green-100 text-sm font-medium">{t('dashboard.total_provinces')}</p>
                                     <p className="text-3xl font-black">{stats.total_provinces}</p>
-                                    <p className="text-green-200 text-xs">Coverage areas</p>
+                                    <p className="text-green-200 text-xs">{t('dashboard.coverage_areas')}</p>
                                 </div>
                             </div>
                         </div>
@@ -230,7 +230,7 @@ export default function Dashboard({
                                 <div className="space-y-1">
                                     <p className="text-purple-100 text-sm font-medium">{t('dashboard.reports_generated')}</p>
                                     <p className="text-3xl font-black">{stats.total_reports}</p>
-                                    <p className="text-purple-200 text-xs">This month</p>
+                                    <p className="text-purple-200 text-xs">{t('dashboard.this_month')}</p>
                                 </div>
                             </div>
                         </div>
@@ -504,7 +504,7 @@ export default function Dashboard({
         );
 
         legend.data.setAll([{
-            name: "Provinces with incidents",
+            name: t('dashboard.province_statistics'),
             fill: am5.color(0x666666)
         }]);
 
