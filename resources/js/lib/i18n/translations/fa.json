@@ -1696,5 +1696,7 @@
   "criminal.access.remove_user_confirm_title":"حذف دسترسی کاربر",
   "criminal.access.remove_user_confirm_message":"آیا مطمئن هستید که می‌خواهید دسترسی کاربر \"{name}\" را به این پرونده حذف کنید؟",
   "criminal.access.remove_user_confirm_button":"حذف دسترسی",
-  "criminal.access.remove_all":"حذف همه"
+  "criminal.access.remove_all":"حذف همه",
+  "info_types.info_records":"معلومات ثبت شده",
+  "info_types.stats_records":"تحلیلها ثبت شده"
 }

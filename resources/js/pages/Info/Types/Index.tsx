@@ -267,12 +267,12 @@ export default function InfoTypesIndex({
                       <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('info_types.table.infos_count')}</TableHead>
                       <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('info_types.table.stats_count')}</TableHead>
                       <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('info_types.table.created_at')}</TableHead>
-                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6 text-right">{t('info_types.table.actions')}</TableHead>
+                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('info_types.table.actions')}</TableHead>
                     </TableRow>
                   </TableHeader>
-                                     <TableBody>
-                     {infoTypes?.data && infoTypes.data.length > 0 ? (
-                       infoTypes.data.map((infoType: InfoType) => (
+                  <TableBody>
+                    {infoTypes?.data && infoTypes.data.length > 0 ? (
+                      infoTypes.data.map((infoType: InfoType) => (
                         <TableRow key={infoType.id} className="hover:bg-purple-50/50 dark:hover:bg-purple-900/20 transition-colors duration-300 border-b border-purple-100 dark:border-purple-800">
                           <TableCell className="font-bold text-purple-900 dark:text-purple-100 py-6 px-6 text-lg">{infoType.id}</TableCell>
                           <TableCell className="font-bold text-purple-900 dark:text-purple-100 py-6 px-6 text-lg">{infoType.name}</TableCell>
@@ -283,28 +283,32 @@ export default function InfoTypesIndex({
                               <span className="text-purple-600 dark:text-purple-400 font-medium">-</span>
                             )}
                           </TableCell>
-                          <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6 font-medium text-center">
-                            <Badge variant="secondary" className="bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200">
-                              {infoType.infos_count || 0}
+                          <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6">
+                            <Badge variant="outline" className="bg-gradient-to-l from-purple-100 dark:from-purple-800 to-purple-200 dark:to-purple-700 text-purple-800 dark:text-purple-200 border-purple-300 dark:border-purple-600 px-4 py-2 rounded-xl font-semibold">
+                              {infoType.infos_count || 0} {t('info_types.info_records')}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6 font-medium text-center">
-                            <Badge variant="secondary" className="bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200">
-                              {infoType.info_stats_count || 0}
+                          <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6">
+                            <Badge variant="outline" className="bg-gradient-to-l from-purple-100 dark:from-purple-800 to-purple-200 dark:to-purple-700 text-purple-800 dark:text-purple-200 border-purple-300 dark:border-purple-600 px-4 py-2 rounded-xl font-semibold">
+                              {infoType.info_stats_count || 0} {t('info_types.stats_records')}
                             </Badge>
                           </TableCell>
                           <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6 font-medium">
-                            {formatPersianDateOnly(infoType.created_at)}
+                            {infoType.created_at ? (
+                              formatPersianDateOnly(infoType.created_at)
+                            ) : (
+                              <span className="text-purple-600 dark:text-purple-400">{t('info_types.na')}</span>
+                            )}
                           </TableCell>
                           <TableCell className="py-6 px-6">
-                            <div className="flex items-center gap-2 justify-end">
+                            <div className="flex items-center gap-2">
                               <CanView model="info_type">
                                 <Button
                                   variant="ghost"
                                   size="icon"
                                   asChild
                                   title={t('info_types.actions.view')}
-                                  className="h-10 w-10 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-800 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-300 hover:scale-110"
+                                  className="h-10 w-10 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-800 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-300 hover:scale-110"
                                 >
                                   <Link href={route('info-types.show', infoType.id)}>
                                     <Eye className="h-5 w-5" />
@@ -317,7 +321,7 @@ export default function InfoTypesIndex({
                                   size="icon"
                                   asChild
                                   title={t('info_types.actions.manage_stats')}
-                                  className="h-10 w-10 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-800 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-300 hover:scale-110"
+                                  className="h-10 w-10 rounded-xl hover:bg-orange-100 dark:hover:bg-orange-800 text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 transition-all duration-300 hover:scale-110"
                                 >
                                   <Link href={route('info-types.stats', infoType.id)}>
                                     <BarChart3 className="h-5 w-5" />
@@ -360,7 +364,7 @@ export default function InfoTypesIndex({
                               <AlertTriangle className="h-16 w-16 text-purple-400 dark:text-purple-300" />
                             </div>
                             <p className="text-xl font-bold">{t('info_types.no_records')}</p>
-                            <p className="text-purple-500 dark:text-purple-400">{t('info_types.no_records_description')}</p>
+                            <p className="text-purple-500 dark:text-purple-400">No info type records found</p>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -372,8 +376,8 @@ export default function InfoTypesIndex({
           </Card>
         </div>
 
-                 {/* Pagination */}
-         {infoTypes?.links && infoTypes.links.length > 0 && (
+        {/* Pagination */}
+        {infoTypes?.links && infoTypes.links.length > 0 && (
           <div className="mt-8 flex justify-center">
             <div className="bg-gradient-to-l from-purple-50 dark:from-purple-900/20 to-white dark:to-gray-800 p-4 rounded-3xl shadow-2xl border border-purple-200 dark:border-purple-700">
               <Pagination links={infoTypes.links} />

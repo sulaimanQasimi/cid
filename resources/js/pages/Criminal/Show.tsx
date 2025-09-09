@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Pencil, Trash, UserRound, MapPin, FileText, Calendar, Building2, Phone, IdCard, Printer, BarChart3, Eye, Clock, Users, Shield, Home, Gavel, FileCheck, BookText, AlertTriangle, User } from 'lucide-react';
+import { ArrowRight, Pencil, Trash, UserRound, MapPin, FileText, Calendar, Building2, Phone, IdCard, Printer, BarChart3, Eye, Clock, Users, Shield, Home, Gavel, FileCheck, BookText, AlertTriangle, User, Star, Award, Target, Zap, Sparkles, Crown, Gem, ShieldCheck, Lock, Unlock, EyeOff, TrendingUp, Activity, Globe, Mail, MessageSquare, Heart, ThumbsUp, Share2, Download, ExternalLink, Info, CheckCircle, XCircle, AlertCircle, Plus, Minus, Edit3, Copy, Save, RefreshCw, Settings, MoreHorizontal, Filter, Search, SortAsc, SortDesc, Bell, BellOff, Volume2, VolumeX, Battery, BatteryLow, Signal, SignalHigh, SignalLow, SignalZero, SignalMedium, Wifi, WifiOff, WifiHigh, WifiLow } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import {
   AlertDialog,
