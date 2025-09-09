@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -59,7 +59,7 @@ type InfoTypeFormData = {
 export default function InfoTypesCreate({ statItems, statCategories }: CreateProps) {
   const { t } = useTranslation();
   const { canCreate } = usePermissions();
-  
+
   const { data, setData, post, processing, errors } = useForm<InfoTypeFormData>({
     name: '',
     code: '',
@@ -143,7 +143,7 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={t('info_types.create.page_title')} />
-      
+
       <div className="container px-0 py-6">
         <Header
           title={t('info_types.create.page_title')}
@@ -157,6 +157,17 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
           showBackButton={true}
           backRouteName="info-types.index"
           backButtonText={t('info_types.create.back_button')}
+          showButton={false}
+          actionButtons={
+            <>
+              <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
+                <Link href={route('info-types.index')} className="flex items-center gap-3">
+                  <ArrowLeft className="h-5 w-5" />
+                  {t('info_types.create.back_button')}
+                </Link>
+              </Button>
+            </>
+          }
         />
 
         {/* Create Form Card */}
@@ -175,7 +186,7 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
                     </div>
                   </CardTitle>
                 </CardHeader>
-                
+
                 <CardContent className="p-8 space-y-8">
                   {/* Name Field */}
                   <div className="space-y-4">
@@ -317,14 +328,35 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
               </Card>
 
               {/* Form Actions */}
-              <FooterButtons
-                onCancel={() => window.history.back()}
-                onSubmit={() => {}}
-                processing={processing}
-                cancelText={t('info_types.create.cancel_button')}
-                submitText={t('info_types.create.save_button')}
-                savingText={t('info_types.create.saving_button')}
-              />
+              <Card className="shadow-2xl bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl overflow-hidden">
+                <CardContent className="px-8 py-6 bg-gradient-to-l from-purple-50 to-white border-t border-purple-200 flex justify-end gap-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => window.history.back()}
+                    className="h-12 px-6 shadow-lg border-purple-300 text-purple-700 hover:bg-purple-100 hover:border-purple-400 rounded-xl transition-all duration-300 hover:scale-105 text-lg font-semibold"
+                  >
+                    {t('info_types.create.cancel_button')}
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={processing}
+                    className="h-12 px-8 bg-gradient-to-l from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 shadow-2xl rounded-xl transition-all duration-300 hover:scale-105 text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {processing ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        {t('info_types.create.saving_button')}
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Save className="h-5 w-5" />
+                        {t('info_types.create.save_button')}
+                      </div>
+                    )}
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
           </form>
         </CanCreate>
