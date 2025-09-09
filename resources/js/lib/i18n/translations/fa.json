@@ -1698,5 +1698,14 @@
   "criminal.access.remove_user_confirm_button":"حذف دسترسی",
   "criminal.access.remove_all":"حذف همه",
   "info_types.info_records":"معلومات ثبت شده",
-  "info_types.stats_records":"تحلیلها ثبت شده"
+  "info_types.stats_records":"تحلیلها ثبت شده",
+  "info_types.create.code_label":"کد",
+  "info_types.create.code_placeholder":"کد وارد کنید",
+  "info_types.create.code_helper":"کد باید یک عدد باشد.",
+  "info_types.create.code_error":"کد باید یک عدد باشد.",
+  "info_types.create.code_required":"کد الزامی است.",
+  "info_types.create.code_unique":"کد باید یکتا باشد.",
+  "info_types.create.code_max":"کد باید حداکثر 255 کاراکتر باشد.",
+  "info_types.create.code_min":"کد باید حداقل 3 کاراکتر باشد.",
+  "info_types.create.code_regex":"کد باید یک عدد باشد."
 }
