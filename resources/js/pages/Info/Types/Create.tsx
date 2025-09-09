@@ -58,7 +58,7 @@ type InfoTypeFormData = {
 export default function InfoTypesCreate({ statItems, statCategories }: CreateProps) {
   const { t } = useTranslation();
   const { canCreate } = usePermissions();
-  
+
   const { data, setData, post, processing, errors } = useForm<InfoTypeFormData>({
     name: '',
     code: '',
@@ -142,7 +142,7 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={t('info_types.create.page_title')} />
-      
+
       <div className="container px-0 py-6">
         <Header
           title={t('info_types.create.page_title')}
@@ -185,7 +185,7 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
                     </div>
                   </CardTitle>
                 </CardHeader>
-                
+
                 <CardContent className="p-8 space-y-8">
                   {/* Name Field */}
                   <div className="space-y-4">
@@ -337,8 +337,8 @@ export default function InfoTypesCreate({ statItems, statCategories }: CreatePro
                   >
                     {t('info_types.create.cancel_button')}
                   </Button>
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     disabled={processing}
                     className="h-12 px-8 bg-gradient-to-l from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 shadow-2xl rounded-xl transition-all duration-300 hover:scale-105 text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                   >
