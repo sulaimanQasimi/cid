@@ -1,6 +1,4 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import fa from './translations/fa.json';
-import en from './translations/en.json';
 
 // Types for our language context
 export type Direction = 'ltr' | 'rtl';
@@ -19,6 +17,8 @@ interface LanguageContextType {
   setLanguage: (code: LanguageCode) => void;
   t: (key: string, params?: Record<string, string>) => string;
   direction: Direction;
+  isLoading: boolean;
+  reloadTranslations: () => Promise<void>;
 }
 
 // Create the context with default values
@@ -36,12 +36,8 @@ interface LanguageProviderProps {
   initialLanguage?: LanguageCode;
 }
 
-// Static translations (RTL-only app uses fa as primary, en as fallback)
+// Dynamic translations loaded from API
 type TranslationMap = Record<string, Record<string, string>>;
-const translations: TranslationMap = {
-  fa: (fa as unknown as Record<string, string>) || {},
-  en: (en as unknown as Record<string, string>) || {},
-};
 
 export const LanguageProvider: React.FC<LanguageProviderProps> = ({
   children,
@@ -55,6 +51,49 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
 
   const [currentLanguage, setCurrentLanguage] = useState<Language>(getInitialLanguage());
   const [languages] = useState<Language[]>(defaultLanguages);
+  const [translations, setTranslations] = useState<TranslationMap>({});
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Function to load translations from API
+  const loadTranslations = async () => {
+    try {
+      setIsLoading(true);
+      const loadedTranslations: TranslationMap = {};
+
+      // Load fa translations from API
+      try {
+        const faResponse = await fetch('/api/languages/translations?language=fa');
+        if (faResponse.ok) {
+          const faData = await faResponse.json();
+          loadedTranslations.fa = faData.translations || {};
+        }
+      } catch (error) {
+        console.warn('Failed to load fa translations from API:', error);
+      }
+
+      // Load en translations as fallback from API
+      try {
+        const enResponse = await fetch('/api/languages/translations?language=en');
+        if (enResponse.ok) {
+          const enData = await enResponse.json();
+          loadedTranslations.en = enData.translations || {};
+        }
+      } catch (error) {
+        console.warn('Failed to load en translations from API:', error);
+      }
+
+      setTranslations(loadedTranslations);
+    } catch (error) {
+      console.error('Failed to load translations from API:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Function to reload translations (useful after updates)
+  const reloadTranslations = async () => {
+    await loadTranslations();
+  };
 
   // Function to change the current language (no-op in RTL-only app)
   const setLanguage = (_code: LanguageCode) => {};
@@ -71,6 +110,11 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
     return result;
   };
 
+  // Load translations on component mount
+  useEffect(() => {
+    loadTranslations();
+  }, []);
+
   // Initial setup
   useEffect(() => {
     // Apply RTL direction and lang
@@ -86,6 +130,8 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
         setLanguage,
         t,
         direction: currentLanguage.direction,
+        isLoading,
+        reloadTranslations,
       }}
     >
       {children}

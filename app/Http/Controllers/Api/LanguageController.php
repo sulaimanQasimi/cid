@@ -10,6 +10,33 @@ use Illuminate\Support\Facades\Validator;
 
 class LanguageController extends Controller
 {
+    public function getTranslations(Request $request): JsonResponse
+    {
+        $language = $request->input('language', 'fa');
+        $jsonPath = resource_path("js/lib/i18n/translations/{$language}.json");
+        
+        if (!file_exists($jsonPath)) {
+            return response()->json([
+                'success' => true,
+                'translations' => [],
+                'language' => $language
+            ]);
+        }
+
+        $jsonContent = file_get_contents($jsonPath);
+        $translations = json_decode($jsonContent, true);
+        
+        if (!is_array($translations)) {
+            $translations = [];
+        }
+
+        return response()->json([
+            'success' => true,
+            'translations' => $translations,
+            'language' => $language
+        ]);
+    }
+
     public function updateTranslation(Request $request, string $key): JsonResponse
     {
         // Validate the request
@@ -28,10 +55,10 @@ class LanguageController extends Controller
 
         $language = $request->input('language', 'fa');
         $value = $request->input('value');
-        
+
         // Construct the JSON file path based on language
         $jsonPath = resource_path("js/lib/i18n/translations/{$language}.json");
-        
+
         // Ensure the directory exists
         $directory = dirname($jsonPath);
         if (!is_dir($directory)) {
@@ -53,7 +80,7 @@ class LanguageController extends Controller
 
         // Save back to file
         $jsonData = json_encode($translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        
+
         if (file_put_contents($jsonPath, $jsonData) === false) {
             return response()->json([
                 'success' => false,
@@ -69,5 +96,28 @@ class LanguageController extends Controller
             'language' => $language
         ]);
     }
+    public function allTranslations(): JsonResponse
+    {
+        
+        // Construct the JSON file path based on language
+        $jsonPath = resource_path("js/lib/i18n/translations/fa.json");
 
+        // Ensure the directory exists
+        $directory = dirname($jsonPath);
+        if (!is_dir($directory)) {
+            mkdir($directory, 0755, true);
+        }
+
+        // Load existing translations
+        $translations = [];
+        if (file_exists($jsonPath)) {
+            $jsonContent = file_get_contents($jsonPath);
+            $translations = json_decode($jsonContent, true);
+            if (!is_array($translations)) {
+                $translations = [];
+            }
+        }
+
+        return response()->json($translations);
+    }
 }

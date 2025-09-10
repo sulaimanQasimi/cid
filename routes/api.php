@@ -20,7 +20,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// Language translations - more specific route
+// Language translations
+Route::get('languages/translations', [LanguageController::class, 'getTranslations']);
 Route::put('languages/translations/{key}', [LanguageController::class, 'updateTranslation']);
 
 // Translation management - specific routes first

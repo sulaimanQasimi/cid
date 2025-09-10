@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Plus, Search, Edit, Trash, Download, Upload, Loader2 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/translate';
+import { useLanguage } from '@/lib/i18n/language-context';
 import axios from 'axios';
 
 interface Language {
@@ -49,6 +50,7 @@ export default function TranslationsIndex({
   translations = [],
 }: TranslationProps) {
   const { t } = useTranslation();
+  const { reloadTranslations } = useLanguage();
   const [localTranslations, setLocalTranslations] = useState<Translation[]>([]);
   const [updatingKeys, setUpdatingKeys] = useState<Set<string>>(new Set());
 
@@ -91,6 +93,9 @@ export default function TranslationsIndex({
               : translation
           )
         );
+        
+        // Reload translations in the language context
+        await reloadTranslations();
       }
     } catch (error) {
       console.error('Failed to update translation:', error);
