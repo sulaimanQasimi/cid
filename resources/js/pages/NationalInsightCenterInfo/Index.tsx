@@ -39,7 +39,7 @@ interface NationalInsightCenterInfo {
   description: string | null;
   created_at: string;
   updated_at: string;
-  infos_count?: number;
+  info_items_count?: number;
   info_stats_count?: number;
 }
 
@@ -83,7 +83,7 @@ const sortOptions = [
   { value: 'description', label: 'Description' },
   { value: 'created_at', label: 'Created Date' },
   { value: 'updated_at', label: 'Updated Date' },
-  { value: 'infos_count', label: 'Infos Count' },
+  { value: 'info_items_count', label: 'Info Items Count' },
   { value: 'info_stats_count', label: 'Stats Count' },
 ];
 
@@ -255,7 +255,7 @@ export default function NationalInsightCenterInfosIndex({
                       <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.id')}</TableHead>
                       <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.name')}</TableHead>
                       <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.description')}</TableHead>
-                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.infos_count')}</TableHead>
+                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.info_items_count')}</TableHead>
                       <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.stats_count')}</TableHead>
                       <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.created_at')}</TableHead>
                       <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.actions')}</TableHead>
@@ -276,7 +276,7 @@ export default function NationalInsightCenterInfosIndex({
                           </TableCell>
                           <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6">
                             <Badge variant="outline" className="bg-gradient-to-l from-purple-100 dark:from-purple-800 to-purple-200 dark:to-purple-700 text-purple-800 dark:text-purple-200 border-purple-300 dark:border-purple-600 px-4 py-2 rounded-xl font-semibold">
-                              {nationalInsightCenterInfo.infos_count || 0} {t('national_insight_center_info.info_records')}
+                              {nationalInsightCenterInfo.info_items_count || 0} {t('national_insight_center_info.info_items')}
                             </Badge>
                           </TableCell>
                           <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6">

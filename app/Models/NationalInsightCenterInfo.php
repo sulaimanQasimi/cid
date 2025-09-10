@@ -58,14 +58,6 @@ class NationalInsightCenterInfo extends Model
     }
 
     /**
-     * Get the info records associated with the national insight center info.
-     */
-    public function infos(): HasMany
-    {
-        return $this->hasMany(Info::class, 'national_insight_center_info_id');
-    }
-
-    /**
      * Get the info items associated with the national insight center info.
      */
     public function infoItems(): HasMany

@@ -14,22 +14,19 @@ return new class extends Migration
         Schema::create('national_insight_center_info_items', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger("national_insight_center_info_id");
-            $table->unsignedBigInteger("info_category_id")->nullable();
-            $table->unsignedBigInteger("department_id")->nullable();
-            $table->string("name")->nullable();
-            $table->string("code")->nullable();
+            $table->string("title")->nullable();
+            $table->unsignedBigInteger("province_id")->nullable();
+            $table->unsignedBigInteger("district_id")->nullable();
             $table->text("description")->nullable();
-            $table->json("value")->nullable();
-            $table->unsignedBigInteger("user_id")->nullable();
-            $table->boolean("confirmed")->default(false);
+            $table->date("date")->nullable();
             $table->unsignedBigInteger("created_by")->nullable();
+            $table->boolean("confirmed")->default(false);
             $table->unsignedBigInteger("confirmed_by")->nullable();
             $table->timestamps();
             
             $table->foreign('national_insight_center_info_id', 'nic_info_items_nic_info_id_foreign')->references('id')->on('national_insight_center_infos')->onDelete('cascade');
-            $table->foreign('info_category_id', 'nic_info_items_category_id_foreign')->references('id')->on('info_categories')->onDelete('set null');
-            $table->foreign('department_id', 'nic_info_items_department_id_foreign')->references('id')->on('departments')->onDelete('set null');
-            $table->foreign('user_id', 'nic_info_items_user_id_foreign')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('province_id', 'nic_info_items_province_id_foreign')->references('id')->on('provinces')->onDelete('set null');
+            $table->foreign('district_id', 'nic_info_items_district_id_foreign')->references('id')->on('districts')->onDelete('set null');
             $table->foreign('created_by', 'nic_info_items_created_by_foreign')->references('id')->on('users')->onDelete('set null');
             $table->foreign('confirmed_by', 'nic_info_items_confirmed_by_foreign')->references('id')->on('users')->onDelete('set null');
         });

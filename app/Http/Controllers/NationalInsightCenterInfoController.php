@@ -31,7 +31,7 @@ class NationalInsightCenterInfoController extends Controller
         $validated = $request->validate([
             'search' => 'nullable|string|max:255',
             'sort_field' => ['nullable', 'string', Rule::in([
-                'name', 'code', 'description', 'created_at', 'updated_at', 'infos_count', 'info_stats_count'
+                'name', 'code', 'description', 'created_at', 'updated_at', 'info_items_count', 'info_stats_count'
             ])],
             'sort_direction' => ['nullable', 'string', Rule::in(['asc', 'desc'])],
             'per_page' => 'nullable|integer|min:5|max:100',
@@ -39,7 +39,7 @@ class NationalInsightCenterInfoController extends Controller
         ]);
 
         $query = NationalInsightCenterInfo::with(['creator:id,name'])
-            ->withCount(['infos', 'infoStats'])
+            ->withCount(['infoItems', 'infoStats'])
             ->where(function($q) {
                 $q->where('created_by', Auth::id())
                   ->orWhereHas('accesses', function($accessQuery) {
@@ -176,14 +176,11 @@ class NationalInsightCenterInfoController extends Controller
         // Load the national insight center info with all necessary relationships
         $nationalInsightCenterInfo->load([
             'creator:id,name',
-            'infoStats' => function($query) {
-                $query->with(['statCategoryItem.category'])
-                      ->orderBy('created_at', 'desc');
-            }
+            'infoStats.statCategoryItem.category'
         ]);
 
-        $infos = $nationalInsightCenterInfo->infos()
-            ->with(['infoType:id,name', 'infoCategory:id,name'])
+        $infos = $nationalInsightCenterInfo->infoItems()
+            ->with(['infoCategory:id,name,label,color', 'department:id,name,label,color', 'user:id,name', 'creator:id,name'])
             ->orderBy('created_at', 'desc')
             ->paginate(5);
 

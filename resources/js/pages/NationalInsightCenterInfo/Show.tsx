@@ -13,7 +13,6 @@ import { usePermissions } from '@/hooks/use-permissions';
 import { CanCreate, CanView, CanUpdate, CanDelete } from '@/components/ui/permission-guard';
 import { formatPersianDateOnly } from '@/lib/utils/date';
 import Header from '@/components/template/header';
-import InfoCreateModal from '@/components/InfoCreateModal';
 
 interface Info {
   id: number;
@@ -91,7 +90,6 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
   const { t } = useTranslation();
   const { canCreate, canView, canUpdate, canDelete } = usePermissions();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
-  const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -333,9 +331,11 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
             theme="purple"
             showButton={false}
             actionButtons={
-              <Button onClick={() => setIsCreateModalOpen(true)}>
-                <Plus className="h-5 w-5 mr-2" />
-                {t('national_insight_center_info.show.create_info_button')}
+              <Button asChild>
+                <Link href={route('national-insight-center-info-items.create', { national_insight_center_info_id: nationalInsightCenterInfo.id })}>
+                  <Plus className="h-5 w-5 mr-2" />
+                  {t('national_insight_center_info.show.create_info_button')}
+                </Link>
               </Button>
             }
           />
@@ -402,12 +402,11 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
                             <p className="text-purple-500 dark:text-purple-400 text-center">{t('national_insight_center_info.show.no_info_records_description')}</p>
                             <CanCreate model="info">
                               <div className="flex justify-center">
-                                <Button 
-                                  onClick={() => setIsCreateModalOpen(true)}
-                                  className="bg-gradient-to-l from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105 flex items-center gap-3"
-                                >
-                                  <Plus className="h-5 w-5" />
-                                  {t('national_insight_center_info.show.create_first_info_button')}
+                                <Button asChild className="bg-gradient-to-l from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105 flex items-center gap-3">
+                                  <Link href={route('national-insight-center-info-items.create', { national_insight_center_info_id: nationalInsightCenterInfo.id })}>
+                                    <Plus className="h-5 w-5" />
+                                    {t('national_insight_center_info.show.create_first_info_button')}
+                                  </Link>
                                 </Button>
                               </div>
                             </CanCreate>
@@ -422,15 +421,6 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
           </Card>
         </div>
 
-        {/* Info Create Modal */}
-        <InfoCreateModal
-          isOpen={isCreateModalOpen}
-          onClose={() => setIsCreateModalOpen(false)}
-          infoTypes={[]}
-          infoCategories={infoCategories}
-          departments={departments}
-          nationalInsightCenterInfoId={nationalInsightCenterInfo.id}
-        />
       </div>
     </AppLayout>
   );

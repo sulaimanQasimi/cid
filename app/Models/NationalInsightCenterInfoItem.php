@@ -22,15 +22,15 @@ class NationalInsightCenterInfoItem extends Model
      */
     protected $fillable = [
         'national_insight_center_info_id',
+        'title',
+        'registration_number',
         'info_category_id',
-        'department_id',
-        'name',
-        'code',
+        'province_id',
+        'district_id',
         'description',
-        'value',
-        'user_id',
-        'confirmed',
+        'date',
         'created_by',
+        'confirmed',
         'confirmed_by',
     ];
 
@@ -40,7 +40,7 @@ class NationalInsightCenterInfoItem extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'value' => 'array',
+        'date' => 'date',
         'confirmed' => 'boolean',
     ];
 
@@ -99,19 +99,19 @@ class NationalInsightCenterInfoItem extends Model
     }
 
     /**
-     * Get the department that owns this item.
+     * Get the province that owns this item.
      */
-    public function department(): BelongsTo
+    public function province(): BelongsTo
     {
-        return $this->belongsTo(Department::class);
+        return $this->belongsTo(Province::class);
     }
 
     /**
-     * Get the user that owns this item.
+     * Get the district that owns this item.
      */
-    public function user(): BelongsTo
+    public function district(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(District::class);
     }
 
     /**

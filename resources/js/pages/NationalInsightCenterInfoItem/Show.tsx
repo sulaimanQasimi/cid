@@ -40,7 +40,14 @@ interface InfoCategory {
   color: string;
 }
 
-interface Department {
+interface Province {
+  id: number;
+  name: string;
+  label: string;
+  color: string;
+}
+
+interface District {
   id: number;
   name: string;
   label: string;
@@ -74,17 +81,17 @@ interface InfoStat {
 
 interface NationalInsightCenterInfoItem {
   id: number;
-  name: string;
-  code: string;
+  title: string;
+  registration_number: string;
   description: string | null;
-  value: any;
+  date: string | null;
   confirmed: boolean;
   created_at: string;
   updated_at: string;
   nationalInsightCenterInfo: NationalInsightCenterInfo;
   infoCategory: InfoCategory | null;
-  department: Department | null;
-  user: User | null;
+  province: Province | null;
+  district: District | null;
   creator: User | null;
   confirmer: User | null;
   infoStats: InfoStat[];
@@ -131,20 +138,14 @@ export default function Show({ item }: ShowProps) {
     });
   };
 
-  const formatValue = (value: any) => {
-    if (typeof value === 'object' && value !== null) {
-      return JSON.stringify(value, null, 2);
-    }
-    return String(value);
-  };
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title={t('national_insight_center_info_item.show.title', { name: item.name })} />
+      <Head title={t('national_insight_center_info_item.show.title', { name: item.title })} />
 
       <div className="container px-0 py-6">
         <Header
-          title={t('national_insight_center_info_item.show.title', { name: item.name })}
+          title={t('national_insight_center_info_item.show.title', { name: item.title })}
           description={t('national_insight_center_info_item.show.description')}
           icon={<FileText className="h-6 w-6 text-white" />}
           model="national_insight_center_info_item"
@@ -231,13 +232,13 @@ export default function Show({ item }: ShowProps) {
             <CardContent className="p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.name')}</Label>
-                  <p className="text-lg font-semibold text-gray-900 dark:text-white">{item.name}</p>
+                  <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.title')}</Label>
+                  <p className="text-lg font-semibold text-gray-900 dark:text-white">{item.title}</p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.code')}</Label>
-                  <p className="text-lg font-semibold text-gray-900 dark:text-white">{item.code}</p>
+                  <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.registration_number')}</Label>
+                  <p className="text-lg font-semibold text-gray-900 dark:text-white">{item.registration_number}</p>
                 </div>
 
                 <div className="space-y-2">
@@ -255,9 +256,9 @@ export default function Show({ item }: ShowProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.value')}</Label>
-                  <p className="text-lg font-semibold text-gray-900 dark:text-white font-mono bg-gray-100 dark:bg-gray-800 p-2 rounded">
-                    {formatValue(item.value)}
+                  <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.date')}</Label>
+                  <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                    {item.date ? new Date(item.date).toLocaleDateString('fa-IR') : '-'}
                   </p>
                 </div>
               </div>
@@ -304,23 +305,29 @@ export default function Show({ item }: ShowProps) {
                   </div>
                 )}
 
-                {item.department && (
+                {item.province && (
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.department')}</Label>
+                    <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.province')}</Label>
                     <div className="flex items-center gap-2">
                       <div 
                         className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: item.department.color }}
+                        style={{ backgroundColor: item.province.color }}
                       ></div>
-                      <span className="text-lg font-semibold text-gray-900 dark:text-white">{item.department.label}</span>
+                      <span className="text-lg font-semibold text-gray-900 dark:text-white">{item.province.label}</span>
                     </div>
                   </div>
                 )}
 
-                {item.user && (
+                {item.district && (
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.user')}</Label>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-white">{item.user.name}</p>
+                    <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.district')}</Label>
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: item.district.color }}
+                      ></div>
+                      <span className="text-lg font-semibold text-gray-900 dark:text-white">{item.district.label}</span>
+                    </div>
                   </div>
                 )}
               </div>

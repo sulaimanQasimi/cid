@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\NationalInsightCenterInfoItem;
 use App\Models\NationalInsightCenterInfo;
 use App\Models\InfoCategory;
-use App\Models\Department;
+use App\Models\Province;
+use App\Models\District;
 use App\Models\User;
 use App\Models\StatCategory;
 use App\Models\StatCategoryItem;
@@ -86,14 +87,14 @@ class NationalInsightCenterInfoItemController extends Controller
         
         $nationalInsightCenterInfos = NationalInsightCenterInfo::orderBy('name')->get();
         $infoCategories = InfoCategory::orderBy('name')->get();
-        $departments = Department::orderBy('name')->get();
-        $users = User::orderBy('name')->get();
+        $provinces = Province::orderBy('name')->get();
+        $districts = District::orderBy('name')->get();
 
         return Inertia::render('NationalInsightCenterInfoItem/Create', [
             'nationalInsightCenterInfos' => $nationalInsightCenterInfos,
             'infoCategories' => $infoCategories,
-            'departments' => $departments,
-            'users' => $users,
+            'provinces' => $provinces,
+            'districts' => $districts,
             'nationalInsightCenterInfoId' => $nationalInsightCenterInfoId,
         ]);
     }
@@ -107,25 +108,25 @@ class NationalInsightCenterInfoItemController extends Controller
         
         $validated = $request->validate([
             'national_insight_center_info_id' => 'required|exists:national_insight_center_infos,id',
+            'title' => 'required|string|max:255',
+            'registration_number' => 'required|string|max:255|unique:national_insight_center_info_items',
             'info_category_id' => 'nullable|exists:info_categories,id',
-            'department_id' => 'nullable|exists:departments,id',
-            'name' => 'required|string|max:255',
-            'code' => 'nullable|string|max:50',
+            'province_id' => 'nullable|exists:provinces,id',
+            'district_id' => 'nullable|exists:districts,id',
             'description' => 'nullable|string',
-            'value' => 'nullable|array',
-            'user_id' => 'nullable|exists:users,id',
+            'date' => 'nullable|date',
         ]);
 
         try {
             $item = NationalInsightCenterInfoItem::create([
                 'national_insight_center_info_id' => $validated['national_insight_center_info_id'],
+                'title' => $validated['title'],
+                'registration_number' => $validated['registration_number'],
                 'info_category_id' => $validated['info_category_id'],
-                'department_id' => $validated['department_id'],
-                'name' => $validated['name'],
-                'code' => $validated['code'],
+                'province_id' => $validated['province_id'],
+                'district_id' => $validated['district_id'],
                 'description' => $validated['description'],
-                'value' => $validated['value'],
-                'user_id' => $validated['user_id'],
+                'date' => $validated['date'],
                 'created_by' => Auth::id(),
             ]);
 
@@ -149,97 +150,98 @@ class NationalInsightCenterInfoItemController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(NationalInsightCenterInfoItem $nationalInsightCenterInfoItem): Response
+    public function show(NationalInsightCenterInfoItem $item): Response
     {
-        $this->authorize('view', $nationalInsightCenterInfoItem);
+        $this->authorize('view', $item);
 
         // Record the visit
-        $nationalInsightCenterInfoItem->recordVisit();
+        $item->recordVisit();
 
         // Load related data
-        $nationalInsightCenterInfoItem->load([
+        $item->load([
             'nationalInsightCenterInfo',
             'infoCategory',
-            'department',
-            'user',
+            'province',
+            'district',
             'creator',
             'confirmer',
             'infoStats.statCategoryItem.category'
         ]);
 
         return Inertia::render('NationalInsightCenterInfoItem/Show', [
-            'item' => $nationalInsightCenterInfoItem,
+            'item' => $item,
         ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(NationalInsightCenterInfoItem $nationalInsightCenterInfoItem): Response
+    public function edit(NationalInsightCenterInfoItem $item): Response
     {
-        $this->authorize('update', $nationalInsightCenterInfoItem);
+        $this->authorize('update', $item);
 
         // Load data for dropdowns
         $nationalInsightCenterInfos = NationalInsightCenterInfo::orderBy('name')->get();
         $infoCategories = InfoCategory::orderBy('name')->get();
-        $departments = Department::orderBy('name')->get();
-        $users = User::orderBy('name')->get();
+        $provinces = Province::orderBy('name')->get();
+        $districts = District::orderBy('name')->get();
 
         // Load the item with its relationships
-        $nationalInsightCenterInfoItem->load([
+        $item->load([
             'nationalInsightCenterInfo',
             'infoCategory',
-            'department',
-            'user'
+            'province',
+            'district',
+            'creator'
         ]);
 
         return Inertia::render('NationalInsightCenterInfoItem/Edit', [
-            'item' => $nationalInsightCenterInfoItem,
+            'item' => $item,
             'nationalInsightCenterInfos' => $nationalInsightCenterInfos,
             'infoCategories' => $infoCategories,
-            'departments' => $departments,
-            'users' => $users,
+            'provinces' => $provinces,
+            'districts' => $districts,
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, NationalInsightCenterInfoItem $nationalInsightCenterInfoItem): RedirectResponse
+    public function update(Request $request, NationalInsightCenterInfoItem $item): RedirectResponse
     {
-        $this->authorize('update', $nationalInsightCenterInfoItem);
+        $this->authorize('update', $item);
         
         $validated = $request->validate([
             'national_insight_center_info_id' => 'required|exists:national_insight_center_infos,id',
+            'title' => 'required|string|max:255',
+            'registration_number' => 'required|string|max:255|unique:national_insight_center_info_items,registration_number,' . $item->id,
             'info_category_id' => 'nullable|exists:info_categories,id',
-            'department_id' => 'nullable|exists:departments,id',
-            'name' => 'required|string|max:255',
-            'code' => 'nullable|string|max:50',
+            'province_id' => 'nullable|exists:provinces,id',
+            'district_id' => 'nullable|exists:districts,id',
             'description' => 'nullable|string',
-            'value' => 'nullable|array',
-            'user_id' => 'nullable|exists:users,id',
+            'date' => 'nullable|date',
         ]);
 
         try {
-            $nationalInsightCenterInfoItem->update([
+            $item->update([
                 'national_insight_center_info_id' => $validated['national_insight_center_info_id'],
+                'title' => $validated['title'],
+                'registration_number' => $validated['registration_number'],
                 'info_category_id' => $validated['info_category_id'],
-                'department_id' => $validated['department_id'],
-                'name' => $validated['name'],
-                'code' => $validated['code'],
+                'province_id' => $validated['province_id'],
+                'district_id' => $validated['district_id'],
                 'description' => $validated['description'],
-                'value' => $validated['value'],
-                'user_id' => $validated['user_id'],
+                'date' => $validated['date'],
             ]);
 
             return redirect()
-                ->route('national-insight-center-info-items.show', $nationalInsightCenterInfoItem)
+                ->route('national-insight-center-info-items.show', $item)
                 ->with('success', 'National Insight Center Info Item updated successfully.');
 
         } catch (\Exception $e) {
             Log::error('Failed to update national insight center info item', [
                 'error' => $e->getMessage(),
-                'item_id' => $nationalInsightCenterInfoItem->id,
+                'item_id' => $item->id,
                 'data' => $validated
             ]);
 
@@ -253,12 +255,12 @@ class NationalInsightCenterInfoItemController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(NationalInsightCenterInfoItem $nationalInsightCenterInfoItem): RedirectResponse
+    public function destroy(NationalInsightCenterInfoItem $item): RedirectResponse
     {
-        $this->authorize('delete', $nationalInsightCenterInfoItem);
+        $this->authorize('delete', $item);
         
         try {
-            $nationalInsightCenterInfoItem->delete();
+            $item->delete();
 
             return redirect()
                 ->route('national-insight-center-info-items.index')
@@ -267,7 +269,7 @@ class NationalInsightCenterInfoItemController extends Controller
         } catch (\Exception $e) {
             Log::error('Failed to delete national insight center info item', [
                 'error' => $e->getMessage(),
-                'item_id' => $nationalInsightCenterInfoItem->id
+                'item_id' => $item->id
             ]);
 
             return redirect()
@@ -279,12 +281,12 @@ class NationalInsightCenterInfoItemController extends Controller
     /**
      * Confirm the specified resource.
      */
-    public function confirm(NationalInsightCenterInfoItem $nationalInsightCenterInfoItem): RedirectResponse
+    public function confirm(NationalInsightCenterInfoItem $item): RedirectResponse
     {
-        $this->authorize('confirm', $nationalInsightCenterInfoItem);
+        $this->authorize('confirm', $item);
         
         try {
-            $nationalInsightCenterInfoItem->update([
+            $item->update([
                 'confirmed' => true,
                 'confirmed_by' => Auth::id(),
             ]);
@@ -296,7 +298,7 @@ class NationalInsightCenterInfoItemController extends Controller
         } catch (\Exception $e) {
             Log::error('Failed to confirm national insight center info item', [
                 'error' => $e->getMessage(),
-                'item_id' => $nationalInsightCenterInfoItem->id
+                'item_id' => $item->id
             ]);
 
             return redirect()
@@ -308,9 +310,9 @@ class NationalInsightCenterInfoItemController extends Controller
     /**
      * Show the form for managing statistics.
      */
-    public function manageStats(NationalInsightCenterInfoItem $nationalInsightCenterInfoItem): Response
+    public function manageStats(NationalInsightCenterInfoItem $item): Response
     {
-        $this->authorize('update', $nationalInsightCenterInfoItem);
+        $this->authorize('update', $item);
         
         $statItems = StatCategoryItem::with('category')
             ->whereHas('category', function($query) {
@@ -324,10 +326,10 @@ class NationalInsightCenterInfoItemController extends Controller
             ->get();
 
         // Load existing stats
-        $nationalInsightCenterInfoItem->load(['infoStats.statCategoryItem.category']);
+        $item->load(['infoStats.statCategoryItem.category']);
 
         return Inertia::render('NationalInsightCenterInfoItem/ManageStats', [
-            'item' => $nationalInsightCenterInfoItem,
+            'item' => $item,
             'statItems' => $statItems,
             'statCategories' => $statCategories,
         ]);
@@ -336,9 +338,9 @@ class NationalInsightCenterInfoItemController extends Controller
     /**
      * Update statistics for a specific national insight center info item.
      */
-    public function updateStats(Request $request, NationalInsightCenterInfoItem $nationalInsightCenterInfoItem): RedirectResponse
+    public function updateStats(Request $request, NationalInsightCenterInfoItem $item): RedirectResponse
     {
-        $this->authorize('update', $nationalInsightCenterInfoItem);
+        $this->authorize('update', $item);
         
         $validated = $request->validate([
             'stats' => 'required|array|min:1',
@@ -348,18 +350,18 @@ class NationalInsightCenterInfoItemController extends Controller
         ]);
 
         try {
-            DB::transaction(function () use ($nationalInsightCenterInfoItem, $validated) {
-                $this->updateInfoStats($nationalInsightCenterInfoItem, $validated['stats']);
+            DB::transaction(function () use ($item, $validated) {
+                $this->updateInfoStats($item, $validated['stats']);
             });
 
             return redirect()
-                ->route('national-insight-center-info-items.show', $nationalInsightCenterInfoItem)
+                ->route('national-insight-center-info-items.show', $item)
                 ->with('success', 'Statistics updated successfully.');
 
         } catch (\Exception $e) {
             Log::error('Failed to update national insight center info item statistics', [
                 'error' => $e->getMessage(),
-                'item_id' => $nationalInsightCenterInfoItem->id,
+                'item_id' => $item->id,
                 'stats_data' => $validated['stats'] ?? []
             ]);
 
@@ -373,10 +375,10 @@ class NationalInsightCenterInfoItemController extends Controller
     /**
      * Create info stats for the national insight center info item.
      */
-    private function createInfoStats(NationalInsightCenterInfoItem $nationalInsightCenterInfoItem, array $stats): void
+    private function createInfoStats(NationalInsightCenterInfoItem $item, array $stats): void
     {
         foreach ($stats as $stat) {
-            $nationalInsightCenterInfoItem->infoStats()->create([
+            $item->infoStats()->create([
                 'stat_category_item_id' => $stat['stat_category_item_id'],
                 'string_value' => $stat['value'],
                 'notes' => $stat['notes'] ?? null,
@@ -387,12 +389,12 @@ class NationalInsightCenterInfoItemController extends Controller
     /**
      * Update info stats for the national insight center info item.
      */
-    private function updateInfoStats(NationalInsightCenterInfoItem $nationalInsightCenterInfoItem, array $stats): void
+    private function updateInfoStats(NationalInsightCenterInfoItem $item, array $stats): void
     {
         // Delete existing stats
-        $nationalInsightCenterInfoItem->infoStats()->delete();
+        $item->infoStats()->delete();
 
         // Create new stats
-        $this->createInfoStats($nationalInsightCenterInfoItem, $stats);
+        $this->createInfoStats($item, $stats);
     }
 }
