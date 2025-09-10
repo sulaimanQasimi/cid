@@ -1732,5 +1732,14 @@
     "info_types.delete_dialog.description":"آیا مطمئن هستید که می‌خواهید این گزارش را حذف کنید؟ این عمل قابل بازگشت نیست.",
     "info_types.delete_dialog.button":"حذف گزارش",
     "info_types.delete_dialog.cancel":"لغو",
-    "info_types.delete_dialog.confirm":"تأیید"
+    "info_types.delete_dialog.confirm":"تأیید",
+    "info_categories.show.title":"جزئیات ګزارشات تحلیلی او تفضیلی",
+    "info_categories.delete_dialog.title":"حذف ګزارشات تحلیلی او تفضیلی",
+    "info_categories.delete_dialog.description":"آیا مطمئن هستید که می‌خواهید این ګزارشات تحلیلی او تفضیلی را حذف کنید؟ این عمل قابل بازگشت نیست.",
+    "info_categories.delete_dialog.button":"حذف ګزارشات تحلیلی او تفضیلی",
+    "info_categories.delete_dialog.cancel":"لغو",
+    "info_categories.delete_dialog.confirm":"تأیید",
+    "info_categories.edit.page_title":"ویرایش ګزارشات تحلیلی او تفضیلی",
+    "info_categories.edit.page_description":"لاندې فورمه ډکه کړئ ترڅو د ګزارشات تحلیلی او تفضیلی معلومات تازه کړئ.",
+    "info_categories.edit.back_button":"شاته تګ"
 }
