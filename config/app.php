@@ -65,7 +65,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Kabul',
 
     /*
     |--------------------------------------------------------------------------
@@ -78,7 +78,7 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'fa'),
+    'locale' => 'fa',
 
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 

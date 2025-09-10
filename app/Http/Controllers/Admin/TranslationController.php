@@ -35,100 +35,20 @@ class TranslationController extends Controller
     public function index(Request $request)
     {
         $this->authorize('viewAny', Translation::class);
-        
-        $languages = Language::orderBy('default', 'desc')
-            ->orderBy('name')
-            ->get();
-
-        $selectedLanguage = $request->query('language');
-        $selectedGroup = $request->query('group');
-
-        if (!$selectedLanguage && count($languages) > 0) {
-            $selectedLanguage = $languages->firstWhere('default', true)?->code ?? $languages->first()->code;
-        }
-
-        $language = Language::where('code', $selectedLanguage)->first();
-
-        // Prefer JSON file source for faster reads; fall back to DB
-        $jsonMap = $selectedLanguage ? $this->readJsonTranslations($selectedLanguage) : null;
-
-        if ($jsonMap !== null) {
-            // Build items from JSON
-            $items = [];
-            foreach ($jsonMap as $key => $value) {
-                $group = $this->extractGroupFromKey($key);
-                if ($selectedGroup && $group !== $selectedGroup) {
-                    continue;
-                }
-                $items[] = [
-                    'id' => null,
-                    'language_id' => $language?->id,
-                    'key' => $key,
-                    'value' => is_string($value) ? $value : json_encode($value, JSON_UNESCAPED_UNICODE),
-                    'group' => $group,
-                ];
-            }
-
-            // Sort by group then key
-            usort($items, function ($a, $b) {
-                return [$a['group'], $a['key']] <=> [$b['group'], $b['key']];
-            });
-
-            // Manual pagination
-            $perPage = (int)($request->query('per_page', 50));
-            $page = max(1, (int)$request->query('page', 1));
-            $total = count($items);
-            $lastPage = (int)max(1, ceil($total / $perPage));
-            $offset = ($page - 1) * $perPage;
-            $data = array_slice($items, $offset, $perPage);
-
-            $translations = [
-                'data' => $data,
-                'current_page' => $page,
-                'last_page' => $lastPage,
-                'per_page' => $perPage,
-                'total' => $total,
-            ];
-
-            // Build groups list from JSON keys
-            $groups = collect(array_values(array_unique(array_map(function ($key) {
-                $pos = strpos($key, '.');
-                return $pos !== false ? substr($key, 0, $pos) : 'general';
-            }, array_keys($jsonMap)))))->values();
-
+        $jsonPath = resource_path('js/lib/i18n/translations/fa.json');
+        if (!file_exists($jsonPath)) {
+            $languages = [];
         } else {
-            // Fallback to DB-backed listing
-            $query = Translation::query()
-                ->when($language, function ($query) use ($language) {
-                    $query->where('language_id', $language->id);
-                })
-                ->when($selectedGroup, function ($query) use ($selectedGroup) {
-                    $query->where('group', $selectedGroup);
-                });
-
-            $paginator = $query->orderBy('group')
-                ->orderBy('key')
-                ->paginate(50)
-                ->withQueryString();
-
-            $translations = $paginator;
-
-            $groups = Translation::select('group')
-                ->when($language, function ($query) use ($language) {
-                    $query->where('language_id', $language->id);
-                })
-                ->groupBy('group')
-                ->pluck('group');
+            $jsonContent = file_get_contents($jsonPath);
+            $languages = json_decode($jsonContent, true);
+            if (!is_array($languages)) {
+                $languages = [];
+            }
         }
-
+        
         return Inertia::render('Translations/Index', [
-            'languages' => $languages,
-            'translations' => $translations,
-            'groups' => $groups,
-            'filters' => [
-                'language' => $selectedLanguage,
-                'group' => $selectedGroup,
-            ],
+            'translations' => $languages,
+            
         ]);
     }
 

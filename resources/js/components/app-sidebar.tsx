@@ -245,13 +245,7 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
 
     // Multilingual Support
     const languageItems: NavItem[] = [];
-    if (auth.permissions.includes('language.view_any')) {
-        languageItems.push({
-            title: t('sidebar.language_management'),
-            href: route('languages.index'),
-            icon: Globe
-        });
-    }
+  
     if (auth.permissions.includes('translation.view_any')) {
         languageItems.push({
             title: t('sidebar.translations'),
