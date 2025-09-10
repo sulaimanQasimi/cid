@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Traits\HasVisitors;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
@@ -127,5 +128,13 @@ class NationalInsightCenterInfoItem extends Model
     public function confirmer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'confirmed_by');
+    }
+
+    /**
+     * Get the stats associated with this item.
+     */
+    public function infoStats(): HasMany
+    {
+        return $this->hasMany(InfoStat::class, 'national_insight_center_info_item_id');
     }
 }

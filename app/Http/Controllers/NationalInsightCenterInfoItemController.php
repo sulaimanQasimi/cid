@@ -7,8 +7,11 @@ use App\Models\NationalInsightCenterInfo;
 use App\Models\InfoCategory;
 use App\Models\Department;
 use App\Models\User;
+use App\Models\StatCategory;
+use App\Models\StatCategoryItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -160,7 +163,8 @@ class NationalInsightCenterInfoItemController extends Controller
             'department',
             'user',
             'creator',
-            'confirmer'
+            'confirmer',
+            'infoStats.statCategoryItem.category'
         ]);
 
         return Inertia::render('NationalInsightCenterInfoItem/Show', [
@@ -299,5 +303,96 @@ class NationalInsightCenterInfoItemController extends Controller
                 ->back()
                 ->with('error', 'Failed to confirm national insight center info item. Please try again.');
         }
+    }
+
+    /**
+     * Show the form for managing statistics.
+     */
+    public function manageStats(NationalInsightCenterInfoItem $nationalInsightCenterInfoItem): Response
+    {
+        $this->authorize('update', $nationalInsightCenterInfoItem);
+        
+        $statItems = StatCategoryItem::with('category')
+            ->whereHas('category', function($query) {
+                $query->where('status', 'active');
+            })
+            ->orderBy('name')
+            ->get();
+
+        $statCategories = StatCategory::where('status', 'active')
+            ->orderBy('label')
+            ->get();
+
+        // Load existing stats
+        $nationalInsightCenterInfoItem->load(['infoStats.statCategoryItem.category']);
+
+        return Inertia::render('NationalInsightCenterInfoItem/ManageStats', [
+            'item' => $nationalInsightCenterInfoItem,
+            'statItems' => $statItems,
+            'statCategories' => $statCategories,
+        ]);
+    }
+
+    /**
+     * Update statistics for a specific national insight center info item.
+     */
+    public function updateStats(Request $request, NationalInsightCenterInfoItem $nationalInsightCenterInfoItem): RedirectResponse
+    {
+        $this->authorize('update', $nationalInsightCenterInfoItem);
+        
+        $validated = $request->validate([
+            'stats' => 'required|array|min:1',
+            'stats.*.stat_category_item_id' => 'required|integer|exists:stat_category_items,id',
+            'stats.*.value' => 'required|string|max:255',
+            'stats.*.notes' => 'nullable|string|max:1000',
+        ]);
+
+        try {
+            DB::transaction(function () use ($nationalInsightCenterInfoItem, $validated) {
+                $this->updateInfoStats($nationalInsightCenterInfoItem, $validated['stats']);
+            });
+
+            return redirect()
+                ->route('national-insight-center-info-items.show', $nationalInsightCenterInfoItem)
+                ->with('success', 'Statistics updated successfully.');
+
+        } catch (\Exception $e) {
+            Log::error('Failed to update national insight center info item statistics', [
+                'error' => $e->getMessage(),
+                'item_id' => $nationalInsightCenterInfoItem->id,
+                'stats_data' => $validated['stats'] ?? []
+            ]);
+
+            return redirect()
+                ->back()
+                ->with('error', 'Failed to update statistics. Please try again.')
+                ->withInput();
+        }
+    }
+
+    /**
+     * Create info stats for the national insight center info item.
+     */
+    private function createInfoStats(NationalInsightCenterInfoItem $nationalInsightCenterInfoItem, array $stats): void
+    {
+        foreach ($stats as $stat) {
+            $nationalInsightCenterInfoItem->infoStats()->create([
+                'stat_category_item_id' => $stat['stat_category_item_id'],
+                'string_value' => $stat['value'],
+                'notes' => $stat['notes'] ?? null,
+            ]);
+        }
+    }
+
+    /**
+     * Update info stats for the national insight center info item.
+     */
+    private function updateInfoStats(NationalInsightCenterInfoItem $nationalInsightCenterInfoItem, array $stats): void
+    {
+        // Delete existing stats
+        $nationalInsightCenterInfoItem->infoStats()->delete();
+
+        // Create new stats
+        $this->createInfoStats($nationalInsightCenterInfoItem, $stats);
     }
 }
