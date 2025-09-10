@@ -12,6 +12,8 @@ import { useTranslation } from '@/lib/i18n/translate';
 import { CanUpdate } from '@/components/ui/permission-guard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import Header from '@/components/template/header';
+import FooterButtons from '@/components/template/FooterButtons';
 // Note: Using browser alert for simplicity, can be replaced with toast notifications
 
 // Type definitions
@@ -156,7 +158,7 @@ const TreeNode: React.FC<{
               onChange={(e) => onValueChange(item.id, e.target.value)}
               onClick={(e) => e.stopPropagation()}
               placeholder="Value"
-              className="text-right h-8 text-sm"
+              className="text-right h-8 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700"
             />
           </div>
         )}
@@ -169,7 +171,7 @@ const TreeNode: React.FC<{
             value={currentStat.notes}
             onChange={(e) => onNotesChange(item.id, e.target.value)}
             placeholder="Notes (optional)"
-            className="text-sm resize-none"
+            className="text-sm resize-none bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700"
             rows={2}
           />
         </div>
@@ -320,6 +322,59 @@ export default function ManageStats({ infoType, statItems, statCategories }: Man
     }
   }, [isSubmitting, statsData, infoType.id, t]);
 
+  const handleFormSubmit = useCallback(async () => {
+    if (isSubmitting) return;
+
+    // Prepare data for submission
+    const statsToSubmit = Object.entries(statsData)
+      .filter(([_, data]) => data.value.trim() !== '')
+      .map(([itemId, data]) => ({
+        stat_category_item_id: parseInt(itemId, 10),
+        value: data.value.trim(),
+        notes: data.notes.trim() || null
+      }));
+
+    if (statsToSubmit.length === 0) {
+      alert(t('info_types.manage_stats.no_stats_error'));
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await new Promise<void>((resolve, reject) => {
+        router.put(
+          route('info-types.stats.update', infoType.id),
+          { stats: statsToSubmit },
+          {
+            preserveScroll: true,
+            onSuccess: () => {
+              alert(t('info_types.manage_stats.save_success'));
+              // Refresh the page to show updated stats
+              router.reload({ only: ['infoType'] });
+              resolve();
+            },
+            onError: (errors) => {
+              console.error('Validation errors:', errors);
+              alert(t('info_types.manage_stats.save_error'));
+              reject(new Error('Validation failed'));
+            },
+            onFinish: () => {
+              setIsSubmitting(false);
+            }
+          }
+        );
+      });
+    } catch (error) {
+      console.error('Submit error:', error);
+      setIsSubmitting(false);
+    }
+  }, [isSubmitting, statsData, infoType.id, t]);
+
+  const handleCancel = useCallback(() => {
+    router.visit(route('info-types.show', infoType.id));
+  }, [infoType.id]);
+
   // Breadcrumbs
   const breadcrumbs: BreadcrumbItem[] = [
     { title: t('info_types.page_title'), href: route('info-types.index') },
@@ -333,42 +388,39 @@ export default function ManageStats({ infoType, statItems, statCategories }: Man
       <Head title={t('info_types.manage_stats.page_title', { name: infoType.name })} />
       
       <div className="container mx-auto px-4 py-6 max-w-6xl">
-        {/* Header */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 p-8 text-white shadow-2xl mb-8">
-          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
-            <div className="flex items-center gap-6">
-              <div className="p-4 bg-white/20 backdrop-blur-md rounded-2xl">
-                <Settings className="h-8 w-8" />
-              </div>
-              <div>
-                <h1 className="text-3xl lg:text-4xl font-bold mb-2">
-                  {t('info_types.manage_stats.page_title', { name: infoType.name })}
-                </h1>
-                <p className="text-purple-100 text-lg">
-                  {t('info_types.manage_stats.page_description')}
-                </p>
-              </div>
-            </div>
-            
+        {/* Header Component */}
+        <Header
+          title={t('info_types.manage_stats.page_title', { name: infoType.name })}
+          description={t('info_types.manage_stats.page_description')}
+          icon={<Settings className="h-6 w-6 text-white" />}
+          model="info_type"
+          routeName={route('info-types.stats', infoType.id)}
+          theme="purple"
+          buttonText={t('info_types.manage_stats.back_button')}
+          showBackButton={true}
+          backRouteName={route('info-types.show', infoType.id)}
+          backButtonText={t('info_types.manage_stats.back_button')}
+          showButton={false}
+          actionButtons={
             <Button
               asChild
               variant="outline"
               size="lg"
-              className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30"
+              className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105"
             >
-              <Link href={route('info-types.show', infoType.id)} className="flex items-center gap-2">
-                <ArrowLeft className="h-4 w-4" />
+              <Link href={route('info-types.show', infoType.id)} className="flex items-center gap-3">
+                <ArrowLeft className="h-5 w-5" />
                 {t('info_types.manage_stats.back_button')}
               </Link>
             </Button>
-          </div>
-        </div>
+          }
+        />
 
         {/* Main Content */}
         <CanUpdate model="info_type">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Stats Management Card */}
-            <Card className="shadow-xl border-0 rounded-2xl overflow-hidden">
+            <Card className="shadow-xl border-0 rounded-2xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20">
               <CardHeader className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
                 <CardTitle className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -389,7 +441,7 @@ export default function ManageStats({ infoType, statItems, statCategories }: Man
               <CardContent className="p-6 space-y-6">
                 {/* Category Filter */}
                 <div>
-                  <Label htmlFor="category-filter" className="text-base font-medium flex items-center gap-2 text-purple-700 mb-2">
+                  <Label htmlFor="category-filter" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 mb-2">
                     <Building2 className="h-4 w-4" />
                     {t('info_types.manage_stats.filter_by_category')}
                   </Label>
@@ -397,7 +449,7 @@ export default function ManageStats({ infoType, statItems, statCategories }: Man
                     value={selectedCategory?.toString() || 'all'}
                     onValueChange={(value) => setSelectedCategory(value !== 'all' ? parseInt(value, 10) : null)}
                   >
-                    <SelectTrigger className="h-12 border-purple-200 focus:border-purple-500 focus:ring-purple-500/20">
+                    <SelectTrigger className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-purple-500/20 dark:focus:ring-purple-400/20 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
                       <SelectValue placeholder={t('incidents.filters.all_categories')} />
                     </SelectTrigger>
                     <SelectContent>
@@ -419,8 +471,8 @@ export default function ManageStats({ infoType, statItems, statCategories }: Man
 
                 {/* Stats Tree */}
                 {filteredTreeItems.length > 0 ? (
-                  <div className="border rounded-lg overflow-hidden">
-                    <div className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 font-medium text-sm">
+                  <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                    <div className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 font-medium text-sm text-gray-900 dark:text-gray-100">
                       <span>{t('info_types.manage_stats.category_items')}</span>
                       <span className="w-32 text-right">{t('info_types.manage_stats.value_column')}</span>
                     </div>
@@ -439,13 +491,13 @@ export default function ManageStats({ infoType, statItems, statCategories }: Man
                   </div>
                 ) : (
                   <div className="text-center py-12">
-                    <div className="p-4 bg-purple-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                      <AlertTriangle className="h-8 w-8 text-purple-400" />
+                    <div className="p-4 bg-purple-100 dark:bg-purple-800 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                      <AlertTriangle className="h-8 w-8 text-purple-400 dark:text-purple-300" />
                     </div>
-                    <h3 className="text-lg font-semibold text-purple-800 mb-2">
+                    <h3 className="text-lg font-semibold text-purple-800 dark:text-purple-200 mb-2">
                       {t('info_types.manage_stats.no_items')}
                     </h3>
-                    <p className="text-purple-600">
+                    <p className="text-purple-600 dark:text-purple-400">
                       {t('info_types.manage_stats.no_items_description')}
                     </p>
                   </div>
@@ -455,35 +507,16 @@ export default function ManageStats({ infoType, statItems, statCategories }: Man
 
             {/* Actions */}
             <Card className="shadow-xl border-0 rounded-2xl overflow-hidden">
-              <CardContent className="p-6 bg-gradient-to-r from-purple-50 to-white flex justify-end gap-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  asChild
-                  className="h-12 px-6 border-purple-300 text-purple-700 hover:bg-purple-100"
-                >
-                  <Link href={route('info-types.show', infoType.id)}>
-                    {t('info_types.manage_stats.cancel_button')}
-                  </Link>
-                </Button>
-                
-                <Button
-                  type="submit"
-                  disabled={isSubmitting || statsCount === 0}
-                  className="h-12 px-8 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 disabled:opacity-50"
-                >
-                  {isSubmitting ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      {t('info_types.manage_stats.saving_button')}
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <Save className="h-4 w-4" />
-                      {t('info_types.manage_stats.save_button')}
-                    </div>
-                  )}
-                </Button>
+              <CardContent className="p-6 bg-gradient-to-r from-purple-50 dark:from-purple-900/20 to-white dark:to-gray-800">
+                <FooterButtons
+                  onCancel={handleCancel}
+                  onSubmit={handleFormSubmit}
+                  processing={isSubmitting}
+                  cancelText={t('info_types.manage_stats.cancel_button')}
+                  submitText={t('info_types.manage_stats.save_button')}
+                  savingText={t('info_types.manage_stats.saving_button')}
+                  disabled={statsCount === 0}
+                />
               </CardContent>
             </Card>
           </form>

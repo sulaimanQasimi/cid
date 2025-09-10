@@ -111,6 +111,7 @@ export default function Welcome() {
 
                     {/* Call to Action */}
                     <div className="text-center">
+                        
                         {auth.user ? (
                             <Link
                                 href={route('dashboard')}
