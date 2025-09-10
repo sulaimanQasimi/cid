@@ -188,7 +188,7 @@ export default function SearchFilters({
                                     variant="outline"
                                     onClick={onDirectionChange}
                                     title={t(`common.sort_${(filters.direction || 'asc') === 'asc' ? 'ascending' : 'descending'}`)}
-                                    className="h-10 w-full border-gray-300 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-200"
+                                    className="h-10 w-full bg-purple-700  dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-200"
                                 >
                                     <ArrowUpDown className={`mr-2 h-4 w-4 ${(filters.direction || 'asc') === 'asc' ? '' : 'rotate-180 transform'}`} />
                                     {(filters.direction || 'asc') === 'asc' ? t('common.sort_ascending') : t('common.sort_descending')}

@@ -187,7 +187,7 @@ export default function ShowInfoType({ infoType, infos, infoCategories = [], dep
         />
 
         {/* Info Type Details Card */}
-        <Card className="shadow-2xl bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl overflow-hidden mb-8">
+        <Card className="shadow-2xl bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 overflow-hidden mb-8">
           <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 text-white py-6">
             <CardTitle className="flex items-center gap-4">
               <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
@@ -203,28 +203,28 @@ export default function ShowInfoType({ infoType, infos, infoCategories = [], dep
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-purple-800 mb-2">{t('info_types.show.name_label')}</h3>
-                  <p className="text-xl font-bold text-purple-900 bg-gradient-to-l from-purple-50 to-white p-4 rounded-xl border border-purple-200">
+                  <h3 className="text-md font-semibold text-purple-800 dark:text-purple-200 mb-2">{t('info_types.show.name_label')}</h3>
+                  <p className="text-xl font-bold text-purple-900 dark:text-purple-100 bg-white dark:bg-gray-800 p-4 rounded-xl border border-purple-200 dark:border-purple-700">
                     {infoType.name}
                   </p>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-purple-800 mb-2">{t('info_types.show.description_label')}</h3>
-                  <p className="text-purple-800 bg-gradient-to-l from-purple-50 to-white p-4 rounded-xl border border-purple-200 min-h-[60px]">
+                  <h3 className="text-md font-semibold text-purple-800 dark:text-purple-200 mb-2">{t('info_types.show.description_label')}</h3>
+                  <p className="text-purple-800 dark:text-purple-200 bg-white dark:bg-gray-800 p-4 rounded-xl border border-purple-200 dark:border-purple-700 min-h-[60px]">
                     {infoType.description || t('info_types.show.no_description')}
                   </p>
                 </div>
               </div>
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-purple-800 mb-2">{t('info_types.show.created_at_label')}</h3>
-                  <p className="text-purple-800 bg-gradient-to-l from-purple-50 to-white p-4 rounded-xl border border-purple-200">
+                  <h3 className="text-md font-semibold text-purple-800 dark:text-purple-200 mb-2">{t('info_types.show.created_at_label')}</h3>
+                  <p className="text-purple-800 dark:text-purple-200 bg-white dark:bg-gray-800 p-4 rounded-xl border border-purple-200 dark:border-purple-700">
                     {formatPersianDateOnly(infoType.created_at)}
                   </p>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-purple-800 mb-2">{t('info_types.show.updated_at_label')}</h3>
-                  <p className="text-purple-800 bg-gradient-to-l from-purple-50 to-white p-4 rounded-xl border border-purple-200">
+                  <h3 className="text-md font-semibold text-purple-800 dark:text-purple-200 mb-2">{t('info_types.show.updated_at_label')}</h3>
+                  <p className="text-purple-800 dark:text-purple-200 bg-white dark:bg-gray-800 p-4 rounded-xl border border-purple-200 dark:border-purple-700">
                     {formatPersianDateOnly(infoType.updated_at)}
                   </p>
                 </div>
