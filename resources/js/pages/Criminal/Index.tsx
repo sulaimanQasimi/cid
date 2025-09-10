@@ -264,7 +264,7 @@ export default function CriminalIndex({
           icon={<TrendingUp className="h-6 w-6 text-white" />}
           model="criminal"
           routeName="criminals.create"
-          theme="orange"
+          theme="blue"
           buttonText={t('criminal.add_button')}
           showBackButton={true}
           backRouteName={() => route('criminals.index')}
@@ -297,18 +297,18 @@ export default function CriminalIndex({
         {/* Results Table */}
         <div className="mt-8">
 
-          <Card className="overflow-hidden rounded-lg border dark:border-gray-700 dark:bg-gray-800 shadow-sm">
+          <Card className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-muted/50 dark:bg-muted/30">
-                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('common.table.id')}</TableHead>
-                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('criminal.table.name')}</TableHead>
-                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('criminal.table.number')}</TableHead>
-                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('criminal.table.crime_type')}</TableHead>
-                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('criminal.table.department')}</TableHead>
-                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('criminal.table.arrest_date')}</TableHead>
-                    <TableHead className="px-6 py-4 text-right font-semibold text-foreground dark:text-foreground">
+                  <TableRow className="bg-gray-50 dark:bg-gray-700">
+                    <TableHead className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">{t('common.table.id')}</TableHead>
+                    <TableHead className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">{t('criminal.table.name')}</TableHead>
+                    <TableHead className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">{t('criminal.table.number')}</TableHead>
+                    <TableHead className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">{t('criminal.table.crime_type')}</TableHead>
+                    <TableHead className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">{t('criminal.table.department')}</TableHead>
+                    <TableHead className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">{t('criminal.table.arrest_date')}</TableHead>
+                    <TableHead className="px-6 py-4 text-right font-semibold text-gray-900 dark:text-gray-100">
                       {t('criminal.table.actions')}
                     </TableHead>
                   </TableRow>
@@ -318,34 +318,34 @@ export default function CriminalIndex({
                     criminals.data.map((criminal) => (
                       <TableRow
                         key={criminal.id}
-                        className="hover:bg-muted/50 dark:hover:bg-muted/30 border-b border-border dark:border-border"
+                        className="hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-600"
                       >
-                        <TableCell className="px-6 py-4 font-medium text-foreground dark:text-foreground">{criminal.id}</TableCell>
-                        <TableCell className="px-6 py-4 font-medium text-foreground dark:text-foreground">{criminal.name}</TableCell>
-                        <TableCell className="px-6 py-4 text-foreground dark:text-foreground">{criminal.number || '-'}</TableCell>
+                        <TableCell className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">{criminal.id}</TableCell>
+                        <TableCell className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">{criminal.name}</TableCell>
+                        <TableCell className="px-6 py-4 text-gray-900 dark:text-gray-100">{criminal.number || '-'}</TableCell>
                         <TableCell className="px-6 py-4">
                           {criminal.crime_type ? (
-                            <Badge variant="secondary" className="bg-secondary text-secondary-foreground dark:bg-secondary dark:text-secondary-foreground">
+                            <Badge variant="secondary" className="bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200">
                               {criminal.crime_type}
                             </Badge>
                           ) : (
-                            <span className="text-muted-foreground dark:text-muted-foreground">-</span>
+                            <span className="text-gray-500 dark:text-gray-400">-</span>
                           )}
                         </TableCell>
                         <TableCell className="px-6 py-4">
                           {criminal.department ? (
-                            <Badge variant="secondary" className="bg-secondary text-secondary-foreground dark:bg-secondary dark:text-secondary-foreground">
+                            <Badge variant="secondary" className="bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200">
                               {criminal.department.name}
                             </Badge>
                           ) : (
-                            <span className="text-muted-foreground dark:text-muted-foreground">-</span>
+                            <span className="text-gray-500 dark:text-gray-400">-</span>
                           )}
                         </TableCell>
-                        <TableCell className="px-6 py-4 text-muted-foreground dark:text-muted-foreground">
+                        <TableCell className="px-6 py-4 text-gray-500 dark:text-gray-400">
                           {criminal.arrest_date ? (
                             formatPersianDate(criminal.arrest_date)
                           ) : (
-                            <span className="text-muted-foreground dark:text-muted-foreground">-</span>
+                            <span className="text-gray-500 dark:text-gray-400">-</span>
                           )}
                         </TableCell>
                         <TableCell className="px-6 py-4">
@@ -405,12 +405,12 @@ export default function CriminalIndex({
                   ) : (
                     <TableRow>
                       <TableCell colSpan={7} className="h-32 text-center">
-                        <div className="flex flex-col items-center gap-4 text-muted-foreground dark:text-muted-foreground">
-                          <div className="rounded-full bg-muted dark:bg-black p-4">
-                            <AlertTriangle className="h-8 w-8 text-muted-foreground dark:text-muted-foreground dark:bg-black" />
+                        <div className="flex flex-col items-center gap-4 text-gray-500 dark:text-gray-400">
+                          <div className="rounded-full bg-gray-100 dark:bg-gray-700 p-4">
+                            <AlertTriangle className="h-8 w-8 text-gray-500 dark:text-gray-400" />
                           </div>
-                          <p className="text-lg font-semibold text-foreground dark:text-foreground">{t('criminal.no_records')}</p>
-                          <p className="text-sm text-muted-foreground dark:text-muted-foreground">{t('criminal.no_records_description')}</p>
+                          <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('criminal.no_records')}</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">{t('criminal.no_records_description')}</p>
                         </div>
                       </TableCell>
                     </TableRow>

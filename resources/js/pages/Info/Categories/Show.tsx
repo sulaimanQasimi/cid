@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { useTranslation } from '@/lib/i18n/translate';
 import { usePermissions } from '@/hooks/use-permissions';
 import { CanCreate, CanView, CanUpdate, CanDelete } from '@/components/ui/permission-guard';
+import Header from '@/components/template/header';
 
 interface Info {
   id: number;
@@ -67,75 +68,56 @@ export default function ShowInfoCategory({ infoCategory }: Props) {
       <Head title={t('info_categories.show.title', { name: infoCategory.name })} />
       
       <div className="container px-0 py-6">
-        {/* Modern Header with Glassmorphism */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-l from-purple-600 via-indigo-600 to-blue-600 p-8 lg:p-12 text-white shadow-2xl mb-8 group">
-          {/* Animated background elements */}
-          <div className="absolute inset-0 bg-black/5"></div>
-          <div className="absolute top-0 left-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 -translate-x-40 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
-          <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full translate-y-32 translate-x-32 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
-          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white/5 rounded-full -translate-x-16 -translate-y-16 blur-xl group-hover:scale-150 transition-transform duration-500"></div>
-          
-          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-8">
-            <div className="flex items-center gap-8">
-              <Button
-                variant="ghost"
-                size="lg"
-                onClick={() => window.history.back()}
-                className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105 group/btn"
-              >
-                <div className="p-1 bg-white/20 rounded-lg group-hover/btn:scale-110 transition-transform duration-300">
-                  <ArrowRight className="h-5 w-5" />
-                </div>
-                {t('common.back')}
+        {/* Header Component */}
+        <Header
+          title={t('info_categories.show.title', { name: infoCategory.name })}
+          description={t('info_categories.show.description')}
+          icon={<FileText className="h-6 w-6 text-white" />}
+          model="info_category"
+          routeName={route('info-categories.show', infoCategory.id)}
+          theme="purple"
+          buttonText={t('info_categories.show.edit_button')}
+          showBackButton={true}
+          backRouteName={route('info-categories.index')}
+          backButtonText={t('common.back_to_list')}
+          showButton={false}
+          actionButtons={
+            <>
+              <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
+                <Link href={route('info-categories.index')} className="flex items-center gap-3">
+                  <ArrowLeft className="h-5 w-5" />
+                  {t('common.back_to_list')}
+                </Link>
               </Button>
-              
-              <div className="p-6 bg-white/20 backdrop-blur-md rounded-3xl border border-white/30 shadow-2xl group-hover:scale-105 transition-transform duration-300">
-                <FileText className="h-10 w-10 text-white" />
-              </div>
-              <div className="space-y-3">
-                <h2 className="text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight">{infoCategory.name}</h2>
-                <div className="text-white/90 flex items-center gap-3 text-xl font-medium">
-                  <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                    <BarChart3 className="h-6 w-6" />
-                  </div>
-                  {t('info_categories.show.description')}
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
               <CanUpdate model="info_category">
-                <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105 group/btn">
+                <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
                   <Link href={route('info-categories.edit', infoCategory.id)} className="flex items-center gap-3">
-                    <div className="p-1 bg-white/20 rounded-lg group-hover/btn:scale-110 transition-transform duration-300">
-                      <Pencil className="h-5 w-5" />
-                    </div>
+                    <Pencil className="h-5 w-5" />
                     {t('info_categories.show.edit_button')}
                   </Link>
                 </Button>
               </CanUpdate>
               <CanDelete model="info_category">
                 <Button 
-                  size="lg" 
+                  size="lg"
+                  variant="destructive"
                   onClick={() => setIsDeleteDialogOpen(true)}
-                  className="bg-red-500/20 backdrop-blur-md border-red-300/30 text-white hover:bg-red-500/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105 group/btn"
+                  className="bg-red-500/20 backdrop-blur-md border-red-300/30 text-white hover:bg-red-500/30 shadow-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105"
                 >
-                  <div className="p-1 bg-red-500/20 rounded-lg group-hover/btn:scale-110 transition-transform duration-300">
-                    <Trash className="h-5 w-5" />
-                  </div>
+                  <Trash className="h-5 w-5 mr-2" />
                   {t('info_categories.show.delete_button')}
                 </Button>
               </CanDelete>
-            </div>
-          </div>
-        </div>
+            </>
+          }
+        />
 
         {/* Category Details */}
         <div className="mb-8">
-          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl">
+          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 ">
             <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 text-white py-6">
               <CardTitle className="flex items-center gap-4">
-                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
+                <div className="p-3 bg-white/20 backdrop-blur-sm shadow-lg">
                   <FileText className="h-6 w-6" />
                 </div>
                 <div>
@@ -148,24 +130,24 @@ export default function ShowInfoCategory({ infoCategory }: Props) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-4">
                   <div>
-                    <h3 className="text-lg font-semibold text-purple-900 mb-2">{t('info_categories.show.name_label')}</h3>
-                    <p className="text-lg text-purple-800 font-medium">{infoCategory.name}</p>
+                    <h3 className="text-lg font-semibold text-purple-800 dark:text-purple-200 mb-2">{t('info_categories.show.name_label')}</h3>
+                    <p className="text-lg text-purple-900 dark:text-purple-100 font-medium bg-white dark:bg-gray-800 p-4 rounded-xl border border-purple-200 dark:border-purple-700">{infoCategory.name}</p>
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-purple-900 mb-2">{t('info_categories.show.description_label')}</h3>
-                    <p className="text-purple-800">
+                    <h3 className="text-lg font-semibold text-purple-800 dark:text-purple-200 mb-2">{t('info_categories.show.description_label')}</h3>
+                    <p className="text-purple-800 dark:text-purple-200 bg-white dark:bg-gray-800 p-4 rounded-xl border border-purple-200 dark:border-purple-700 min-h-[60px]">
                       {infoCategory.description || t('info_categories.show.no_description')}
                     </p>
                   </div>
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <h3 className="text-lg font-semibold text-purple-900 mb-2">{t('info_categories.show.created_at_label')}</h3>
-                    <p className="text-purple-800">{new Date(infoCategory.created_at).toLocaleString()}</p>
+                    <h3 className="text-lg font-semibold text-purple-800 dark:text-purple-200 mb-2">{t('info_categories.show.created_at_label')}</h3>
+                    <p className="text-purple-800 dark:text-purple-200 bg-white dark:bg-gray-800 p-4 rounded-xl border border-purple-200 dark:border-purple-700">{new Date(infoCategory.created_at).toLocaleString()}</p>
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-purple-900 mb-2">{t('info_categories.show.updated_at_label')}</h3>
-                    <p className="text-purple-800">{new Date(infoCategory.updated_at).toLocaleString()}</p>
+                    <h3 className="text-lg font-semibold text-purple-800 dark:text-purple-200 mb-2">{t('info_categories.show.updated_at_label')}</h3>
+                    <p className="text-purple-800 dark:text-purple-200 bg-white dark:bg-gray-800 p-4 rounded-xl border border-purple-200 dark:border-purple-700">{new Date(infoCategory.updated_at).toLocaleString()}</p>
                   </div>
                 </div>
               </div>
@@ -175,11 +157,11 @@ export default function ShowInfoCategory({ infoCategory }: Props) {
 
         {/* Associated Info Records */}
         <div className="mb-8">
-          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl">
+          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 ">
             <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 text-white py-6">
               <CardTitle className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
+                  <div className="p-3 bg-white/20 backdrop-blur-sm shadow-lg">
                     <TrendingUp className="h-6 w-6" />
                   </div>
                   <div>
@@ -188,11 +170,9 @@ export default function ShowInfoCategory({ infoCategory }: Props) {
                   </div>
                 </div>
                 <CanCreate model="info">
-                  <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105 group/btn">
+                  <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
                     <Link href={route('info-types.index')} className="flex items-center gap-3">
-                      <div className="p-1 bg-white/20 rounded-lg group-hover/btn:scale-110 transition-transform duration-300">
-                        <Plus className="h-5 w-5" />
-                      </div>
+                      <Plus className="h-5 w-5" />
                       {t('info_categories.show.create_info_button')}
                     </Link>
                   </Button>
@@ -204,34 +184,34 @@ export default function ShowInfoCategory({ infoCategory }: Props) {
                 <div className="overflow-hidden rounded-b-3xl">
                   <Table>
                     <TableHeader>
-                      <TableRow className="bg-gradient-to-l from-purple-100 to-purple-200 border-0">
-                        <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_categories.show.table.id')}</TableHead>
-                        <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_categories.show.table.title')}</TableHead>
-                        <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_categories.show.table.status')}</TableHead>
-                        <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('info_categories.show.table.created_at')}</TableHead>
-                        <TableHead className="text-purple-800 font-bold text-lg py-6 px-6 text-right">{t('info_categories.show.table.actions')}</TableHead>
+                      <TableRow className="bg-gradient-to-l from-purple-100 dark:from-purple-900 to-purple-200 dark:to-purple-800 border-0">
+                        <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('info_categories.show.table.id')}</TableHead>
+                        <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('info_categories.show.table.title')}</TableHead>
+                        <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('info_categories.show.table.status')}</TableHead>
+                        <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('info_categories.show.table.created_at')}</TableHead>
+                        <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6 text-right">{t('info_categories.show.table.actions')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {infoCategory.infos.map((info) => (
-                        <TableRow key={info.id} className="hover:bg-purple-50/50 transition-colors duration-300 border-b border-purple-100">
-                          <TableCell className="font-bold text-purple-900 py-6 px-6 text-lg">{info.id}</TableCell>
-                          <TableCell className="font-bold text-purple-900 py-6 px-6 text-lg">{info.title}</TableCell>
+                        <TableRow key={info.id} className="hover:bg-purple-50/50 dark:hover:bg-purple-900/20 transition-colors duration-300 border-b border-purple-100 dark:border-purple-800">
+                          <TableCell className="font-bold text-purple-900 dark:text-purple-100 py-6 px-6 text-lg">{info.id}</TableCell>
+                          <TableCell className="font-bold text-purple-900 dark:text-purple-100 py-6 px-6 text-lg">{info.title}</TableCell>
                           <TableCell className="py-6 px-6">
                             <Badge 
                               variant={info.status === 'published' ? 'default' : info.status === 'draft' ? 'secondary' : 'outline'}
                               className={`${
                                 info.status === 'published'
-                                  ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                                  ? 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 border-green-300 dark:border-green-600'
                                   : info.status === 'draft'
-                                  ? 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                                  : 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
+                                  ? 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600'
+                                  : 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 border-yellow-300 dark:border-yellow-600'
                               }`}
                             >
                               {info.status.charAt(0).toUpperCase() + info.status.slice(1)}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-purple-800 py-6 px-6 font-medium">
+                          <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6 font-medium">
                             {new Date(info.created_at).toLocaleDateString()}
                           </TableCell>
                           <TableCell className="py-6 px-6">
@@ -242,7 +222,7 @@ export default function ShowInfoCategory({ infoCategory }: Props) {
                                   size="icon"
                                   asChild
                                   title={t('info_categories.show.actions.view')}
-                                  className="h-10 w-10 rounded-xl hover:bg-blue-100 text-blue-600 hover:text-blue-700 transition-all duration-300 hover:scale-110"
+                                  className="h-10 w-10 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-800 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-300 hover:scale-110"
                                 >
                                   <Link href={route('infos.show', info.id)}>
                                     <ExternalLink className="h-5 w-5" />
@@ -258,12 +238,12 @@ export default function ShowInfoCategory({ infoCategory }: Props) {
                 </div>
               ) : (
                 <div className="p-8 text-center">
-                  <div className="flex flex-col items-center gap-4 text-purple-600">
-                    <div className="p-4 bg-purple-100 rounded-full">
-                      <AlertTriangle className="h-16 w-16 text-purple-400" />
+                  <div className="flex flex-col items-center gap-4 text-purple-600 dark:text-purple-400">
+                    <div className="p-4 bg-purple-100 dark:bg-purple-800 rounded-full">
+                      <AlertTriangle className="h-16 w-16 text-purple-400 dark:text-purple-300" />
                     </div>
                     <p className="text-xl font-bold">{t('info_categories.show.no_info_records')}</p>
-                    <p className="text-purple-500">{t('info_categories.show.no_info_records_description')}</p>
+                    <p className="text-purple-500 dark:text-purple-400">{t('info_categories.show.no_info_records_description')}</p>
                     <CanCreate model="info">
                       <Button asChild className="mt-4 bg-gradient-to-l from-purple-500 to-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                         <Link href={route('info-types.index')}>

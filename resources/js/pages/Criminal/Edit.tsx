@@ -31,7 +31,7 @@ interface Criminal {
   arrest_location: string | null;
   arrested_by: string | null;
   arrest_date: string | null;
-  referred_to: string | null;
+  refercyan_to: string | null;
   final_verdict: string | null;
   notes: string | null;
   department_id: number | null;
@@ -109,7 +109,7 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
     arrest_location: criminal.arrest_location || '',
     arrested_by: criminal.arrested_by || '',
     arrest_date: criminal.arrest_date || '',
-    referred_to: criminal.referred_to || '',
+    refercyan_to: criminal.refercyan_to || '',
     final_verdict: criminal.final_verdict || '',
     notes: criminal.notes || '',
     department_id: criminal.department_id ? criminal.department_id.toString() : 'none',
@@ -176,7 +176,7 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
   };
 
   // Filter users based on search term
-  const filteredUsers = users.filter(user => 
+  const filtecyanUsers = users.filter(user => 
     user.name.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(userSearchTerm.toLowerCase())
   ).filter(user => !selectedUsers.includes(user.id));
@@ -210,7 +210,7 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
     router.post(route('criminals.update', criminal.id), completeFormData, {
       forceFormData: true,
       onSuccess: () => {
-        // Redirect happens automatically from the controller
+        // cyanirect happens automatically from the controller
       }
     });
   };
@@ -220,7 +220,7 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
     router.delete(route('criminals.destroy', criminal.id), {
       onSuccess: () => {
         setIsDeleteDialogOpen(false);
-        // Redirect happens automatically from the controller
+        // cyanirect happens automatically from the controller
       },
       onError: () => {
         setIsDeleteDialogOpen(false);
@@ -243,7 +243,7 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
           icon={<Shield className="h-6 w-6 text-white" />}
           model="criminal"
           routeName={route('criminals.show', criminal.id)}
-          theme="orange"
+          theme="cyan"
           buttonText={(t('common.edit'))}
           showBackButton={true}
           backRouteName={() => route('criminals.index')}
@@ -254,10 +254,10 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                 {auth.permissions.includes('criminal.delete') && (
                   <Button
                     onClick={() => setIsDeleteDialogOpen(true)}
-                    className="bg-red-500/20 backdrop-blur-md border-red-300/30 text-white hover:bg-red-500/30 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105"
+                    className="bg-cyan-500/20 backdrop-blur-md border-cyan-300/30 text-white hover:bg-cyan-500/30 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105"
                   >
                     <div className="flex items-center gap-2">
-                      <div className="p-1 bg-red-500/20 rounded-lg">
+                      <div className="p-1 bg-cyan-500/20 rounded-lg">
                         <Trash className="h-4 w-4" />
                       </div>
                       {t('criminal.show.delete_button')}
@@ -271,15 +271,15 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
             {/* Photo Upload Card */}
-            <Card className="lg:col-span-1 overflow-hidden border-none shadow-xl bg-gradient-to-bl from-white to-red-50/30">
-              <CardHeader className="bg-gradient-to-l from-red-500 to-red-600 text-white border-b pb-4">
+            <Card className="lg:col-span-1 overflow-hidden border-none shadow-xl bg-gradient-to-bl from-white dark:from-gray-800 to-cyan-50/30 dark:to-cyan-900/20">
+              <CardHeader className="bg-gradient-to-l from-cyan-500 to-cyan-600 dark:from-cyan-600 dark:to-cyan-700 text-white border-b pb-4">
                 <CardTitle className="flex items-center gap-3 text-lg">
                   <div className="p-2 bg-white/20 rounded-lg">
                     <Camera className="h-5 w-5" />
                   </div>
                   {t('criminal.edit.photo.title')}
                 </CardTitle>
-                <CardDescription className="text-red-100">
+                <CardDescription className="text-cyan-100">
                   {t('criminal.edit.photo.description')}
                 </CardDescription>
               </CardHeader>
@@ -287,9 +287,9 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                 <div className="flex flex-col items-center justify-center">
                   <div className={cn(
                     "relative mb-6 h-56 w-56 overflow-hidden rounded-2xl border-2 border-dashed",
-                    "bg-gradient-to-bl from-red-50 to-red-100 text-center transition-all duration-300 hover:border-red-400/50 hover:shadow-xl",
+                    "bg-gradient-to-bl from-cyan-50 dark:from-cyan-900/30 to-cyan-100 dark:to-cyan-800/30 text-center transition-all duration-300 hover:border-cyan-400/50 dark:hover:border-cyan-400/50 hover:shadow-xl",
                     "flex items-center justify-center group",
-                    photoPreview ? "border-red-400/50 shadow-lg" : "border-red-200"
+                    photoPreview ? "border-cyan-400/50 dark:border-cyan-400/50 shadow-lg" : "border-cyan-200 dark:border-cyan-700"
                   )}>
                     {photoPreview ? (
                       <img
@@ -299,11 +299,11 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                       />
                     ) : (
                       <div className="flex h-full w-full flex-col items-center justify-center p-6">
-                        <div className="p-4 bg-gradient-to-br from-red-100 to-red-200 rounded-full mb-3 group-hover:scale-110 transition-transform duration-300">
-                          <Camera className="h-12 w-12 text-red-600" />
+                        <div className="p-4 bg-gradient-to-br from-cyan-100 dark:from-cyan-800 to-cyan-200 dark:to-cyan-700 rounded-full mb-3 group-hover:scale-110 transition-transform duration-300">
+                          <Camera className="h-12 w-12 text-cyan-600 dark:text-cyan-400" />
                         </div>
-                        <p className="text-sm text-red-700 font-medium">{t('criminal.edit.photo.no_photo')}</p>
-                        <p className="text-xs text-red-500 mt-1">{t('criminal.edit.photo.click_to_upload')}</p>
+                        <p className="text-sm text-cyan-700 dark:text-cyan-300 font-medium">{t('criminal.edit.photo.no_photo')}</p>
+                        <p className="text-xs text-cyan-500 dark:text-cyan-400 mt-1">{t('criminal.edit.photo.click_to_upload')}</p>
                       </div>
                     )}
                   </div>
@@ -311,7 +311,7 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                     htmlFor="photo"
                     className={cn(
                       "cursor-pointer rounded-full px-6 py-3 text-sm font-medium transition-all duration-300",
-                      "bg-gradient-to-l from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 shadow-lg hover:shadow-xl hover:scale-105"
+                      "bg-gradient-to-l from-cyan-500 to-cyan-600 dark:from-cyan-600 dark:to-cyan-700 text-white hover:from-cyan-600 hover:to-cyan-700 shadow-lg hover:shadow-xl hover:scale-105"
                     )}
                   >
                     {photoPreview ? t('criminal.edit.photo.change_button') : t('criminal.edit.photo.upload')}
@@ -323,13 +323,13 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                     onChange={handlePhotoChange}
                     className="sr-only"
                   />
-                  {errors.photo && <p className="mt-3 text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2">
+                  {errors.photo && <p className="mt-3 text-sm text-cyan-500 dark:text-cyan-400 font-medium bg-cyan-50 dark:bg-cyan-900/30 p-2 rounded-lg border border-cyan-200 dark:border-cyan-700 flex items-center gap-2">
                     <AlertTriangle className="h-4 w-4" />
                     {errors.photo}
                   </p>}
 
                   <div className="mt-6 text-center max-w-xs">
-                    <p className="text-xs text-red-600 bg-red-50 p-3 rounded-lg border border-red-200">
+                    <p className="text-xs text-cyan-600 bg-cyan-50 p-3 rounded-lg border border-cyan-200">
                       {t('criminal.create.photo.helper_text')}
                     </p>
                   </div>
@@ -338,26 +338,26 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
             </Card>
 
             {/* Main Form Card */}
-            <Card className="lg:col-span-2 border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-orange-50/30">
-              <CardHeader className="bg-gradient-to-l from-orange-500 to-orange-600 text-white border-b pb-4">
+            <Card className="lg:col-span-2 border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-cyan-50/30 dark:to-cyan-900/20">
+              <CardHeader className="bg-gradient-to-l from-cyan-500 to-cyan-600 dark:from-cyan-600 dark:to-cyan-700 text-white border-b pb-4">
                 <CardTitle className="text-lg flex items-center gap-3">
                   <div className="p-2 bg-white/20 rounded-lg">
                     <FileText className="h-5 w-5" />
                   </div>
                   {t('criminal.edit.form.title')}
                 </CardTitle>
-                <CardDescription className="text-orange-100">
+                <CardDescription className="text-cyan-100">
                   {t('criminal.edit.form.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6">
                 <Tabs defaultValue="other" value={activeTab} onValueChange={handleTabChange} className="w-full">
-                  <TabsList className="grid w-full grid-cols-4 mb-6 rounded-xl p-1 bg-gradient-to-l from-orange-100 to-orange-200 shadow-lg">
+                  <TabsList className="grid w-full grid-cols-4 mb-6 rounded-xl p-1 bg-gradient-to-l from-cyan-100 dark:from-cyan-900/30 to-cyan-200 dark:to-cyan-800/30 shadow-lg">
                     <TabsTrigger
                       value="other"
                       className={cn(
-                        "data-[state=active]:bg-gradient-to-l data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
-                        "transition-all duration-300 rounded-lg"
+                        "data-[state=active]:bg-gradient-to-l data-[state=active]:from-cyan-500 data-[state=active]:to-cyan-600 dark:data-[state=active]:from-cyan-600 dark:data-[state=active]:to-cyan-700 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
+                        "transition-all duration-300 rounded-lg text-gray-700 dark:text-gray-300"
                       )}
                     >
                       <BookText className="h-4 w-4" />
@@ -366,8 +366,8 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                     <TabsTrigger
                       value="crime"
                       className={cn(
-                        "data-[state=active]:bg-gradient-to-l data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
-                        "transition-all duration-300 rounded-lg"
+                        "data-[state=active]:bg-gradient-to-l data-[state=active]:from-cyan-500 data-[state=active]:to-cyan-600 dark:data-[state=active]:from-cyan-600 dark:data-[state=active]:to-cyan-700 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
+                        "transition-all duration-300 rounded-lg text-gray-700 dark:text-gray-300"
                       )}
                     >
                       <FileText className="h-4 w-4" />
@@ -376,8 +376,8 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                     <TabsTrigger
                       value="personal"
                       className={cn(
-                        "data-[state=active]:bg-gradient-to-l data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
-                        "transition-all duration-300 rounded-lg"
+                        "data-[state=active]:bg-gradient-to-l data-[state=active]:from-cyan-500 data-[state=active]:to-cyan-600 dark:data-[state=active]:from-cyan-600 dark:data-[state=active]:to-cyan-700 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
+                        "transition-all duration-300 rounded-lg text-gray-700 dark:text-gray-300"
                       )}
                     >
                       <UserRound className="h-4 w-4" />
@@ -386,8 +386,8 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                     <TabsTrigger
                       value="access"
                       className={cn(
-                        "data-[state=active]:bg-gradient-to-l data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
-                        "transition-all duration-300 rounded-lg"
+                        "data-[state=active]:bg-gradient-to-l data-[state=active]:from-cyan-500 data-[state=active]:to-cyan-600 dark:data-[state=active]:from-cyan-600 dark:data-[state=active]:to-cyan-700 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
+                        "transition-all duration-300 rounded-lg text-gray-700 dark:text-gray-300"
                       )}
                     >
                       <Shield className="h-4 w-4" />
@@ -398,8 +398,8 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                   {/* Personal Details Tab */}
                   <TabsContent value="personal" className="space-y-6 pt-2">
                     <div className="space-y-3">
-                      <Label htmlFor="name" className="text-base font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
-                        <span className="text-red-500">*</span>
+                      <Label htmlFor="name" className="text-base font-medium flex items-center gap-2 text-cyan-700 dark:text-cyan-300 text-right" dir="rtl">
+                        <span className="text-cyan-500 dark:text-cyan-400">*</span>
                         {t('criminal.create.fields.full_name')}
                         <Users className="h-4 w-4" />
                       </Label>
@@ -410,10 +410,10 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                           onChange={(e) => setData('name', e.target.value)}
                           required
                           placeholder={t('criminal.create.placeholders.full_name')}
-                          className="h-12 border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white text-right"
+                          className="h-12 border-cyan-200 dark:border-cyan-700 focus:border-cyan-500 dark:focus:border-cyan-400 focus:ring-cyan-500/20 dark:focus:ring-cyan-400/20 bg-gradient-to-l from-cyan-50 dark:from-cyan-900/30 to-white dark:to-gray-800 text-right"
                         />
                       </div>
-                      {errors.name && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                      {errors.name && <p className="text-sm text-cyan-500 dark:text-cyan-400 font-medium bg-cyan-50 dark:bg-cyan-900/30 p-2 rounded-lg border border-cyan-200 dark:border-cyan-700 flex items-center gap-2 text-right">
                         <AlertTriangle className="h-4 w-4" />
                         {errors.name}
                       </p>}
@@ -421,7 +421,7 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="space-y-3">
-                        <Label htmlFor="father_name" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
+                        <Label htmlFor="father_name" className="font-medium flex items-center gap-2 text-cyan-700 dark:text-cyan-300 text-right" dir="rtl">
                           {t('criminal.create.fields.father_name')}
                           <Users className="h-4 w-4" />
                         </Label>
@@ -430,16 +430,16 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                           value={data.father_name}
                           onChange={(e) => setData('father_name', e.target.value)}
                           placeholder={t('criminal.create.placeholders.father_name')}
-                          className="h-12 border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white text-right"
+                          className="h-12 border-cyan-200 dark:border-cyan-700 focus:border-cyan-500 dark:focus:border-cyan-400 focus:ring-cyan-500/20 dark:focus:ring-cyan-400/20 bg-gradient-to-l from-cyan-50 dark:from-cyan-900/30 to-white dark:to-gray-800 text-right"
                         />
-                        {errors.father_name && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                        {errors.father_name && <p className="text-sm text-cyan-500 dark:text-cyan-400 font-medium bg-cyan-50 dark:bg-cyan-900/30 p-2 rounded-lg border border-cyan-200 dark:border-cyan-700 flex items-center gap-2 text-right">
                           <AlertTriangle className="h-4 w-4" />
                           {errors.father_name}
                         </p>}
                       </div>
 
                       <div className="space-y-3">
-                        <Label htmlFor="grandfather_name" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
+                        <Label htmlFor="grandfather_name" className="font-medium flex items-center gap-2 text-cyan-700 dark:text-cyan-300 text-right" dir="rtl">
                           {t('criminal.create.fields.grandfather_name')}
                           <Users className="h-4 w-4" />
                         </Label>
@@ -448,9 +448,9 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                           value={data.grandfather_name}
                           onChange={(e) => setData('grandfather_name', e.target.value)}
                           placeholder={t('criminal.create.placeholders.grandfather_name')}
-                          className="h-12 border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white text-right"
+                          className="h-12 border-cyan-200 dark:border-cyan-700 focus:border-cyan-500 dark:focus:border-cyan-400 focus:ring-cyan-500/20 dark:focus:ring-cyan-400/20 bg-gradient-to-l from-cyan-50 dark:from-cyan-900/30 to-white dark:to-gray-800 text-right"
                         />
-                        {errors.grandfather_name && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                        {errors.grandfather_name && <p className="text-sm text-cyan-500 dark:text-cyan-400 font-medium bg-cyan-50 dark:bg-cyan-900/30 p-2 rounded-lg border border-cyan-200 dark:border-cyan-700 flex items-center gap-2 text-right">
                           <AlertTriangle className="h-4 w-4" />
                           {errors.grandfather_name}
                         </p>}
@@ -459,7 +459,7 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="space-y-3">
-                        <Label htmlFor="id_card_number" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
+                        <Label htmlFor="id_card_number" className="font-medium flex items-center gap-2 text-cyan-700 dark:text-cyan-300 text-right" dir="rtl">
                           {t('criminal.create.fields.id_card_number')}
                           <IdCard className="h-4 w-4" />
                         </Label>
@@ -468,16 +468,16 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                           value={data.id_card_number}
                           onChange={(e) => setData('id_card_number', e.target.value)}
                           placeholder={t('criminal.create.placeholders.id_card_number')}
-                          className="h-12 border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white text-right"
+                          className="h-12 border-cyan-200 dark:border-cyan-700 focus:border-cyan-500 dark:focus:border-cyan-400 focus:ring-cyan-500/20 dark:focus:ring-cyan-400/20 bg-gradient-to-l from-cyan-50 dark:from-cyan-900/30 to-white dark:to-gray-800 text-right"
                         />
-                        {errors.id_card_number && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                        {errors.id_card_number && <p className="text-sm text-cyan-500 dark:text-cyan-400 font-medium bg-cyan-50 dark:bg-cyan-900/30 p-2 rounded-lg border border-cyan-200 dark:border-cyan-700 flex items-center gap-2 text-right">
                           <AlertTriangle className="h-4 w-4" />
                           {errors.id_card_number}
                         </p>}
                       </div>
 
                       <div className="space-y-3">
-                        <Label htmlFor="phone_number" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
+                        <Label htmlFor="phone_number" className="font-medium flex items-center gap-2 text-cyan-700 dark:text-cyan-300 text-right" dir="rtl">
                           {t('criminal.create.fields.phone_number')}
                           <Phone className="h-4 w-4" />
                         </Label>
@@ -486,9 +486,9 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                           value={data.phone_number}
                           onChange={(e) => setData('phone_number', e.target.value)}
                           placeholder={t('criminal.create.placeholders.phone_number')}
-                          className="h-12 border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white text-right"
+                          className="h-12 border-cyan-200 dark:border-cyan-700 focus:border-cyan-500 dark:focus:border-cyan-400 focus:ring-cyan-500/20 dark:focus:ring-cyan-400/20 bg-gradient-to-l from-cyan-50 dark:from-cyan-900/30 to-white dark:to-gray-800 text-right"
                         />
-                        {errors.phone_number && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                        {errors.phone_number && <p className="text-sm text-cyan-500 dark:text-cyan-400 font-medium bg-cyan-50 dark:bg-cyan-900/30 p-2 rounded-lg border border-cyan-200 dark:border-cyan-700 flex items-center gap-2 text-right">
                           <AlertTriangle className="h-4 w-4" />
                           {errors.phone_number}
                         </p>}
@@ -496,7 +496,7 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                     </div>
 
                     <div className="space-y-3">
-                      <Label htmlFor="original_residence" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
+                      <Label htmlFor="original_residence" className="font-medium flex items-center gap-2 text-cyan-700 dark:text-cyan-300 text-right" dir="rtl">
                         {t('criminal.create.fields.original_residence')}
                         <Home className="h-4 w-4" />
                       </Label>
@@ -506,16 +506,16 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                         onChange={(e) => setData('original_residence', e.target.value)}
                         rows={2}
                         placeholder={t('criminal.create.placeholders.original_residence')}
-                        className="min-h-[80px] resize-none border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white text-right"
+                        className="min-h-[80px] resize-none border-cyan-200 dark:border-cyan-700 focus:border-cyan-500 dark:focus:border-cyan-400 focus:ring-cyan-500/20 dark:focus:ring-cyan-400/20 bg-gradient-to-l from-cyan-50 dark:from-cyan-900/30 to-white dark:to-gray-800 text-right"
                       />
-                      {errors.original_residence && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                      {errors.original_residence && <p className="text-sm text-cyan-500 dark:text-cyan-400 font-medium bg-cyan-50 dark:bg-cyan-900/30 p-2 rounded-lg border border-cyan-200 dark:border-cyan-700 flex items-center gap-2 text-right">
                         <AlertTriangle className="h-4 w-4" />
                         {errors.original_residence}
                       </p>}
                     </div>
 
                     <div className="space-y-3">
-                      <Label htmlFor="current_residence" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
+                      <Label htmlFor="current_residence" className="font-medium flex items-center gap-2 text-cyan-700 dark:text-cyan-300 text-right" dir="rtl">
                         {t('criminal.create.fields.current_residence')}
                         <MapPin className="h-4 w-4" />
                       </Label>
@@ -525,16 +525,16 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                         onChange={(e) => setData('current_residence', e.target.value)}
                         rows={2}
                         placeholder={t('criminal.create.placeholders.current_residence')}
-                        className="min-h-[80px] resize-none border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white text-right"
+                        className="min-h-[80px] resize-none border-cyan-200 dark:border-cyan-700 focus:border-cyan-500 dark:focus:border-cyan-400 focus:ring-cyan-500/20 dark:focus:ring-cyan-400/20 bg-gradient-to-l from-cyan-50 dark:from-cyan-900/30 to-white dark:to-gray-800 text-right"
                       />
-                      {errors.current_residence && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                      {errors.current_residence && <p className="text-sm text-cyan-500 dark:text-cyan-400 font-medium bg-cyan-50 dark:bg-cyan-900/30 p-2 rounded-lg border border-cyan-200 dark:border-cyan-700 flex items-center gap-2 text-right">
                         <AlertTriangle className="h-4 w-4" />
                         {errors.current_residence}
                       </p>}
                     </div>
 
                     <div className="space-y-3">
-                      <Label htmlFor="department_id" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
+                      <Label htmlFor="department_id" className="font-medium flex items-center gap-2 text-cyan-700 dark:text-cyan-300 text-right" dir="rtl">
                         {t('criminal.create.fields.department')}
                         <Building2 className="h-4 w-4" />
                       </Label>
@@ -542,7 +542,7 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                         value={data.department_id}
                         onValueChange={(value) => setData('department_id', value)}
                       >
-                        <SelectTrigger id="department_id" className="h-12 border-orange-200 focus:border-orange-500 focus:ring-orange-500/20 bg-gradient-to-l from-orange-50 to-white text-right">
+                        <SelectTrigger id="department_id" className="h-12 border-cyan-200 dark:border-cyan-700 focus:border-cyan-500 dark:focus:border-cyan-400 focus:ring-cyan-500/20 dark:focus:ring-cyan-400/20 bg-gradient-to-l from-cyan-50 dark:from-cyan-900/30 to-white dark:to-gray-800 text-right">
                           <SelectValue placeholder={t('criminal.create.placeholders.department')} />
                         </SelectTrigger>
                         <SelectContent>
@@ -554,11 +554,11 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                               </SelectItem>
                             ))
                           ) : (
-                            <div className="p-2 text-sm text-orange-500 bg-orange-50 rounded-lg">{t('criminal.create.no_departments')}</div>
+                            <div className="p-2 text-sm text-cyan-500 dark:text-cyan-400 bg-cyan-50 rounded-lg">{t('criminal.create.no_departments')}</div>
                           )}
                         </SelectContent>
                       </Select>
-                      {errors.department_id && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                      {errors.department_id && <p className="text-sm text-cyan-500 dark:text-cyan-400 font-medium bg-cyan-50 dark:bg-cyan-900/30 p-2 rounded-lg border border-cyan-200 dark:border-cyan-700 flex items-center gap-2 text-right">
                         <AlertTriangle className="h-4 w-4" />
                         {errors.department_id}
                       </p>}
@@ -569,7 +569,7 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                   <TabsContent value="crime" className="space-y-6 pt-2">
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="space-y-3">
-                        <Label htmlFor="number" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
+                        <Label htmlFor="number" className="font-medium flex items-center gap-2 text-cyan-700 dark:text-cyan-300 text-right" dir="rtl">
                           {t('criminal.create.fields.record_number')}
                           <FileText className="h-4 w-4" />
                         </Label>
@@ -578,13 +578,13 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                           value={data.number}
                           onChange={(e) => setData('number', e.target.value)}
                           placeholder={t('criminal.create.placeholders.record_number')}
-                          className="h-11 text-right"
+                          className="h-11 text-right border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                         />
-                        {errors.number && <p className="text-sm text-red-500 font-medium text-right">{errors.number}</p>}
+                        {errors.number && <p className="text-sm text-cyan-500 dark:text-cyan-400 font-medium text-right">{errors.number}</p>}
                       </div>
 
                       <div className="space-y-3">
-                        <Label htmlFor="crime_type" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
+                        <Label htmlFor="crime_type" className="font-medium flex items-center gap-2 text-cyan-700 dark:text-cyan-300 text-right" dir="rtl">
                           {t('criminal.create.fields.crime_type')}
                           <Gavel className="h-4 w-4" />
                         </Label>
@@ -593,15 +593,15 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                           value={data.crime_type}
                           onChange={(e) => setData('crime_type', e.target.value)}
                           placeholder={t('criminal.create.placeholders.crime_type')}
-                          className="h-11 text-right"
+                          className="h-11 text-right border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                         />
-                        {errors.crime_type && <p className="text-sm text-red-500 font-medium text-right">{errors.crime_type}</p>}
+                        {errors.crime_type && <p className="text-sm text-cyan-500 dark:text-cyan-400 font-medium text-right">{errors.crime_type}</p>}
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="space-y-3">
-                        <Label htmlFor="arrest_date" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
+                        <Label htmlFor="arrest_date" className="font-medium flex items-center gap-2 text-cyan-700 dark:text-cyan-300 text-right" dir="rtl">
                           {t('criminal.create.fields.arrest_date')}
                           <Calendar className="h-4 w-4" />
                         </Label>
@@ -611,15 +611,15 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                             type="date"
                             value={data.arrest_date}
                             onChange={(e) => setData('arrest_date', e.target.value)}
-                            className="h-11 text-right"
+                            className="h-11 text-right border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                           />
-                          <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400 pointer-events-none" />
+                          <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400 dark:text-neutral-500 pointer-events-none" />
                         </div>
-                        {errors.arrest_date && <p className="text-sm text-red-500 font-medium text-right">{errors.arrest_date}</p>}
+                        {errors.arrest_date && <p className="text-sm text-cyan-500 dark:text-cyan-400 font-medium text-right">{errors.arrest_date}</p>}
                       </div>
 
                       <div className="space-y-3">
-                        <Label htmlFor="arrest_location" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
+                        <Label htmlFor="arrest_location" className="font-medium flex items-center gap-2 text-cyan-700 dark:text-cyan-300 text-right" dir="rtl">
                           {t('criminal.create.fields.arrest_location')}
                           <MapPin className="h-4 w-4" />
                         </Label>
@@ -628,15 +628,15 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                           value={data.arrest_location}
                           onChange={(e) => setData('arrest_location', e.target.value)}
                           placeholder={t('criminal.create.placeholders.arrest_location')}
-                          className="h-11 text-right"
+                          className="h-11 text-right border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                         />
-                        {errors.arrest_location && <p className="text-sm text-red-500 font-medium text-right">{errors.arrest_location}</p>}
+                        {errors.arrest_location && <p className="text-sm text-cyan-500 dark:text-cyan-400 font-medium text-right">{errors.arrest_location}</p>}
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="space-y-3">
-                        <Label htmlFor="arrested_by" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
+                        <Label htmlFor="arrested_by" className="font-medium flex items-center gap-2 text-cyan-700 dark:text-cyan-300 text-right" dir="rtl">
                           {t('criminal.create.fields.arrested_by')}
                           <Shield className="h-4 w-4" />
                         </Label>
@@ -645,29 +645,29 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                           value={data.arrested_by}
                           onChange={(e) => setData('arrested_by', e.target.value)}
                           placeholder={t('criminal.create.placeholders.arrested_by')}
-                          className="h-11 text-right"
+                          className="h-11 text-right border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                         />
-                        {errors.arrested_by && <p className="text-sm text-red-500 font-medium text-right">{errors.arrested_by}</p>}
+                        {errors.arrested_by && <p className="text-sm text-cyan-500 dark:text-cyan-400 font-medium text-right">{errors.arrested_by}</p>}
                       </div>
 
                       <div className="space-y-3">
-                        <Label htmlFor="referred_to" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
-                          {t('criminal.create.fields.referred_to')}
+                        <Label htmlFor="refercyan_to" className="font-medium flex items-center gap-2 text-cyan-700 dark:text-cyan-300 text-right" dir="rtl">
+                          {t('criminal.create.fields.refercyan_to')}
                           <Building2 className="h-4 w-4" />
                         </Label>
                         <Input
-                          id="referred_to"
-                          value={data.referred_to}
-                          onChange={(e) => setData('referred_to', e.target.value)}
-                          placeholder={t('criminal.create.placeholders.referred_to')}
-                          className="h-11 text-right"
+                          id="refercyan_to"
+                          value={data.refercyan_to}
+                          onChange={(e) => setData('refercyan_to', e.target.value)}
+                          placeholder={t('criminal.create.placeholders.refercyan_to')}
+                          className="h-11 text-right border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                         />
-                        {errors.referred_to && <p className="text-sm text-red-500 font-medium text-right">{errors.referred_to}</p>}
+                        {errors.refercyan_to && <p className="text-sm text-cyan-500 dark:text-cyan-400 font-medium text-right">{errors.refercyan_to}</p>}
                       </div>
                     </div>
 
                     <div className="space-y-3">
-                      <Label htmlFor="final_verdict" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
+                      <Label htmlFor="final_verdict" className="font-medium flex items-center gap-2 text-cyan-700 dark:text-cyan-300 text-right" dir="rtl">
                         {t('criminal.create.fields.final_verdict')}
                         <FileCheck className="h-4 w-4" />
                       </Label>
@@ -677,16 +677,16 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                         onChange={(e) => setData('final_verdict', e.target.value)}
                         rows={3}
                         placeholder={t('criminal.create.placeholders.final_verdict')}
-                        className="min-h-[120px] resize-none text-right"
+                        className="min-h-[120px] resize-none text-right border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                       />
-                      {errors.final_verdict && <p className="text-sm text-red-500 font-medium text-right">{errors.final_verdict}</p>}
+                      {errors.final_verdict && <p className="text-sm text-cyan-500 dark:text-cyan-400 font-medium text-right">{errors.final_verdict}</p>}
                     </div>
                   </TabsContent>
 
                   {/* Other Information Tab */}
                   <TabsContent value="other" className="space-y-6 pt-2">
                     <div className="space-y-3">
-                      <Label htmlFor="notes" className="font-medium flex items-center gap-2 text-orange-700 text-right" dir="rtl">
+                      <Label htmlFor="notes" className="font-medium flex items-center gap-2 text-cyan-700 dark:text-cyan-300 text-right" dir="rtl">
                         {t('criminal.create.fields.notes')}
                         <BookText className="h-4 w-4" />
                       </Label>
@@ -696,11 +696,11 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                         onChange={(e) => setData('notes', e.target.value)}
                         rows={8}
                         placeholder={t('criminal.create.placeholders.notes')}
-                        className="min-h-[240px] text-right"
+                        className="min-h-[240px] text-right border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                       />
-                      {errors.notes && <p className="text-sm text-red-500 font-medium text-right">{errors.notes}</p>}
+                      {errors.notes && <p className="text-sm text-cyan-500 dark:text-cyan-400 font-medium text-right">{errors.notes}</p>}
 
-                      <p className="text-xs text-neutral-500 mt-2 text-right">
+                      <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2 text-right">
                         {t('criminal.create.notes_helper')}
                       </p>
                     </div>
@@ -709,10 +709,10 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                   {/* Access Control Tab */}
                   <TabsContent value="access" className="space-y-6 pt-2">
                     <div className="space-y-6">
-                      <div className="bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800 rounded-lg p-6 border border-orange-200 dark:border-orange-700">
+                      <div className="bg-gradient-to-l from-cyan-50 dark:from-cyan-900/20 to-white dark:to-gray-800 rounded-lg p-6 border border-cyan-200 dark:border-cyan-700">
                         <div className="flex items-center gap-2 mb-4">
-                          <Shield className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-                          <h3 className="text-lg font-semibold text-orange-700 dark:text-orange-300">
+                          <Shield className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
+                          <h3 className="text-lg font-semibold text-cyan-700 dark:text-cyan-300 dark:text-cyan-300">
                             {t('criminal.access.title')}
                           </h3>
                         </div>
@@ -722,7 +722,7 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
 
                         {/* User Search */}
                         <div className="space-y-4">
-                          <Label className="text-base font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300 text-right" dir="rtl">
+                          <Label className="text-base font-medium flex items-center gap-2 text-cyan-700 dark:text-cyan-300 dark:text-cyan-300 text-right" dir="rtl">
                             <Users className="h-4 w-4" />
                             {t('criminal.access.select_users')}
                           </Label>
@@ -736,30 +736,30 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                               value={userSearchTerm}
                               onChange={(e) => setUserSearchTerm(e.target.value)}
                               placeholder={t('criminal.access.search_users')}
-                              className="text-right border-orange-200 dark:border-orange-700 focus:border-orange-500 dark:focus:border-orange-400 focus:ring-orange-500/20 dark:focus:ring-orange-400/20 bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800"
+                              className="text-right border-cyan-200 dark:border-cyan-700 focus:border-cyan-500 dark:focus:border-cyan-400 focus:ring-cyan-500/20 dark:focus:ring-cyan-400/20 bg-gradient-to-l from-cyan-50 dark:from-cyan-900/20 to-white dark:to-gray-800"
                             />
                           </div>
 
                           {/* User Search Results */}
-                          {userSearchTerm && filteredUsers.length > 0 && (
-                            <div className="border border-orange-200 dark:border-orange-700 rounded-xl bg-white dark:bg-gray-800 max-h-48 overflow-y-auto shadow-lg">
-                              {filteredUsers.map((user) => (
+                          {userSearchTerm && filtecyanUsers.length > 0 && (
+                            <div className="border border-cyan-200 dark:border-cyan-700 rounded-xl bg-white dark:bg-gray-800 max-h-48 overflow-y-auto shadow-lg">
+                              {filtecyanUsers.map((user) => (
                                 <div
                                   key={user.id}
                                   onClick={() => handleUserSelect(user.id)}
-                                  className="p-4 hover:bg-gradient-to-r hover:from-orange-50 hover:to-amber-50 dark:hover:from-orange-900/20 dark:hover:to-amber-900/20 cursor-pointer border-b border-orange-100 dark:border-orange-800 last:border-b-0 transition-all duration-200 hover:shadow-sm"
+                                  className="p-4 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-amber-50 dark:hover:from-cyan-900/20 dark:hover:to-amber-900/20 cursor-pointer border-b border-cyan-100 dark:border-cyan-800 last:border-b-0 transition-all duration-200 hover:shadow-sm"
                                 >
                                   <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3 text-right">
-                                      <div className="p-2 bg-orange-100 dark:bg-orange-800 rounded-full">
-                                        <Users className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                                      <div className="p-2 bg-cyan-100 dark:bg-cyan-800 rounded-full">
+                                        <Users className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
                                       </div>
                                       <div>
                                         <p className="font-semibold text-gray-900 dark:text-gray-100">{user.name}</p>
                                         <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
                                       </div>
                                     </div>
-                                    <div className="text-orange-500 dark:text-orange-400">
+                                    <div className="text-cyan-500 dark:text-cyan-400 dark:text-cyan-400">
                                       <ArrowRight className="h-4 w-4" />
                                     </div>
                                   </div>
@@ -768,7 +768,7 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                             </div>
                           )}
 
-                          {userSearchTerm && filteredUsers.length === 0 && (
+                          {userSearchTerm && filtecyanUsers.length === 0 && (
                             <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
                               {t('criminal.access.no_users_found')}
                             </p>
@@ -778,11 +778,11 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                         {/* Selected Users */}
                         <div className="mt-6">
                           <div className="flex items-center justify-between mb-4">
-                            <Label className="text-base font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300 text-right" dir="rtl">
+                            <Label className="text-base font-medium flex items-center gap-2 text-cyan-700 dark:text-cyan-300 dark:text-cyan-300 text-right" dir="rtl">
                               <Users className="h-4 w-4" />
                               {t('criminal.access.selected_users')}
                               {selectedUsers.length > 0 && (
-                                <span className="px-2 py-1 text-xs bg-orange-100 dark:bg-orange-800 text-orange-800 dark:text-orange-200 rounded-full">
+                                <span className="px-2 py-1 text-xs bg-cyan-100 dark:bg-cyan-800 text-cyan-800 dark:text-cyan-200 rounded-full">
                                   {selectedUsers.length}
                                 </span>
                               )}
@@ -800,7 +800,7 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                 setSelectedUsers([criminal.created_by]);
               }
             }}
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20 border-red-200 dark:border-red-700"
+                                className="text-cyan-600 hover:text-cyan-700 dark:text-cyan-300 hover:bg-cyan-50 dark:text-cyan-400 dark:hover:text-cyan-300 dark:hover:bg-cyan-900/20 border-cyan-200 dark:border-cyan-700"
                               >
                                 <Trash className="h-3 w-3 mr-1" />
                                 {t('criminal.access.remove_all')}
@@ -823,19 +823,19 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                                     className={`group flex items-center justify-between p-4 rounded-xl border transition-all duration-300 hover:shadow-md ${
                                       isCreator 
                                         ? 'bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700 hover:border-green-300 dark:hover:border-green-600' 
-                                        : 'bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 border-orange-200 dark:border-orange-700 hover:border-orange-300 dark:hover:border-orange-600'
+                                        : 'bg-gradient-to-r from-cyan-50 to-amber-50 dark:from-cyan-900/20 dark:to-amber-900/20 border-cyan-200 dark:border-cyan-700 hover:border-cyan-300 dark:hover:border-cyan-600'
                                     }`}
                                   >
                                     <div className="flex items-center gap-3 text-right">
                                       <div className={`p-2 rounded-full ${
                                         isCreator 
                                           ? 'bg-green-100 dark:bg-green-800' 
-                                          : 'bg-orange-100 dark:bg-orange-800'
+                                          : 'bg-cyan-100 dark:bg-cyan-800'
                                       }`}>
                                         <Users className={`h-4 w-4 ${
                                           isCreator 
                                             ? 'text-green-600 dark:text-green-400' 
-                                            : 'text-orange-600 dark:text-orange-400'
+                                            : 'text-cyan-600 dark:text-cyan-400'
                                         }`} />
                                       </div>
                                       <div>
@@ -860,7 +860,7 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                                           e.stopPropagation();
                                           handleUserRemoveClick(userId);
                                         }}
-                                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20 border-red-200 dark:border-red-700 hover:border-red-300 dark:hover:border-red-600"
+                                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-cyan-600 hover:text-cyan-700 dark:text-cyan-300 hover:bg-cyan-50 dark:text-cyan-400 dark:hover:text-cyan-300 dark:hover:bg-cyan-900/20 border-cyan-200 dark:border-cyan-700 hover:border-cyan-300 dark:hover:border-cyan-600"
                                       >
                                         <Trash className="h-3 w-3 mr-1" />
                                         {t('criminal.access.remove_user')}
@@ -899,20 +899,20 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
                 </Tabs>
               </CardContent>
 
-              <CardFooter className="flex justify-between border-t px-6 py-5 bg-gradient-to-l from-orange-50 to-orange-100">
+              <CardFooter className="flex justify-between border-t px-6 py-5 bg-gradient-to-l from-cyan-50 dark:from-cyan-900/30 to-cyan-100 dark:to-cyan-800/30">
                 <Button
                   variant="outline"
                   onClick={() => window.location.href = route('criminals.show', criminal.id)}
                   type="button"
                   disabled={processing}
-                  className="rounded-full border-orange-300 text-orange-700 hover:bg-orange-100 hover:border-orange-400 shadow-lg"
+                  className="rounded-full border-cyan-300 dark:border-cyan-600 text-cyan-700 dark:text-cyan-300 hover:bg-cyan-100 dark:hover:bg-cyan-800/30 hover:border-cyan-400 dark:hover:border-cyan-500 shadow-lg"
                 >
                   {t('common.cancel')}
                 </Button>
                 <Button
                   type="submit"
                   disabled={processing}
-                  className="rounded-full px-8 font-medium bg-gradient-to-l from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="rounded-full px-8 font-medium bg-gradient-to-l from-cyan-500 to-cyan-600 dark:from-cyan-600 dark:to-cyan-700 hover:from-cyan-600 hover:to-cyan-700 dark:hover:from-cyan-700 dark:hover:to-cyan-800 text-white shadow-lg hover:shadow-xl transition-all duration-300"
                 >
                   {processing ? t('criminal.edit.saving') : t('criminal.edit.update')}
                 </Button>
@@ -925,7 +925,7 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
         <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-red-600">
+              <DialogTitle className="flex items-center gap-2 text-cyan-600">
                 <AlertTriangle className="h-5 w-5" />
                 {t('criminal.delete.confirm_title')}
               </DialogTitle>
@@ -943,7 +943,7 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
               </Button>
               <Button
                 onClick={handleDelete}
-                className="bg-red-600 hover:bg-red-700 text-white"
+                className="bg-cyan-600 hover:bg-cyan-700 text-white"
               >
                 {t('criminal.delete.confirm_button')}
               </Button>
@@ -955,7 +955,7 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
         <Dialog open={isRemoveUserDialogOpen} onOpenChange={setIsRemoveUserDialogOpen}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-orange-600">
+              <DialogTitle className="flex items-center gap-2 text-cyan-600">
                 <Users className="h-5 w-5" />
                 {t('criminal.access.remove_user_confirm_title')}
               </DialogTitle>
@@ -976,7 +976,7 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
               </Button>
               <Button
                 onClick={confirmUserRemove}
-                className="bg-orange-600 hover:bg-orange-700 text-white"
+                className="bg-cyan-600 hover:bg-cyan-700 text-white"
               >
                 {t('criminal.access.remove_user_confirm_button')}
               </Button>
