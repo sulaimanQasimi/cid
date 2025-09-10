@@ -73,7 +73,23 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
             icon: Folder
         });
     }
-
+    const nationalInsightCenterItems: NavItem[] = [];
+    if (auth.permissions.includes('national_insight_center_info.view_any')) {
+        nationalInsightCenterItems.push({
+            title: t('sidebar.national_insight_center'),
+            href: '/national-insight-center-infos',
+            icon: Target
+        });
+    }
+    if (nationalInsightCenterItems.length > 0) {
+        navigation.push({
+            title: t('sidebar.national_insight_center'),
+            href: '#national-insight-center',
+            icon: Target,
+            items: nationalInsightCenterItems
+        });
+    }
+    
     if (intelligenceItems.length > 0) {
         navigation.push({
             title: t('sidebar.intelligence_operations'),

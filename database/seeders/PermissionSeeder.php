@@ -101,6 +101,26 @@ class PermissionSeeder extends Seeder
             ['name' => 'info_type.restore', 'label' => 'بازیابی نوع اطلاعات'],
             ['name' => 'info_type.force_delete', 'label' => 'حذف دائمی نوع اطلاعات'],
 
+            // National Insight Center Info permissions
+            ['name' => 'national_insight_center_info.view_any', 'label' => 'مشاهده همه اطلاعات مرکز ملی بصیر'],
+            ['name' => 'national_insight_center_info.view', 'label' => 'مشاهده اطلاعات مرکز ملی بصیر'],
+            ['name' => 'national_insight_center_info.create', 'label' => 'ایجاد اطلاعات مرکز ملی بصیر'],
+            ['name' => 'national_insight_center_info.update', 'label' => 'ویرایش اطلاعات مرکز ملی بصیر'],
+            ['name' => 'national_insight_center_info.delete', 'label' => 'حذف اطلاعات مرکز ملی بصیر'],
+            ['name' => 'national_insight_center_info.confirm', 'label' => 'تایید اطلاعات مرکز ملی بصیر'],
+            ['name' => 'national_insight_center_info.restore', 'label' => 'بازیابی اطلاعات مرکز ملی بصیر'],
+            ['name' => 'national_insight_center_info.force_delete', 'label' => 'حذف دائمی اطلاعات مرکز ملی بصیر'],
+
+            // National Insight Center Info Item permissions
+            ['name' => 'national_insight_center_info_item.view_any', 'label' => 'مشاهده همه آیتم‌های اطلاعات مرکز ملی بصیر'],
+            ['name' => 'national_insight_center_info_item.view', 'label' => 'مشاهده آیتم اطلاعات مرکز ملی بصیر'],
+            ['name' => 'national_insight_center_info_item.create', 'label' => 'ایجاد آیتم اطلاعات مرکز ملی بصیر'],
+            ['name' => 'national_insight_center_info_item.update', 'label' => 'ویرایش آیتم اطلاعات مرکز ملی بصیر'],
+            ['name' => 'national_insight_center_info_item.delete', 'label' => 'حذف آیتم اطلاعات مرکز ملی بصیر'],
+            ['name' => 'national_insight_center_info_item.confirm', 'label' => 'تایید آیتم اطلاعات مرکز ملی بصیر'],
+            ['name' => 'national_insight_center_info_item.restore', 'label' => 'بازیابی آیتم اطلاعات مرکز ملی بصیر'],
+            ['name' => 'national_insight_center_info_item.force_delete', 'label' => 'حذف دائمی آیتم اطلاعات مرکز ملی بصیر'],
+
             // Language permissions
             ['name' => 'language.view_any', 'label' => 'مشاهده همه زبان‌ها'],
             ['name' => 'language.view', 'label' => 'مشاهده زبان'],
@@ -234,6 +254,8 @@ class PermissionSeeder extends Seeder
             'info.view_any', 'info.view', 'info.create', 'info.update', 'info.confirm',
             'info_category.view_any', 'info_category.view', 'info_category.confirm',
             'info_type.view_any', 'info_type.view', 'info_type.confirm',
+            'national_insight_center_info.view_any', 'national_insight_center_info.view', 'national_insight_center_info.confirm',
+            'national_insight_center_info_item.view_any', 'national_insight_center_info_item.view', 'national_insight_center_info_item.confirm',
            
             'report.view_any', 'report.view', 'report.create', 'report.update',
             'report_stat.view_any', 'report_stat.view', 'report_stat.create', 'report_stat.update',

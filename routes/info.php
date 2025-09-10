@@ -3,6 +3,8 @@
 use App\Http\Controllers\InfoController;
 use App\Http\Controllers\InfoTypeController;
 use App\Http\Controllers\InfoCategoryController;
+use App\Http\Controllers\NationalInsightCenterInfoController;
+use App\Http\Controllers\NationalInsightCenterInfoItemController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
@@ -18,4 +20,14 @@ Route::middleware(['auth'])->group(function () {
     // Info routes (without index and create)
     Route::resource('infos', InfoController::class)->except(['index', 'create']);
     Route::patch('infos/{info}/confirm', [InfoController::class, 'confirm'])->name('infos.confirm');
+
+    // National Insight Center Info routes
+    Route::resource('national-insight-center-infos', NationalInsightCenterInfoController::class);
+    Route::get('national-insight-center-infos/{nationalInsightCenterInfo}/stats', [NationalInsightCenterInfoController::class, 'manageStats'])->name('national-insight-center-infos.stats');
+    Route::put('national-insight-center-infos/{nationalInsightCenterInfo}/stats', [NationalInsightCenterInfoController::class, 'updateStats'])->name('national-insight-center-infos.stats.update');
+    Route::get('national-insight-center-infos/{nationalInsightCenterInfo}/print', [NationalInsightCenterInfoController::class, 'print'])->name('national-insight-center-infos.print');
+
+    // National Insight Center Info Item routes
+    Route::resource('national-insight-center-info-items', NationalInsightCenterInfoItemController::class);
+    Route::patch('national-insight-center-info-items/{nationalInsightCenterInfoItem}/confirm', [NationalInsightCenterInfoItemController::class, 'confirm'])->name('national-insight-center-info-items.confirm');
 });

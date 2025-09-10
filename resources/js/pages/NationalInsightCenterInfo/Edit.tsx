@@ -1,0 +1,408 @@
+import React from 'react';
+import { Head, Link, useForm } from '@inertiajs/react';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { ArrowLeft, FileText, BarChart3, Save, X, AlertTriangle, Building2, Users, Search, ArrowRight, Trash, User } from 'lucide-react';
+import { useTranslation } from '@/lib/i18n/translate';
+import { usePermissions } from '@/hooks/use-permissions';
+import { CanUpdate } from '@/components/ui/permission-guard';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import TreeViewStatSelector from '@/components/reports/TreeViewStatSelector';
+import { useState, useEffect } from 'react';
+import { Badge } from '@/components/ui/badge';
+import Header from '@/components/template/header';
+import FooterButtons from '@/components/template/FooterButtons';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+interface StatCategory {
+  id: number;
+  name: string;
+  label: string;
+  color: string;
+  status: string;
+}
+
+interface StatCategoryItem {
+  id: number;
+  name: string;
+  label: string;
+  color: string | null;
+  parent_id: number | null;
+  category: {
+    id: number;
+    name: string;
+    label: string;
+    color: string;
+  };
+}
+
+interface InfoStat {
+  id: number;
+  stat_category_item_id: number;
+  string_value: string;
+  notes: string | null;
+  stat_category_item: {
+    id: number;
+    name: string;
+    label: string;
+    category: {
+      id: number;
+      name: string;
+      label: string;
+      color: string;
+    };
+  };
+}
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+interface NationalInsightCenterInfo {
+  id: number;
+  name: string;
+  code: string;
+  description: string | null;
+  created_at: string;
+  updated_at: string;
+  infoStats: InfoStat[];
+}
+
+interface EditProps {
+  nationalInsightCenterInfo: NationalInsightCenterInfo;
+  statItems: StatCategoryItem[];
+  statCategories: StatCategory[];
+  users: User[];
+}
+
+type NationalInsightCenterInfoFormData = {
+  name: string;
+  code?: string;
+  description?: string;
+  access_users?: number[];
+  stats?: Array<{
+    stat_category_item_id: number;
+    value: string;
+    notes?: string;
+  }>;
+};
+
+export default function NationalInsightCenterInfosEdit({ nationalInsightCenterInfo, statItems, statCategories, users }: EditProps) {
+  const { t } = useTranslation();
+  const { canUpdate } = usePermissions();
+
+  const { data, setData, put, processing, errors } = useForm<NationalInsightCenterInfoFormData>({
+    name: nationalInsightCenterInfo.name || '',
+    code: nationalInsightCenterInfo.code || '',
+    description: nationalInsightCenterInfo.description || '',
+    access_users: [] as number[],
+  });
+
+  // State for managing statistical data
+  const [statsData, setStatsData] = useState<{
+    [key: number]: { value: string; notes: string | null };
+  }>({});
+
+  // Add state for category filter
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+
+  // Access control state
+  const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
+  const [userSearchTerm, setUserSearchTerm] = useState<string>('');
+
+  // Initialize stats data from existing stats
+  useEffect(() => {
+    const initialStatsData: { [key: number]: { value: string; notes: string | null } } = {};
+    nationalInsightCenterInfo.infoStats?.forEach(stat => {
+      initialStatsData[stat.stat_category_item_id] = {
+        value: stat.string_value || '',
+        notes: stat.notes
+      };
+    });
+    setStatsData(initialStatsData);
+  }, [nationalInsightCenterInfo.infoStats]);
+
+  const breadcrumbs: BreadcrumbItem[] = [
+    {
+      title: t('info.page_title'),
+      href: route('national-insight-center-infos.index'),
+    },
+    {
+      title: t('national_insight_center_info.page_title'),
+      href: route('national-insight-center-infos.index'),
+    },
+    {
+      title: nationalInsightCenterInfo.name,
+      href: route('national-insight-center-infos.show', nationalInsightCenterInfo.id),
+    },
+    {
+      title: t('national_insight_center_info.edit.page_title'),
+      href: '#',
+    },
+  ];
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Prepare stats data for submission
+    const stats = Object.entries(statsData)
+      .filter(([_, { value }]) => value.trim() !== '')
+      .map(([itemId, { value, notes }]) => ({
+        stat_category_item_id: parseInt(itemId),
+        value,
+        notes: notes || undefined,
+      }));
+
+    // Add stats to form data
+    if (stats.length > 0) {
+      setData('stats', stats);
+    }
+
+    // Submit the form
+    put(route('national-insight-center-infos.update', nationalInsightCenterInfo.id));
+  };
+
+  // Group stat items by category for the dropdown filter
+  const categoriesForFilter = statCategories.map(category => ({
+    id: category.id,
+    label: category.label,
+    color: category.color
+  }));
+
+  // Filter stat items by category if one is selected
+  const filteredStatItems = selectedCategory
+    ? statItems.filter(item => item.category.id === selectedCategory)
+    : statItems;
+
+  // Handle stat input change
+  function handleStatChange(itemId: number, value: string) {
+    setStatsData(prev => ({
+      ...prev,
+      [itemId]: { ...prev[itemId] || { notes: null }, value }
+    }));
+  }
+
+  // Handle stat notes change
+  function handleNotesChange(itemId: number, notes: string) {
+    setStatsData(prev => ({
+      ...prev,
+      [itemId]: { ...prev[itemId] || { value: '' }, notes: notes || null }
+    }));
+  }
+
+  const statsCount = Object.keys(statsData).length;
+
+  // Access control functions
+  const handleUserSelect = (userId: number) => {
+    if (!selectedUsers.includes(userId)) {
+      setSelectedUsers(prev => [...prev, userId]);
+      setData('access_users', [...selectedUsers, userId]);
+    }
+  };
+
+  const handleUserRemove = (userId: number) => {
+    const newSelectedUsers = selectedUsers.filter(id => id !== userId);
+    setSelectedUsers(newSelectedUsers);
+    setData('access_users', newSelectedUsers);
+  };
+
+  // Filter users based on search term
+  const filteredUsers = users.filter(user => 
+    user.name.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(userSearchTerm.toLowerCase())
+  );
+
+  return (
+    <AppLayout breadcrumbs={breadcrumbs}>
+      <Head title={t('national_insight_center_info.edit.page_title', { name: nationalInsightCenterInfo.name })} />
+
+      <div className="container px-0 py-6">
+        <Header
+          title={t('national_insight_center_info.edit.page_title', { name: nationalInsightCenterInfo.name })}
+          description={t('national_insight_center_info.edit.page_description')}
+          icon={<FileText className="h-6 w-6 text-white" />}
+          model="national_insight_center_info"
+          routeName="national-insight-center-infos.edit"
+          buttonText={t('national_insight_center_info.edit.save_button')}
+          theme="purple"
+          buttonSize="lg"
+          showBackButton={true}
+          backRouteName="national-insight-center-infos.show"
+          backRouteParams={{ nationalInsightCenterInfo: nationalInsightCenterInfo.id }}
+          backButtonText={t('national_insight_center_info.edit.back_button')}
+          showButton={false}
+          actionButtons={
+            <>
+              <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
+                <Link href={route('national-insight-center-infos.show', nationalInsightCenterInfo.id)} className="flex items-center gap-3">
+                  <ArrowLeft className="h-5 w-5" />
+                  {t('national_insight_center_info.edit.back_button')}
+                </Link>
+              </Button>
+            </>
+          }
+        />
+
+        {/* Edit Form Card */}
+        <CanUpdate model="national_insight_center_info">
+          <form onSubmit={handleSubmit}>
+            <div className="grid gap-8">
+              <Card className="shadow-2xl bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 overflow-hidden">
+
+                <CardContent className="p-8 space-y-8">
+                  {/* Name Field */}
+                  <div className="space-y-4">
+                    <Label htmlFor="name" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      {t('national_insight_center_info.edit.name_label')} *
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="name"
+                        value={data.name}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('name', e.target.value)}
+                        required
+                        className="h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg"
+                        placeholder={t('national_insight_center_info.edit.name_placeholder')}
+                      />
+                      {errors.name && (
+                        <div className="mt-2 flex items-center gap-2 text-red-600">
+                          <X className="h-4 w-4" />
+                          <p className="text-sm font-medium">{errors.name}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                      {/* Code Field */}
+                      <div className="space-y-4">
+                        <Label htmlFor="code" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
+                          <BarChart3 className="h-4 w-4" />
+                          {t('national_insight_center_info.edit.code_label')}
+                        </Label>
+                        <div className="relative">
+                          <Input
+                            id="code"
+                            value={data.code}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('code', e.target.value)}
+                            className="h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg"
+                            placeholder={t('national_insight_center_info.edit.code_placeholder')}
+                          />
+                          {errors.code && (
+                            <div className="mt-2 flex items-center gap-2 text-red-600">
+                              <X className="h-4 w-4" />
+                              <p className="text-sm font-medium">{errors.code}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                  {/* Description Field */}
+                  <div className="space-y-4">
+                    <Label htmlFor="description" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      {t('national_insight_center_info.edit.description_label')}
+                    </Label>
+                    <div className="relative">
+                      <Textarea
+                        id="description"
+                        value={data.description}
+                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setData('description', e.target.value)}
+                        rows={4}
+                        className="text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 shadow-lg resize-none"
+                        placeholder={t('national_insight_center_info.edit.description_placeholder')}
+                      />
+                      {errors.description && (
+                        <div className="mt-2 flex items-center gap-2 text-red-600">
+                          <X className="h-4 w-4" />
+                          <p className="text-sm font-medium">{errors.description}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Header
+                title={t('national_insight_center_info.stats.title')}
+                description={t('national_insight_center_info.stats.description')}
+                icon={<AlertTriangle className="h-6 w-6" />}
+                model="national_insight_center_info"
+                routeName={() => ''}
+                buttonText=""
+                theme="purple"
+                showButton={false}
+              />
+              <Card className="shadow-2xl bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 overflow-hidden">
+                <CardContent className="p-8 space-y-6">
+                  <div className="mb-6">
+                    <Label htmlFor="category-filter" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right" dir="rtl">
+                      {t('national_insight_center_info.stats.filter_by_category')}
+                      <Building2 className="h-4 w-4" />
+                    </Label>
+                    <Select
+                      value={selectedCategory?.toString() || 'all'}
+                      onValueChange={(value) => setSelectedCategory(value !== 'all' ? parseInt(value) : null)}
+                    >
+                      <SelectTrigger id="category-filter" className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right">
+                        <SelectValue placeholder={t('incidents.filters.all_categories')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">{t('incidents.filters.all_categories')}</SelectItem>
+                        {categoriesForFilter.map((category) => (
+                          <SelectItem key={category.id} value={category.id.toString()}>
+                            <div className="flex items-center">
+                              <div
+                                className="mr-2 h-3 w-3 rounded-full"
+                                style={{ backgroundColor: category.color }}
+                              ></div>
+                              {category.label}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {filteredStatItems.length > 0 ? (
+                    <TreeViewStatSelector
+                      items={filteredStatItems}
+                      statsData={statsData}
+                      onValueChange={handleStatChange}
+                      onNotesChange={handleNotesChange}
+                    />
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="p-4 bg-purple-100 dark:bg-purple-800/30 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                        <AlertTriangle className="h-8 w-8 text-purple-400 dark:text-purple-500" />
+                      </div>
+                      <p className="text-lg font-semibold text-purple-800 dark:text-purple-200 mb-2">{t('national_insight_center_info.stats.no_items')}</p>
+                      <p className="text-purple-600 dark:text-purple-400">{t('national_insight_center_info.stats.no_items_description')}</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Form Actions */}
+              <FooterButtons
+                onCancel={() => window.history.back()}
+                onSubmit={() => {}}
+                processing={processing}
+                cancelText={t('national_insight_center_info.edit.cancel_button')}
+                submitText={t('national_insight_center_info.edit.save_button')}
+                savingText={t('national_insight_center_info.edit.saving_button')}
+              />
+            </div>
+          </form>
+        </CanUpdate>
+      </div>
+    </AppLayout>
+  );
+}
