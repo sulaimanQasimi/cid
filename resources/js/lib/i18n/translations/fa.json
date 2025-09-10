@@ -1720,6 +1720,8 @@
   "info_types.stats_records":"تحلیلها ثبت شده",
   "info_types.create.code_label":"کد",
   "info_types.create.code_placeholder":"کد وارد کنید",
+  "info_types.edit.code_label":"کد",
+  "info_types.edit.code_placeholder":"کد وارد کنید",
   "info_types.create.code_helper":"کد باید یک عدد باشد.",
   "info_types.create.code_error":"کد باید یک عدد باشد.",
   "info_types.create.code_required":"کد الزامی است.",

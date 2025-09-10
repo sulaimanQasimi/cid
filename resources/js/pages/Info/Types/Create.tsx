@@ -57,6 +57,7 @@ type InfoTypeFormData = {
   name: string;
   code?: string;
   description?: string;
+  access_users?: number[];
   stats?: Array<{
     stat_category_item_id: number;
     value: string;
