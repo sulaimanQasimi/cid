@@ -68,6 +68,7 @@ const perPageOptions = [
   { value: 25, label: '25 per page' },
   { value: 50, label: '50 per page' },
   { value: 100, label: '100 per page' },
+  { value: 999999, label: 'All' }, // Use a large number to represent "all"
 ];
 
 export default function TranslationsIndex({
@@ -132,13 +133,21 @@ export default function TranslationsIndex({
 
   // Paginate filtered translations
   const paginatedTranslations = useMemo(() => {
+    if (itemsPerPage >= filteredTranslations.length) {
+      return filteredTranslations;
+    }
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     return filteredTranslations.slice(startIndex, endIndex);
   }, [filteredTranslations, currentPage, itemsPerPage]);
 
   // Calculate total pages
-  const totalPages = Math.ceil(filteredTranslations.length / itemsPerPage);
+  const totalPages = useMemo(() => {
+    if (itemsPerPage >= filteredTranslations.length) {
+      return 1;
+    }
+    return Math.ceil(filteredTranslations.length / itemsPerPage);
+  }, [filteredTranslations.length, itemsPerPage]);
 
   // Generate pagination links
   const generatePaginationLinks = () => {
@@ -359,25 +368,25 @@ export default function TranslationsIndex({
           <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 rounded-3xl">
             <CardContent className="p-0">
               <div className="overflow-hidden rounded-b-3xl">
-                <Table>
-                  <TableHeader>
+            <Table>
+              <TableHeader>
                     <TableRow className="bg-gradient-to-l from-purple-100 dark:from-purple-900 to-purple-200 dark:to-purple-800 border-0">
                       <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('translations.key')}</TableHead>
                       <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('translations.value')}</TableHead>
                       <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('common.actions')}</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                     {paginatedTranslations.length > 0 ? (
                       paginatedTranslations.map((translation: Translation, idx: number) => (
                         <TableRow key={`${translation.key}-${idx}`} className="hover:bg-purple-50/50 dark:hover:bg-purple-900/20 transition-colors duration-300 border-b border-purple-100 dark:border-purple-800">
                           <TableCell className="font-bold text-purple-900 dark:text-purple-100 py-6 px-6 text-lg max-w-[250px]" title={translation.key}>
-                            <span className="truncate block">{translation.key}</span>
-                          </TableCell>
+                          <span className="truncate block">{translation.key}</span>
+                      </TableCell>
                           <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6 max-w-[300px]">
                             <div className="flex items-center gap-2">
-                              <Input
-                                value={translation.value ?? ''}
+                          <Input
+                            value={translation.value ?? ''}
                                 onChange={(e) => handleValueChange(translation.key, e.target.value)}
                                 onBlur={(e) => handleValueBlur(translation.key, e.target.value)}
                                 disabled={updatingKeys.has(translation.key)}
@@ -399,7 +408,7 @@ export default function TranslationsIndex({
                                 <Edit className="h-5 w-5" />
                               </Button>
                             </div>
-                          </TableCell>
+                      </TableCell>
                         </TableRow>
                       ))
                     ) : (
@@ -412,13 +421,13 @@ export default function TranslationsIndex({
                             <p className="text-xl font-bold">{t('translations.no_records')}</p>
                             <p className="text-purple-500 dark:text-purple-400">No translation records found</p>
                           </div>
-                        </TableCell>
-                      </TableRow>
+                      </TableCell>
+                    </TableRow>
                     )}
-                  </TableBody>
-                </Table>
+              </TableBody>
+            </Table>
               </div>
-            </CardContent>
+          </CardContent>
           </Card>
         </div>
 
@@ -469,13 +478,17 @@ export default function TranslationsIndex({
                     className="bg-white dark:bg-gray-800 border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20"
                   >
                     Next
-                  </Button>
+            </Button>
                 )}
               </div>
               
               {/* Pagination Info */}
               <div className="mt-4 text-center text-sm text-purple-600 dark:text-purple-400">
-                Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredTranslations.length)} of {filteredTranslations.length} translations
+                {itemsPerPage >= filteredTranslations.length ? (
+                  `Showing all ${filteredTranslations.length} translations`
+                ) : (
+                  `Showing ${((currentPage - 1) * itemsPerPage) + 1} to ${Math.min(currentPage * itemsPerPage, filteredTranslations.length)} of ${filteredTranslations.length} translations`
+                )}
               </div>
             </div>
           </div>

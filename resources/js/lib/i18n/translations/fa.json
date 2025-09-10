@@ -1409,8 +1409,8 @@
     "translations.add_translation": "افزودن ترجمه",
     "translations.search_placeholder": "جستجو در کلیدها و مقادیر...",
     "translations.search_filters": "فیلترهای جستجو",
-    "translations.table.title": "لیست ترجمه‌ها",
-    "translations.table.description": "مدیریت و ویرایش ترجمه‌ها",
+    "translations.table.title": "گزارشات تحلیلی او تفضیلی ",
+    "translations.table.description": "د څانګې ثبتونه لیست",
     "translations.key": "کلید",
     "translations.value": "مقدار",
     "translations.sort_options.key": "کلید",
@@ -1691,10 +1691,5 @@
     "info_types.create.code_min": "کد باید حداقل 3 کاراکتر باشد.",
     "info_types.create.code_regex": "کد باید یک عدد باشد.",
     "languages.manage_languages": "مدیریت زبان‌ها",
-    "translations.search_filters": "فیلترهای جستجو",
-    "translations.table.title": "گزارشات تحلیلی او تفضیلی ",
-    "translations.table.description": "د څانګې ثبتونه لیست",
-    "translations.key": "کلید",
-    "translations.value": "مقدار",
     "translations.table.actions": "عملیات"
-  }
+}
