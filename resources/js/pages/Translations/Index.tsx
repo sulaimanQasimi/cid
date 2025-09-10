@@ -87,6 +87,8 @@ export default function TranslationsIndex({
   const [localTranslations, setLocalTranslations] = useState<Translation[]>([]);
   const [updatingKeys, setUpdatingKeys] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState(filters.search);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(filters.per_page);
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -114,6 +116,73 @@ export default function TranslationsIndex({
   useEffect(() => {
     setLocalTranslations(translationsArray);
   }, [translationsArray]);
+
+  // Filter translations based on search query
+  const filteredTranslations = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return localTranslations;
+    }
+    
+    const query = searchQuery.toLowerCase().trim();
+    return localTranslations.filter(translation => 
+      translation.key.toLowerCase().includes(query) || 
+      translation.value.toLowerCase().includes(query)
+    );
+  }, [localTranslations, searchQuery]);
+
+  // Paginate filtered translations
+  const paginatedTranslations = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredTranslations.slice(startIndex, endIndex);
+  }, [filteredTranslations, currentPage, itemsPerPage]);
+
+  // Calculate total pages
+  const totalPages = Math.ceil(filteredTranslations.length / itemsPerPage);
+
+  // Generate pagination links
+  const generatePaginationLinks = () => {
+    const links = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    // Previous page
+    if (currentPage > 1) {
+      links.push({
+        url: null,
+        label: 'Previous',
+        active: false,
+        isPrevious: true
+      });
+    }
+
+    // Page numbers
+    for (let i = startPage; i <= endPage; i++) {
+      links.push({
+        url: null,
+        label: i.toString(),
+        active: i === currentPage,
+        page: i
+      });
+    }
+
+    // Next page
+    if (currentPage < totalPages) {
+      links.push({
+        url: null,
+        label: 'Next',
+        active: false,
+        isNext: true
+      });
+    }
+
+    return links;
+  };
 
   // Method to update translation value
   const updateTranslation = async (key: string, value: string, language: string = 'fa') => {
@@ -170,8 +239,7 @@ export default function TranslationsIndex({
   // Handle search form submission
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // For now, just filter locally since we don't have server-side filtering
-    // In the future, this could be connected to a backend API
+    setCurrentPage(1); // Reset to first page when searching
   };
 
   // Handle sort change
@@ -197,8 +265,8 @@ export default function TranslationsIndex({
 
   // Handle per page change
   const handlePerPageChange = (value: string) => {
-    // For now, just update local state
-    // In the future, this could trigger a new API call
+    setItemsPerPage(parseInt(value));
+    setCurrentPage(1); // Reset to first page when changing items per page
   };
 
   // Handle type filter change (not used for translations)
@@ -219,7 +287,14 @@ export default function TranslationsIndex({
   // Reset all filters
   const resetFilters = () => {
     setSearchQuery('');
+    setCurrentPage(1);
+    setItemsPerPage(filters.per_page);
     setLocalTranslations(translationsArray);
+  };
+
+  // Handle pagination
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   return (
@@ -246,7 +321,7 @@ export default function TranslationsIndex({
           filters={{
             sort: filters.sort,
             direction: filters.direction as 'asc' | 'desc',
-            per_page: filters.per_page
+            per_page: itemsPerPage
           }}
           onTypeChange={handleTypeChange}
           onCategoryChange={handleCategoryChange}
@@ -293,8 +368,8 @@ export default function TranslationsIndex({
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {localTranslations.length > 0 ? (
-                      localTranslations.map((translation: Translation, idx: number) => (
+                    {paginatedTranslations.length > 0 ? (
+                      paginatedTranslations.map((translation: Translation, idx: number) => (
                         <TableRow key={`${translation.key}-${idx}`} className="hover:bg-purple-50/50 dark:hover:bg-purple-900/20 transition-colors duration-300 border-b border-purple-100 dark:border-purple-800">
                           <TableCell className="font-bold text-purple-900 dark:text-purple-100 py-6 px-6 text-lg max-w-[250px]" title={translation.key}>
                             <span className="truncate block">{translation.key}</span>
@@ -346,6 +421,65 @@ export default function TranslationsIndex({
             </CardContent>
           </Card>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-8 flex justify-center">
+            <div className="bg-gradient-to-l from-purple-50 dark:from-purple-900/20 to-white dark:to-gray-800 p-4 rounded-3xl shadow-2xl border border-purple-200 dark:border-purple-700">
+              <div className="flex items-center gap-2">
+                {/* Previous Button */}
+                {currentPage > 1 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    className="bg-white dark:bg-gray-800 border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                  >
+                    Previous
+                  </Button>
+                )}
+
+                {/* Page Numbers */}
+                {generatePaginationLinks().map((link, index) => {
+                  if (link.isPrevious || link.isNext) return null;
+                  
+                  return (
+                    <Button
+                      key={index}
+                      variant={link.active ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => handlePageChange(link.page!)}
+                      className={`min-w-[40px] ${
+                        link.active
+                          ? "bg-purple-600 hover:bg-purple-700 text-white"
+                          : "bg-white dark:bg-gray-800 border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                      }`}
+                    >
+                      {link.label}
+                    </Button>
+                  );
+                })}
+
+                {/* Next Button */}
+                {currentPage < totalPages && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    className="bg-white dark:bg-gray-800 border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                  >
+                    Next
+                  </Button>
+                )}
+              </div>
+              
+              {/* Pagination Info */}
+              <div className="mt-4 text-center text-sm text-purple-600 dark:text-purple-400">
+                Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredTranslations.length)} of {filteredTranslations.length} translations
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </AppLayout>
   );
