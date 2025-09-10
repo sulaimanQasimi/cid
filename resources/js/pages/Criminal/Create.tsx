@@ -154,7 +154,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
           icon={<Shield className="h-6 w-6 text-white" />}
           model="criminal"
           routeName={route('criminals.create')}
-          theme="orange"
+          theme="blue"
           showButton={false}
           buttonText={t('criminal.create.back_to_list')}
           backRouteName={route('criminals.index')}
@@ -173,17 +173,17 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                 model="criminal"
                 routeName="criminals.create"
                 buttonText={t('criminal.create.photo.title')}
-                theme="red"
+                theme="blue"
                 showButton={false}
               />
-              <Card className="overflow-hidden border-none shadow-xl bg-gradient-to-bl from-white dark:from-gray-800 to-red-50/30 dark:to-red-900/20">
+              <Card className="overflow-hidden border-none shadow-xl bg-gradient-to-bl from-white dark:from-gray-800 to-red-50/10 dark:to-red-900/5">
               <CardContent className="p-6 space-y-6">
                 <div className="flex flex-col items-center justify-center">
                   <div className={cn(
                     "relative mb-6 h-56 w-56 overflow-hidden rounded-2xl border-2 border-dashed",
-                    "bg-gradient-to-bl from-red-50 dark:from-red-900/20 to-red-100 dark:to-red-800/30 text-center transition-all duration-300 hover:border-red-400/50 dark:hover:border-red-500/50 hover:shadow-xl",
+                    "bg-gradient-to-bl from-blue-50/50 dark:from-blue-900/10 to-blue-100/50 dark:to-blue-800/10 text-center transition-all duration-300 hover:border-blue-400/50 dark:hover:border-blue-500/50 hover:shadow-xl",
                     "flex items-center justify-center group",
-                    photoPreview ? "border-red-400/50 dark:border-red-500/50 shadow-lg" : "border-red-200 dark:border-red-700"
+                    photoPreview ? "border-blue-400/50 dark:border-blue-500/50 shadow-lg" : "border-blue-200 dark:border-blue-700"
                   )}>
                     {photoPreview ? (
                       <img
@@ -193,11 +193,11 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                       />
                     ) : (
                       <div className="flex h-full w-full flex-col items-center justify-center p-6">
-                        <div className="p-4 bg-gradient-to-br from-red-100 dark:from-red-800 to-red-200 dark:to-red-700 rounded-full mb-3 group-hover:scale-110 transition-transform duration-300">
-                          <Camera className="h-12 w-12 text-red-600 dark:text-red-400" />
+                        <div className="p-4 bg-gradient-to-br from-blue-100 dark:from-blue-800 to-blue-200 dark:to-blue-700 rounded-full mb-3 group-hover:scale-110 transition-transform duration-300">
+                          <Camera className="h-12 w-12 text-blue-600 dark:text-blue-400" />
                         </div>
-                        <p className="text-sm text-red-700 dark:text-red-300 font-medium">{t('criminal.create.photo.no_photo')}</p>
-                        <p className="text-xs text-red-500 dark:text-red-400 dark:text-red-400 mt-1">{t('criminal.create.photo.hint')}</p>
+                        <p className="text-sm text-blue-700 dark:text-blue-300 font-medium">{t('criminal.create.photo.no_photo')}</p>
+                        <p className="text-xs text-blue-500 dark:text-blue-400 dark:text-blue-400 mt-1">{t('criminal.create.photo.hint')}</p>
                       </div>
                     )}
                   </div>
@@ -205,7 +205,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                     htmlFor="photo"
                     className={cn(
                       "cursor-pointer rounded-full px-6 py-3 text-sm font-medium transition-all duration-300",
-                      "bg-gradient-to-l from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 shadow-lg hover:shadow-xl hover:scale-105"
+                      "bg-gradient-to-l from-blue-400 to-blue-500 text-white hover:from-blue-500 hover:to-blue-600 shadow-lg hover:shadow-xl hover:scale-105"
                     )}
                   >
                     {photoPreview ? t('criminal.create.photo.change') : t('criminal.create.photo.upload')}
@@ -217,10 +217,10 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                     onChange={handlePhotoChange}
                     className="sr-only"
                   />
-                  {errors.photo && <p className="mt-3 text-sm text-red-500 dark:text-red-400 dark:text-red-400 font-medium bg-red-50 dark:bg-red-900/20 p-2 rounded-lg border border-red-200 dark:border-red-700">{errors.photo}</p>}
+                  {errors.photo && <p className="mt-3 text-sm text-blue-500 dark:text-blue-400 dark:text-blue-400 font-medium bg-blue-50 dark:bg-blue-900/20 p-2 rounded-lg border border-blue-200 dark:border-blue-700">{errors.photo}</p>}
 
                   <div className="mt-6 text-center max-w-xs">
-                    <p className="text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-200 dark:border-red-700">
+                    <p className="text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-200 dark:border-blue-700">
                       {t('criminal.create.photo.helper_text')}
                     </p>
                   </div>
@@ -238,17 +238,17 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                 model="criminal"
                 routeName="criminals.create"
                 buttonText={t('criminal.create.form.title')}
-                theme="orange"
+                theme="blue"
                 showButton={false}
               />
-              <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-orange-50/30 dark:to-orange-900/20">
+              <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-blue-50/10 dark:to-blue-900/5">
               <CardContent className="p-6">
                 <Tabs defaultValue="other" value={activeTab} onValueChange={handleTabChange} className="w-full">
-                  <TabsList className="grid w-full grid-cols-4 mb-6 rounded-xl p-1 bg-gradient-to-l from-orange-100 dark:from-orange-900/30 to-orange-200 dark:to-orange-800/30 shadow-lg">
+                  <TabsList className="grid w-full grid-cols-4 mb-6 rounded-xl p-1 bg-gradient-to-l from-blue-50 dark:from-blue-900/10 to-blue-100 dark:to-blue-800/10 shadow-lg">
                     <TabsTrigger
                       value="other"
                       className={cn(
-                        "data-[state=active]:bg-gradient-to-l data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
+                        "data-[state=active]:bg-gradient-to-l data-[state=active]:from-blue-400 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
                         "transition-all duration-300 rounded-lg"
                       )}
                     >
@@ -258,7 +258,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                     <TabsTrigger
                       value="crime"
                       className={cn(
-                        "data-[state=active]:bg-gradient-to-l data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
+                        "data-[state=active]:bg-gradient-to-l data-[state=active]:from-blue-400 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
                         "transition-all duration-300 rounded-lg"
                       )}
                     >
@@ -268,7 +268,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                     <TabsTrigger
                       value="personal"
                       className={cn(
-                        "data-[state=active]:bg-gradient-to-l data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
+                        "data-[state=active]:bg-gradient-to-l data-[state=active]:from-blue-400 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
                         "transition-all duration-300 rounded-lg"
                       )}
                     >
@@ -278,7 +278,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                     <TabsTrigger
                       value="access"
                       className={cn(
-                        "data-[state=active]:bg-gradient-to-l data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
+                        "data-[state=active]:bg-gradient-to-l data-[state=active]:from-blue-400 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
                         "transition-all duration-300 rounded-lg"
                       )}
                     >
@@ -290,10 +290,10 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                   {/* Personal Details Tab */}
                   <TabsContent value="personal" className="space-y-6 pt-2">
                     <div className="space-y-3">
-                      <Label htmlFor="name" className="text-base font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300 dark:text-orange-300 text-right" dir="rtl">
+                      <Label htmlFor="name" className="text-base font-medium flex items-center gap-2 text-blue-600 dark:text-blue-400 text-right" dir="rtl">
                         <Users className="h-4 w-4" />
                         {t('criminal.create.fields.full_name')}
-                        <span className="text-red-500 dark:text-red-400">*</span>
+                        <span className="text-blue-500 dark:text-red-400">*</span>
                       </Label>
                       <div className="relative">
                         <Input
@@ -302,7 +302,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                           onChange={(e) => setData('name', e.target.value)}
                           required
                           placeholder={t('criminal.create.placeholders.full_name')}
-                          className="h-12 border-orange-200 dark:border-orange-700 dark:border-orange-700 focus:border-orange-500 dark:focus:border-orange-400 focus:ring-orange-500/20 dark:focus:ring-orange-400/20 bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800 text-right"
+                          className="h-12 border-blue-200 dark:border-blue-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-blue-400/20 dark:focus:ring-blue-500/20 bg-gradient-to-l from-blue-50/50 dark:from-blue-900/10 to-white dark:to-gray-800 text-right"
                         />
                       </div>
                       {errors.name && <p className="text-sm text-red-500 dark:text-red-400 font-medium bg-red-50 dark:bg-red-900/20 p-2 rounded-lg border border-red-200 dark:border-red-700 flex items-center gap-2 text-right">
@@ -313,7 +313,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="space-y-3">
-                        <Label htmlFor="father_name" className="font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300 text-right" dir="rtl">
+                        <Label htmlFor="father_name" className="font-medium flex items-center gap-2 text-blue-600 dark:text-blue-400 text-right" dir="rtl">
                           <Users className="h-4 w-4" />
                           {t('criminal.create.fields.father_name')}
                         </Label>
@@ -322,7 +322,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                           value={data.father_name}
                           onChange={(e) => setData('father_name', e.target.value)}
                           placeholder={t('criminal.create.placeholders.father_name')}
-                          className="h-12 border-orange-200 dark:border-orange-700 dark:border-orange-700 focus:border-orange-500 dark:focus:border-orange-400 focus:ring-orange-500/20 dark:focus:ring-orange-400/20 bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800 text-right"
+                          className="h-12 border-blue-200 dark:border-blue-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-blue-400/20 dark:focus:ring-blue-500/20 bg-gradient-to-l from-blue-50/50 dark:from-blue-900/10 to-white dark:to-gray-800 text-right"
                         />
                         {errors.father_name && <p className="text-sm text-red-500 dark:text-red-400 font-medium bg-red-50 dark:bg-red-900/20 p-2 rounded-lg border border-red-200 dark:border-red-700 flex items-center gap-2 text-right">
                           <AlertTriangle className="h-4 w-4" />
@@ -331,7 +331,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                       </div>
 
                       <div className="space-y-3">
-                        <Label htmlFor="grandfather_name" className="font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300 text-right" dir="rtl">
+                        <Label htmlFor="grandfather_name" className="font-medium flex items-center gap-2 text-blue-600 dark:text-blue-400 text-right" dir="rtl">
                           <Users className="h-4 w-4" />
                           {t('criminal.create.fields.grandfather_name')}
                         </Label>
@@ -340,7 +340,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                           value={data.grandfather_name}
                           onChange={(e) => setData('grandfather_name', e.target.value)}
                           placeholder={t('criminal.create.placeholders.grandfather_name')}
-                          className="h-12 border-orange-200 dark:border-orange-700 dark:border-orange-700 focus:border-orange-500 dark:focus:border-orange-400 focus:ring-orange-500/20 dark:focus:ring-orange-400/20 bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800 text-right"
+                          className="h-12 border-blue-200 dark:border-blue-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-blue-400/20 dark:focus:ring-blue-500/20 bg-gradient-to-l from-blue-50/50 dark:from-blue-900/10 to-white dark:to-gray-800 text-right"
                         />
                         {errors.grandfather_name && <p className="text-sm text-red-500 dark:text-red-400 font-medium bg-red-50 dark:bg-red-900/20 p-2 rounded-lg border border-red-200 dark:border-red-700 flex items-center gap-2 text-right">
                           <AlertTriangle className="h-4 w-4" />
@@ -351,7 +351,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="space-y-3">
-                        <Label htmlFor="id_card_number" className="font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300 text-right" dir="rtl">
+                        <Label htmlFor="id_card_number" className="font-medium flex items-center gap-2 text-blue-600 dark:text-blue-400 text-right" dir="rtl">
                           <IdCard className="h-4 w-4" />
                           {t('criminal.create.fields.id_card_number')}
                         </Label>
@@ -360,7 +360,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                           value={data.id_card_number}
                           onChange={(e) => setData('id_card_number', e.target.value)}
                           placeholder={t('criminal.create.placeholders.id_card_number')}
-                          className="h-12 border-orange-200 dark:border-orange-700 dark:border-orange-700 focus:border-orange-500 dark:focus:border-orange-400 focus:ring-orange-500/20 dark:focus:ring-orange-400/20 bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800 text-right"
+                          className="h-12 border-blue-200 dark:border-blue-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-blue-400/20 dark:focus:ring-blue-500/20 bg-gradient-to-l from-blue-50/50 dark:from-blue-900/10 to-white dark:to-gray-800 text-right"
                         />
                         {errors.id_card_number && <p className="text-sm text-red-500 dark:text-red-400 font-medium bg-red-50 dark:bg-red-900/20 p-2 rounded-lg border border-red-200 dark:border-red-700 flex items-center gap-2 text-right">
                           <AlertTriangle className="h-4 w-4" />
@@ -369,7 +369,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                       </div>
 
                       <div className="space-y-3">
-                        <Label htmlFor="phone_number" className="font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300 text-right" dir="rtl">
+                        <Label htmlFor="phone_number" className="font-medium flex items-center gap-2 text-blue-600 dark:text-blue-400 text-right" dir="rtl">
                           <Phone className="h-4 w-4" />
                           {t('criminal.create.fields.phone_number')}
                         </Label>
@@ -378,7 +378,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                           value={data.phone_number}
                           onChange={(e) => setData('phone_number', e.target.value)}
                           placeholder={t('criminal.create.placeholders.phone_number')}
-                          className="h-12 border-orange-200 dark:border-orange-700 dark:border-orange-700 focus:border-orange-500 dark:focus:border-orange-400 focus:ring-orange-500/20 dark:focus:ring-orange-400/20 bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800 text-right"
+                          className="h-12 border-blue-200 dark:border-blue-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-blue-400/20 dark:focus:ring-blue-500/20 bg-gradient-to-l from-blue-50/50 dark:from-blue-900/10 to-white dark:to-gray-800 text-right"
                         />
                         {errors.phone_number && <p className="text-sm text-red-500 dark:text-red-400 font-medium bg-red-50 dark:bg-red-900/20 p-2 rounded-lg border border-red-200 dark:border-red-700 flex items-center gap-2 text-right">
                           <AlertTriangle className="h-4 w-4" />
@@ -388,7 +388,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                     </div>
 
                     <div className="space-y-3">
-                      <Label htmlFor="original_residence" className="font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300 text-right" dir="rtl">
+                      <Label htmlFor="original_residence" className="font-medium flex items-center gap-2 text-blue-600 dark:text-blue-400 text-right" dir="rtl">
                         <Home className="h-4 w-4" />
                         {t('criminal.create.fields.original_residence')}
                       </Label>
@@ -398,7 +398,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                         onChange={(e) => setData('original_residence', e.target.value)}
                         rows={2}
                         placeholder={t('criminal.create.placeholders.original_residence')}
-                        className="min-h-[80px] resize-none border-orange-200 dark:border-orange-700 focus:border-orange-500 dark:focus:border-orange-400 focus:ring-orange-500/20 dark:focus:ring-orange-400/20 bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800 text-right text-gray-900 dark:text-gray-100"
+                        className="min-h-[80px] resize-none border-blue-200 dark:border-blue-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-blue-400/20 dark:focus:ring-blue-500/20 bg-gradient-to-l from-blue-50/50 dark:from-blue-900/10 to-white dark:to-gray-800 text-right text-gray-900 dark:text-gray-100"
                       />
                       {errors.original_residence && <p className="text-sm text-red-500 dark:text-red-400 font-medium bg-red-50 dark:bg-red-900/20 p-2 rounded-lg border border-red-200 dark:border-red-700 flex items-center gap-2 text-right">
                         <AlertTriangle className="h-4 w-4" />
@@ -407,7 +407,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                     </div>
 
                     <div className="space-y-3">
-                      <Label htmlFor="current_residence" className="font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300 text-right" dir="rtl">
+                      <Label htmlFor="current_residence" className="font-medium flex items-center gap-2 text-blue-600 dark:text-blue-400 text-right" dir="rtl">
                         <MapPin className="h-4 w-4" />
                         {t('criminal.create.fields.current_residence')}
                       </Label>
@@ -417,7 +417,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                         onChange={(e) => setData('current_residence', e.target.value)}
                         rows={2}
                         placeholder={t('criminal.create.placeholders.current_residence')}
-                        className="min-h-[80px] resize-none border-orange-200 dark:border-orange-700 focus:border-orange-500 dark:focus:border-orange-400 focus:ring-orange-500/20 dark:focus:ring-orange-400/20 bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800 text-right text-gray-900 dark:text-gray-100"
+                        className="min-h-[80px] resize-none border-blue-200 dark:border-blue-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-blue-400/20 dark:focus:ring-blue-500/20 bg-gradient-to-l from-blue-50/50 dark:from-blue-900/10 to-white dark:to-gray-800 text-right text-gray-900 dark:text-gray-100"
                       />
                       {errors.current_residence && <p className="text-sm text-red-500 dark:text-red-400 font-medium bg-red-50 dark:bg-red-900/20 p-2 rounded-lg border border-red-200 dark:border-red-700 flex items-center gap-2 text-right">
                         <AlertTriangle className="h-4 w-4" />
@@ -426,7 +426,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                     </div>
 
                     <div className="space-y-3">
-                      <Label htmlFor="department_id" className="font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300 text-right" dir="rtl">
+                      <Label htmlFor="department_id" className="font-medium flex items-center gap-2 text-blue-600 dark:text-blue-400 text-right" dir="rtl">
                         <Building2 className="h-4 w-4" />
                         {t('criminal.create.fields.department')}
                       </Label>
@@ -434,7 +434,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                         value={data.department_id}
                         onValueChange={(value) => setData('department_id', value)}
                       >
-                        <SelectTrigger id="department_id" className="h-12 border-orange-200 dark:border-orange-700 dark:border-orange-700 focus:border-orange-500 dark:focus:border-orange-400 focus:ring-orange-500/20 dark:focus:ring-orange-400/20 bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800 text-right">
+                        <SelectTrigger id="department_id" className="h-12 border-blue-200 dark:border-blue-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-blue-400/20 dark:focus:ring-blue-500/20 bg-gradient-to-l from-blue-50/50 dark:from-blue-900/10 to-white dark:to-gray-800 text-right">
                           <SelectValue placeholder={t('criminal.create.placeholders.department')} />
                         </SelectTrigger>
                         <SelectContent>
@@ -446,7 +446,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                               </SelectItem>
                             ))
                           ) : (
-                            <div className="p-2 text-sm text-orange-500 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 rounded-lg">{t('criminal.create.no_departments')}</div>
+                            <div className="p-2 text-sm text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 rounded-lg">{t('criminal.create.no_departments')}</div>
                           )}
                         </SelectContent>
                       </Select>
@@ -461,7 +461,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                   <TabsContent value="crime" className="space-y-6 pt-2">
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="space-y-3">
-                        <Label htmlFor="number" className="font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300 text-right" dir="rtl">
+                        <Label htmlFor="number" className="font-medium flex items-center gap-2 text-blue-600 dark:text-blue-400 text-right" dir="rtl">
                           <FileText className="h-4 w-4" />
                           {t('criminal.create.fields.record_number')}
                         </Label>
@@ -476,7 +476,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                       </div>
 
                       <div className="space-y-3">
-                        <Label htmlFor="crime_type" className="font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300 text-right" dir="rtl">
+                        <Label htmlFor="crime_type" className="font-medium flex items-center gap-2 text-blue-600 dark:text-blue-400 text-right" dir="rtl">
                           <Gavel className="h-4 w-4" />
                           {t('criminal.create.fields.crime_type')}
                         </Label>
@@ -493,7 +493,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="space-y-3">
-                        <Label htmlFor="arrest_date" className="font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300 text-right" dir="rtl">
+                        <Label htmlFor="arrest_date" className="font-medium flex items-center gap-2 text-blue-600 dark:text-blue-400 text-right" dir="rtl">
                           <Calendar className="h-4 w-4" />
                           {t('criminal.create.fields.arrest_date')}
                         </Label>
@@ -503,11 +503,11 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                             type="date"
                             value={data.arrest_date}
                             onChange={handleDateChange}
-                            className="h-11 border-orange-200 dark:border-orange-700 dark:border-orange-700 focus:border-orange-500 dark:focus:border-orange-400 focus:ring-orange-500/20 dark:focus:ring-orange-400/20 bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800 text-right"
+                            className="h-11 border-blue-200 dark:border-blue-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-blue-400/20 dark:focus:ring-blue-500/20 bg-gradient-to-l from-blue-50/50 dark:from-blue-900/10 to-white dark:to-gray-800 text-right"
                           />
                           {persianDateDisplay && (
-                            <div className="mt-2 p-2 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700 rounded-md text-right">
-                              <span className="text-sm text-orange-700 dark:text-orange-300 font-medium">
+                            <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-md text-right">
+                              <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">
                                 {t('criminal.create.persian_date_label')}: {persianDateDisplay}
                               </span>
                             </div>
@@ -517,7 +517,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                       </div>
 
                       <div className="space-y-3">
-                        <Label htmlFor="arrest_location" className="font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300 text-right" dir="rtl">
+                        <Label htmlFor="arrest_location" className="font-medium flex items-center gap-2 text-blue-600 dark:text-blue-400 text-right" dir="rtl">
                           <MapPin className="h-4 w-4" />
                           {t('criminal.create.fields.arrest_location')}
                         </Label>
@@ -534,7 +534,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="space-y-3">
-                        <Label htmlFor="arrested_by" className="font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300 text-right" dir="rtl">
+                        <Label htmlFor="arrested_by" className="font-medium flex items-center gap-2 text-blue-600 dark:text-blue-400 text-right" dir="rtl">
                           <Shield className="h-4 w-4" />
                           {t('criminal.create.fields.arrested_by')}
                         </Label>
@@ -549,7 +549,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                       </div>
 
                       <div className="space-y-3">
-                        <Label htmlFor="referred_to" className="font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300 text-right" dir="rtl">
+                        <Label htmlFor="referred_to" className="font-medium flex items-center gap-2 text-blue-600 dark:text-blue-400 text-right" dir="rtl">
                           <Building2 className="h-4 w-4" />
                           {t('criminal.create.fields.referred_to')}
                         </Label>
@@ -565,7 +565,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                     </div>
 
                     <div className="space-y-3">
-                      <Label htmlFor="final_verdict" className="font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300 text-right" dir="rtl">
+                      <Label htmlFor="final_verdict" className="font-medium flex items-center gap-2 text-blue-600 dark:text-blue-400 text-right" dir="rtl">
                         <FileCheck className="h-4 w-4" />
                         {t('criminal.create.fields.final_verdict')}
                       </Label>
@@ -575,7 +575,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                         onChange={(e) => setData('final_verdict', e.target.value)}
                         rows={3}
                         placeholder={t('criminal.create.placeholders.final_verdict')}
-                        className="min-h-[120px] resize-none text-right border-orange-200 dark:border-orange-700 focus:border-orange-500 dark:focus:border-orange-400 focus:ring-orange-500/20 dark:focus:ring-orange-400/20 bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800 text-gray-900 dark:text-gray-100"
+                        className="min-h-[120px] resize-none text-right border-blue-200 dark:border-blue-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-blue-400/20 dark:focus:ring-blue-500/20 bg-gradient-to-l from-blue-50/50 dark:from-blue-900/10 to-white dark:to-gray-800 text-gray-900 dark:text-gray-100"
                       />
                       {errors.final_verdict && <p className="text-sm text-red-500 dark:text-red-400 font-medium text-right">{errors.final_verdict}</p>}
                     </div>
@@ -584,7 +584,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                   {/* Other Information Tab */}
                   <TabsContent value="other" className="space-y-6 pt-2">
                     <div className="space-y-3">
-                      <Label htmlFor="notes" className="font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300 text-right" dir="rtl">
+                      <Label htmlFor="notes" className="font-medium flex items-center gap-2 text-blue-600 dark:text-blue-400 text-right" dir="rtl">
                         <BookText className="h-4 w-4" />
                         {t('criminal.create.fields.notes')}
                       </Label>
@@ -594,7 +594,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                         onChange={(e) => setData('notes', e.target.value)}
                         rows={8}
                         placeholder={t('criminal.create.placeholders.notes')}
-                        className="min-h-[240px] dark:bg-gray-700 text-right border-orange-200 dark:border-orange-700 focus:border-orange-500 dark:focus:border-orange-400 focus:ring-orange-500/20 dark:focus:ring-orange-400/20 bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800 text-gray-900 dark:text-gray-100"
+                        className="min-h-[240px] dark:bg-gray-700 text-right border-blue-200 dark:border-blue-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-blue-400/20 dark:focus:ring-blue-500/20 bg-gradient-to-l from-blue-50/50 dark:from-blue-900/10 to-white dark:to-gray-800 text-gray-900 dark:text-gray-100"
                       />
                       {errors.notes && <p className="text-sm text-red-500 dark:text-red-400 font-medium text-right">{errors.notes}</p>}
 
@@ -607,10 +607,10 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                   {/* Access Control Tab */}
                   <TabsContent value="access" className="space-y-6 pt-2">
                     <div className="space-y-6">
-                      <div className="bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800 rounded-lg p-6 border border-orange-200 dark:border-orange-700">
+                      <div className="bg-gradient-to-l from-blue-50/50 dark:from-blue-900/10 to-white dark:to-gray-800 rounded-lg p-6 border border-blue-200 dark:border-blue-700">
                         <div className="flex items-center gap-2 mb-4">
-                          <Shield className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-                          <h3 className="text-lg font-semibold text-orange-700 dark:text-orange-300">
+                          <Shield className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                          <h3 className="text-lg font-semibold text-blue-600 dark:text-blue-400">
                             {t('criminal.access.title')}
                           </h3>
                         </div>
@@ -620,7 +620,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
 
                         {/* User Search */}
                         <div className="space-y-4">
-                          <Label className="text-base font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300 text-right" dir="rtl">
+                          <Label className="text-base font-medium flex items-center gap-2 text-blue-600 dark:text-blue-400 text-right" dir="rtl">
                             <Users className="h-4 w-4" />
                             {t('criminal.access.select_users')}
                           </Label>
@@ -634,25 +634,25 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                               value={userSearchTerm}
                               onChange={(e) => setUserSearchTerm(e.target.value)}
                               placeholder={t('criminal.access.search_users')}
-                              className="text-right border-orange-200 dark:border-orange-700 focus:border-orange-500 dark:focus:border-orange-400 focus:ring-orange-500/20 dark:focus:ring-orange-400/20 bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-white dark:to-gray-800"
+                              className="text-right border-blue-200 dark:border-blue-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-blue-400/20 dark:focus:ring-blue-500/20 bg-gradient-to-l from-blue-50/50 dark:from-blue-900/10 to-white dark:to-gray-800"
                             />
                           </div>
 
                           {/* User Search Results */}
                           {userSearchTerm && filteredUsers.length > 0 && (
-                            <div className="border border-orange-200 dark:border-orange-700 rounded-lg bg-white dark:bg-gray-800 max-h-48 overflow-y-auto">
+                            <div className="border border-blue-200 dark:border-blue-700 rounded-lg bg-white dark:bg-gray-800 max-h-48 overflow-y-auto">
                               {filteredUsers.map((user) => (
                                 <div
                                   key={user.id}
                                   onClick={() => handleUserSelect(user.id)}
-                                  className="p-3 hover:bg-orange-50 dark:hover:bg-orange-900/20 cursor-pointer border-b border-orange-100 dark:border-orange-800 last:border-b-0"
+                                  className="p-3 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer border-b border-blue-100 dark:border-blue-800 last:border-b-0"
                                 >
                                   <div className="flex items-center justify-between">
                                     <div className="text-right">
                                       <p className="font-medium text-gray-900 dark:text-gray-100">{user.name}</p>
                                       <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
                                     </div>
-                                    <Users className="h-4 w-4 text-orange-500" />
+                                    <Users className="h-4 w-4 text-blue-500" />
                                   </div>
                                 </div>
                               ))}
@@ -668,7 +668,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
 
                         {/* Selected Users */}
                         <div className="mt-6">
-                          <Label className="text-base font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300 text-right mb-4" dir="rtl">
+                          <Label className="text-base font-medium flex items-center gap-2 text-blue-600 dark:text-blue-400 text-right mb-4" dir="rtl">
                             <Users className="h-4 w-4" />
                             {t('criminal.access.selected_users')}
                           </Label>
@@ -684,7 +684,7 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                                 return user ? (
                                   <div
                                     key={userId}
-                                    className="flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-700"
+                                    className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700"
                                   >
                                     <div className="text-right">
                                       <p className="font-medium text-gray-900 dark:text-gray-100">{user.name}</p>
@@ -726,20 +726,20 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
                 </Tabs>
               </CardContent>
 
-              <CardFooter className="flex justify-between border-t px-6 py-5 bg-gradient-to-l from-orange-50 dark:from-orange-900/20 to-orange-100 dark:to-orange-800/30">
+              <CardFooter className="flex justify-between border-t px-6 py-5 bg-gradient-to-l from-blue-50/50 dark:from-blue-900/10 to-blue-100/50 dark:to-blue-800/10">
                 <Button
                   variant="outline"
                   onClick={() => reset()}
                   type="button"
                   disabled={processing}
-                  className="mr-2 border-orange-300 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 hover:bg-orange-100 hover:border-orange-400 shadow-lg"
+                  className="mr-2 border-blue-300 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400 hover:bg-blue-100/50 hover:border-blue-400 shadow-lg"
                 >
                   {t('criminal.create.reset')}
                 </Button>
                 <Button
                   type="submit"
                   disabled={processing}
-                  className="ml-2 px-8 font-medium bg-gradient-to-l from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="ml-2 px-8 font-medium bg-gradient-to-l from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white shadow-lg hover:shadow-xl transition-all duration-300"
                 >
                   {processing ? t('criminal.create.saving') : t('criminal.create.save')}
                 </Button>

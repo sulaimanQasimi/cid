@@ -12,7 +12,7 @@ interface ActionButtonsProps {
     showBackButton?: boolean;
     backRouteName?: string | (() => string);
     backButtonText?: string;
-    theme?: 'purple' | 'blue' | 'green' | 'red' | 'orange' | 'indigo';
+    theme?: 'purple' | 'blue' | 'green' | 'red' | 'orange' | 'indigo' | 'teal' | 'emerald' | 'cyan' | 'rose' | 'pink' | 'violet' | 'fuchsia' | 'sky' | 'lime' | 'amber' | 'slate' | 'zinc' | 'stone' | 'neutral';
 }
 
 export default function ActionButtons({ 

@@ -26,6 +26,62 @@ const themes = {
     indigo: {
         bg: 'bg-indigo-600 dark:bg-indigo-700',
         iconBg: 'bg-indigo-500 dark:bg-indigo-600'
+    },
+    teal: {
+        bg: 'bg-teal-600 dark:bg-teal-700',
+        iconBg: 'bg-teal-500 dark:bg-teal-600'
+    },
+    emerald: {
+        bg: 'bg-emerald-600 dark:bg-emerald-700',
+        iconBg: 'bg-emerald-500 dark:bg-emerald-600'
+    },
+    cyan: {
+        bg: 'bg-cyan-600 dark:bg-cyan-700',
+        iconBg: 'bg-cyan-500 dark:bg-cyan-600'
+    },
+    rose: {
+        bg: 'bg-rose-600 dark:bg-rose-700',
+        iconBg: 'bg-rose-500 dark:bg-rose-600'
+    },
+    pink: {
+        bg: 'bg-pink-600 dark:bg-pink-700',
+        iconBg: 'bg-pink-500 dark:bg-pink-600'
+    },
+    violet: {
+        bg: 'bg-violet-600 dark:bg-violet-700',
+        iconBg: 'bg-violet-500 dark:bg-violet-600'
+    },
+    fuchsia: {
+        bg: 'bg-fuchsia-600 dark:bg-fuchsia-700',
+        iconBg: 'bg-fuchsia-500 dark:bg-fuchsia-600'
+    },
+    sky: {
+        bg: 'bg-sky-600 dark:bg-sky-700',
+        iconBg: 'bg-sky-500 dark:bg-sky-600'
+    },
+    lime: {
+        bg: 'bg-lime-600 dark:bg-lime-700',
+        iconBg: 'bg-lime-500 dark:bg-lime-600'
+    },
+    amber: {
+        bg: 'bg-amber-600 dark:bg-amber-700',
+        iconBg: 'bg-amber-500 dark:bg-amber-600'
+    },
+    slate: {
+        bg: 'bg-slate-600 dark:bg-slate-700',
+        iconBg: 'bg-slate-500 dark:bg-slate-600'
+    },
+    zinc: {
+        bg: 'bg-zinc-600 dark:bg-zinc-700',
+        iconBg: 'bg-zinc-500 dark:bg-zinc-600'
+    },
+    stone: {
+        bg: 'bg-stone-600 dark:bg-stone-700',
+        iconBg: 'bg-stone-500 dark:bg-stone-600'
+    },
+    neutral: {
+        bg: 'bg-neutral-600 dark:bg-neutral-700',
+        iconBg: 'bg-neutral-500 dark:bg-neutral-600'
     }
 };
 
@@ -71,24 +127,26 @@ export default function Header({ title, description, icon, model, routeName, but
                         </div>
                     </div>
 
-                    {/* Action Buttons */}
-                    {showButton && (
-                        <ActionButtons
-                            model={model}
-                            routeName={routeName}
-                            buttonText={buttonText}
-                            buttonSize={buttonSize}
-                            showBackButton={showBackButton}
-                            backRouteName={backRouteName}
-                            backButtonText={backButtonText}
-                            theme={theme}
-                        />
-                    )}
-                    {actionButtons && (
-                        <div className="flex items-center gap-2">
-                            {actionButtons}
-                        </div>
-                    )}
+                    {/* Action Buttons Container */}
+                    <div className="flex items-center gap-2">
+                        {showButton && (
+                            <ActionButtons
+                                model={model}
+                                routeName={routeName}
+                                buttonText={buttonText}
+                                buttonSize={buttonSize}
+                                showBackButton={showBackButton}
+                                backRouteName={backRouteName}
+                                backButtonText={backButtonText}
+                                theme={theme}
+                            />
+                        )}
+                        {actionButtons && (
+                            <div className="flex items-center gap-2">
+                                {actionButtons}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
