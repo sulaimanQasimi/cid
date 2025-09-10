@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Plus, Search, Edit, Trash, Download, Upload } from 'lucide-react';
+import { Plus, Search, Edit, Trash, Download, Upload, Loader2 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/translate';
 import axios from 'axios';
 
@@ -20,31 +20,20 @@ interface Language {
 }
 
 interface Translation {
-  id: number;
-  language_id: number;
   key: string;
   value: string;
-  group: string;
 }
 
-interface Pagination {
-  data: Translation[];
-  current_page: number;
-  last_page: number;
-  per_page: number;
-  total: number;
-}
-
-interface Filters {
-  language?: string;
-  group?: string;
+interface ApiResponse {
+  translations: Translation[];
+  message?: string;
 }
 
 interface TranslationProps {
-  languages: Language[];
-  translations: Pagination;
+  translations: Translation[] | Record<string, any>;
   groups: string[];
-  filters: Filters;
+  initialLanguage?: string;
+  initialGroup?: string;
 }
 
 // Add PageProps interface for usePage
@@ -57,104 +46,79 @@ interface PageProps {
 }
 
 export default function TranslationsIndex({
-  languages = [],
-  translations = { data: [], current_page: 1, last_page: 1, per_page: 15, total: 0 },
-  groups = [],
-  filters = {}
+  translations = [],
 }: TranslationProps) {
   const { t } = useTranslation();
-  const [searchQuery, setSearchQuery] = useState('');
-  const { auth, csrf_token } = usePage<PageProps>().props;
-  const [editMode, setEditMode] = useState(false);
-  const [editedValues, setEditedValues] = useState<Record<string, string>>({});
-  const [editedKeys, setEditedKeys] = useState<Record<string, string>>({});
-  const [saving, setSaving] = useState(false);
+  const [localTranslations, setLocalTranslations] = useState<Translation[]>([]);
+  const [updatingKeys, setUpdatingKeys] = useState<Set<string>>(new Set());
 
-  // Ensure we have valid language and group values for the selects
-  const currentLanguage = filters.language || (languages[0]?.code || "en");
-  const currentGroup = filters.group || "all";
-
-  const languageId = useMemo(() => languages.find(l => l.code === currentLanguage)?.id, [languages, currentLanguage]);
-
-  // Pre-process groups to ensure no empty strings
-  const safeGroups = groups.map(g => g || "unnamed-group");
-
-  // If no translations data, provide default empty state
-  const translationsData = translations?.data || [];
-  const currentPage = translations?.current_page || 1;
-  const lastPage = translations?.last_page || 1;
-  const total = translations?.total || 0;
-
-  // Filter translations by search query
-  const filteredTranslations = searchQuery ?
-    translationsData.filter(translation =>
-      translation.key?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      translation.value?.toLowerCase().includes(searchQuery.toLowerCase())
-    ) :
-    translationsData;
-
-  const hasEdits = useMemo(() => Object.keys(editedValues).length > 0 || Object.keys(editedKeys).length > 0, [editedValues, editedKeys]);
-
-  const handleValueChange = (key: string, value: string) => {
-    setEditedValues(prev => ({ ...prev, [key]: value }));
-  };
-
-  const handleKeyChange = (originalKey: string, newKey: string) => {
-    setEditedKeys(prev => ({ ...prev, [originalKey]: newKey }));
-  };
-
-  const handleRevert = () => { setEditedValues({}); setEditedKeys({}); };
-
-  const extractGroupFromKey = (key: string) => {
-    const idx = key.indexOf('.')
-    return idx > 0 ? key.slice(0, idx) : 'general';
-  };
-
-  const handleSave = async () => {
-    if (!hasEdits) return;
-    try {
-      setSaving(true);
-      // Build final key/value map from current rows, considering key renames and value edits
-      const grouped: Record<string, Record<string, string>> = {};
-      translationsData.forEach(tr => {
-        const originalKey = tr.key;
-        const newKey = (editedKeys[originalKey] ?? originalKey).trim();
-        if (!newKey) return; // skip empty key
-        const value = editedValues[originalKey] ?? (tr.value ?? '');
-        const group = extractGroupFromKey(newKey);
-        if (!grouped[group]) grouped[group] = {};
-        grouped[group][newKey] = value;
-      });
-
-      // Perform batch import per group via API TranslationController::import
-      const groupEntries = Object.entries(grouped);
-      for (const [group, payload] of groupEntries) {
-        // Prefer web route: POST /translations (Admin Controller) with language_id
-        const requests = Object.entries(payload).map(([key, value]) =>
-          axios.post('translations/import', {
-            language_id: languageId,
-            key,
-            value,
-            group,
-          })
-        );
-        console.log(requests);
-        await Promise.all(requests);
-      }
-
-      setEditedValues({});
-      setEditedKeys({});
-      // Refresh current page
-      window.location.href = route('translations.index', {
-        page: currentPage,
-        language: currentLanguage,
-        group: currentGroup === 'all' ? '' : currentGroup,
-      });
-    } catch (e) {
-      console.error('Failed to save translations', e);
-    } finally {
-      setSaving(false);
+  // Ensure translations is always an array
+  const translationsArray = useMemo(() => {
+    if (Array.isArray(translations)) {
+      return translations;
     }
+    // If it's an object, convert it to an array of key-value pairs
+    if (typeof translations === 'object' && translations !== null) {
+      return Object.entries(translations).map(([key, value]) => ({
+        key,
+        value: typeof value === 'string' ? value : String(value)
+      }));
+    }
+    return [];
+  }, [translations]);
+
+  // Initialize local translations state
+  useEffect(() => {
+    setLocalTranslations(translationsArray);
+  }, [translationsArray]);
+
+  // Method to update translation value
+  const updateTranslation = async (key: string, value: string, language: string = 'fa') => {
+    setUpdatingKeys(prev => new Set(prev).add(key));
+    
+    try {
+      const response = await axios.put(`/api/languages/translations/${key}`, {
+        value: value,
+        language: language
+      });
+
+      if (response.data.success) {
+        // Update local state
+        setLocalTranslations(prev => 
+          prev.map(translation => 
+            translation.key === key 
+              ? { ...translation, value: value }
+              : translation
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Failed to update translation:', error);
+      // You might want to show a toast notification here
+    } finally {
+      setUpdatingKeys(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(key);
+        return newSet;
+      });
+    }
+  };
+
+  // Handle input change
+  const handleValueChange = (key: string, newValue: string) => {
+    // Update local state immediately for better UX
+    setLocalTranslations(prev => 
+      prev.map(translation => 
+        translation.key === key 
+          ? { ...translation, value: newValue }
+          : translation
+      )
+    );
+  };
+
+  // Handle input blur (when user finishes editing)
+  const handleValueBlur = (key: string, value: string) => {
+    updateTranslation(key, value);
   };
 
   return (
@@ -164,35 +128,7 @@ export default function TranslationsIndex({
       <div className="container py-6 space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold tracking-tight">{t('translations.translations')}</h1>
-          <div className="flex gap-2">
-            <Button variant="outline" asChild>
-              <Link href={route('translations.export', { language_id: currentLanguage, group: filters.group === "all" ? "" : filters.group })}>
-                <Download className="mr-2 h-4 w-4" />
-                {t('translations.export')}
-              </Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link href={route('translations.export-json')}>
-                <Upload className="mr-2 h-4 w-4" />
-                {t('translations.export_translations')}
-              </Link>
-            </Button>
-            <Button asChild>
-              <Link href={route('translations.create')}>
-                <Plus className="mr-2 h-4 w-4" />
-                {t('translations.add_translation')}
-              </Link>
-            </Button>
-            <Button variant="outline" onClick={() => setEditMode(v => !v)}>
-              {t('common.edit')}
-            </Button>
-            <Button onClick={handleSave} disabled={!hasEdits || saving}>
-              {t('common.save')}
-            </Button>
-            <Button variant="outline" onClick={handleRevert} disabled={!hasEdits}>
-              {t('common.cancel')}
-            </Button>
-          </div>
+
         </div>
 
         <Card>
@@ -204,146 +140,49 @@ export default function TranslationsIndex({
           </CardHeader>
 
           <CardContent>
-            <div className="mb-4 flex flex-col md:flex-row gap-4">
-              <div className="w-full md:w-1/3">
-                <Select
-                  value={currentLanguage}
-                  onValueChange={(value) => window.location.href = route('translations.index', { language: value, group: currentGroup === "all" ? "" : currentGroup })}
-                >
-                    <SelectTrigger>
-                      <SelectValue placeholder={t('translations.select_language')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {languages.map((language) => (
-                      <SelectItem key={language.code} value={language.code}>
-                        {language.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
 
-              <div className="w-full md:w-1/3">
-                <Select
-                  value={currentGroup}
-                  onValueChange={(value) => window.location.href = route('translations.index', { language: currentLanguage, group: value === "all" ? "" : value })}
-                >
-                    <SelectTrigger>
-                      <SelectValue placeholder={t('translations.select_group')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{t('translations.all_groups')}</SelectItem>
-                    {safeGroups.map((group) => (
-                      <SelectItem key={group} value={group}>
-                        {group}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="w-full md:w-1/3 relative">
-                <Input
-                  placeholder={t('translations.filter_translations')}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pr-8"
-                />
-                <Search className="absolute right-3 top-2.5 h-4 w-4 text-muted-foreground" />
-              </div>
-            </div>
 
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>{t('translations.key')}</TableHead>
                   <TableHead>{t('translations.value')}</TableHead>
-                  <TableHead>{t('translations.group')}</TableHead>
                   <TableHead className="text-right">{t('common.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredTranslations.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center py-8">
-                      {searchQuery ? t('common.no_results') : t('translations.no_translations')}
+                {localTranslations.map((translation: Translation, idx: number) => (
+                  <TableRow key={`${translation.key}-${idx}`}>
+                    <TableCell className="font-medium max-w-[250px]" title={translation.key}>
+                      <span className="truncate block">{translation.key}</span>
+                    </TableCell>
+                    <TableCell className="max-w-[300px]" title={translation.value}>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          value={translation.value ?? ''}
+                          onChange={(e) => handleValueChange(translation.key, e.target.value)}
+                          onBlur={(e) => handleValueBlur(translation.key, e.target.value)}
+                          disabled={updatingKeys.has(translation.key)}
+                          className="flex-1"
+                        />
+                        {updatingKeys.has(translation.key) && (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+
                     </TableCell>
                   </TableRow>
-                ) : (
-                  filteredTranslations.map((translation, idx) => (
-                    <TableRow key={translation.id ?? `${translation.key}-${idx}`}>
-                      <TableCell className="font-medium max-w-[250px]" title={editedKeys[translation.key] ?? translation.key}>
-                        {editMode ? (
-                          <Input
-                            value={editedKeys[translation.key] ?? translation.key}
-                            onChange={(e) => handleKeyChange(translation.key, e.target.value)}
-                          />
-                        ) : (
-                          <span className="truncate block">{translation.key}</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="max-w-[300px]" title={editedValues[translation.key] ?? translation.value}>
-                        {editMode ? (
-                          <Input
-                            value={editedValues[translation.key] ?? translation.value ?? ''}
-                            onChange={(e) => handleValueChange(translation.key, e.target.value)}
-                          />
-                        ) : (
-                          <span className={!(translation.value) ? 'text-muted-foreground italic' : ''}>
-                            {translation.value || 'Empty'}
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell>{translation.group}</TableCell>
-                      <TableCell className="text-right">
-                       
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
+                ))}
               </TableBody>
             </Table>
 
-            {lastPage > 1 && (
-              <div className="mt-4 flex items-center justify-between">
-                <div className="text-sm text-muted-foreground">
-                  {t('languages.total_languages', { count: String(total) })}
-                </div>
-
-                <div className="flex gap-1">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={currentPage <= 1}
-                    onClick={() => window.location.href = route('translations.index', {
-                      page: currentPage - 1,
-                      language: currentLanguage,
-                      group: currentGroup === "all" ? "" : currentGroup
-                    })}
-                  >
-                    {t('departments.prev')}
-                  </Button>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={currentPage >= lastPage}
-                    onClick={() => window.location.href = route('translations.index', {
-                      page: currentPage + 1,
-                      language: currentLanguage,
-                      group: currentGroup === "all" ? "" : currentGroup
-                    })}
-                  >
-                    {t('departments.next')}
-                  </Button>
-                </div>
-              </div>
-            )}
           </CardContent>
 
           <CardFooter className="flex justify-between">
             <p className="text-sm text-muted-foreground">
-              {t('translations.total_translations', { count: String(total) })}
+              {t('translations.total_translations', { count: String(localTranslations.length) })}
             </p>
 
             <Button variant="outline" asChild>

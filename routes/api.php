@@ -20,19 +20,15 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// Language management
-Route::get('languages', [LanguageController::class, 'index']);
-Route::get('languages/{id}', [LanguageController::class, 'show']);
-Route::post('languages', [LanguageController::class, 'store']);
-Route::put('languages/{id}', [LanguageController::class, 'update']);
-Route::delete('languages/{id}', [LanguageController::class, 'destroy']);
+// Language translations - more specific route
+Route::put('languages/translations/{key}', [LanguageController::class, 'updateTranslation']);
 
-// Translation management
+// Translation management - specific routes first
 Route::get('translations/lang/{languageCode}', [TranslationController::class, 'getLanguageTranslations']);
 Route::post('translations/import', [TranslationController::class, 'import']);
 Route::post('translations/export', [TranslationController::class, 'export']);
 
-// General translation resource routes
+// General translation resource routes - generic routes last
 Route::get('translations', [TranslationController::class, 'index']);
 Route::get('translations/{id}', [TranslationController::class, 'show']);
 Route::post('translations', [TranslationController::class, 'store']);

@@ -10,118 +10,64 @@ use Illuminate\Support\Facades\Validator;
 
 class LanguageController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(): JsonResponse
+    public function updateTranslation(Request $request, string $key): JsonResponse
     {
-        $languages = Language::orderBy('default', 'desc')
-            ->orderBy('name')
-            ->get();
-
-        return response()->json([
-            'languages' => $languages,
-        ]);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request): JsonResponse
-    {
+        // Validate the request
         $validator = Validator::make($request->all(), [
-            'code' => 'required|string|max:10|unique:languages,code',
-            'name' => 'required|string|max:50',
-            'direction' => 'required|in:ltr,rtl',
-            'active' => 'boolean',
-            'default' => 'boolean',
+            'value' => 'required|string',
+            'language' => 'required|string|in:fa,en', // Add more languages as needed
         ]);
 
         if ($validator->fails()) {
             return response()->json([
+                'success' => false,
                 'message' => 'Validation failed',
-                'errors' => $validator->errors(),
+                'errors' => $validator->errors()
             ], 422);
         }
 
-        // If this is set as default, remove default from others
-        if ($request->input('default', false)) {
-            Language::where('default', true)->update(['default' => false]);
+        $language = $request->input('language', 'fa');
+        $value = $request->input('value');
+        
+        // Construct the JSON file path based on language
+        $jsonPath = resource_path("js/lib/i18n/translations/{$language}.json");
+        
+        // Ensure the directory exists
+        $directory = dirname($jsonPath);
+        if (!is_dir($directory)) {
+            mkdir($directory, 0755, true);
         }
 
-        $language = Language::create($request->all());
+        // Load existing translations
+        $translations = [];
+        if (file_exists($jsonPath)) {
+            $jsonContent = file_get_contents($jsonPath);
+            $translations = json_decode($jsonContent, true);
+            if (!is_array($translations)) {
+                $translations = [];
+            }
+        }
 
-        return response()->json([
-            'message' => 'Language created successfully',
-            'language' => $language,
-        ], 201);
-    }
+        // Update the specific key
+        $translations[$key] = $value;
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id): JsonResponse
-    {
-        $language = Language::findOrFail($id);
-
-        return response()->json([
-            'language' => $language,
-        ]);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id): JsonResponse
-    {
-        $language = Language::findOrFail($id);
-
-        $validator = Validator::make($request->all(), [
-            'code' => 'string|max:10|unique:languages,code,' . $language->id,
-            'name' => 'string|max:50',
-            'direction' => 'in:ltr,rtl',
-            'active' => 'boolean',
-            'default' => 'boolean',
-        ]);
-
-        if ($validator->fails()) {
+        // Save back to file
+        $jsonData = json_encode($translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        
+        if (file_put_contents($jsonPath, $jsonData) === false) {
             return response()->json([
-                'message' => 'Validation failed',
-                'errors' => $validator->errors(),
-            ], 422);
+                'success' => false,
+                'message' => 'Failed to save translation file'
+            ], 500);
         }
-
-        // If this is set as default, remove default from others
-        if ($request->has('default') && $request->input('default')) {
-            Language::where('default', true)->update(['default' => false]);
-        }
-
-        $language->update($request->all());
 
         return response()->json([
-            'message' => 'Language updated successfully',
-            'language' => $language,
+            'success' => true,
+            'message' => 'Translation updated successfully',
+            'key' => $key,
+            'value' => $value,
+            'language' => $language
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id): JsonResponse
-    {
-        $language = Language::findOrFail($id);
-
-        // Prevent deleting the default language
-        if ($language->default) {
-            return response()->json([
-                'message' => 'Cannot delete the default language',
-            ], 422);
-        }
-
-        $language->delete();
-
-        return response()->json([
-            'message' => 'Language deleted successfully',
-        ]);
-    }
 }
