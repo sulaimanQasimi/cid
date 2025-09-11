@@ -347,34 +347,34 @@ export default function ProvinceIndex({
             theme="purple"
             showButton={false}
           />
-          <Card className="shadow-lg">
+          <Card className="shadow-lg bg-white dark:bg-gray-800 border-purple-200 dark:border-purple-700">
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-gradient-to-l from-purple-100 to-purple-200 border-0">
-                    <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('provinces.table.name')}</TableHead>
-                    <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('provinces.table.code')}</TableHead>
-                    <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('provinces.table.capital')}</TableHead>
-                    <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('provinces.table.status')}</TableHead>
-                    <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('provinces.table.created_by')}</TableHead>
-                    <TableHead className="text-purple-800 font-bold text-lg py-6 px-6 text-right">{t('provinces.table.actions')}</TableHead>
+                  <TableRow className="bg-gradient-to-l from-purple-100 dark:from-purple-900/30 to-purple-200 dark:to-purple-800/30 border-0">
+                    <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('provinces.table.name')}</TableHead>
+                    <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('provinces.table.code')}</TableHead>
+                    <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('provinces.table.capital')}</TableHead>
+                    <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('provinces.table.status')}</TableHead>
+                    <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('provinces.table.created_by')}</TableHead>
+                    <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6 text-right">{t('provinces.table.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {provinces?.data && provinces.data.length > 0 ? (
                     provinces.data.map((province: ProvinceData) => (
-                      <TableRow key={province.id}>
+                      <TableRow key={province.id} className="hover:bg-purple-50/50 dark:hover:bg-purple-900/20">
                         <TableCell>
                           <Link
                             href={route('provinces.show', province.id)}
-                            className="font-bold hover:underline flex items-center gap-2"
+                            className="font-bold hover:underline flex items-center gap-2 text-purple-900 dark:text-purple-100"
                           >
                             <MapPin className="h-4 w-4" />
                             {province.name}
                           </Link>
                         </TableCell>
-                        <TableCell className="font-bold">{province.code}</TableCell>
-                        <TableCell>
+                        <TableCell className="font-bold text-purple-900 dark:text-purple-100">{province.code}</TableCell>
+                        <TableCell className="text-purple-900 dark:text-purple-100">
                           {province.capital || '-'}
                         </TableCell>
                         <TableCell>
@@ -382,7 +382,7 @@ export default function ProvinceIndex({
                             {province.status}
                           </Badge>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="text-purple-900 dark:text-purple-100">
                           {province.creator?.name || '-'}
                         </TableCell>
                         <TableCell>
@@ -428,7 +428,7 @@ export default function ProvinceIndex({
                   ) : (
                     <TableRow>
                       <TableCell colSpan={6} className="h-32 text-center">
-                        <div className="flex flex-col items-center gap-4 text-muted-foreground">
+                        <div className="flex flex-col items-center gap-4 text-purple-600 dark:text-purple-400">
                           <AlertTriangle className="h-16 w-16" />
                           <p className="text-xl font-bold">{t('provinces.no_records')}</p>
                           <p>{t('provinces.no_records_description')}</p>
@@ -445,7 +445,7 @@ export default function ProvinceIndex({
         {/* Pagination */}
         {provinces?.links && provinces.links.length > 0 && (
           <div className="mt-8 flex justify-center">
-            <div className="bg-gradient-to-l from-purple-50 to-white p-4 rounded-3xl shadow-2xl border border-purple-200">
+            <div className="bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 p-4 rounded-3xl shadow-2xl border border-purple-200 dark:border-purple-700">
               <Pagination links={provinces.links} />
             </div>
           </div>
