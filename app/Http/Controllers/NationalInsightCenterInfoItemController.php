@@ -87,14 +87,13 @@ class NationalInsightCenterInfoItemController extends Controller
         
         $nationalInsightCenterInfos = NationalInsightCenterInfo::orderBy('name')->get();
         $infoCategories = InfoCategory::orderBy('name')->get();
-        $provinces = Province::orderBy('name')->get();
-        $districts = District::orderBy('name')->get();
+        $provinces = Province::orderBy('name')->with('districts')->get();
+        $districts = District::orderBy('name')->with('province')->get();
 
         return Inertia::render('NationalInsightCenterInfoItem/Create', [
             'nationalInsightCenterInfos' => $nationalInsightCenterInfos,
             'infoCategories' => $infoCategories,
             'provinces' => $provinces,
-            'districts' => $districts,
             'nationalInsightCenterInfoId' => $nationalInsightCenterInfoId,
         ]);
     }
@@ -183,8 +182,8 @@ class NationalInsightCenterInfoItemController extends Controller
         // Load data for dropdowns
         $nationalInsightCenterInfos = NationalInsightCenterInfo::orderBy('name')->get();
         $infoCategories = InfoCategory::orderBy('name')->get();
-        $provinces = Province::orderBy('name')->get();
-        $districts = District::orderBy('name')->get();
+        $provinces = Province::orderBy('name')->with('districts')->get();
+        $districts = District::orderBy('name')->with('province')->get();
 
         // Load the item with its relationships
         $item->load([
@@ -382,6 +381,7 @@ class NationalInsightCenterInfoItemController extends Controller
                 'stat_category_item_id' => $stat['stat_category_item_id'],
                 'string_value' => $stat['value'],
                 'notes' => $stat['notes'] ?? null,
+                'created_by' => Auth::id(),
             ]);
         }
     }

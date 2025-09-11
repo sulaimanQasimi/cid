@@ -325,6 +325,7 @@ class NationalInsightCenterInfoController extends Controller
                 'stat_category_item_id' => $stat['stat_category_item_id'],
                 'string_value' => $stat['value'],
                 'notes' => $stat['notes'] ?? null,
+                'created_by' => Auth::id(),
             ]);
         }
     }

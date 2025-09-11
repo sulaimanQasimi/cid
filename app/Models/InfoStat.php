@@ -21,6 +21,7 @@ class InfoStat extends Model
      */
     protected $fillable = [
         'info_type_id',
+        'national_insight_center_info_id',
         'stat_category_item_id',
         'integer_value',
         'string_value',
@@ -77,6 +78,14 @@ class InfoStat extends Model
     public function infoType(): BelongsTo
     {
         return $this->belongsTo(InfoType::class);
+    }
+
+    /**
+     * Get the national insight center info that owns this stat.
+     */
+    public function nationalInsightCenterInfo(): BelongsTo
+    {
+        return $this->belongsTo(NationalInsightCenterInfo::class);
     }
 
     /**

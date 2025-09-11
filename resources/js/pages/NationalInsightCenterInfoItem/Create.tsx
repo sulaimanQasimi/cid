@@ -34,6 +34,7 @@ interface Province {
   name: string;
   label: string;
   color: string;
+  districts: District[];
 }
 
 interface District {
@@ -51,7 +52,7 @@ interface CreateProps {
   nationalInsightCenterInfoId?: number;
 }
 
-export default function Create({ nationalInsightCenterInfos, infoCategories, provinces, districts, nationalInsightCenterInfoId }: CreateProps) {
+export default function Create({ nationalInsightCenterInfos, infoCategories, provinces, nationalInsightCenterInfoId }: CreateProps) {
   const { t } = useTranslation();
   const { canCreate } = usePermissions();
 
@@ -65,6 +66,10 @@ export default function Create({ nationalInsightCenterInfos, infoCategories, pro
     description: '',
     date: '',
   });
+
+  // Get districts for the selected province
+  const selectedProvince = provinces.find(p => p.id === data.province_id);
+  const availableDistricts = selectedProvince?.districts || [];
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -88,6 +93,12 @@ export default function Create({ nationalInsightCenterInfos, infoCategories, pro
     } else {
       window.location.href = route('national-insight-center-infos.index');
     }
+  };
+
+  const handleProvinceChange = (value: string) => {
+    setData('province_id', value ? parseInt(value) : '');
+    // Reset district when province changes
+    setData('district_id', '');
   };
 
   return (
@@ -196,7 +207,7 @@ export default function Create({ nationalInsightCenterInfos, infoCategories, pro
                       </Label>
                       <Select
                         value={data.info_category_id.toString()}
-                        onValueChange={(value) => setData('info_category_id', value ? parseInt(value) : '')}
+                        onValueChange={(value) => setData('info_category_id', value ? parseInt(value) : null)}
                       >
                         <SelectTrigger id="info_category_id" className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right">
                           <SelectValue placeholder={t('national_insight_center_info_item.create.select_info_category')} />
@@ -226,7 +237,7 @@ export default function Create({ nationalInsightCenterInfos, infoCategories, pro
                       </Label>
                       <Select
                         value={data.province_id.toString()}
-                        onValueChange={(value) => setData('province_id', value ? parseInt(value) : '')}
+                        onValueChange={handleProvinceChange}
                       >
                         <SelectTrigger id="province_id" className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right">
                           <SelectValue placeholder={t('national_insight_center_info_item.create.select_province')} />
@@ -239,7 +250,7 @@ export default function Create({ nationalInsightCenterInfos, infoCategories, pro
                                   className="mr-2 h-3 w-3 rounded-full"
                                   style={{ backgroundColor: province.color }}
                                 ></div>
-                                {province.label}
+                                {province.name}
                               </div>
                             </SelectItem>
                           ))}
@@ -257,19 +268,24 @@ export default function Create({ nationalInsightCenterInfos, infoCategories, pro
                       <Select
                         value={data.district_id.toString()}
                         onValueChange={(value) => setData('district_id', value ? parseInt(value) : '')}
+                        disabled={!data.province_id}
                       >
-                        <SelectTrigger id="district_id" className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right">
-                          <SelectValue placeholder={t('national_insight_center_info_item.create.select_district')} />
+                        <SelectTrigger id="district_id" className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right disabled:opacity-50 disabled:cursor-not-allowed">
+                          <SelectValue placeholder={
+                            !data.province_id 
+                              ? t('national_insight_center_info_item.create.select_province_first')
+                              : t('national_insight_center_info_item.create.select_district')
+                          } />
                         </SelectTrigger>
                         <SelectContent>
-                          {districts.map((district) => (
+                          {availableDistricts.map((district) => (
                             <SelectItem key={district.id} value={district.id.toString()}>
                               <div className="flex items-center">
                                 <div
                                   className="mr-2 h-3 w-3 rounded-full"
                                   style={{ backgroundColor: district.color }}
                                 ></div>
-                                {district.label}
+                                {district.name}
                               </div>
                             </SelectItem>
                           ))}
