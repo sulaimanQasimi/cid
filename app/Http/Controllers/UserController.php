@@ -11,6 +11,7 @@ use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use App\Models\Department;
 
 class UserController extends Controller
 {
@@ -55,7 +56,7 @@ class UserController extends Controller
         $direction = $validated['direction'] ?? 'asc';
 
         // Apply search and filters
-        $query = User::query();
+        $query = User::with('department');
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -89,6 +90,7 @@ class UserController extends Controller
         
         $roles = Role::all();
         $permissions = Permission::all();
+        $departments = Department::orderBy('name')->get();
 
         // Group permissions by model
         $groupedPermissions = [];
@@ -131,6 +133,7 @@ class UserController extends Controller
         return Inertia::render('User/Create', [
             'roles' => $roles,
             'groupedPermissions' => $groupedPermissions,
+            'departments' => $departments,
         ]);
     }
 
@@ -145,6 +148,7 @@ class UserController extends Controller
             'name' => 'required|string|min:2|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'department_id' => 'nullable|exists:departments,id',
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,id',
             'permissions' => 'nullable|array',
@@ -165,6 +169,7 @@ class UserController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
+            'department_id' => $validated['department_id'],
         ]);
 
         // Assign roles if provided
@@ -187,7 +192,7 @@ class UserController extends Controller
     {
         $this->authorize('view', $user);
         
-        $user->load('roles');
+        $user->load('roles', 'department');
         return Inertia::render('User/Show', [
             'user' => $user,
         ]);
@@ -200,9 +205,10 @@ class UserController extends Controller
     {
         $this->authorize('update', $user);
         
-        $user->load('roles', 'permissions');
+        $user->load('roles', 'permissions', 'department');
         $roles = Role::all();
         $permissions = Permission::all();
+        $departments = Department::orderBy('name')->get();
 
         // Group permissions by model
         $groupedPermissions = [];
@@ -248,6 +254,7 @@ class UserController extends Controller
             'userPermissions' => $user->permissions->pluck('id')->toArray(),
             'roles' => $roles,
             'groupedPermissions' => $groupedPermissions,
+            'departments' => $departments,
         ]);
     }
 
@@ -268,6 +275,7 @@ class UserController extends Controller
                 Rule::unique('users')->ignore($user->id),
             ],
             'password' => 'nullable|string|min:8|confirmed',
+            'department_id' => 'nullable|exists:departments,id',
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,id',
             'permissions' => 'nullable|array',
@@ -287,6 +295,7 @@ class UserController extends Controller
         $userData = [
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'department_id' => $validated['department_id'],
         ];
 
         // Update password if provided

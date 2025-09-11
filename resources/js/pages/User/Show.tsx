@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Pencil, Trash, Shield, FileText, User, Eye, Calendar, Mail, CheckCircle, AlertTriangle, Clock, Edit3 } from 'lucide-react';
+import { ArrowLeft, Pencil, Trash, Shield, FileText, User, Eye, Calendar, Mail, CheckCircle, AlertTriangle, Clock, Edit3, Building2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { format } from 'date-fns';
@@ -23,6 +23,11 @@ interface User {
   email_verified_at: string | null;
   created_at: string;
   updated_at: string;
+  department?: {
+    id: number;
+    name: string;
+    code: string;
+  } | null;
   roles: Role[];
 }
 
@@ -118,6 +123,22 @@ export default function UserShow({ user }: Props) {
                       <h4 className="text-lg font-semibold text-blue-900">{t('users.form.email')}</h4>
                     </div>
                     <p className="text-xl font-bold text-blue-800">{user.email}</p>
+                  </div>
+
+                  <div className="bg-gradient-to-l from-blue-50 to-white p-6 rounded-2xl border border-blue-200 shadow-lg">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="p-2 bg-blue-100 rounded-xl">
+                        <Building2 className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <h4 className="text-lg font-semibold text-blue-900">{t('users.form.department')}</h4>
+                    </div>
+                    {user.department ? (
+                      <Badge variant="outline" className="bg-gradient-to-l from-blue-100 to-blue-200 text-blue-800 border-blue-300 px-4 py-2 rounded-xl font-semibold">
+                        {user.department.name}
+                      </Badge>
+                    ) : (
+                      <span className="text-blue-600 font-medium">{t('users.none')}</span>
+                    )}
                   </div>
 
                   <div className="bg-gradient-to-l from-blue-50 to-white p-6 rounded-2xl border border-blue-200 shadow-lg">

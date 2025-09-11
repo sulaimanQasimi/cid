@@ -12,6 +12,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Contracts\Activity;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class User extends Authenticatable
 {
@@ -28,6 +29,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'department_id',
     ];
 
     /**
@@ -255,5 +257,13 @@ class User extends Authenticatable
     public function canAccessIncidentsOnlyForReport($reportId): bool
     {
         return $this->hasIncidentReportAccessForReport($reportId, 'incidents_only');
+    }
+
+    /**
+     * Get the department that the user belongs to.
+     */
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class);
     }
 }
