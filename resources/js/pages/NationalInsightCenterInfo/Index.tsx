@@ -301,7 +301,7 @@ export default function NationalInsightCenterInfosIndex({
                                   title={t('national_insight_center_info.actions.view')}
                                   className="h-10 w-10 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-800 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-300 hover:scale-110"
                                 >
-                                  <Link href={route('national-insight-center-infos.show', nationalInsightCenterInfo.id)}>
+                                  <Link href={route('national-insight-center-infos.show', { national_insight_center_info: nationalInsightCenterInfo.id })}>
                                     <Eye className="h-5 w-5" />
                                   </Link>
                                 </Button>

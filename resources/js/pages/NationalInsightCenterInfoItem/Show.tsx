@@ -111,8 +111,8 @@ export default function Show({ item }: ShowProps) {
       href: route('national-insight-center-infos.index'),
     },
     {
-      title: item.nationalInsightCenterInfo.name,
-      href: route('national-insight-center-infos.show', item.nationalInsightCenterInfo.id),
+      title: item.nationalInsightCenterInfo?.name || t('national_insight_center_info_item.unknown'),
+      href: item.nationalInsightCenterInfo?.id ? route('national-insight-center-infos.show', { national_insight_center_info: item.nationalInsightCenterInfo.id }) : route('national-insight-center-infos.index'),
     },
     {
       title: item.title,
@@ -154,7 +154,7 @@ export default function Show({ item }: ShowProps) {
           theme="purple"
           buttonSize="lg"
           showBackButton={true}
-          backRouteName="national-insight-center-infos.show"
+          backRouteName={() => item.nationalInsightCenterInfo?.id ? route('national-insight-center-infos.show', { national_insight_center_info: item.nationalInsightCenterInfo.id }) : route('national-insight-center-infos.index')}
           backButtonText={t('national_insight_center_info_item.show.back_button')}
           showButton={canUpdate('national_insight_center_info_item')}
           actionButtons={
@@ -283,23 +283,29 @@ export default function Show({ item }: ShowProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.national_insight_center_info')}</Label>
-                  <Link 
-                    href={route('national-insight-center-infos.show', item.nationalInsightCenterInfo.id)}
-                    className="text-lg font-semibold text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 transition-colors"
-                  >
-                    {item.nationalInsightCenterInfo.name}
-                  </Link>
+                  {item.nationalInsightCenterInfo ? (
+                    <Link 
+                      href={route('national-insight-center-infos.show', { national_insight_center_info: item.nationalInsightCenterInfo.id })}
+                      className="text-lg font-semibold text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 transition-colors"
+                    >
+                      {item.nationalInsightCenterInfo.name}
+                    </Link>
+                  ) : (
+                    <span className="text-lg font-semibold text-gray-500 dark:text-gray-400">
+                      {t('national_insight_center_info_item.unknown')}
+                    </span>
+                  )}
                 </div>
 
                 {item.infoCategory && (
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.info_category')}</Label>
                     <div className="flex items-center gap-2">
-                      <div 
+                      <div
                         className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: item.infoCategory.color }}
+                        style={{ backgroundColor: item.infoCategory?.color || '#6b7280' }}
                       ></div>
-                      <span className="text-lg font-semibold text-gray-900 dark:text-white">{item.infoCategory.label}</span>
+                      <span className="text-lg font-semibold text-gray-900 dark:text-white">{item.infoCategory?.label || t('national_insight_center_info_item.unknown')}</span>
                     </div>
                   </div>
                 )}
@@ -308,11 +314,11 @@ export default function Show({ item }: ShowProps) {
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.province')}</Label>
                     <div className="flex items-center gap-2">
-                      <div 
+                      <div
                         className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: item.province.color }}
+                        style={{ backgroundColor: item.province?.color || '#6b7280' }}
                       ></div>
-                      <span className="text-lg font-semibold text-gray-900 dark:text-white">{item.province.label}</span>
+                      <span className="text-lg font-semibold text-gray-900 dark:text-white">{item.province?.label || t('national_insight_center_info_item.unknown')}</span>
                     </div>
                   </div>
                 )}
@@ -321,11 +327,11 @@ export default function Show({ item }: ShowProps) {
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.district')}</Label>
                     <div className="flex items-center gap-2">
-                      <div 
+                      <div
                         className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: item.district.color }}
+                        style={{ backgroundColor: item.district?.color || '#6b7280' }}
                       ></div>
-                      <span className="text-lg font-semibold text-gray-900 dark:text-white">{item.district.label}</span>
+                      <span className="text-lg font-semibold text-gray-900 dark:text-white">{item.district?.label || t('national_insight_center_info_item.unknown')}</span>
                     </div>
                   </div>
                 )}
@@ -391,14 +397,14 @@ export default function Show({ item }: ShowProps) {
                 {item.creator && (
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.created_by')}</Label>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-white">{item.creator.name}</p>
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white">{item.creator?.name || t('national_insight_center_info_item.unknown')}</p>
                   </div>
                 )}
 
                 {item.confirmer && (
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.confirmed_by')}</Label>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-white">{item.confirmer.name}</p>
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white">{item.confirmer?.name || t('national_insight_center_info_item.unknown')}</p>
                   </div>
                 )}
               </div>

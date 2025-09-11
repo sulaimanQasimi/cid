@@ -121,8 +121,8 @@ export default function ManageStats({ item, statItems, statCategories }: ManageS
       }));
 
     // Submit the form
-    put(route('national-insight-center-info-items.stats.update', item.id), {
-      data: { stats }
+    put(route('national-insight-center-info-items.stats.update', item.id), {        
+      stats
     });
   };
 
@@ -172,7 +172,6 @@ export default function ManageStats({ item, statItems, statCategories }: ManageS
           buttonSize="lg"
           showBackButton={true}
           backRouteName="national-insight-center-info-items.show"
-          backRouteParams={{ nationalInsightCenterInfoItem: item.id }}
           backButtonText={t('national_insight_center_info_item.stats.back_button')}
           showButton={false}
           actionButtons={

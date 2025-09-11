@@ -140,7 +140,7 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
           description={t('national_insight_center_info.show.description')}
           icon={<TrendingUp className="h-6 w-6 text-white" />}
           model="national_insight_center_info"
-          routeName={route('national-insight-center-infos.show', nationalInsightCenterInfo.id)}
+          routeName={route('national-insight-center-infos.show', { national_insight_center_info: nationalInsightCenterInfo.id })}
           theme="purple"
           buttonText={t('common.edit', { name: nationalInsightCenterInfo.name })}
           showBackButton={true}
@@ -326,7 +326,7 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
             description={t('national_insight_center_info.show.associated_info_description')}
             icon={<FileText className="h-6 w-6 text-white" />}
             model="info"
-            routeName={route('national-insight-center-infos.show', nationalInsightCenterInfo.id)}
+            routeName="national-insight-center-info-items.create"
             buttonText={t('national_insight_center_info.show.create_info_button')}
             theme="purple"
             showButton={false}

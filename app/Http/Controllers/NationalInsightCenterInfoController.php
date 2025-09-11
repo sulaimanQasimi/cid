@@ -180,7 +180,7 @@ class NationalInsightCenterInfoController extends Controller
         ]);
 
         $infos = $nationalInsightCenterInfo->infoItems()
-            ->with(['infoCategory:id,name,label,color', 'department:id,name,label,color', 'user:id,name', 'creator:id,name'])
+            ->with(['infoCategory:id,name,code', 'department:id,name,code', 'creator:id,name'])
             ->orderBy('created_at', 'desc')
             ->paginate(5);
 

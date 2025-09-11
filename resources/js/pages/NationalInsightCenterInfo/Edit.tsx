@@ -140,7 +140,7 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
     },
     {
       title: nationalInsightCenterInfo.name,
-      href: route('national-insight-center-infos.show', nationalInsightCenterInfo.id),
+      href: route('national-insight-center-infos.show', { national_insight_center_info: nationalInsightCenterInfo.id }),
     },
     {
       title: t('national_insight_center_info.edit.page_title'),
@@ -234,14 +234,13 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
           theme="purple"
           buttonSize="lg"
           showBackButton={true}
-          backRouteName="national-insight-center-infos.show"
-          backRouteParams={{ nationalInsightCenterInfo: nationalInsightCenterInfo.id }}
+          backRouteName={() => route('national-insight-center-infos.show', { national_insight_center_info: nationalInsightCenterInfo.id })}
           backButtonText={t('national_insight_center_info.edit.back_button')}
           showButton={false}
           actionButtons={
             <>
               <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
-                <Link href={route('national-insight-center-infos.show', nationalInsightCenterInfo.id)} className="flex items-center gap-3">
+                <Link href={route('national-insight-center-infos.show', { national_insight_center_info: nationalInsightCenterInfo.id })} className="flex items-center gap-3">
                   <ArrowLeft className="h-5 w-5" />
                   {t('national_insight_center_info.edit.back_button')}
                 </Link>

@@ -1823,6 +1823,7 @@
     "national_insight_center_info_item.create.select_province": "انتخاب ولایت",
     "national_insight_center_info_item.create.select_district": "انتخاب ولسوالی",
     "national_insight_center_info_item.create.select_province_first": "ابتدا ولایت را انتخاب کنید",
+    "national_insight_center_info_item.unknown": "نامشخص",
     "national_insight_center_info_item.create.description_placeholder": "توضیحات را وارد کنید",
     "national_insight_center_info_item.create.cancel_button": "انصراف",
     "national_insight_center_info_item.create.save_button": "ذخیره",

@@ -60,9 +60,9 @@ export default function Create({ nationalInsightCenterInfos, infoCategories, pro
     national_insight_center_info_id: nationalInsightCenterInfoId || '',
     title: '',
     registration_number: '',
-    info_category_id: '',
-    province_id: '',
-    district_id: '',
+    info_category_id: null as number | null,
+    province_id: null as number | null,
+    district_id: null as number | null,
     description: '',
     date: '',
   });
@@ -96,9 +96,9 @@ export default function Create({ nationalInsightCenterInfos, infoCategories, pro
   };
 
   const handleProvinceChange = (value: string) => {
-    setData('province_id', value ? parseInt(value) : '');
+    setData('province_id', value ? parseInt(value) : null);
     // Reset district when province changes
-    setData('district_id', '');
+    setData('district_id', null);
   };
 
   return (
@@ -116,12 +116,12 @@ export default function Create({ nationalInsightCenterInfos, infoCategories, pro
           theme="purple"
           buttonSize="lg"
           showBackButton={true}
-          backRouteName={nationalInsightCenterInfoId ? 'national-insight-center-infos.show' : 'national-insight-center-infos.index'}
+          backRouteName={nationalInsightCenterInfoId ? () => route('national-insight-center-infos.show', { national_insight_center_info: nationalInsightCenterInfoId }) : 'national-insight-center-infos.index'}
                backButtonText={t('national_insight_center_info_item.create.back_button')}
           showButton={false}
           actionButtons={
             <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
-              <Link href={nationalInsightCenterInfoId ? route('national-insight-center-infos.show', nationalInsightCenterInfoId) : route('national-insight-center-infos.index')} className="flex items-center gap-3">
+              <Link href={nationalInsightCenterInfoId ? route('national-insight-center-infos.show', { national_insight_center_info: nationalInsightCenterInfoId }) : route('national-insight-center-infos.index')} className="flex items-center gap-3">
                 <ArrowLeft className="h-5 w-5" />
                 {t('national_insight_center_info_item.create.back_button')}
               </Link>
@@ -206,7 +206,7 @@ export default function Create({ nationalInsightCenterInfos, infoCategories, pro
                         {t('national_insight_center_info_item.create.info_category')}
                       </Label>
                       <Select
-                        value={data.info_category_id.toString()}
+                        value={data.info_category_id?.toString() || ''}
                         onValueChange={(value) => setData('info_category_id', value ? parseInt(value) : null)}
                       >
                         <SelectTrigger id="info_category_id" className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right">
@@ -236,7 +236,7 @@ export default function Create({ nationalInsightCenterInfos, infoCategories, pro
                         {t('national_insight_center_info_item.create.province')}
                       </Label>
                       <Select
-                        value={data.province_id.toString()}
+                        value={data.province_id?.toString() || ''}
                         onValueChange={handleProvinceChange}
                       >
                         <SelectTrigger id="province_id" className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right">
@@ -266,8 +266,8 @@ export default function Create({ nationalInsightCenterInfos, infoCategories, pro
                         {t('national_insight_center_info_item.create.district')}
                       </Label>
                       <Select
-                        value={data.district_id.toString()}
-                        onValueChange={(value) => setData('district_id', value ? parseInt(value) : '')}
+                        value={data.district_id?.toString() || ''}
+                        onValueChange={(value) => setData('district_id', value ? parseInt(value) : null)}
                         disabled={!data.province_id}
                       >
                         <SelectTrigger id="district_id" className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right disabled:opacity-50 disabled:cursor-not-allowed">
