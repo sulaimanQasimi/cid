@@ -188,17 +188,6 @@ export default function ShowInfoType({ infoType, infos, infoCategories = [], dep
 
         {/* Info Type Details Card */}
         <Card className="shadow-2xl bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 overflow-hidden mb-8">
-          <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 text-white py-6">
-            <CardTitle className="flex items-center gap-4">
-              <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
-                <TrendingUp className="h-6 w-6" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold">{t('info_types.show.details_title')}</div>
-                <div className="text-purple-100 text-sm font-medium">{t('info_types.show.details_description')}</div>
-              </div>
-            </CardTitle>
-          </CardHeader>
           <CardContent className="p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-6">
