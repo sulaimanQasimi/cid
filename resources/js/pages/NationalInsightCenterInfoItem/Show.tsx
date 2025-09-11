@@ -115,7 +115,7 @@ export default function Show({ item }: ShowProps) {
       href: route('national-insight-center-infos.show', item.nationalInsightCenterInfo.id),
     },
     {
-      title: item.name,
+      title: item.title,
       href: '#',
     },
   ];
@@ -155,7 +155,6 @@ export default function Show({ item }: ShowProps) {
           buttonSize="lg"
           showBackButton={true}
           backRouteName="national-insight-center-infos.show"
-          backRouteParams={{ nationalInsightCenterInfo: item.nationalInsightCenterInfo.id }}
           backButtonText={t('national_insight_center_info_item.show.back_button')}
           showButton={canUpdate('national_insight_center_info_item')}
           actionButtons={
@@ -204,7 +203,7 @@ export default function Show({ item }: ShowProps) {
                     <AlertDialogHeader>
                       <AlertDialogTitle>{t('national_insight_center_info_item.show.delete_confirm_title')}</AlertDialogTitle>
                       <AlertDialogDescription>
-                        {t('national_insight_center_info_item.show.delete_confirm_description', { name: item.name })}
+                        {t('national_insight_center_info_item.show.delete_confirm_description', { name: item.title })}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
