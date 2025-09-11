@@ -161,7 +161,7 @@ export default function PrintInfoType({ infoType, infos, statCategories }: Props
 
         {/* Info Type Details */}
         <Card className="mb-4 print:mb-2 print:shadow-none print:border print:border-gray-300">
-          <CardHeader className="bg-gradient-to-r from-purple-500 to-purple-600 text-white print:bg-gray-100 print:text-gray-900 print:py-2">
+          <CardHeader className=" text-black print:bg-gray-100 print:text-black print:py-2">
             <CardTitle className="flex items-center gap-2 print:gap-1">
               <div className="p-1 bg-white/20 rounded-lg print:bg-gray-200 print:p-0.5">
                 <FileText className="h-4 w-4 print:h-3 print:w-3" />
@@ -170,7 +170,7 @@ export default function PrintInfoType({ infoType, infos, statCategories }: Props
                 <div className="text-lg font-bold print:text-sm print:font-semibold">
                   {t('info_types.print.details_title')}
                 </div>
-                <div className="text-purple-100 text-xs print:text-gray-600 print:text-xs">
+                <div className="text-black text-xs print:text-gray-600 print:text-xs">
                   {t('info_types.print.details_description')}
                 </div>
               </div>
