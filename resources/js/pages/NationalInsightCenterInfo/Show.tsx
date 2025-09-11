@@ -140,7 +140,7 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
           description={t('national_insight_center_info.show.description')}
           icon={<TrendingUp className="h-6 w-6 text-white" />}
           model="national_insight_center_info"
-          routeName={route('national-insight-center-infos.show', nationalInsightCenterInfo.id)}
+          routeName={route('national-insight-center-infos.show', { national_insight_center_info: nationalInsightCenterInfo.id })}
           theme="purple"
           buttonText={t('common.edit', { name: nationalInsightCenterInfo.name })}
           showBackButton={true}
@@ -325,8 +325,8 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
             title={t('national_insight_center_info.show.associated_info_title')}
             description={t('national_insight_center_info.show.associated_info_description')}
             icon={<FileText className="h-6 w-6 text-white" />}
-            model="info"
-            routeName={route('national-insight-center-infos.show', nationalInsightCenterInfo.id)}
+            model="national_insight_center_info_item"
+            routeName="national-insight-center-info-items.create"
             buttonText={t('national_insight_center_info.show.create_info_button')}
             theme="purple"
             showButton={false}
@@ -374,7 +374,7 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
                           </TableCell>
                           <TableCell className="py-6 px-6">
                             <div className="flex items-center gap-2 justify-end">
-                              <CanView model="info">
+                              <CanView model="national_insight_center_info_item">
                                 <Button
                                   variant="ghost"
                                   size="icon"
@@ -382,7 +382,7 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
                                   title={t('national_insight_center_info.show.actions.view')}
                                   className="h-10 w-10 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-800 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-300 hover:scale-110"
                                 >
-                                  <Link href={route('infos.show', info.id)}>
+                                  <Link href={route('national-insight-center-info-items.show', info.id)}>
                                     <ExternalLink className="h-5 w-5" />
                                   </Link>
                                 </Button>
@@ -400,7 +400,7 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
                             </div>
                             <p className="text-xl font-bold text-center">{t('national_insight_center_info.show.no_info_records')}</p>
                             <p className="text-purple-500 dark:text-purple-400 text-center">{t('national_insight_center_info.show.no_info_records_description')}</p>
-                            <CanCreate model="info">
+                            <CanCreate model="national_insight_center_info_item">
                               <div className="flex justify-center">
                                 <Button asChild className="bg-gradient-to-l from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105 flex items-center gap-3">
                                   <Link href={route('national-insight-center-info-items.create', { national_insight_center_info_id: nationalInsightCenterInfo.id })}>

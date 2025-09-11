@@ -38,7 +38,6 @@ class NationalInsightCenterInfoItemController extends Controller
             'nationalInsightCenterInfo:id,name',
             'infoCategory:id,name',
             'department:id,name',
-            'user:id,name',
             'creator:id,name'
         ]);
 
@@ -110,6 +109,7 @@ class NationalInsightCenterInfoItemController extends Controller
             'title' => 'required|string|max:255',
             'registration_number' => 'required|string|max:255|unique:national_insight_center_info_items',
             'info_category_id' => 'nullable|exists:info_categories,id',
+            'department_id' => 'nullable|exists:departments,id',
             'province_id' => 'nullable|exists:provinces,id',
             'district_id' => 'nullable|exists:districts,id',
             'description' => 'nullable|string',
@@ -122,6 +122,7 @@ class NationalInsightCenterInfoItemController extends Controller
                 'title' => $validated['title'],
                 'registration_number' => $validated['registration_number'],
                 'info_category_id' => $validated['info_category_id'],
+                'department_id' => $validated['department_id'],
                 'province_id' => $validated['province_id'],
                 'district_id' => $validated['district_id'],
                 'description' => $validated['description'],
@@ -183,8 +184,7 @@ class NationalInsightCenterInfoItemController extends Controller
         $nationalInsightCenterInfos = NationalInsightCenterInfo::orderBy('name')->get();
         $infoCategories = InfoCategory::orderBy('name')->get();
         $provinces = Province::orderBy('name')->with('districts')->get();
-        $districts = District::orderBy('name')->with('province')->get();
-
+     
         // Load the item with its relationships
         $item->load([
             'nationalInsightCenterInfo',
@@ -199,7 +199,6 @@ class NationalInsightCenterInfoItemController extends Controller
             'nationalInsightCenterInfos' => $nationalInsightCenterInfos,
             'infoCategories' => $infoCategories,
             'provinces' => $provinces,
-            'districts' => $districts,
         ]);
     }
 
@@ -215,6 +214,7 @@ class NationalInsightCenterInfoItemController extends Controller
             'title' => 'required|string|max:255',
             'registration_number' => 'required|string|max:255|unique:national_insight_center_info_items,registration_number,' . $item->id,
             'info_category_id' => 'nullable|exists:info_categories,id',
+            'department_id' => 'nullable|exists:departments,id',
             'province_id' => 'nullable|exists:provinces,id',
             'district_id' => 'nullable|exists:districts,id',
             'description' => 'nullable|string',
@@ -227,6 +227,7 @@ class NationalInsightCenterInfoItemController extends Controller
                 'title' => $validated['title'],
                 'registration_number' => $validated['registration_number'],
                 'info_category_id' => $validated['info_category_id'],
+                'department_id' => $validated['department_id'],
                 'province_id' => $validated['province_id'],
                 'district_id' => $validated['district_id'],
                 'description' => $validated['description'],

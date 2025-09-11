@@ -25,6 +25,7 @@ class NationalInsightCenterInfoItem extends Model
         'title',
         'registration_number',
         'info_category_id',
+        'department_id',
         'province_id',
         'district_id',
         'description',
@@ -96,6 +97,14 @@ class NationalInsightCenterInfoItem extends Model
     public function infoCategory(): BelongsTo
     {
         return $this->belongsTo(InfoCategory::class);
+    }
+
+    /**
+     * Get the department that owns this item.
+     */
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class);
     }
 
     /**

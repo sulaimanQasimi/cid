@@ -70,11 +70,21 @@ interface ManageStatsProps {
   statCategories: StatCategory[];
 }
 
+type ManageStatsFormData = {
+  stats: Array<{
+    stat_category_item_id: number;
+    value: string;
+    notes: string | undefined;
+  }>;
+};
+
 export default function ManageStats({ item, statItems, statCategories }: ManageStatsProps) {
   const { t } = useTranslation();
   const { canUpdate } = usePermissions();
 
-  const { put, processing, errors } = useForm();
+  const { data, setData, put, processing, errors } = useForm<ManageStatsFormData>({
+    stats: []
+  });
 
   // State for managing statistical data
   const [statsData, setStatsData] = useState<{
@@ -120,10 +130,13 @@ export default function ManageStats({ item, statItems, statCategories }: ManageS
         notes: notes || undefined,
       }));
 
+    // Add stats to form data
+    if (stats.length > 0) {
+      setData('stats', stats);
+    }
+
     // Submit the form
-    put(route('national-insight-center-info-items.stats.update', item.id), {
-      data: { stats }
-    });
+    put(route('national-insight-center-info-items.stats.update', item.id));
   };
 
   // Group stat items by category for the dropdown filter
@@ -172,7 +185,6 @@ export default function ManageStats({ item, statItems, statCategories }: ManageS
           buttonSize="lg"
           showBackButton={true}
           backRouteName="national-insight-center-info-items.show"
-          backRouteParams={{ nationalInsightCenterInfoItem: item.id }}
           backButtonText={t('national_insight_center_info_item.stats.back_button')}
           showButton={false}
           actionButtons={
