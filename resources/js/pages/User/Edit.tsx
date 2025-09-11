@@ -6,13 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Shield, FileText, User, CheckCircle, AlertCircle, Save, Mail, Lock, Users, Key } from 'lucide-react';
+import { ArrowLeft, Shield, FileText, User, CheckCircle, AlertCircle, Save, Mail, Lock, Users, Key, Building2 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useTranslation } from '@/lib/i18n/translate';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Header from '@/components/template/header';
 
 interface User {
@@ -21,6 +22,11 @@ interface User {
   email: string;
   created_at: string;
   updated_at: string;
+  department?: {
+    id: number;
+    name: string;
+    code: string;
+  } | null;
   roles?: {
     id: number;
     name: string;
@@ -42,15 +48,22 @@ interface GroupedPermissions {
   [key: string]: Permission[];
 }
 
+interface Department {
+  id: number;
+  name: string;
+  code: string;
+}
+
 interface Props {
   user: User;
   roles: Role[];
   userRoles: number[];
   userPermissions: number[];
   groupedPermissions: GroupedPermissions;
+  departments: Department[];
 }
 
-export default function UserEdit({ user, roles = [], userRoles = [], userPermissions = [], groupedPermissions = {} }: Props) {
+export default function UserEdit({ user, roles = [], userRoles = [], userPermissions = [], groupedPermissions = {}, departments = [] }: Props) {
   const { t } = useTranslation();
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -72,6 +85,7 @@ export default function UserEdit({ user, roles = [], userRoles = [], userPermiss
     email: user.email,
     password: '',
     password_confirmation: '',
+    department_id: user.department?.id || null,
     roles: userRoles,
     permissions: userPermissions,
   });
@@ -229,6 +243,37 @@ export default function UserEdit({ user, roles = [], userRoles = [], userPermiss
                       <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-xl border border-red-200">
                         <AlertCircle className="h-4 w-4" />
                         <p className="text-sm font-medium">{errors.email}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Department Field */}
+                  <div className="space-y-3">
+                    <Label htmlFor="department_id" className="text-lg font-semibold text-blue-900 flex items-center gap-2">
+                      <span>{t('users.form.department')}</span>
+                    </Label>
+                    <div className="relative">
+                      <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-blue-400" />
+                      <Select
+                        value={data.department_id?.toString() || ''}
+                        onValueChange={(value) => setData('department_id', value ? parseInt(value) : null)}
+                      >
+                        <SelectTrigger className="h-12 text-lg border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white rounded-xl shadow-lg pl-10">
+                          <SelectValue placeholder={t('users.form.select_department')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {departments.map((department) => (
+                            <SelectItem key={department.id} value={department.id.toString()}>
+                              {department.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {errors.department_id && (
+                      <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-xl border border-red-200">
+                        <AlertCircle className="h-4 w-4" />
+                        <p className="text-sm font-medium">{errors.department_id}</p>
                       </div>
                     )}
                   </div>

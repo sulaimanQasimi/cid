@@ -68,4 +68,12 @@ class Department extends Model
     {
         return $this->hasMany(Criminal::class);
     }
+
+    /**
+     * Get the users for the department.
+     */
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class);
+    }
 }

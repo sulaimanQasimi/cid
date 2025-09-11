@@ -31,6 +31,11 @@ interface User {
   email_verified_at: string | null;
   created_at: string;
   updated_at: string;
+  department?: {
+    id: number;
+    name: string;
+    code: string;
+  } | null;
   roles: Role[];
 }
 
@@ -241,6 +246,7 @@ export default function UserIndex({ users, filters }: Props) {
                     <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('users.table.id')}</TableHead>
                     <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('users.table.name')}</TableHead>
                     <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('users.table.email')}</TableHead>
+                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('users.table.department')}</TableHead>
                     <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('users.table.roles')}</TableHead>
                     <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('users.table.created')}</TableHead>
                     <TableHead className="px-6 py-4 text-right font-semibold text-foreground dark:text-foreground">
@@ -263,6 +269,15 @@ export default function UserIndex({ users, filters }: Props) {
                           </div>
                         </TableCell>
                         <TableCell className="px-6 py-4 text-foreground dark:text-foreground">{user.email}</TableCell>
+                        <TableCell className="px-6 py-4">
+                          {user.department ? (
+                            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                              {user.department.name}
+                            </Badge>
+                          ) : (
+                            <span className="text-muted-foreground dark:text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
                         <TableCell className="px-6 py-4">
                           <div className="flex flex-wrap gap-1">
                             {user.roles && user.roles.length > 0 ? (
@@ -335,7 +350,7 @@ export default function UserIndex({ users, filters }: Props) {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={6} className="h-32 text-center">
+                      <TableCell colSpan={7} className="h-32 text-center">
                         <div className="flex flex-col items-center gap-4 text-muted-foreground dark:text-muted-foreground">
                           <div className="rounded-full bg-muted dark:bg-black p-4">
                             <AlertTriangle className="h-8 w-8 text-muted-foreground dark:text-muted-foreground dark:bg-black" />
