@@ -2,9 +2,8 @@ import { Head, Link, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { PageHeader } from '@/components/page-header';
 import { Pagination } from '@/components/pagination';
-import { ArrowRight, Edit, Shield, AlertTriangle, FileText, Clock, User, PlusCircle, ChartBar, Pencil, Trash, UserRound, MapPin, Calendar, Building2, Phone, IdCard, Printer, BarChart3, Eye, Users, Home, Gavel, FileCheck, BookText, ArrowLeft } from 'lucide-react';
+import {  Edit, Shield, AlertTriangle, FileText, Clock, User, PlusCircle, ChartBar, Pencil, Trash, UserRound, MapPin, Calendar, Building2, Phone, IdCard, Printer, BarChart3, Eye, Users, Home, Gavel, FileCheck, BookText, ArrowLeft } from 'lucide-react';
 import { format } from 'date-fns';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -15,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTranslation } from '@/lib/i18n/translate';
 import { cn } from '@/lib/utils';
+import Header from '@/components/template/header';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -211,59 +211,20 @@ export default function Show({ report, incidents, reportStats, statCategories }:
       <Head title={t('incident_reports.show.page_title', { number: report.report_number })} />
 
       <div className="container px-0 py-6">
-        {/* Modern Header with Glassmorphism */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-l from-teal-600 via-emerald-600 to-green-600 p-8 lg:p-12 text-white shadow-2xl mb-8 group">
-          {/* Animated background elements */}
-          <div className="absolute inset-0 bg-black/5"></div>
-          <div className="absolute top-0 left-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 -translate-x-40 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
-          <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full translate-y-32 translate-x-32 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
-          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white/5 rounded-full -translate-x-16 -translate-y-16 blur-xl group-hover:scale-150 transition-transform duration-500"></div>
-          
-          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-8">
-            <div className="flex items-center gap-8">
-              <div className="p-6 bg-white/20 backdrop-blur-md rounded-3xl border border-white/30 shadow-2xl group-hover:scale-105 transition-transform duration-300">
-                <Shield className="h-10 w-10 text-white" />
-              </div>
-              <div className="space-y-3">
-                <h2 className="text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight">{report.report_number}</h2>
-                <p className="text-white/90 flex items-center gap-3 text-xl font-medium">
-                  <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                    <FileText className="h-6 w-6" />
-                  </div>
-                  {t('incident_reports.show.report_date_label')}: {format(new Date(report.report_date), 'PPP')}
-                </p>
-                {incidentReportAccess.currentAccess && (
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="bg-white/20 backdrop-blur-sm border-white/30 text-white px-3 py-1 text-sm font-medium">
-                      <Shield className="h-3 w-3 mr-1" />
-                      {incidentReportAccess.currentAccess.access_type === 'full' && t('incident_reports.access.full')}
-                      {incidentReportAccess.currentAccess.access_type === 'read_only' && t('incident_reports.access.read_only')}
-                      {incidentReportAccess.currentAccess.access_type === 'incidents_only' && t('incident_reports.access.incidents_only')}
-                    </Badge>
-                    <Badge variant="outline" className="bg-white/20 backdrop-blur-sm border-white/30 text-white px-3 py-1 text-sm font-medium">
-                      <FileText className="h-3 w-3 mr-1" />
-                      {incidentReportAccess.isReportSpecific() ? t('incident_reports.access.report_specific') : t('incident_reports.access.global')}
-                    </Badge>
-                    {incidentReportAccess.currentAccess.expires_at && (
-                      <Badge 
-                        variant="outline" 
-                        className={cn(
-                          "backdrop-blur-sm text-white px-3 py-1 text-sm font-medium",
-                          new Date(incidentReportAccess.currentAccess.expires_at) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-                            ? "bg-yellow-500/20 border-yellow-300/30"
-                            : "bg-white/20 border-white/30"
-                        )}
-                      >
-                        <Clock className="h-3 w-3 mr-1" />
-                        {t('incident_reports.access.expires')}: {format(new Date(incidentReportAccess.currentAccess.expires_at), 'PP')}
-                      </Badge>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
+        <Header
+          title={report.report_number}
+          description={`${t('incident_reports.show.report_date_label')}: ${format(new Date(report.report_date), 'PPP')}`}
+          icon={<Shield className="h-5 w-5" />}
+          model="incident_reports"
+          routeName={() => route('incident-reports.index')}
+          buttonText={t('common.back')}
+          theme="violet"
+          showBackButton={true}
+          backRouteName={() => route('incident-reports.index')}
+          backButtonText={t('common.back')}
+          showButton={false}
+          actionButtons={
+            <div className="flex items-center gap-2">
               {incidentReportAccess.canDeleteIncidentReport && (
                 <Button
                   onClick={() => setIsDeleteDialogOpen(true)}
@@ -303,128 +264,149 @@ export default function Show({ report, incidents, reportStats, statCategories }:
                   </Link>
                 </Button>
               )}
-              
-              <Link href={route('incident-reports.index')} className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105 group/btn">
-                <div className="flex items-center gap-2">
-                  {t('common.back')}
-                  <div className="p-1 bg-white/20 rounded-lg group-hover/btn:scale-110 transition-transform duration-300">
-                    <ArrowLeft className="h-4 w-4" />
-                  </div>
-                </div>
-              </Link>
             </div>
+          }
+        />
+
+        {/* Access badges */}
+        {incidentReportAccess.currentAccess && (
+          <div className="mb-6 flex items-center gap-2">
+            <Badge variant="outline" className="bg-white/20 backdrop-blur-sm border-white/30 text-white px-3 py-1 text-sm font-medium">
+              <Shield className="h-3 w-3 mr-1" />
+              {incidentReportAccess.currentAccess.access_type === 'full' && t('incident_reports.access.full')}
+              {incidentReportAccess.currentAccess.access_type === 'read_only' && t('incident_reports.access.read_only')}
+              {incidentReportAccess.currentAccess.access_type === 'incidents_only' && t('incident_reports.access.incidents_only')}
+            </Badge>
+            <Badge variant="outline" className="bg-white/20 backdrop-blur-sm border-white/30 text-white px-3 py-1 text-sm font-medium">
+              <FileText className="h-3 w-3 mr-1" />
+              {incidentReportAccess.isReportSpecific() ? t('incident_reports.access.report_specific') : t('incident_reports.access.global')}
+            </Badge>
+            {incidentReportAccess.currentAccess.expires_at && (
+              <Badge 
+                variant="outline" 
+                className={cn(
+                  "backdrop-blur-sm text-white px-3 py-1 text-sm font-medium",
+                  new Date(incidentReportAccess.currentAccess.expires_at) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                    ? "bg-yellow-500/20 border-yellow-300/30"
+                    : "bg-white/20 border-white/30"
+                )}
+              >
+                <Clock className="h-3 w-3 mr-1" />
+                {t('incident_reports.access.expires')}: {format(new Date(incidentReportAccess.currentAccess.expires_at), 'PP')}
+              </Badge>
+            )}
           </div>
-        </div>
+        )}
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-12">
           {/* Report Information */}
-          <Card className="md:col-span-4 border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-green-50/30">
-            <CardHeader className="bg-gradient-to-l from-green-500 to-green-600 text-white border-b pb-4">
+          <Card className="md:col-span-4 border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-violet-50/30 dark:to-violet-900/20">
+            <CardHeader className="bg-gradient-to-l from-violet-500 dark:from-violet-600 to-violet-600 dark:to-violet-700 text-white border-b pb-4">
               <CardTitle className="flex items-center gap-3 text-lg">
                 <div className="p-2 bg-white/20 rounded-lg">
                   <FileText className="h-5 w-5" />
                 </div>
                 {t('incident_reports.form.info_title')}
               </CardTitle>
-              <CardDescription className="text-green-100">
+              <CardDescription className="text-violet-100">
                 {t('incident_reports.details.long_description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6">
               <div className="space-y-5">
                 <div>
-                  <h3 className="text-sm font-medium text-green-600 mb-3 flex items-center gap-2" dir="rtl">
+                  <h3 className="text-sm font-medium text-violet-600 dark:text-violet-400 dark:text-violet-400 mb-3 flex items-center gap-2" dir="rtl">
                     {t('incident_reports.show.report_info')}
                     <FileText className="h-4 w-4" />
                   </h3>
-                  <div className="rounded-xl border border-green-100 bg-gradient-to-l from-green-50 to-white p-4 space-y-3">
+                  <div className="rounded-xl border border-violet-100 dark:border-violet-800 bg-gradient-to-l from-violet-50 dark:from-violet-900/30 to-white dark:to-gray-800 p-4 space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-green-700 font-medium flex items-center gap-2" dir="rtl">
+                      <span className="text-sm text-violet-700 dark:text-violet-300 dark:text-violet-300 font-medium flex items-center gap-2" dir="rtl">
                         {t('incident_reports.show.report_number')}:
                         <FileText className="h-4 w-4" />
                       </span>
-                      <span className="text-sm text-green-900 font-semibold">{report.report_number}</span>
+                      <span className="text-sm text-violet-900 dark:text-violet-100 dark:text-violet-100 font-semibold">{report.report_number}</span>
                     </div>
 
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-green-700 font-medium flex items-center gap-2" dir="rtl">
+                      <span className="text-sm text-violet-700 dark:text-violet-300 dark:text-violet-300 font-medium flex items-center gap-2" dir="rtl">
                         {t('incident_reports.show.report_date_label')}:
                         <Calendar className="h-4 w-4" />
                       </span>
-                      <span className="text-sm text-green-900">{format(new Date(report.report_date), 'PPP')}</span>
+                      <span className="text-sm text-violet-900 dark:text-violet-100">{format(new Date(report.report_date), 'PPP')}</span>
                     </div>
 
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-green-700 font-medium flex items-center gap-2" dir="rtl">
+                      <span className="text-sm text-violet-700 dark:text-violet-300 dark:text-violet-300 font-medium flex items-center gap-2" dir="rtl">
                         {t('incident_reports.show.status')}:
                         <Clock className="h-4 w-4" />
                       </span>
-                      <Badge variant="outline" className="bg-gradient-to-l from-green-100 to-green-200 text-green-800 border-green-300 px-3 py-1 text-xs font-medium">
+                      <Badge variant="outline" className="bg-gradient-to-l from-violet-100 dark:from-violet-900/30 to-violet-200 dark:to-violet-800/30 text-violet-800 dark:text-violet-200 border-violet-300 dark:border-violet-700 px-3 py-1 text-xs font-medium">
                         {t(`incident_reports.status.${report.report_status}`)}
                       </Badge>
                     </div>
 
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-green-700 font-medium flex items-center gap-2" dir="rtl">
+                      <span className="text-sm text-violet-700 dark:text-violet-300 dark:text-violet-300 font-medium flex items-center gap-2" dir="rtl">
                         {t('incident_reports.show.security_level')}:
                         <Shield className="h-4 w-4" />
                       </span>
-                      <Badge variant="outline" className="bg-gradient-to-l from-green-100 to-green-200 text-green-800 border-green-300 px-3 py-1 text-xs font-medium">
+                      <Badge variant="outline" className="bg-gradient-to-l from-violet-100 dark:from-violet-900/30 to-violet-200 dark:to-violet-800/30 text-violet-800 dark:text-violet-200 border-violet-300 dark:border-violet-700 px-3 py-1 text-xs font-medium">
                         {t(`incident_reports.level.${report.security_level}`)}
                       </Badge>
                     </div>
 
                     {report.source && (
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-green-700 font-medium flex items-center gap-2" dir="rtl">
+                        <span className="text-sm text-violet-700 dark:text-violet-300 dark:text-violet-300 font-medium flex items-center gap-2" dir="rtl">
                           {t('incident_reports.show.source_label')}:
                           <Users className="h-4 w-4" />
                         </span>
-                        <span className="text-sm text-green-900">{report.source}</span>
+                        <span className="text-sm text-violet-900 dark:text-violet-100">{report.source}</span>
                       </div>
                     )}
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-medium text-green-600 mb-3 flex items-center gap-2" dir="rtl">
+                  <h3 className="text-sm font-medium text-violet-600 dark:text-violet-400 mb-3 flex items-center gap-2" dir="rtl">
                     {t('incident_reports.show.user_info')}
                     <UserRound className="h-4 w-4" />
                   </h3>
-                  <div className="rounded-xl border border-green-100 bg-gradient-to-l from-green-50 to-white p-4 space-y-3">
+                  <div className="rounded-xl border border-violet-100 dark:border-violet-800 bg-gradient-to-l from-violet-50 dark:from-violet-900/30 to-white dark:to-gray-800 p-4 space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-green-700 font-medium flex items-center gap-2" dir="rtl">
+                      <span className="text-sm text-violet-700 dark:text-violet-300 dark:text-violet-300 font-medium flex items-center gap-2" dir="rtl">
                         {t('incident_reports.show.submitted_by')}:
                         <User className="h-4 w-4" />
                       </span>
-                      <span className="text-sm text-green-900">{report.submitter?.name || t('incidents.unknown')}</span>
+                      <span className="text-sm text-violet-900 dark:text-violet-100">{report.submitter?.name || t('incidents.unknown')}</span>
                     </div>
 
                     {report.approver && (
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-green-700 font-medium flex items-center gap-2" dir="rtl">
+                        <span className="text-sm text-violet-700 dark:text-violet-300 dark:text-violet-300 font-medium flex items-center gap-2" dir="rtl">
                           {t('incident_reports.show.approved_by')}:
                           <User className="h-4 w-4" />
                         </span>
-                        <span className="text-sm text-green-900">{report.approver?.name}</span>
+                        <span className="text-sm text-violet-900 dark:text-violet-100">{report.approver?.name}</span>
                       </div>
                     )}
 
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-green-700 font-medium flex items-center gap-2" dir="rtl">
+                      <span className="text-sm text-violet-700 dark:text-violet-300 dark:text-violet-300 font-medium flex items-center gap-2" dir="rtl">
                         {t('incident_reports.show.created_at')}:
                         <Clock className="h-4 w-4" />
                       </span>
-                      <span className="text-sm text-green-900">{format(new Date(report.created_at), 'PPP')}</span>
+                      <span className="text-sm text-violet-900 dark:text-violet-100">{format(new Date(report.created_at), 'PPP')}</span>
                     </div>
 
                     {report.updated_at !== report.created_at && (
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-green-700 font-medium flex items-center gap-2" dir="rtl">
+                        <span className="text-sm text-violet-700 dark:text-violet-300 dark:text-violet-300 font-medium flex items-center gap-2" dir="rtl">
                           {t('incident_reports.show.last_updated')}:
                           <Clock className="h-4 w-4" />
                         </span>
-                        <span className="text-sm text-green-900">{format(new Date(report.updated_at), 'PPP')}</span>
+                        <span className="text-sm text-violet-900 dark:text-violet-100">{format(new Date(report.updated_at), 'PPP')}</span>
                       </div>
                     )}
                   </div>
@@ -435,50 +417,50 @@ export default function Show({ report, incidents, reportStats, statCategories }:
 
           {/* Report Details */}
           <div className="md:col-span-8 space-y-8">
-            <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-green-50/30">
-              <CardHeader className="bg-gradient-to-l from-green-500 to-green-600 text-white border-b pb-4">
+            <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-violet-50/30 dark:to-violet-900/20">
+              <CardHeader className="bg-gradient-to-l from-violet-500 dark:from-violet-600 to-violet-600 dark:to-violet-700 text-white border-b pb-4">
                 <CardTitle className="flex items-center gap-3 text-lg">
                   <div className="p-2 bg-white/20 rounded-lg">
                     <BookText className="h-5 w-5" />
                   </div>
                   {t('incident_reports.details.title')}
                 </CardTitle>
-                <CardDescription className="text-green-100">
+                <CardDescription className="text-violet-100">
                   {t('incident_reports.details.long_description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6">
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-sm font-medium text-green-600 mb-3 flex items-center gap-2" dir="rtl">
+                    <h3 className="text-sm font-medium text-violet-600 dark:text-violet-400 mb-3 flex items-center gap-2" dir="rtl">
                       {t('incident_reports.details.details_label')}
                       <FileText className="h-4 w-4" />
                     </h3>
-                    <div className="rounded-xl border border-green-100 bg-gradient-to-l from-green-50 to-white p-4">
-                      <p className="text-sm text-green-900 whitespace-pre-wrap" dir="rtl">{report.details}</p>
+                    <div className="rounded-xl border border-violet-100 dark:border-violet-800 bg-gradient-to-l from-violet-50 dark:from-violet-900/30 to-white dark:to-gray-800 p-4">
+                      <p className="text-sm text-violet-900 dark:text-violet-100 whitespace-pre-wrap" dir="rtl">{report.details}</p>
                     </div>
                   </div>
 
                   {report.action_taken && (
                     <div>
-                      <h3 className="text-sm font-medium text-green-600 mb-3 flex items-center gap-2" dir="rtl">
+                      <h3 className="text-sm font-medium text-violet-600 dark:text-violet-400 mb-3 flex items-center gap-2" dir="rtl">
                         {t('incident_reports.details.action_taken_label')}
                         <Gavel className="h-4 w-4" />
                       </h3>
-                      <div className="rounded-xl border border-green-100 bg-gradient-to-l from-green-50 to-white p-4">
-                        <p className="text-sm text-green-900 whitespace-pre-wrap" dir="rtl">{report.action_taken}</p>
+                      <div className="rounded-xl border border-violet-100 dark:border-violet-800 bg-gradient-to-l from-violet-50 dark:from-violet-900/30 to-white dark:to-gray-800 p-4">
+                        <p className="text-sm text-violet-900 dark:text-violet-100 whitespace-pre-wrap" dir="rtl">{report.action_taken}</p>
                       </div>
                     </div>
                   )}
 
                   {report.recommendation && (
                     <div>
-                      <h3 className="text-sm font-medium text-green-600 mb-3 flex items-center gap-2" dir="rtl">
+                      <h3 className="text-sm font-medium text-violet-600 dark:text-violet-400 mb-3 flex items-center gap-2" dir="rtl">
                         {t('incident_reports.details.recommendation_label')}
                         <FileCheck className="h-4 w-4" />
                       </h3>
-                      <div className="rounded-xl border border-green-100 bg-gradient-to-l from-green-50 to-white p-4">
-                        <p className="text-sm text-green-900 whitespace-pre-wrap" dir="rtl">{report.recommendation}</p>
+                      <div className="rounded-xl border border-violet-100 dark:border-violet-800 bg-gradient-to-l from-violet-50 dark:from-violet-900/30 to-white dark:to-gray-800 p-4">
+                        <p className="text-sm text-violet-900 dark:text-violet-100 whitespace-pre-wrap" dir="rtl">{report.recommendation}</p>
                       </div>
                     </div>
                   )}
@@ -491,11 +473,11 @@ export default function Show({ report, incidents, reportStats, statCategories }:
         {/* Additional Sections */}
         <div className="mt-8">
           <Tabs defaultValue="incidents" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6 rounded-xl p-1 bg-gradient-to-l from-green-100 to-green-200 shadow-lg">
+            <TabsList className="grid w-full grid-cols-2 mb-6 rounded-xl p-1 bg-gradient-to-l from-violet-100 dark:from-violet-900/30 to-violet-200 dark:to-violet-800/30 shadow-lg">
               <TabsTrigger
                 value="incidents"
                 className={cn(
-                  "data-[state=active]:bg-gradient-to-l data-[state=active]:from-green-500 data-[state=active]:to-green-600 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
+                  "data-[state=active]:bg-gradient-to-l data-[state=active]:from-violet-500 data-[state=active]:to-violet-600 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
                   "transition-all duration-300 rounded-lg"
                 )}
               >
@@ -505,7 +487,7 @@ export default function Show({ report, incidents, reportStats, statCategories }:
               <TabsTrigger
                 value="stats"
                 className={cn(
-                  "data-[state=active]:bg-gradient-to-l data-[state=active]:from-green-500 data-[state=active]:to-green-600 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
+                  "data-[state=active]:bg-gradient-to-l data-[state=active]:from-violet-500 data-[state=active]:to-violet-600 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
                   "transition-all duration-300 rounded-lg"
                 )}
               >
@@ -515,21 +497,21 @@ export default function Show({ report, incidents, reportStats, statCategories }:
             </TabsList>
 
             <TabsContent value="incidents">
-              <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-green-50/30">
-                <CardHeader className="bg-gradient-to-l from-green-500 to-green-600 text-white border-b pb-4">
+              <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-violet-50/30 dark:to-violet-900/20">
+                <CardHeader className="bg-gradient-to-l from-violet-500 dark:from-violet-600 to-violet-600 dark:to-violet-700 text-white border-b pb-4">
                   <CardTitle className="flex items-center gap-3 text-lg">
                     <div className="p-2 bg-white/20 rounded-lg">
                       <AlertTriangle className="h-5 w-5" />
                     </div>
                     {t('incidents.page_title')}
                   </CardTitle>
-                  <CardDescription className="text-green-100">
+                  <CardDescription className="text-violet-100">
                     {t('incident_reports.incidents.card_description')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="p-6">
                   <div className="flex justify-end mb-4">
-                    <Button asChild className="bg-gradient-to-l from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg">
+                    <Button asChild className="bg-gradient-to-l from-violet-500 to-violet-600 hover:from-violet-600 hover:to-violet-700 text-white shadow-lg">
                       <Link href={route('incident-reports.incidents', report.id)}>
                         <AlertTriangle className="mr-2 h-4 w-4" />
                         {t('incident_reports.incidents.view_all')}
@@ -540,26 +522,26 @@ export default function Show({ report, incidents, reportStats, statCategories }:
                   <div className="relative w-full overflow-auto">
                     <table className="w-full caption-bottom text-sm">
                       <thead className="[&_tr]:border-b">
-                        <tr className="border-b transition-colors hover:bg-green-50/50 data-[state=selected]:bg-green-50">
-                          <th className="h-12 px-4 text-left align-middle font-medium text-green-700">{t('incidents.table.title')}</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium text-green-700">{t('incidents.table.date')}</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium text-green-700">{t('incidents.table.category')}</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium text-green-700">{t('incidents.table.severity')}</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium text-green-700">{t('common.actions')}</th>
+                        <tr className="border-b transition-colors hover:bg-violet-50/50 dark:hover:bg-violet-900/20 data-[state=selected]:bg-violet-50 dark:data-[state=selected]:bg-violet-900/20">
+                          <th className="h-12 px-4 text-left align-middle font-medium text-violet-700 dark:text-violet-300">{t('incidents.table.title')}</th>
+                          <th className="h-12 px-4 text-left align-middle font-medium text-violet-700 dark:text-violet-300">{t('incidents.table.date')}</th>
+                          <th className="h-12 px-4 text-left align-middle font-medium text-violet-700 dark:text-violet-300">{t('incidents.table.category')}</th>
+                          <th className="h-12 px-4 text-left align-middle font-medium text-violet-700 dark:text-violet-300">{t('incidents.table.severity')}</th>
+                          <th className="h-12 px-4 text-left align-middle font-medium text-violet-700 dark:text-violet-300">{t('common.actions')}</th>
                         </tr>
                       </thead>
                       <tbody className="[&_tr:last-child]:border-0">
                         {incidents.data.length === 0 ? (
                           <tr>
-                            <td colSpan={5} className="h-12 px-4 text-center align-middle text-green-600">
+                            <td colSpan={5} className="h-12 px-4 text-center align-middle text-violet-600 dark:text-violet-400">
                               {t('incidents.no_incidents')}
                             </td>
                           </tr>
                         ) : (
                           incidents.data.map((incident) => (
-                            <tr key={incident.id} className="border-b transition-colors hover:bg-green-50/50 data-[state=selected]:bg-green-50">
-                              <td className="p-4 align-middle text-green-900">{incident.title}</td>
-                              <td className="p-4 align-middle text-green-900">{format(new Date(incident.incident_date), 'PP')}</td>
+                            <tr key={incident.id} className="border-b transition-colors hover:bg-violet-50/50 dark:hover:bg-violet-900/20 data-[state=selected]:bg-violet-50 dark:data-[state=selected]:bg-violet-900/20">
+                              <td className="p-4 align-middle text-violet-900 dark:text-violet-100">{incident.title}</td>
+                              <td className="p-4 align-middle text-violet-900 dark:text-violet-100">{format(new Date(incident.incident_date), 'PP')}</td>
                               <td className="p-4 align-middle">
                                 {incident.category ? (
                                   <Badge
@@ -580,7 +562,7 @@ export default function Show({ report, incidents, reportStats, statCategories }:
                                 </Badge>
                               </td>
                               <td className="p-4 align-middle">
-                                <Button variant="ghost" size="sm" asChild className="text-green-600 hover:text-green-700 hover:bg-green-50">
+                                <Button variant="ghost" size="sm" asChild className="text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:text-violet-300 hover:bg-violet-50">
                                   <Link href={route('incidents.show', incident.id)}>{t('incident_reports.view')}</Link>
                                 </Button>
                               </td>
@@ -598,22 +580,22 @@ export default function Show({ report, incidents, reportStats, statCategories }:
             </TabsContent>
 
             <TabsContent value="stats">
-              <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-green-50/30">
-                <CardHeader className="bg-gradient-to-l from-green-500 to-green-600 text-white border-b pb-4">
+              <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-violet-50/30 dark:to-violet-900/20">
+                <CardHeader className="bg-gradient-to-l from-violet-500 dark:from-violet-600 to-violet-600 dark:to-violet-700 text-white border-b pb-4">
                   <CardTitle className="flex items-center gap-3 text-lg">
                     <div className="p-2 bg-white/20 rounded-lg">
                       <ChartBar className="h-5 w-5" />
                     </div>
                     {t('incident_reports.stats.title')}
                   </CardTitle>
-                  <CardDescription className="text-green-100">
+                  <CardDescription className="text-violet-100">
                     {t('incident_reports.stats.description')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="p-6">
                   {incidentReportAccess.canUpdateIncidentReport && (
                     <div className="flex justify-end mb-4">
-                      <Button asChild className="bg-gradient-to-l from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg">
+                      <Button asChild className="bg-gradient-to-l from-violet-500 to-violet-600 hover:from-violet-600 hover:to-violet-700 text-white shadow-lg">
                         <Link href={route('incident-reports.edit', report.id)}>
                           <Edit className="mr-2 h-4 w-4" />
                           {t('incident_reports.stats.edit')}
@@ -624,9 +606,9 @@ export default function Show({ report, incidents, reportStats, statCategories }:
                   
                   {Object.keys(statsByCategory).length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-8 text-center">
-                      <p className="text-green-600">{t('incident_reports.stats.empty')}</p>
+                      <p className="text-violet-600 dark:text-violet-400">{t('incident_reports.stats.empty')}</p>
                       {incidentReportAccess.canUpdateIncidentReport && (
-                        <Button variant="outline" asChild className="mt-4 border-green-300 text-green-700 hover:bg-green-50">
+                        <Button variant="outline" asChild className="mt-4 border-violet-300 text-violet-700 dark:text-violet-300 hover:bg-violet-50">
                           <Link href={route('incident-reports.edit', report.id)}>
                             <PlusCircle className="mr-2 h-4 w-4" />
                             {t('incident_reports.stats.add_data')}
@@ -638,12 +620,12 @@ export default function Show({ report, incidents, reportStats, statCategories }:
                     <div className="space-y-6">
                       {statCategories.length > 1 && reportStats.length > 0 && (
                         <div className="mb-4">
-                          <Label htmlFor="category-filter" className="text-green-700 font-medium">{t('incident_reports.stats.filter_by_category')}</Label>
+                          <Label htmlFor="category-filter" className="text-violet-700 dark:text-violet-300 font-medium">{t('incident_reports.stats.filter_by_category')}</Label>
                           <Select
                             onValueChange={(value) => setSelectedCategory(value === "all" ? null : parseInt(value))}
                             defaultValue="all"
                           >
-                            <SelectTrigger id="category-filter" className="border-green-200 focus:border-green-500 focus:ring-green-500/20 bg-gradient-to-l from-green-50 to-white">
+                            <SelectTrigger id="category-filter" className="border-violet-200 dark:border-violet-700 focus:border-violet-500 dark:focus:border-violet-400 focus:ring-violet-500/20 dark:focus:ring-violet-400/20 bg-gradient-to-l from-violet-50 dark:from-violet-900/30 to-white dark:to-gray-800">
                               <SelectValue placeholder={t('incident_reports.stats.select_category')} />
                             </SelectTrigger>
                             <SelectContent>
@@ -670,7 +652,7 @@ export default function Show({ report, incidents, reportStats, statCategories }:
 
                       {filteredStatsByCategory.map(([categoryName, stats]) => (
                         <div key={categoryName} className="space-y-3">
-                          <h3 className="text-lg font-medium text-green-700">
+                          <h3 className="text-lg font-medium text-violet-700 dark:text-violet-300">
                             <div className="flex items-center">
                               <div
                                 className="h-3 w-3 rounded-full mr-2"
@@ -681,16 +663,16 @@ export default function Show({ report, incidents, reportStats, statCategories }:
                           </h3>
                           <Table>
                             <TableHeader>
-                              <TableRow className="bg-green-50">
-                                <TableHead className="text-green-700 font-medium">{t('incident_reports.stats.table.item')}</TableHead>
-                                <TableHead className="text-green-700 font-medium">{t('incident_reports.stats.table.value')}</TableHead>
-                                <TableHead className="text-green-700 font-medium">{t('incident_reports.stats.table.notes')}</TableHead>
+                              <TableRow className="bg-violet-50">
+                                <TableHead className="text-violet-700 dark:text-violet-300 font-medium">{t('incident_reports.stats.table.item')}</TableHead>
+                                <TableHead className="text-violet-700 dark:text-violet-300 font-medium">{t('incident_reports.stats.table.value')}</TableHead>
+                                <TableHead className="text-violet-700 dark:text-violet-300 font-medium">{t('incident_reports.stats.table.notes')}</TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody>
                               {stats.map((stat) => (
-                                <TableRow key={stat.id} className="hover:bg-green-50/50">
-                                  <TableCell className="text-green-900">
+                                <TableRow key={stat.id} className="hover:bg-violet-50/50">
+                                  <TableCell className="text-violet-900 dark:text-violet-100">
                                     <div className="flex items-center space-x-2">
                                       <div
                                         className="h-3 w-3 rounded-full"
@@ -699,8 +681,8 @@ export default function Show({ report, incidents, reportStats, statCategories }:
                                       <span>{stat.stat_category_item.label}</span>
                                     </div>
                                   </TableCell>
-                                  <TableCell className="text-green-900 font-medium">{getStatValue(stat)}</TableCell>
-                                  <TableCell className="text-green-900">{stat.notes || '-'}</TableCell>
+                                  <TableCell className="text-violet-900 dark:text-violet-100 font-medium">{getStatValue(stat)}</TableCell>
+                                  <TableCell className="text-violet-900 dark:text-violet-100">{stat.notes || '-'}</TableCell>
                                 </TableRow>
                               ))}
                             </TableBody>

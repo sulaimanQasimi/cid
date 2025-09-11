@@ -1,4 +1,4 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -27,6 +27,7 @@ import { useTranslation } from '@/lib/i18n/translate';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import Header from '@/components/template/header';
+import FooterButtons from '@/components/template/FooterButtons';
 
 interface CreateIncidentProps {
   districts: Array<{
@@ -100,6 +101,10 @@ export default function Create({ districts, categories, reports }: CreateInciden
     });
   };
 
+  const handleCancel = () => {
+    router.visit(route('incidents.index'));
+  };
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={t('incidents.create_title')} />
@@ -118,7 +123,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
         />
 
         <form onSubmit={submit}>
-        <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30">
+        <Card className="border border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden bg-white dark:bg-gray-800">
           <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 text-white border-b pb-4">
             <CardTitle className="flex items-center gap-3 text-lg">
               <div className="p-2 bg-white/20 rounded-lg">
@@ -133,7 +138,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
           <CardContent className="p-6 space-y-6">
             <div className="grid gap-6 sm:grid-cols-2">
               <div className="space-y-3">
-                <Label htmlFor="title" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+                <Label htmlFor="title" className="text-base font-medium flex items-center gap-2 text-gray-800 dark:text-gray-200 text-right" dir="rtl">
                   <span className="text-red-500">*</span>
                   {t('incidents.form.title')}
                   <FileText className="h-4 w-4" />
@@ -144,7 +149,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
                   onChange={e => setData('title', e.target.value)}
                   placeholder={t('incidents.form.title_placeholder')}
                   required
-                  className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
+                  className="h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 bg-white dark:bg-gray-800 text-right"
                 />
                 {errors.title && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
                   <AlertTriangle className="h-4 w-4" />
@@ -153,7 +158,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
               </div>
 
               <div className="space-y-3">
-                <Label htmlFor="incident_type" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+                <Label htmlFor="incident_type" className="text-base font-medium flex items-center gap-2 text-gray-800 dark:text-gray-200 text-right" dir="rtl">
                   <span className="text-red-500">*</span>
                   {t('incidents.form.type')}
                   <AlertCircle className="h-4 w-4" />
@@ -164,7 +169,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
                   onChange={e => setData('incident_type', e.target.value)}
                   placeholder={t('incidents.form.type_placeholder')}
                   required
-                  className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
+                  className="h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 bg-white dark:bg-gray-800 text-right"
                 />
                 {errors.incident_type && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
                   <AlertTriangle className="h-4 w-4" />
@@ -174,7 +179,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
             </div>
 
             <div className="space-y-3">
-              <Label htmlFor="description" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+              <Label htmlFor="description" className="text-base font-medium flex items-center gap-2 text-gray-800 dark:text-gray-200 text-right" dir="rtl">
                 <span className="text-red-500">*</span>
                 {t('incidents.form.description')}
                 <BookText className="h-4 w-4" />
@@ -186,7 +191,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
                 placeholder={t('incidents.form.description_placeholder')}
                 rows={5}
                 required
-                className="min-h-[120px] resize-none border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
+                className="min-h-[120px] resize-none border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 bg-white dark:bg-gray-800 text-right"
               />
               {errors.description && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
                 <AlertTriangle className="h-4 w-4" />
@@ -196,7 +201,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
 
             <div className="grid gap-6 sm:grid-cols-2">
               <div className="space-y-3">
-                <Label htmlFor="incident_date" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+                <Label htmlFor="incident_date" className="text-base font-medium flex items-center gap-2 text-gray-800 dark:text-gray-200 text-right" dir="rtl">
                   <span className="text-red-500">*</span>
                   {t('incidents.form.date')}
                   <Calendar className="h-4 w-4" />
@@ -208,7 +213,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
                     value={data.incident_date}
                     onChange={e => setData('incident_date', e.target.value)}
                     required
-                    className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
+                    className="h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 bg-white dark:bg-gray-800 text-right"
                   />
                   <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-400 pointer-events-none" />
                 </div>
@@ -219,7 +224,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
               </div>
 
               <div className="space-y-3">
-                <Label htmlFor="incident_time" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+                <Label htmlFor="incident_time" className="text-base font-medium flex items-center gap-2 text-gray-800 dark:text-gray-200 text-right" dir="rtl">
                   {t('incidents.form.time')}
                   <Clock className="h-4 w-4" />
                 </Label>
@@ -229,7 +234,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
                     type="time"
                     value={data.incident_time}
                     onChange={e => setData('incident_time', e.target.value)}
-                    className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
+                    className="h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 bg-white dark:bg-gray-800 text-right"
                   />
                   <Clock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-400 pointer-events-none" />
                 </div>
@@ -242,7 +247,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30">
+        <Card className="border border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden bg-white dark:bg-gray-800">
           <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 text-white border-b pb-4">
             <CardTitle className="flex items-center gap-3 text-lg">
               <div className="p-2 bg-white/20 rounded-lg">
@@ -254,7 +259,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
           <CardContent className="p-6 space-y-6">
             <div className="grid gap-6 sm:grid-cols-2">
               <div className="space-y-3">
-                <Label htmlFor="district_id" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+                <Label htmlFor="district_id" className="text-base font-medium flex items-center gap-2 text-gray-800 dark:text-gray-200 text-right" dir="rtl">
                   <span className="text-red-500">*</span>
                   {t('incidents.form.district')}
                   <Building2 className="h-4 w-4" />
@@ -264,7 +269,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
                   onValueChange={value => setData('district_id', value)}
                   required
                 >
-                  <SelectTrigger className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right">
+                  <SelectTrigger className="h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 bg-white dark:bg-gray-800 text-right">
                     <SelectValue placeholder={t('incidents.form.select_district')} />
                   </SelectTrigger>
                   <SelectContent>
@@ -282,7 +287,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
               </div>
 
               <div className="space-y-3">
-                <Label htmlFor="incident_category_id" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+                <Label htmlFor="incident_category_id" className="text-base font-medium flex items-center gap-2 text-gray-800 dark:text-gray-200 text-right" dir="rtl">
                   <span className="text-red-500">*</span>
                   {t('incidents.form.category')}
                   <AlertCircle className="h-4 w-4" />
@@ -292,7 +297,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
                   onValueChange={value => setData('incident_category_id', value)}
                   required
                 >
-                  <SelectTrigger className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right">
+                  <SelectTrigger className="h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 bg-white dark:bg-gray-800 text-right">
                     <SelectValue placeholder={t('incidents.form.select_category')} />
                   </SelectTrigger>
                   <SelectContent>
@@ -311,7 +316,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
             </div>
 
             <div className="space-y-3">
-              <Label htmlFor="location" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+              <Label htmlFor="location" className="text-base font-medium flex items-center gap-2 text-gray-800 dark:text-gray-200 text-right" dir="rtl">
                 {t('incidents.form.location')}
                 <MapPin className="h-4 w-4" />
               </Label>
@@ -320,7 +325,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
                 value={data.location}
                 onChange={e => setData('location', e.target.value)}
                 placeholder={t('incidents.form.location_placeholder')}
-                className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
+                className="h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 bg-white dark:bg-gray-800 text-right"
               />
               {errors.location && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
                 <AlertTriangle className="h-4 w-4" />
@@ -329,7 +334,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
             </div>
 
             <div className="space-y-3">
-              <Label htmlFor="coordinates" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+              <Label htmlFor="coordinates" className="text-base font-medium flex items-center gap-2 text-gray-800 dark:text-gray-200 text-right" dir="rtl">
                 {t('incidents.form.coordinates')}
                 <MapPin className="h-4 w-4" />
               </Label>
@@ -338,7 +343,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
                 value={data.coordinates}
                 onChange={e => setData('coordinates', e.target.value)}
                 placeholder={t('incidents.form.coordinates_placeholder')}
-                className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
+                className="h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 bg-white dark:bg-gray-800 text-right"
               />
               {errors.coordinates && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
                 <AlertTriangle className="h-4 w-4" />
@@ -348,7 +353,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30">
+        <Card className="border border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden bg-white dark:bg-gray-800">
           <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 text-white border-b pb-4">
             <CardTitle className="flex items-center gap-3 text-lg">
               <div className="p-2 bg-white/20 rounded-lg">
@@ -360,7 +365,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
           <CardContent className="p-6 space-y-6">
             <div className="grid gap-6 sm:grid-cols-2">
               <div className="space-y-3">
-                <Label htmlFor="casualties" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+                <Label htmlFor="casualties" className="text-base font-medium flex items-center gap-2 text-gray-800 dark:text-gray-200 text-right" dir="rtl">
                   {t('incidents.form.casualties')}
                   <AlertTriangle className="h-4 w-4" />
                 </Label>
@@ -370,7 +375,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
                   min="0"
                   value={data.casualties}
                   onChange={e => setData('casualties', e.target.value)}
-                  className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
+                  className="h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 bg-white dark:bg-gray-800 text-right"
                 />
                 {errors.casualties && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
                   <AlertTriangle className="h-4 w-4" />
@@ -379,7 +384,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
               </div>
 
               <div className="space-y-3">
-                <Label htmlFor="injuries" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+                <Label htmlFor="injuries" className="text-base font-medium flex items-center gap-2 text-gray-800 dark:text-gray-200 text-right" dir="rtl">
                   {t('incidents.form.injuries')}
                   <AlertTriangle className="h-4 w-4" />
                 </Label>
@@ -389,7 +394,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
                   min="0"
                   value={data.injuries}
                   onChange={e => setData('injuries', e.target.value)}
-                  className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
+                  className="h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 bg-white dark:bg-gray-800 text-right"
                 />
                 {errors.injuries && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
                   <AlertTriangle className="h-4 w-4" />
@@ -399,7 +404,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
             </div>
 
             <div className="space-y-3">
-              <Label htmlFor="status" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+              <Label htmlFor="status" className="text-base font-medium flex items-center gap-2 text-gray-800 dark:text-gray-200 text-right" dir="rtl">
                 <span className="text-red-500">*</span>
                 {t('incidents.form.status')}
                 <FileCheck className="h-4 w-4" />
@@ -409,7 +414,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
                 onValueChange={value => setData('status', value)}
                 required
               >
-                <SelectTrigger className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right">
+                <SelectTrigger className="h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 bg-white dark:bg-gray-800 text-right">
                   <SelectValue placeholder={t('incidents.form.select_status')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -428,7 +433,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
             <Separator className="my-6" />
 
             <div className="space-y-3">
-              <Label htmlFor="incident_report_id" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
+              <Label htmlFor="incident_report_id" className="text-base font-medium flex items-center gap-2 text-gray-800 dark:text-gray-200 text-right" dir="rtl">
                 {t('incidents.form.assign_report')}
                 <FileText className="h-4 w-4" />
               </Label>
@@ -436,7 +441,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
                 value={data.incident_report_id}
                 onValueChange={value => setData('incident_report_id', value)}
               >
-                <SelectTrigger className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right">
+                <SelectTrigger className="h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 bg-white dark:bg-gray-800 text-right">
                   <SelectValue placeholder={t('incidents.form.select_report_optional')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -455,27 +460,20 @@ export default function Create({ districts, categories, reports }: CreateInciden
             </div>
           </CardContent>
 
-          <CardFooter className="flex justify-between border-t px-6 py-5 bg-gradient-to-l from-blue-50 to-blue-100">
-            <Button
-              variant="outline"
-              onClick={() => reset()}
-              type="button"
-              disabled={processing}
-              className="rounded-full border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 shadow-lg"
-            >
-              {t('common.cancel')}
-            </Button>
-            <Button
-              type="submit"
-              disabled={processing}
-              className="rounded-full px-8 font-medium bg-gradient-to-l from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              <Save className="mr-2 h-4 w-4" />
-              {processing ? t('incidents.saving') : t('incidents.save_incident')}
-            </Button>
-          </CardFooter>
         </Card>
       </form>
+
+      {/* Form Actions */}
+      <div className="mt-6">
+        <FooterButtons
+          onCancel={handleCancel}
+          onSubmit={() => {}}
+          processing={processing}
+          cancelText={t('common.cancel')}
+          submitText={t('incidents.save_incident')}
+          savingText={t('incidents.saving')}
+        />
+      </div>
       </div>
     </AppLayout>
   );
