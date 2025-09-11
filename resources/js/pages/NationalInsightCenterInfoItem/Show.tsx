@@ -141,15 +141,15 @@ export default function Show({ item }: ShowProps) {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title={t('national_insight_center_info_item.show.title', { name: item.title })} />
+      <Head title={t('national_insight_center_info_item.show.page_title', { name: item.title })} />
 
       <div className="container px-0 py-6">
         <Header
-          title={t('national_insight_center_info_item.show.title', { name: item.title })}
+          title={t('national_insight_center_info_item.show.page_title', { name: item.title })}
           description={t('national_insight_center_info_item.show.description')}
           icon={<FileText className="h-6 w-6 text-white" />}
           model="national_insight_center_info_item"
-          routeName="national-insight-center-info-items.show"
+          routeName={() => route('national-insight-center-info-items.show', item.id)}
           buttonText={t('national_insight_center_info_item.show.edit_button')}
           theme="purple"
           buttonSize="lg"
@@ -231,7 +231,7 @@ export default function Show({ item }: ShowProps) {
             <CardContent className="p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.title')}</Label>
+                  <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.title_label')}</Label>
                   <p className="text-lg font-semibold text-gray-900 dark:text-white">{item.title}</p>
                 </div>
 
@@ -264,7 +264,7 @@ export default function Show({ item }: ShowProps) {
 
               {item.description && (
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.description')}</Label>
+                  <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.description_label')}</Label>
                   <p className="text-gray-900 dark:text-white leading-relaxed">{item.description}</p>
                 </div>
               )}

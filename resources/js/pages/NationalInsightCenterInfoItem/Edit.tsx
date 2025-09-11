@@ -34,6 +34,7 @@ interface Province {
   name: string;
   label: string;
   color: string;
+  districts: District[];
 }
 
 interface District {
@@ -58,7 +59,7 @@ interface NationalInsightCenterInfoItem {
   confirmed: boolean;
   created_at: string;
   updated_at: string;
-  nationalInsightCenterInfo: NationalInsightCenterInfo;
+  nationalInsightCenterInfo: NationalInsightCenterInfo | null;
   infoCategory: InfoCategory | null;
   province: Province | null;
   district: District | null;
@@ -78,7 +79,7 @@ export default function Edit({ item, nationalInsightCenterInfos, infoCategories,
   const { canUpdate } = usePermissions();
 
   const { data, setData, put, processing, errors } = useForm({
-    national_insight_center_info_id: item.nationalInsightCenterInfo.id,
+    national_insight_center_info_id: item.nationalInsightCenterInfo?.id || null as number | null,
     title: item.title,
     registration_number: item.registration_number,
     info_category_id: item.infoCategory?.id || null as number | null,
@@ -98,8 +99,8 @@ export default function Edit({ item, nationalInsightCenterInfos, infoCategories,
       href: route('national-insight-center-infos.index'),
     },
     {
-      title: item.nationalInsightCenterInfo.name,
-      href: route('national-insight-center-infos.show', { national_insight_center_info: item.nationalInsightCenterInfo.id }),
+      title: item.nationalInsightCenterInfo?.name || t('national_insight_center_info_item.unknown'),
+      href: item.nationalInsightCenterInfo?.id ? route('national-insight-center-infos.show', { national_insight_center_info: item.nationalInsightCenterInfo.id }) : route('national-insight-center-infos.index'),
     },
     {
       title: t('national_insight_center_info_item.edit.title', { name: item.title }),
@@ -167,8 +168,8 @@ export default function Edit({ item, nationalInsightCenterInfos, infoCategories,
                         {t('national_insight_center_info_item.edit.national_insight_center_info')} *
                       </Label>
                       <Select
-                        value={data.national_insight_center_info_id.toString()}
-                        onValueChange={(value) => setData('national_insight_center_info_id', parseInt(value))}
+                        value={data.national_insight_center_info_id?.toString() || ''}
+                        onValueChange={(value) => setData('national_insight_center_info_id', value ? parseInt(value) : null)}
                       >
                         <SelectTrigger id="national_insight_center_info_id" className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right">
                           <SelectValue placeholder={t('national_insight_center_info_item.edit.select_national_insight_center_info')} />
@@ -271,7 +272,7 @@ export default function Edit({ item, nationalInsightCenterInfos, infoCategories,
                                   className="mr-2 h-3 w-3 rounded-full"
                                   style={{ backgroundColor: province.color }}
                                 ></div>
-                                {province.label}
+                                {province.name}
                               </div>
                             </SelectItem>
                           ))}

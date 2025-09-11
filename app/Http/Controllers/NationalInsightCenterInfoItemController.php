@@ -184,8 +184,7 @@ class NationalInsightCenterInfoItemController extends Controller
         $nationalInsightCenterInfos = NationalInsightCenterInfo::orderBy('name')->get();
         $infoCategories = InfoCategory::orderBy('name')->get();
         $provinces = Province::orderBy('name')->with('districts')->get();
-        $districts = District::orderBy('name')->with('province')->get();
-
+     
         // Load the item with its relationships
         $item->load([
             'nationalInsightCenterInfo',
@@ -200,7 +199,6 @@ class NationalInsightCenterInfoItemController extends Controller
             'nationalInsightCenterInfos' => $nationalInsightCenterInfos,
             'infoCategories' => $infoCategories,
             'provinces' => $provinces,
-            'districts' => $districts,
         ]);
     }
 

@@ -1836,6 +1836,36 @@
     "national_insight_center_info_item.create.district": "ولسوالی",
     "national_insight_center_info_item.create.description": "توضیحات",
     "national_insight_center_info_item.create.cancel_button": "انصراف",
-    "national_insight_center_info_item.create.save_button": "ذخیره"
-
+    "national_insight_center_info_item.create.save_button": "ذخیره",
+    
+    "national_insight_center_info_item.show.page_title": "مشاهده آیتم: {name}",
+    "national_insight_center_info_item.show.description": "جزئیات کامل آیتم اطلاعات مرکز ملی بصیرت",
+    "national_insight_center_info_item.show.edit_button": "ویرایش",
+    "national_insight_center_info_item.show.back_button": "بازگشت",
+    "national_insight_center_info_item.show.stats_button": "آمار",
+    "national_insight_center_info_item.show.confirm_button": "تأیید",
+    "national_insight_center_info_item.show.delete_button": "حذف",
+    "national_insight_center_info_item.show.delete_confirm_title": "تأیید حذف",
+    "national_insight_center_info_item.show.delete_confirm_description": "آیا مطمئن هستید که می‌خواهید آیتم \"{name}\" را حذف کنید؟",
+    "national_insight_center_info_item.show.basic_info": "اطلاعات پایه",
+    "national_insight_center_info_item.show.title_label": "عنوان",
+    "national_insight_center_info_item.show.registration_number": "شماره ثبت",
+    "national_insight_center_info_item.show.status": "وضعیت",
+    "national_insight_center_info_item.show.confirmed": "تأیید شده",
+    "national_insight_center_info_item.show.pending": "در انتظار",
+    "national_insight_center_info_item.show.date": "تاریخ",
+    "national_insight_center_info_item.show.description_label": "توضیحات",
+    "national_insight_center_info_item.show.related_info": "اطلاعات مرتبط",
+    "national_insight_center_info_item.show.national_insight_center_info": "مرکز ملی بصیرت",
+    "national_insight_center_info_item.show.info_category": "دسته اطلاعات",
+    "national_insight_center_info_item.show.province": "ولایت",
+    "national_insight_center_info_item.show.district": "ولسوالی",
+    "national_insight_center_info_item.show.statistics": "آمار",
+    "national_insight_center_info_item.show.audit_info": "اطلاعات حسابرسی",
+    "national_insight_center_info_item.show.created_at": "تاریخ ایجاد",
+    "national_insight_center_info_item.show.updated_at": "تاریخ بروزرسانی",
+    "national_insight_center_info_item.show.created_by": "ایجاد شده توسط",
+    "national_insight_center_info_item.show.confirmed_by": "تأیید شده توسط",
+    "national_insight_center_info_item.unknown": "نامشخص"
+    
 }
