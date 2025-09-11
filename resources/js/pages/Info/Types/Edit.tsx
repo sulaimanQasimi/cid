@@ -4,6 +4,8 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Save, FileText, BarChart3, Pencil, X, Database, Settings, Plus, Users, Search, ArrowRight, Trash, User, AlertTriangle } from 'lucide-react';
+import Header from '@/components/template/header';
+import FooterButtons from '@/components/template/FooterButtons';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -156,49 +158,43 @@ export default function EditInfoType({ infoType, users }: Props) {
     });
   };
 
+  const handleCancel = () => {
+    router.visit(route('info-types.index'));
+  };
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={t('info_types.edit.page_title', { name: infoType.name })} />
       
       <div className="container px-0 py-6">
-        {/* Modern Header with Glassmorphism */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-l from-purple-600 via-indigo-600 to-blue-600 p-8 lg:p-12 text-white shadow-2xl mb-8 group">
-          {/* Animated background elements */}
-          <div className="absolute inset-0 bg-black/5"></div>
-          <div className="absolute top-0 left-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 -translate-x-40 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
-          <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full translate-y-32 translate-x-32 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
-          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white/5 rounded-full -translate-x-16 -translate-y-16 blur-xl group-hover:scale-150 transition-transform duration-500"></div>
-          
-          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-8">
-            <div className="flex items-center gap-8">
-              <div className="p-6 bg-white/20 backdrop-blur-md rounded-3xl border border-white/30 shadow-2xl group-hover:scale-105 transition-transform duration-300">
-                <Pencil className="h-10 w-10 text-white" />
-              </div>
-              <div className="space-y-3">
-                <h2 className="text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight">{t('info_types.edit.page_title', { name: infoType.name })}</h2>
-                <div className="text-white/90 flex items-center gap-3 text-xl font-medium">
-                  <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                    <BarChart3 className="h-6 w-6" />
-                  </div>
-                  {t('info_types.edit.page_description')}
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
+        <Header
+          title={t('info_types.edit.page_title', { name: infoType.name })}
+          description={t('info_types.edit.page_description')}
+          icon={<Pencil className="h-6 w-6 text-white" />}
+          model="info_type"
+          routeName={() => route('info-types.index')}
+          buttonText={t('info_types.edit.back_button')}
+          theme="purple"
+          buttonSize="lg"
+          showBackButton={true}
+          backRouteName={() => route('info-types.index')}
+          backButtonText={t('info_types.edit.back_button')}
+          showButton={false}
+          actionButtons={
+            <>
               <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
                 <Link href={route('info-types.index')} className="flex items-center gap-3">
                   <ArrowLeft className="h-5 w-5" />
                   {t('info_types.edit.back_button')}
                 </Link>
               </Button>
-            </div>
-          </div>
-        </div>
+            </>
+          }
+        />
 
         {/* Edit Form Card */}
         <CanUpdate model="info_type">
-          <Card className="shadow-2xl bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl overflow-hidden">
+          <Card className="shadow-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700  overflow-hidden">
             <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 text-white py-6">
               <CardTitle className="flex items-center gap-4">
                 <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
@@ -214,17 +210,17 @@ export default function EditInfoType({ infoType, users }: Props) {
             <form onSubmit={handleSubmit}>
               <CardContent className="p-8">
                 <Tabs defaultValue="basic" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 mb-8 bg-purple-100 dark:bg-purple-900/30 rounded-xl p-1">
+                  <TabsList className="grid w-full grid-cols-2 mb-8 bg-gray-100 dark:bg-gray-700 rounded-xl p-1">
                     <TabsTrigger 
                       value="basic" 
-                      className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-lg rounded-lg font-medium transition-all duration-300"
+                      className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:text-purple-600 dark:data-[state=active]:text-gray-400 data-[state=active]:shadow-lg rounded-lg font-medium transition-all duration-300"
                     >
                       <FileText className="h-4 w-4" />
                       {t('info_types.create.basic_info')}
                     </TabsTrigger>
                     <TabsTrigger 
                       value="access" 
-                      className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-lg rounded-lg font-medium transition-all duration-300"
+                      className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:text-purple-600 dark:data-[state=active]:text-gray-400 data-[state=active]:shadow-lg rounded-lg font-medium transition-all duration-300"
                     >
                       <Users className="h-4 w-4" />
                       {t('info_type.access.tab')}
@@ -234,7 +230,7 @@ export default function EditInfoType({ infoType, users }: Props) {
                   <TabsContent value="basic" className="space-y-8">
                     {/* Name Field */}
                     <div className="space-y-4">
-                      <Label htmlFor="name" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
+                      <Label htmlFor="name" className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
                         <FileText className="h-4 w-4" />
                         {t('info_types.edit.name_label')} *
                       </Label>
@@ -244,7 +240,7 @@ export default function EditInfoType({ infoType, users }: Props) {
                           value={data.name}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('name', e.target.value)}
                           required
-                          className="h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg"
+                          className="h-12 text-lg border-gray-200 dark:border-gray-700 focus:border-purple-500 focus:ring-purple-500/20 bg-white dark:bg-gray-800 rounded-xl shadow-lg"
                           placeholder={t('info_types.edit.name_placeholder')}
                         />
                         {errors.name && (
@@ -258,7 +254,7 @@ export default function EditInfoType({ infoType, users }: Props) {
 
                     {/* Code Field */}
                     <div className="space-y-4">
-                      <Label htmlFor="code" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
+                      <Label htmlFor="code" className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
                         <FileText className="h-4 w-4" />
                         {t('info_types.edit.code_label')}
                       </Label>
@@ -267,7 +263,7 @@ export default function EditInfoType({ infoType, users }: Props) {
                           id="code"
                           value={data.code}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('code', e.target.value)}
-                          className="h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg"
+                          className="h-12 text-lg border-gray-200 dark:border-gray-700 focus:border-purple-500 focus:ring-purple-500/20 bg-white dark:bg-gray-800 rounded-xl shadow-lg"
                           placeholder={t('info_types.edit.code_placeholder')}
                         />
                         {errors.code && (
@@ -281,7 +277,7 @@ export default function EditInfoType({ infoType, users }: Props) {
 
                     {/* Description Field */}
                     <div className="space-y-4">
-                      <Label htmlFor="description" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
+                      <Label htmlFor="description" className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
                         <FileText className="h-4 w-4" />
                         {t('info_types.edit.description_label')}
                       </Label>
@@ -291,7 +287,7 @@ export default function EditInfoType({ infoType, users }: Props) {
                           value={data.description}
                           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setData('description', e.target.value)}
                           rows={4}
-                          className="text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg resize-none"
+                          className="text-lg border-gray-200 dark:border-gray-700 focus:border-purple-500 focus:ring-purple-500/20 bg-white dark:bg-gray-800 rounded-xl shadow-lg resize-none"
                           placeholder={t('info_types.edit.description_placeholder')}
                         />
                         {errors.description && (
@@ -306,17 +302,17 @@ export default function EditInfoType({ infoType, users }: Props) {
 
                   <TabsContent value="access" className="space-y-6">
                     <div className="text-center mb-6">
-                      <h3 className="text-xl font-bold text-purple-800 dark:text-purple-200 mb-2">
+                      <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">
                         {t('info_type.access.title')}
                       </h3>
-                      <p className="text-purple-600 dark:text-purple-300">
+                      <p className="text-gray-600 dark:text-gray-300">
                         {t('info_type.access.description')}
                       </p>
                     </div>
 
                     {/* User Search */}
                     <div className="space-y-4">
-                      <Label className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
+                      <Label className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
                         <Search className="h-4 w-4" />
                         {t('info_type.access.search_users')}
                       </Label>
@@ -325,41 +321,41 @@ export default function EditInfoType({ infoType, users }: Props) {
                           value={userSearchTerm}
                           onChange={(e) => setUserSearchTerm(e.target.value)}
                           placeholder={t('info_type.access.search_users')}
-                          className="h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg"
+                          className="h-12 text-lg border-gray-200 dark:border-gray-700 focus:border-purple-500 focus:ring-purple-500/20 bg-white dark:bg-gray-800 rounded-xl shadow-lg"
                         />
-                        <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-purple-400" />
+                        <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                       </div>
                     </div>
 
                     {/* User Search Results */}
                     {userSearchTerm && (
                       <div className="space-y-2">
-                        <h4 className="text-md font-semibold text-purple-800 dark:text-purple-200">
+                        <h4 className="text-md font-semibold text-gray-800 dark:text-gray-200">
                           {t('info_type.access.select_users')}
                         </h4>
-                        <div className="max-h-48 overflow-y-auto space-y-2 border border-purple-200 dark:border-purple-700 rounded-xl p-4 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800">
+                        <div className="max-h-48 overflow-y-auto space-y-2 border border-gray-200 dark:border-gray-700 rounded-xl p-4 bg-white dark:bg-gray-800">
                           {filteredUsers
                             .filter(user => !selectedUsers.includes(user.id))
                             .map(user => (
                               <div
                                 key={user.id}
                                 onClick={() => handleUserSelect(user.id)}
-                                className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg border border-purple-100 dark:border-purple-700 hover:bg-purple-50 dark:hover:bg-purple-900/30 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md"
+                                className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md"
                               >
                                 <div className="flex items-center gap-3">
-                                  <div className="p-2 bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-800 dark:to-purple-900 rounded-lg">
-                                    <User className="h-4 w-4 text-purple-600 dark:text-purple-300" />
+                                  <div className="p-2 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-lg">
+                                    <User className="h-4 w-4 text-gray-600 dark:text-gray-300" />
                                   </div>
                                   <div>
-                                    <p className="font-medium text-purple-900 dark:text-purple-100">{user.name}</p>
-                                    <p className="text-sm text-purple-600 dark:text-purple-400">{user.email}</p>
+                                    <p className="font-medium text-gray-900 dark:text-gray-100">{user.name}</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400">{user.email}</p>
                                   </div>
                                 </div>
-                                <ArrowRight className="h-4 w-4 text-purple-500" />
+                                <ArrowRight className="h-4 w-4 text-gray-500" />
                               </div>
                             ))}
                           {filteredUsers.filter(user => !selectedUsers.includes(user.id)).length === 0 && (
-                            <p className="text-center text-purple-600 dark:text-purple-400 py-4">
+                            <p className="text-center text-gray-600 dark:text-gray-400 py-4">
                               {t('info_type.access.no_users_found')}
                             </p>
                           )}
@@ -369,7 +365,7 @@ export default function EditInfoType({ infoType, users }: Props) {
 
                     {/* Selected Users */}
                     <div className="space-y-4">
-                      <h4 className="text-md font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
+                      <h4 className="text-md font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
                         <Users className="h-4 w-4" />
                         {t('info_type.access.selected_users')}
                       </h4>
@@ -383,31 +379,31 @@ export default function EditInfoType({ infoType, users }: Props) {
                                 className={`flex items-center justify-between p-3 rounded-lg border transition-all duration-200 ${
                                   userId === infoType.created_by
                                     ? 'bg-gradient-to-r from-green-100 to-green-200 dark:from-green-800 dark:to-green-900 border-green-200 dark:border-green-700'
-                                    : 'bg-gradient-to-r from-purple-100 to-purple-200 dark:from-purple-800 dark:to-purple-900 border-purple-200 dark:border-purple-700'
+                                    : 'bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 border-purple-200 dark:border-purple-700'
                                 }`}
                               >
                                 <div className="flex items-center gap-3">
                                   <div className={`p-2 rounded-lg ${
                                     userId === infoType.created_by
                                       ? 'bg-gradient-to-br from-green-200 to-green-300 dark:from-green-700 dark:to-green-800'
-                                      : 'bg-gradient-to-br from-purple-200 to-purple-300 dark:from-purple-700 dark:to-purple-800'
+                                      : 'bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700'
                                   }`}>
                                     <User className={`h-4 w-4 ${
                                       userId === infoType.created_by
                                         ? 'text-green-700 dark:text-green-200'
-                                        : 'text-purple-700 dark:text-purple-200'
+                                        : 'text-gray-700 dark:text-gray-200'
                                     }`} />
                                   </div>
                                   <div>
                                     <div className="flex items-center gap-2">
-                                      <p className="font-medium text-purple-900 dark:text-purple-100">{user.name}</p>
+                                      <p className="font-medium text-gray-900 dark:text-gray-100">{user.name}</p>
                                       {userId === infoType.created_by && (
                                         <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300 px-2 py-0.5 text-xs font-medium">
                                           {t('info_type.access.creator')}
                                         </Badge>
                                       )}
                                     </div>
-                                    <p className="text-sm text-purple-600 dark:text-purple-400">{user.email}</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400">{user.email}</p>
                                   </div>
                                 </div>
                                 {userId !== infoType.created_by && (
@@ -426,7 +422,7 @@ export default function EditInfoType({ infoType, users }: Props) {
                           })}
                         </div>
                       ) : (
-                        <div className="text-center py-8 text-purple-600 dark:text-purple-400">
+                        <div className="text-center py-8 text-gray-600 dark:text-gray-400">
                           <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
                           <p>{t('info_type.access.no_users_selected')}</p>
                         </div>
@@ -452,33 +448,22 @@ export default function EditInfoType({ infoType, users }: Props) {
               </CardContent>
 
               {/* Form Actions */}
-              <div className="px-8 py-6 bg-gradient-to-l from-purple-50 to-white border-t border-purple-200 flex justify-end gap-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  asChild
-                  className="h-12 px-6 shadow-lg border-purple-300 text-purple-700 hover:bg-purple-100 hover:border-purple-400 rounded-xl transition-all duration-300 hover:scale-105 text-lg font-semibold"
-                >
-                  <Link href={route('info-types.index')}>
-                    {t('info_types.edit.cancel_button')}
-                  </Link>
-                </Button>
-                <Button 
-                  type="submit"
-                  className="h-12 px-8 bg-gradient-to-l from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 shadow-2xl rounded-xl transition-all duration-300 hover:scale-105 text-lg font-semibold"
-                >
-                  <div className="flex items-center gap-2">
-                    <Save className="h-5 w-5" />
-                    {t('info_types.edit.save_button')}
-                  </div>
-                </Button>
+              <div className="px-8 py-6 bg-gray-50 dark:bg-gray-800">
+                <FooterButtons
+                  onCancel={handleCancel}
+                  onSubmit={() => {}}
+                  processing={processing}
+                  cancelText={t('info_types.edit.cancel_button')}
+                  submitText={t('info_types.edit.save_button')}
+                  savingText={t('info_types.edit.saving_button')}
+                />
               </div>
             </form>
           </Card>
         </CanUpdate>
 
         {/* Stats Management Card */}
-        <Card className="shadow-2xl bg-gradient-to-bl from-white to-purple-50/30 border-0 rounded-3xl overflow-hidden mt-8">
+        <Card className="shadow-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl overflow-hidden mt-8">
           <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 text-white py-6">
             <CardTitle className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -504,10 +489,10 @@ export default function EditInfoType({ infoType, users }: Props) {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold text-purple-800">{t('info_types.edit.current_stats')}</h3>
-                  <p className="text-purple-600">{t('info_types.edit.current_stats_description')}</p>
+                  <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">{t('info_types.edit.current_stats')}</h3>
+                  <p className="text-gray-600 dark:text-gray-400">{t('info_types.edit.current_stats_description')}</p>
                 </div>
-                <Badge variant="secondary" className="bg-purple-100 text-purple-800 px-3 py-1">
+                <Badge variant="secondary" className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-3 py-1">
                   {infoType.infoStats?.length || 0} {t('info_types.edit.stats_count')}
                 </Badge>
               </div>
@@ -515,24 +500,24 @@ export default function EditInfoType({ infoType, users }: Props) {
               {infoType.infoStats && infoType.infoStats.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {infoType.infoStats.map((stat) => (
-                    <div key={stat.id} className="bg-gradient-to-l from-purple-50 to-white p-4 rounded-xl border border-purple-200">
+                    <div key={stat.id} className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
                       <div className="flex items-center gap-2 mb-2">
                         <div
                           className="w-3 h-3 rounded-full"
                           style={{ backgroundColor: stat.stat_category_item.category.color }}
                         ></div>
-                        <span className="text-sm font-medium text-purple-700">
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                           {stat.stat_category_item.category.label}
                         </span>
                       </div>
-                      <h4 className="font-semibold text-purple-900 mb-1">
+                      <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">
                         {stat.stat_category_item.label}
                       </h4>
                       <p className="text-lg font-bold text-green-600 mb-2">
                         {stat.integer_value !== null ? stat.integer_value : stat.string_value}
                       </p>
                       {stat.notes && (
-                        <p className="text-sm text-purple-600 italic">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 italic">
                           {stat.notes}
                         </p>
                       )}
@@ -541,11 +526,11 @@ export default function EditInfoType({ infoType, users }: Props) {
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <div className="p-4 bg-purple-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                    <Database className="h-8 w-8 text-purple-400" />
+                  <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                    <Database className="h-8 w-8 text-gray-400" />
                   </div>
-                  <p className="text-lg font-semibold text-purple-800 mb-2">{t('info_types.edit.no_stats')}</p>
-                  <p className="text-purple-600 mb-4">{t('info_types.edit.no_stats_description')}</p>
+                  <p className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">{t('info_types.edit.no_stats')}</p>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">{t('info_types.edit.no_stats_description')}</p>
                   <CanUpdate model="info_type">
                     <Button asChild className="bg-gradient-to-l from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
                       <Link href={route('info-types.stats', infoType.id)} className="flex items-center gap-3">

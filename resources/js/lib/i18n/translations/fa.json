@@ -1810,5 +1810,13 @@
     "national_insight_center_info.show.table.actions": "عملیات",
     "national_insight_center_info.show.no_info_records": "هیچ معلوماتی وجود ندارد",
     "national_insight_center_info.show.no_info_records_description": "هیچ معلوماتی وجود ندارد",
-    "national_insight_center_info.show.create_first_info_button": "افزودن معلومات اولیه"
+    "national_insight_center_info.show.create_first_info_button": "افزودن معلومات اولیه",
+    "info_types.delete_dialog.title":"حذف اطلاعات",
+    "info_types.delete_dialog.description":"آیا مطمئن هستید که می‌خواهید اطلاعات \"{name}\" را حذف کنید؟ این عمل قابل بازگشت نیست.",
+    "info_types.delete_dialog.cancel":"انصراف",
+    "info_types.delete_dialog.confirm":"حذف",
+    "info_types.delete_dialog.confirm_button":"حذف",
+    "info_types.delete_dialog.confirm_button_loading":"حذف کردن...",
+    "info_types.delete_dialog.confirm_button_success":"حذف شد",
+    "info_types.delete_dialog.confirm_button_error":"حذف نشد"
 }
