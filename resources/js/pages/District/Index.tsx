@@ -28,7 +28,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useTranslation } from '@/lib/i18n/translate';
 import { usePermissions } from '@/hooks/use-permissions';
-import { CanCreate, CanView, CanUpdate, CanDelete, CanConfirm } from '@/components/ui/permission-guard';
+import {  CanView, CanUpdate, CanDelete, CanConfirm } from '@/components/ui/permission-guard';
 import { Pagination } from '@/components/pagination';
 import { useState, useEffect, useRef } from 'react';
 
@@ -383,13 +383,13 @@ export default function DistrictIndex({
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-gradient-to-l from-purple-100 to-purple-200 border-0">
-                    <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('districts.table.name')}</TableHead>
-                    <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('districts.table.code')}</TableHead>
-                    <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('districts.table.province')}</TableHead>
-                    <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('districts.table.status')}</TableHead>
-                    <TableHead className="text-purple-800 font-bold text-lg py-6 px-6">{t('districts.table.created_by')}</TableHead>
-                    <TableHead className="text-purple-800 font-bold text-lg py-6 px-6 text-right">{t('districts.table.actions')}</TableHead>
+                  <TableRow className="bg-gradient-to-l from-purple-100 to-purple-200 dark:from-purple-900 dark:to-purple-800 border-0">
+                    <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('districts.table.name')}</TableHead>
+                    <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('districts.table.code')}</TableHead>
+                    <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('districts.table.province')}</TableHead>
+                    <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('districts.table.status')}</TableHead>
+                    <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('districts.table.created_by')}</TableHead>
+                    <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6 text-right">{t('districts.table.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -469,10 +469,10 @@ export default function DistrictIndex({
                   ) : (
                     <TableRow>
                       <TableCell colSpan={6} className="h-32 text-center">
-                        <div className="flex flex-col items-center gap-4 text-muted-foreground">
-                          <AlertTriangle className="h-16 w-16" />
-                          <p className="text-xl font-bold">{t('districts.no_records')}</p>
-                          <p>{t('districts.no_records_description')}</p>
+                        <div className="flex flex-col items-center gap-4 text-muted-foreground dark:text-gray-400">
+                          <AlertTriangle className="h-16 w-16 text-gray-400 dark:text-gray-500" />
+                          <p className="text-xl font-bold text-gray-600 dark:text-gray-300">{t('districts.no_records')}</p>
+                          <p className="text-gray-500 dark:text-gray-400">{t('districts.no_records_description')}</p>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -486,7 +486,7 @@ export default function DistrictIndex({
         {/* Pagination */}
         {districts?.links && districts.links.length > 0 && (
           <div className="mt-8 flex justify-center">
-            <div className="bg-gradient-to-l from-purple-50 to-white p-4 rounded-3xl shadow-2xl border border-purple-200">
+            <div className="bg-gradient-to-l from-purple-50 to-white dark:from-purple-900/20 dark:to-gray-800 p-4 rounded-3xl shadow-2xl border border-purple-200 dark:border-purple-700">
               <Pagination links={districts.links} />
             </div>
           </div>

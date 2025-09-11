@@ -1874,6 +1874,14 @@
     "national_insight_center_info_item.show.updated_at": "تاریخ بروزرسانی",
     "national_insight_center_info_item.show.created_by": "ایجاد شده توسط",
     "national_insight_center_info_item.show.confirmed_by": "تأیید شده توسط",
-    "national_insight_center_info_item.unknown": "نامشخص"
+    "national_insight_center_info_item.unknown": "نامشخص",
+    "districts.delete_dialog.title":"حذف ولسوالی",
+    "districts.delete_dialog.description":"آیا مطمئن هستید که می‌خواهید ولسوالی  را حذف کنید؟ این عمل قابل بازگشت نیست.",
+    "districts.delete_dialog.button":"حذف ولسوالی",
+    "districts.delete_dialog.cancel":"انصراف",
+    "districts.delete_dialog.confirm":"تأیید حذف",
+    "districts.delete_dialog.delete":"حذف ولسوالی",
+    "districts.delete_dialog.delete_button":"حذف ولسوالی",
+    "districts.delete_dialog.cancel_button":"انصراف"
     
 }
