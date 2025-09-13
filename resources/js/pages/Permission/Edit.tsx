@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Crown, Shield, Users, Pencil, ArrowLeft, CheckCircle, XCircle, UserCheck } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/translate';
+import Header from '@/components/template/header';
 
 interface User {
   id: number;
@@ -149,24 +150,24 @@ export default function Edit({ auth, user, roles, permissions }: PermissionEditP
   const getModelIcon = (modelName: string) => {
     switch (modelName.toLowerCase()) {
       case 'user':
-        return <Users className="h-4 w-4" />;
+        return <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />;
       case 'role':
-        return <Crown className="h-4 w-4" />;
+        return <Crown className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />;
       case 'permission':
-        return <Shield className="h-4 w-4" />;
+        return <Shield className="h-4 w-4 text-blue-600 dark:text-blue-400" />;
       default:
-        return <Shield className="h-4 w-4" />;
+        return <Shield className="h-4 w-4 text-blue-600 dark:text-blue-400" />;
     }
   };
 
   const getRoleIcon = (roleName: string) => {
     switch (roleName.toLowerCase()) {
       case 'superadmin':
-        return <Crown className="h-4 w-4" />;
+        return <Crown className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />;
       case 'admin':
-        return <Shield className="h-4 w-4" />;
+        return <Shield className="h-4 w-4 text-blue-600 dark:text-blue-400" />;
       default:
-        return <UserCheck className="h-4 w-4" />;
+        return <UserCheck className="h-4 w-4 text-gray-600 dark:text-gray-400" />;
     }
   };
 
@@ -186,45 +187,25 @@ export default function Edit({ auth, user, roles, permissions }: PermissionEditP
       <Head title={t('permissions.edit_user_permissions', { name: user.name })} />
 
       <div className="container px-0 py-6">
-        {/* Modern Header */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-l from-purple-600 via-indigo-600 to-blue-600 p-8 lg:p-12 text-white shadow-2xl mb-8 group">
-          <div className="absolute inset-0 bg-black/5"></div>
-          <div className="absolute top-0 left-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 -translate-x-40 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
-          <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full translate-y-32 translate-x-32 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
-          
-          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-8">
-            <div className="flex items-center gap-8">
-              <div className="p-6 bg-white/20 backdrop-blur-md rounded-3xl border border-white/30 shadow-2xl group-hover:scale-105 transition-transform duration-300">
-                <UserCheck className="h-10 w-10 text-white" />
-              </div>
-              <div className="space-y-3">
-                <h2 className="text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight">
-                  {t('permissions.edit_user_permissions', { name: user.name })}
-                </h2>
-                <div className="text-white/90 flex items-center gap-3 text-xl font-medium">
-                  <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                    <Shield className="h-6 w-6" />
-                  </div>
-                  {t('permissions.edit_description')}
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-8 py-4 text-lg font-semibold transition-all duration-300 hover:scale-105">
-                <Link href={route('permissions.index')} className="flex items-center gap-3">
-                  <ArrowLeft className="h-5 w-5" />
-                  {t('common.back')}
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
+        {/* Header Component */}
+        <Header
+          title={t('permissions.edit_user_permissions', { name: user.name })}
+          description={t('permissions.edit_description')}
+          icon={<UserCheck className="h-6 w-6 text-white" />}
+          model="permission"
+          routeName={() => route('permissions.edit', user.id)}
+          theme="blue"
+          buttonText={t('common.edit')}
+          showBackButton={true}
+          backRouteName={() => route('permissions.index')}
+          backButtonText={t('common.back')}
+          showButton={false}
+        />
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* User Info Card */}
-          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30 border-0 rounded-3xl">
-            <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 text-white py-6">
+          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30 dark:from-gray-800 dark:to-gray-900 border-0 rounded-3xl">
+            <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 text-white py-6">
               <CardTitle className="flex items-center gap-4">
                 <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
                   <Users className="h-6 w-6" />
@@ -235,21 +216,21 @@ export default function Edit({ auth, user, roles, permissions }: PermissionEditP
                 </div>
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-8">
+            <CardContent className="p-8 bg-white dark:bg-gray-800">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <Label className="text-lg font-semibold text-gray-900 mb-3 block">
+                  <Label className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 block">
                     {t('permissions.user_name')}
                   </Label>
-                  <div className="p-4 bg-gradient-to-l from-blue-50 to-white rounded-xl border border-blue-200 text-lg font-medium text-gray-900">
+                  <div className="p-4 bg-gradient-to-l from-blue-50 to-white dark:from-gray-700 dark:to-gray-800 rounded-xl border border-blue-200 dark:border-gray-600 text-lg font-medium text-gray-900 dark:text-gray-100">
                     {user.name}
                   </div>
                 </div>
                 <div>
-                  <Label className="text-lg font-semibold text-gray-900 mb-3 block">
+                  <Label className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 block">
                     {t('permissions.user_email')}
                   </Label>
-                  <div className="p-4 bg-gradient-to-l from-blue-50 to-white rounded-xl border border-blue-200 text-lg font-medium text-gray-900">
+                  <div className="p-4 bg-gradient-to-l from-blue-50 to-white dark:from-gray-700 dark:to-gray-800 rounded-xl border border-blue-200 dark:border-gray-600 text-lg font-medium text-gray-900 dark:text-gray-100">
                     {user.email}
                   </div>
                 </div>
@@ -258,8 +239,8 @@ export default function Edit({ auth, user, roles, permissions }: PermissionEditP
           </Card>
 
           {/* Roles Card */}
-          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30 border-0 rounded-3xl">
-            <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 text-white py-6">
+          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30 dark:from-gray-800 dark:to-gray-900 border-0 rounded-3xl">
+            <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 text-white py-6">
               <CardTitle className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
@@ -296,10 +277,10 @@ export default function Edit({ auth, user, roles, permissions }: PermissionEditP
                 </div>
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-8">
+            <CardContent className="p-8 bg-white dark:bg-gray-800">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {roles.map((role) => (
-                  <div key={role.id} className="flex items-center space-x-3 p-3 bg-gradient-to-l from-blue-50 to-white rounded-xl border border-blue-200 hover:border-blue-300 transition-colors duration-300">
+                  <div key={role.id} className="flex items-center space-x-3 p-3 bg-gradient-to-l from-blue-50 to-white dark:from-gray-700 dark:to-gray-800 rounded-xl border border-blue-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-gray-500 transition-colors duration-300">
                     <Checkbox
                       id={`role-${role.id}`}
                       checked={data.roles.includes(role.name)}
@@ -307,10 +288,10 @@ export default function Edit({ auth, user, roles, permissions }: PermissionEditP
                       className="border-blue-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
                     />
                     <div className="flex items-center gap-2 flex-1">
-                      <div className="p-1 bg-blue-100 rounded-lg">
+                      <div className="p-1 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                         {getRoleIcon(role.name)}
                       </div>
-                      <Label htmlFor={`role-${role.id}`} className="font-medium text-gray-900 cursor-pointer flex-1">
+                      <Label htmlFor={`role-${role.id}`} className="font-medium text-gray-900 dark:text-gray-100 cursor-pointer flex-1">
                         {role.name}
                       </Label>
                       <Badge variant={getRoleBadgeVariant(role.name)} className="text-xs">
@@ -321,7 +302,7 @@ export default function Edit({ auth, user, roles, permissions }: PermissionEditP
                 ))}
               </div>
               {errors.roles && (
-                <p className="text-sm text-red-600 mt-4 flex items-center gap-2">
+                <p className="text-sm text-red-600 dark:text-red-400 mt-4 flex items-center gap-2">
                   <XCircle className="h-4 w-4" />
                   {errors.roles}
                 </p>
@@ -330,8 +311,8 @@ export default function Edit({ auth, user, roles, permissions }: PermissionEditP
           </Card>
 
           {/* Permissions Card */}
-          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30 border-0 rounded-3xl">
-            <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 text-white py-6">
+          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30 dark:from-gray-800 dark:to-gray-900 border-0 rounded-3xl">
+            <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 text-white py-6">
               <CardTitle className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
@@ -368,31 +349,31 @@ export default function Edit({ auth, user, roles, permissions }: PermissionEditP
                 </div>
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-8">
+            <CardContent className="p-8 bg-white dark:bg-gray-800">
               <div className="space-y-8">
                 {Object.entries(groupedPermissions).map(([model, modelPermissions]) => (
                   <div key={model} className="space-y-4">
-                    <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
-                      <div className="p-2 bg-blue-100 rounded-lg">
+                    <div className="flex items-center gap-3 pb-2 border-b border-gray-200 dark:border-gray-700">
+                      <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                         {getModelIcon(model)}
                       </div>
-                      <h4 className="text-xl font-bold text-gray-900 capitalize">
+                      <h4 className="text-xl font-bold text-gray-900 dark:text-gray-100 capitalize">
                         {model} {t('permissions.permissions')}
                       </h4>
-                      <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">
+                      <Badge variant="outline" className="bg-blue-100 dark:bg-gray-600 text-blue-800 dark:text-blue-200 border-blue-300 dark:border-gray-500">
                         {modelPermissions.length}
                       </Badge>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {modelPermissions.map((permission) => (
-                        <div key={permission.id} className="flex items-center space-x-3 p-3 bg-gradient-to-l from-blue-50 to-white rounded-xl border border-blue-200 hover:border-blue-300 transition-colors duration-300">
+                        <div key={permission.id} className="flex items-center space-x-3 p-3 bg-gradient-to-l from-blue-50 to-white dark:from-gray-700 dark:to-gray-800 rounded-xl border border-blue-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-gray-500 transition-colors duration-300">
                           <Checkbox
                             id={`permission-${permission.id}`}
                             checked={data.permissions.includes(permission.name)}
                             onCheckedChange={() => togglePermission(permission.name)}
                             className="border-blue-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
                           />
-                          <Label htmlFor={`permission-${permission.id}`} className="font-medium text-gray-900 cursor-pointer flex-1">
+                          <Label htmlFor={`permission-${permission.id}`} className="font-medium text-gray-900 dark:text-gray-100 cursor-pointer flex-1">
                             {permission.label || permission.name}
                           </Label>
                         </div>
@@ -402,7 +383,7 @@ export default function Edit({ auth, user, roles, permissions }: PermissionEditP
                 ))}
 
                 {errors.permissions && (
-                  <p className="text-sm text-red-600 mt-4 flex items-center gap-2">
+                  <p className="text-sm text-red-600 dark:text-red-400 mt-4 flex items-center gap-2">
                     <XCircle className="h-4 w-4" />
                     {errors.permissions}
                   </p>
@@ -417,7 +398,7 @@ export default function Edit({ auth, user, roles, permissions }: PermissionEditP
               type="submit"
               disabled={processing}
               size="lg"
-              className="bg-gradient-to-l from-blue-500 to-blue-600 text-white rounded-2xl px-12 py-4 text-lg font-semibold shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105"
+              className="bg-gradient-to-l from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 text-white rounded-2xl px-12 py-4 text-lg font-semibold shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105"
             >
               {processing ? (
                 <div className="flex items-center gap-3">

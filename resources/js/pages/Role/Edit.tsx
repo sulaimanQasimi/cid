@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Crown, Shield, Users, Pencil, ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/translate';
+import Header from '@/components/template/header';
 
 interface Permission {
   id: number;
@@ -114,13 +115,13 @@ export default function Edit({ auth, role, permissions }: RoleEditProps) {
   const getModelIcon = (modelName: string) => {
     switch (modelName.toLowerCase()) {
       case 'user':
-        return <Users className="h-4 w-4" />;
+        return <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />;
       case 'role':
-        return <Crown className="h-4 w-4" />;
+        return <Crown className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />;
       case 'permission':
-        return <Shield className="h-4 w-4" />;
+        return <Shield className="h-4 w-4 text-blue-600 dark:text-blue-400" />;
       default:
-        return <Shield className="h-4 w-4" />;
+        return <Shield className="h-4 w-4 text-blue-600 dark:text-blue-400" />;
     }
   };
 
@@ -131,45 +132,25 @@ export default function Edit({ auth, role, permissions }: RoleEditProps) {
       <Head title={t('roles.edit_role', { name: role.name })} />
 
       <div className="container px-0 py-6">
-        {/* Modern Header */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-l from-purple-600 via-indigo-600 to-blue-600 p-8 lg:p-12 text-white shadow-2xl mb-8 group">
-          <div className="absolute inset-0 bg-black/5"></div>
-          <div className="absolute top-0 left-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 -translate-x-40 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
-          <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full translate-y-32 translate-x-32 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
-          
-          <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-8">
-            <div className="flex items-center gap-8">
-              <div className="p-6 bg-white/20 backdrop-blur-md rounded-3xl border border-white/30 shadow-2xl group-hover:scale-105 transition-transform duration-300">
-                <Pencil className="h-10 w-10 text-white" />
-              </div>
-              <div className="space-y-3">
-                <h2 className="text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight">
-                  {t('roles.edit_role', { name: role.name })}
-                </h2>
-                <div className="text-white/90 flex items-center gap-3 text-xl font-medium">
-                  <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                    <Crown className="h-6 w-6" />
-                  </div>
-                  {t('roles.edit_description')}
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-8 py-4 text-lg font-semibold transition-all duration-300 hover:scale-105">
-                <Link href={route('roles.index')} className="flex items-center gap-3">
-                  <ArrowLeft className="h-5 w-5" />
-                  {t('common.back')}
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
+        {/* Header Component */}
+        <Header
+          title={t('roles.edit_role', { name: role.name })}
+          description={t('roles.edit_description')}
+          icon={<Pencil className="h-6 w-6 text-white" />}
+          model="role"
+          routeName={() => route('roles.edit', role.id)}
+          theme="blue"
+          buttonText={t('common.edit')}
+          showBackButton={true}
+          backRouteName={() => route('roles.index')}
+          backButtonText={t('common.back')}
+          showButton={false}
+        />
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Role Name Card */}
-          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30 border-0 rounded-3xl">
-            <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 text-white py-6">
+          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30 dark:from-gray-800 dark:to-gray-900 border-0 rounded-3xl">
+            <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 text-white py-6">
               <CardTitle className="flex items-center gap-4">
                 <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
                   <Crown className="h-6 w-6" />
@@ -180,10 +161,10 @@ export default function Edit({ auth, role, permissions }: RoleEditProps) {
                 </div>
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-8">
+            <CardContent className="p-8 bg-white dark:bg-gray-800">
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="name" className="text-lg font-semibold text-gray-900 mb-3 block">
+                  <Label htmlFor="name" className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 block">
                     {t('roles.role_name')}
                   </Label>
                   <Input
@@ -192,17 +173,17 @@ export default function Edit({ auth, role, permissions }: RoleEditProps) {
                     value={data.name}
                     onChange={(e) => setData('name', e.target.value)}
                     placeholder={t('roles.role_name_placeholder')}
-                    className="w-full h-12 text-lg border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white rounded-xl shadow-lg"
+                    className="w-full h-12 text-lg border-blue-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 bg-gradient-to-l from-blue-50 to-white dark:from-gray-700 dark:to-gray-800 text-gray-900 dark:text-gray-100 rounded-xl shadow-lg"
                     disabled={isSystemRole}
                   />
                   {isSystemRole && (
-                    <p className="text-sm text-amber-600 mt-2 flex items-center gap-2">
+                    <p className="text-sm text-amber-600 dark:text-amber-400 mt-2 flex items-center gap-2">
                       <Shield className="h-4 w-4" />
                       {t('roles.system_role_protected', { name: role.name })}
                     </p>
                   )}
                   {errors.name && (
-                    <p className="text-sm text-red-600 mt-2 flex items-center gap-2">
+                    <p className="text-sm text-red-600 dark:text-red-400 mt-2 flex items-center gap-2">
                       <XCircle className="h-4 w-4" />
                       {errors.name}
                     </p>
@@ -213,8 +194,8 @@ export default function Edit({ auth, role, permissions }: RoleEditProps) {
           </Card>
 
           {/* Permissions Card */}
-          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30 border-0 rounded-3xl">
-            <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 text-white py-6">
+          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30 dark:from-gray-800 dark:to-gray-900 border-0 rounded-3xl">
+            <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 text-white py-6">
               <CardTitle className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
@@ -253,24 +234,24 @@ export default function Edit({ auth, role, permissions }: RoleEditProps) {
                 )}
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-8">
+            <CardContent className="p-8 bg-white dark:bg-gray-800">
               <div className="space-y-8">
                 {Object.entries(groupedPermissions).map(([model, modelPermissions]) => (
                   <div key={model} className="space-y-4">
-                    <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
-                      <div className="p-2 bg-blue-100 rounded-lg">
+                    <div className="flex items-center gap-3 pb-2 border-b border-gray-200 dark:border-gray-700">
+                      <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                         {getModelIcon(model)}
                       </div>
-                      <h4 className="text-xl font-bold text-gray-900 capitalize">
+                      <h4 className="text-xl font-bold text-gray-900 dark:text-gray-100 capitalize">
                         {model} {t('roles.permissions')}
                       </h4>
-                      <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">
+                      <Badge variant="outline" className="bg-blue-100 dark:bg-gray-600 text-blue-800 dark:text-blue-200 border-blue-300 dark:border-gray-500">
                         {modelPermissions.length}
                       </Badge>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {modelPermissions.map((permission) => (
-                        <div key={permission.id} className="flex items-center space-x-3 p-3 bg-gradient-to-l from-blue-50 to-white rounded-xl border border-blue-200 hover:border-blue-300 transition-colors duration-300">
+                        <div key={permission.id} className="flex items-center space-x-3 p-3 bg-gradient-to-l from-blue-50 to-white dark:from-gray-700 dark:to-gray-800 rounded-xl border border-blue-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-gray-500 transition-colors duration-300">
                           <Checkbox
                             id={`permission-${permission.id}`}
                             checked={data.permissions.includes(permission.name)}
@@ -278,7 +259,7 @@ export default function Edit({ auth, role, permissions }: RoleEditProps) {
                             className="border-blue-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
                             disabled={isSystemRole}
                           />
-                          <Label htmlFor={`permission-${permission.id}`} className="font-medium text-gray-900 cursor-pointer flex-1">
+                          <Label htmlFor={`permission-${permission.id}`} className="font-medium text-gray-900 dark:text-gray-100 cursor-pointer flex-1">
                             {permission.label || permission.name}
                           </Label>
                         </div>
@@ -288,8 +269,8 @@ export default function Edit({ auth, role, permissions }: RoleEditProps) {
                 ))}
 
                 {isSystemRole && (
-                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
-                    <p className="text-sm text-amber-800 flex items-center gap-2">
+                  <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
+                    <p className="text-sm text-amber-800 dark:text-amber-300 flex items-center gap-2">
                       <Shield className="h-4 w-4" />
                       {t('roles.system_role_permissions_info', { name: role.name })}
                     </p>
@@ -297,7 +278,7 @@ export default function Edit({ auth, role, permissions }: RoleEditProps) {
                 )}
 
                 {errors.permissions && (
-                  <p className="text-sm text-red-600 mt-4 flex items-center gap-2">
+                  <p className="text-sm text-red-600 dark:text-red-400 mt-4 flex items-center gap-2">
                     <XCircle className="h-4 w-4" />
                     {errors.permissions}
                   </p>
@@ -312,7 +293,7 @@ export default function Edit({ auth, role, permissions }: RoleEditProps) {
               type="submit"
               disabled={processing || isSystemRole}
               size="lg"
-              className="bg-gradient-to-l from-blue-500 to-blue-600 text-white rounded-2xl px-12 py-4 text-lg font-semibold shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105"
+              className="bg-gradient-to-l from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 text-white rounded-2xl px-12 py-4 text-lg font-semibold shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105"
             >
               {processing ? (
                 <div className="flex items-center gap-3">
