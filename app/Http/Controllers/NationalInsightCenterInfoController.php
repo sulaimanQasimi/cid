@@ -399,11 +399,11 @@ class NationalInsightCenterInfoController extends Controller
         
         // Load the national insight center info with all necessary relationships
         $nationalInsightCenterInfo->load([
-            'creator:id,name',
+            'creator:id,name,department_id',
+            'creator.department:id,name',
             'confirmer:id,name',
             'infoStats.statCategoryItem.category'
         ]);
-
         $infos = $nationalInsightCenterInfo->infoItems()
             ->with(['infoCategory:id,name,code', 'department:id,name,code', 'creator:id,name'])
             ->orderBy('created_at', 'desc')
