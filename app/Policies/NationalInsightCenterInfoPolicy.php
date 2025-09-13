@@ -41,7 +41,7 @@ class NationalInsightCenterInfoPolicy
     public function update(User $user, NationalInsightCenterInfo $nationalInsightCenterInfo): bool
     {
         return $user->hasPermissionTo('national_insight_center_info.update') && 
-               $nationalInsightCenterInfo->created_by === $user->id;
+               ($nationalInsightCenterInfo->created_by === $user->id || $nationalInsightCenterInfo->hasAccess($user));
     }
 
     /**

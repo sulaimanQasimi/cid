@@ -42,7 +42,8 @@ class NationalInsightCenterInfoItemPolicy
     public function update(User $user, NationalInsightCenterInfoItem $nationalInsightCenterInfoItem): bool
     {
         return $user->hasPermissionTo('national_insight_center_info_item.update') && 
-               $nationalInsightCenterInfoItem->created_by === $user->id;
+               ($nationalInsightCenterInfoItem->created_by === $user->id || 
+                $nationalInsightCenterInfoItem->nationalInsightCenterInfo->hasAccess($user));
     }
 
     /**
@@ -51,7 +52,8 @@ class NationalInsightCenterInfoItemPolicy
     public function delete(User $user, NationalInsightCenterInfoItem $nationalInsightCenterInfoItem): bool
     {
         return $user->hasPermissionTo('national_insight_center_info_item.delete') && 
-               $nationalInsightCenterInfoItem->created_by === $user->id;
+               ($nationalInsightCenterInfoItem->created_by === $user->id || 
+                $nationalInsightCenterInfoItem->nationalInsightCenterInfo->hasAccess($user));
     }
 
     /**
@@ -68,7 +70,8 @@ class NationalInsightCenterInfoItemPolicy
     public function restore(User $user, NationalInsightCenterInfoItem $nationalInsightCenterInfoItem): bool
     {
         return $user->hasPermissionTo('national_insight_center_info_item.restore') && 
-               $nationalInsightCenterInfoItem->created_by === $user->id;
+               ($nationalInsightCenterInfoItem->created_by === $user->id || 
+                $nationalInsightCenterInfoItem->nationalInsightCenterInfo->hasAccess($user));
     }
 
     /**
@@ -77,6 +80,7 @@ class NationalInsightCenterInfoItemPolicy
     public function forceDelete(User $user, NationalInsightCenterInfoItem $nationalInsightCenterInfoItem): bool
     {
         return $user->hasPermissionTo('national_insight_center_info_item.force_delete') && 
-               $nationalInsightCenterInfoItem->created_by === $user->id;
+               ($nationalInsightCenterInfoItem->created_by === $user->id || 
+                $nationalInsightCenterInfoItem->nationalInsightCenterInfo->hasAccess($user));
     }
 }

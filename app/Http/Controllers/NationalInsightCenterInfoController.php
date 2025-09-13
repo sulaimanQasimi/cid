@@ -221,8 +221,8 @@ class NationalInsightCenterInfoController extends Controller
 
         $users = User::orderBy('name')->get();
 
-        // Load existing stats
-        $nationalInsightCenterInfo->load(['infoStats.statCategoryItem.category']);
+        // Load existing stats and access users
+        $nationalInsightCenterInfo->load(['infoStats.statCategoryItem.category', 'accesses.user:id,name']);
 
         return Inertia::render('NationalInsightCenterInfo/Edit', [
             'nationalInsightCenterInfo' => $nationalInsightCenterInfo,
