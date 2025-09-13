@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Button } from '@/components/ui/button';
 import { ArrowLeft, Pencil, Trash, Shield, FileText, User, Eye, Calendar, Mail, CheckCircle, AlertTriangle, Clock, Edit3, Building2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -67,8 +66,6 @@ export default function UserShow({ user }: Props) {
       <Head title={t('users.show.title', { name: user.name })} />
 
       <div className="container px-0 py-6">
-        {/* Modern Header with Glassmorphism */}
-
         <Header
           title={t('users.show.title')}
           description={t('users.show.description')}
@@ -82,8 +79,8 @@ export default function UserShow({ user }: Props) {
           backButtonText={t('common.back_to_list')}
         />
         {/* User Information Card */}
-        <Card className="shadow-2xl bg-gradient-to-bl from-white to-blue-50/30 border-0 rounded-3xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 text-white py-6">
+        <Card className="shadow-2xl bg-gradient-to-bl from-white to-blue-50/30 dark:from-gray-800 dark:to-gray-900 border-0 rounded-3xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 text-white py-6">
             <CardTitle className="flex items-center gap-4">
               <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
                 <Shield className="h-6 w-6" />
@@ -95,68 +92,68 @@ export default function UserShow({ user }: Props) {
             </CardTitle>
           </CardHeader>
 
-          <CardContent className="p-8">
+          <CardContent className="p-8 bg-white dark:bg-gray-800">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Basic Information */}
               <div className="space-y-6">
-                <h3 className="text-xl font-bold text-blue-900 flex items-center gap-2">
-                  <User className="h-5 w-5 text-blue-600" />
+                <h3 className="text-xl font-bold text-blue-900 dark:text-blue-100 flex items-center gap-2">
+                  <User className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   {t('users.show.basic_info')}
                 </h3>
 
                 <div className="space-y-4">
-                  <div className="bg-gradient-to-l from-blue-50 to-white p-6 rounded-2xl border border-blue-200 shadow-lg">
+                  <div className="bg-gradient-to-l from-blue-50 to-white dark:from-gray-700 dark:to-gray-800 p-6 rounded-2xl border border-blue-200 dark:border-blue-700 shadow-lg">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="p-2 bg-blue-100 rounded-xl">
-                        <User className="h-5 w-5 text-blue-600" />
+                      <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+                        <User className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                       </div>
-                      <h4 className="text-lg font-semibold text-blue-900">{t('users.form.name')}</h4>
+                      <h4 className="text-lg font-semibold text-blue-900 dark:text-blue-100">{t('users.form.name')}</h4>
                     </div>
-                    <p className="text-xl font-bold text-blue-800">{user.name}</p>
+                    <p className="text-xl font-bold text-blue-800 dark:text-blue-200">{user.name}</p>
                   </div>
 
-                  <div className="bg-gradient-to-l from-blue-50 to-white p-6 rounded-2xl border border-blue-200 shadow-lg">
+                  <div className="bg-gradient-to-l from-blue-50 to-white dark:from-gray-700 dark:to-gray-800 p-6 rounded-2xl border border-blue-200 dark:border-blue-700 shadow-lg">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="p-2 bg-blue-100 rounded-xl">
-                        <Mail className="h-5 w-5 text-blue-600" />
+                      <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+                        <Mail className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                       </div>
-                      <h4 className="text-lg font-semibold text-blue-900">{t('users.form.email')}</h4>
+                      <h4 className="text-lg font-semibold text-blue-900 dark:text-blue-100">{t('users.form.email')}</h4>
                     </div>
-                    <p className="text-xl font-bold text-blue-800">{user.email}</p>
+                    <p className="text-xl font-bold text-blue-800 dark:text-blue-200">{user.email}</p>
                   </div>
 
-                  <div className="bg-gradient-to-l from-blue-50 to-white p-6 rounded-2xl border border-blue-200 shadow-lg">
+                  <div className="bg-gradient-to-l from-blue-50 to-white dark:from-gray-700 dark:to-gray-800 p-6 rounded-2xl border border-blue-200 dark:border-blue-700 shadow-lg">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="p-2 bg-blue-100 rounded-xl">
-                        <Building2 className="h-5 w-5 text-blue-600" />
+                      <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+                        <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                       </div>
-                      <h4 className="text-lg font-semibold text-blue-900">{t('users.form.department')}</h4>
+                      <h4 className="text-lg font-semibold text-blue-900 dark:text-blue-100">{t('users.form.department')}</h4>
                     </div>
                     {user.department ? (
-                      <Badge variant="outline" className="bg-gradient-to-l from-blue-100 to-blue-200 text-blue-800 border-blue-300 px-4 py-2 rounded-xl font-semibold">
+                      <Badge variant="outline" className="bg-gradient-to-l from-blue-100 to-blue-200 dark:from-blue-800 dark:to-blue-900 text-blue-800 dark:text-blue-200 border-blue-300 dark:border-blue-600 px-4 py-2 rounded-xl font-semibold">
                         {user.department.name}
                       </Badge>
                     ) : (
-                      <span className="text-blue-600 font-medium">{t('users.none')}</span>
+                      <span className="text-blue-600 dark:text-blue-400 font-medium">{t('users.none')}</span>
                     )}
                   </div>
 
-                  <div className="bg-gradient-to-l from-blue-50 to-white p-6 rounded-2xl border border-blue-200 shadow-lg">
+                  <div className="bg-gradient-to-l from-blue-50 to-white dark:from-gray-700 dark:to-gray-800 p-6 rounded-2xl border border-blue-200 dark:border-blue-700 shadow-lg">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="p-2 bg-blue-100 rounded-xl">
-                        <Shield className="h-5 w-5 text-blue-600" />
+                      <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+                        <Shield className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                       </div>
-                      <h4 className="text-lg font-semibold text-blue-900">{t('users.form.roles')}</h4>
+                      <h4 className="text-lg font-semibold text-blue-900 dark:text-blue-100">{t('users.form.roles')}</h4>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {user.roles && user.roles.length > 0 ? (
                         user.roles.map(role => (
-                          <Badge key={role.id} variant="outline" className="bg-gradient-to-l from-blue-100 to-blue-200 text-blue-800 border-blue-300 px-4 py-2 rounded-xl font-semibold">
+                          <Badge key={role.id} variant="outline" className="bg-gradient-to-l from-blue-100 to-blue-200 dark:from-blue-800 dark:to-blue-900 text-blue-800 dark:text-blue-200 border-blue-300 dark:border-blue-600 px-4 py-2 rounded-xl font-semibold">
                             {role.name}
                           </Badge>
                         ))
                       ) : (
-                        <span className="text-blue-600 font-medium">{t('users.none')}</span>
+                        <span className="text-blue-600 dark:text-blue-400 font-medium">{t('users.none')}</span>
                       )}
                     </div>
                   </div>
@@ -165,57 +162,57 @@ export default function UserShow({ user }: Props) {
 
               {/* Account Information */}
               <div className="space-y-6">
-                <h3 className="text-xl font-bold text-blue-900 flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-blue-600" />
+                <h3 className="text-xl font-bold text-blue-900 dark:text-blue-100 flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   {t('users.show.account_info')}
                 </h3>
 
                 <div className="space-y-4">
-                  <div className="bg-gradient-to-l from-blue-50 to-white p-6 rounded-2xl border border-blue-200 shadow-lg">
+                  <div className="bg-gradient-to-l from-blue-50 to-white dark:from-gray-700 dark:to-gray-800 p-6 rounded-2xl border border-blue-200 dark:border-blue-700 shadow-lg">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="p-2 bg-blue-100 rounded-xl">
-                        <CheckCircle className="h-5 w-5 text-blue-600" />
+                      <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+                        <CheckCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                       </div>
-                      <h4 className="text-lg font-semibold text-blue-900">{t('users.show.email_verified')}</h4>
+                      <h4 className="text-lg font-semibold text-blue-900 dark:text-blue-100">{t('users.show.email_verified')}</h4>
                     </div>
                     <div className="flex items-center gap-2">
                       {user.email_verified_at ? (
                         <>
-                          <CheckCircle className="h-5 w-5 text-green-600" />
-                          <span className="text-green-700 font-semibold">{t('users.show.verified')}</span>
-                          <span className="text-blue-600 text-sm">
+                          <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                          <span className="text-green-700 dark:text-green-400 font-semibold">{t('users.show.verified')}</span>
+                          <span className="text-blue-600 dark:text-blue-400 text-sm">
                             {format(new Date(user.email_verified_at), 'MMM d, yyyy, h:mm a')}
                           </span>
                         </>
                       ) : (
                         <>
-                          <AlertTriangle className="h-5 w-5 text-orange-600" />
-                          <span className="text-orange-700 font-semibold">{t('users.show.not_verified')}</span>
+                          <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                          <span className="text-orange-700 dark:text-orange-400 font-semibold">{t('users.show.not_verified')}</span>
                         </>
                       )}
                     </div>
                   </div>
 
-                  <div className="bg-gradient-to-l from-blue-50 to-white p-6 rounded-2xl border border-blue-200 shadow-lg">
+                  <div className="bg-gradient-to-l from-blue-50 to-white dark:from-gray-700 dark:to-gray-800 p-6 rounded-2xl border border-blue-200 dark:border-blue-700 shadow-lg">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="p-2 bg-blue-100 rounded-xl">
-                        <Calendar className="h-5 w-5 text-blue-600" />
+                      <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+                        <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                       </div>
-                      <h4 className="text-lg font-semibold text-blue-900">{t('users.show.created_at')}</h4>
+                      <h4 className="text-lg font-semibold text-blue-900 dark:text-blue-100">{t('users.show.created_at')}</h4>
                     </div>
-                    <p className="text-xl font-bold text-blue-800">
+                    <p className="text-xl font-bold text-blue-800 dark:text-blue-200">
                       {format(new Date(user.created_at), 'MMM d, yyyy, h:mm a')}
                     </p>
                   </div>
 
-                  <div className="bg-gradient-to-l from-blue-50 to-white p-6 rounded-2xl border border-blue-200 shadow-lg">
+                  <div className="bg-gradient-to-l from-blue-50 to-white dark:from-gray-700 dark:to-gray-800 p-6 rounded-2xl border border-blue-200 dark:border-blue-700 shadow-lg">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="p-2 bg-blue-100 rounded-xl">
-                        <Clock className="h-5 w-5 text-blue-600" />
+                      <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+                        <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                       </div>
-                      <h4 className="text-lg font-semibold text-blue-900">{t('users.show.last_updated')}</h4>
+                      <h4 className="text-lg font-semibold text-blue-900 dark:text-blue-100">{t('users.show.last_updated')}</h4>
                     </div>
-                    <p className="text-xl font-bold text-blue-800">
+                    <p className="text-xl font-bold text-blue-800 dark:text-blue-200">
                       {format(new Date(user.updated_at), 'MMM d, yyyy, h:mm a')}
                     </p>
                   </div>

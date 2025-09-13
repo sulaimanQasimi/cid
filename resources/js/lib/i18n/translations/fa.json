@@ -1913,5 +1913,15 @@
     "national_insight_center_info.edit.save_button": "ذخیره تغییرات",
     "national_insight_center_info.edit.back_button": "بازگشت",
     "national_insight_center_info.edit.cancel_button": "انصراف",
-    "national_insight_center_info.edit.saving_button": "در حال ذخیره..."   
+    "national_insight_center_info.edit.saving_button": "در حال ذخیره...",
+    "districts.delete_dialog.cancel_button":"انصراف",
+    "users.form.select_department":"انتخاب دیپارتمنت",
+    "users.form.department":"دیپارتمنت",
+    "users.delete_dialog.description":"آیا مطمئن هستید که می‌خواهید کاربر را حذف کنید؟ این عمل قابل بازگشت نیست.",
+    "users.delete_dialog.button":"حذف کاربر",
+    "users.delete_dialog.cancel":"انصراف",
+    "users.delete_dialog.confirm":"تأیید حذف",
+    "users.delete_dialog.delete":"حذف کاربر",
+    "users.delete_dialog.delete_button":"حذف کاربر",
+    "users.delete_dialog.cancel_button":"انصراف"
 }
