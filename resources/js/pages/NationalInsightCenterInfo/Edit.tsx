@@ -241,7 +241,7 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={t('national_insight_center_info.edit.page_title', { name: nationalInsightCenterInfo.name })} />
 
-      <div className="container px-0 py-6">
+      <div className="container px-0 py-6" dir="rtl">
         <Header
           title={t('national_insight_center_info.edit.page_title', { name: nationalInsightCenterInfo.name })}
           description={t('national_insight_center_info.edit.page_description')}
@@ -259,7 +259,7 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
             <>
               <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
                 <Link href={route('national-insight-center-infos.show', { national_insight_center_info: nationalInsightCenterInfo.id })} className="flex items-center gap-3">
-                  <ArrowLeft className="h-5 w-5" />
+                  <ArrowRight className="h-5 w-5" />
                   {t('national_insight_center_info.edit.back_button')}
                 </Link>
               </Button>
@@ -293,7 +293,7 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
                     <TabsContent value="basic" className="space-y-8">
                       {/* Name Field */}
                       <div className="space-y-4">
-                        <Label htmlFor="name" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
+                        <Label htmlFor="name" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2 text-right">
                           <FileText className="h-4 w-4" />
                           {t('national_insight_center_info.name_label')} *
                         </Label>
@@ -303,7 +303,7 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
                             value={data.name}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('name', e.target.value)}
                             required
-                            className="h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg"
+                            className="h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg text-right"
                             placeholder={t('national_insight_center_info.name_placeholder')}
                           />
                           {errors.name && (
@@ -317,7 +317,7 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
 
                       {/* Code Field */}
                       <div className="space-y-4">
-                        <Label htmlFor="code" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
+                        <Label htmlFor="code" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2 text-right">
                           <BarChart3 className="h-4 w-4" />
                           {t('national_insight_center_info.code_label')}
                         </Label>
@@ -326,7 +326,7 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
                             id="code"
                             value={data.code}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('code', e.target.value)}
-                            className="h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg"
+                            className="h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg text-right"
                             placeholder={t('national_insight_center_info.code_placeholder')}
                           />
                           {errors.code && (
@@ -340,7 +340,7 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
 
                       {/* Description Field */}
                       <div className="space-y-4">
-                        <Label htmlFor="description" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
+                        <Label htmlFor="description" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2 text-right">
                           <FileText className="h-4 w-4" />
                           {t('national_insight_center_info.description_label')}
                         </Label>
@@ -350,7 +350,7 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
                             value={data.description}
                             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setData('description', e.target.value)}
                             rows={4}
-                            className="text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 shadow-lg resize-none"
+                            className="text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 shadow-lg resize-none text-right"
                             placeholder={t('national_insight_center_info.description_placeholder')}
                           />
                           {errors.description && (
@@ -378,7 +378,7 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
 
                         {/* User Search */}
                         <div className="space-y-4">
-                          <Label htmlFor="user-search" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300">
+                          <Label htmlFor="user-search" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right">
                             <Search className="h-4 w-4" />
                             {t('national_insight_center_info.access.search_users')}
                           </Label>
@@ -387,7 +387,7 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
                               id="user-search"
                               value={userSearchTerm}
                               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserSearchTerm(e.target.value)}
-                              className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800"
+                              className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right"
                               placeholder={t('national_insight_center_info.access.search_placeholder')}
                             />
                           </div>
@@ -396,7 +396,7 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
                         {/* User Selection */}
                         {filteredUsers.length > 0 && (
                           <div className="space-y-4">
-                            <Label className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300">
+                            <Label className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right">
                               <User className="h-4 w-4" />
                               {t('national_insight_center_info.access.select_users')}
                             </Label>
@@ -427,7 +427,7 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
                         {/* Selected Users */}
                         <div className="mt-6">
                           <div className="flex items-center justify-between mb-4">
-                            <Label className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300">
+                            <Label className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right">
                               <Users className="h-4 w-4" />
                               {t('national_insight_center_info.access.selected_users')}
                               {selectedUsers.length > 0 && (

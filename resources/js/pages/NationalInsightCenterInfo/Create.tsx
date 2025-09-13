@@ -169,7 +169,7 @@ export default function NationalInsightCenterInfosCreate({ statItems, statCatego
   };
 
   // Filter users based on search term
-  const filteredUsers = users.filter(user => 
+  const filteredUsers = users.filter(user =>
     user.name.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(userSearchTerm.toLowerCase())
   );
@@ -178,7 +178,7 @@ export default function NationalInsightCenterInfosCreate({ statItems, statCatego
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={t('national_insight_center_info.create.page_title')} />
 
-      <div className="container px-0 py-6">
+      <div className="container px-0 py-6" dir="rtl">
         <Header
           title={t('national_insight_center_info.create.page_title')}
           description={t('national_insight_center_info.create.page_description')}
@@ -196,7 +196,7 @@ export default function NationalInsightCenterInfosCreate({ statItems, statCatego
             <>
               <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
                 <Link href={route('national-insight-center-infos.index')} className="flex items-center gap-3">
-                  <ArrowLeft className="h-5 w-5" />
+                  <ArrowRight className="h-5 w-5" />
                   {t('national_insight_center_info.create.back_button')}
                 </Link>
               </Button>
@@ -210,7 +210,7 @@ export default function NationalInsightCenterInfosCreate({ statItems, statCatego
             <div className="grid gap-8">
               <Card className="shadow-2xl bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 overflow-hidden">
                 <CardContent className="p-8">
-                  <Tabs defaultValue="basic" className="w-full">
+                  <Tabs defaultValue="basic" className="w-full" dir="rtl">
                     <TabsList className="grid w-full grid-cols-3 mb-8">
                       <TabsTrigger value="basic" className="flex items-center gap-2">
                         <FileText className="h-4 w-4" />
@@ -230,7 +230,7 @@ export default function NationalInsightCenterInfosCreate({ statItems, statCatego
                     <TabsContent value="basic" className="space-y-8">
                       {/* Name Field */}
                       <div className="space-y-4">
-                        <Label htmlFor="name" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
+                        <Label htmlFor="name" dir="rtl" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2 text-right">
                           <FileText className="h-4 w-4" />
                           {t('national_insight_center_info.name_label')} *
                         </Label>
@@ -240,7 +240,7 @@ export default function NationalInsightCenterInfosCreate({ statItems, statCatego
                             value={data.name}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('name', e.target.value)}
                             required
-                            className="h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg"
+                            className="h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg text-right"
                             placeholder={t('national_insight_center_info.name_placeholder')}
                           />
                           {errors.name && (
@@ -254,7 +254,7 @@ export default function NationalInsightCenterInfosCreate({ statItems, statCatego
 
                       {/* Code Field */}
                       <div className="space-y-4">
-                        <Label htmlFor="code" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
+                        <Label htmlFor="code" dir="rtl" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2 text-right">
                           <BarChart3 className="h-4 w-4" />
                           {t('national_insight_center_info.code_label')}
                         </Label>
@@ -263,7 +263,7 @@ export default function NationalInsightCenterInfosCreate({ statItems, statCatego
                             id="code"
                             value={data.code}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('code', e.target.value)}
-                            className="h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg"
+                            className="h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg text-right"
                             placeholder={t('national_insight_center_info.code_placeholder')}
                           />
                           {errors.code && (
@@ -277,7 +277,7 @@ export default function NationalInsightCenterInfosCreate({ statItems, statCatego
 
                       {/* Description Field */}
                       <div className="space-y-4">
-                        <Label htmlFor="description" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
+                        <Label htmlFor="description" dir="rtl" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2 text-right">
                           <FileText className="h-4 w-4" />
                           {t('national_insight_center_info.description_label')}
                         </Label>
@@ -287,7 +287,7 @@ export default function NationalInsightCenterInfosCreate({ statItems, statCatego
                             value={data.description}
                             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setData('description', e.target.value)}
                             rows={4}
-                            className="text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 shadow-lg resize-none"
+                            className="text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 shadow-lg resize-none text-right"
                             placeholder={t('national_insight_center_info.description_placeholder')}
                           />
                           {errors.description && (
@@ -315,7 +315,7 @@ export default function NationalInsightCenterInfosCreate({ statItems, statCatego
 
                         {/* User Search */}
                         <div className="space-y-4">
-                          <Label htmlFor="user-search" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300">
+                          <Label htmlFor="user-search" dir="rtl" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right">
                             <Search className="h-4 w-4" />
                             {t('national_insight_center_info.access.search_users')}
                           </Label>
@@ -324,7 +324,7 @@ export default function NationalInsightCenterInfosCreate({ statItems, statCatego
                               id="user-search"
                               value={userSearchTerm}
                               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserSearchTerm(e.target.value)}
-                              className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800"
+                              className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right"
                               placeholder={t('national_insight_center_info.access.search_placeholder')}
                             />
                           </div>
@@ -333,7 +333,7 @@ export default function NationalInsightCenterInfosCreate({ statItems, statCatego
                         {/* User Selection */}
                         {filteredUsers.length > 0 && (
                           <div className="space-y-4">
-                            <Label className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300">
+                            <Label dir="rtl" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right">
                               <User className="h-4 w-4" />
                               {t('national_insight_center_info.access.select_users')}
                             </Label>
@@ -364,7 +364,7 @@ export default function NationalInsightCenterInfosCreate({ statItems, statCatego
                         {/* Selected Users */}
                         <div className="mt-6">
                           <div className="flex items-center justify-between mb-4">
-                            <Label className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300">
+                            <Label dir="rtl" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right">
                               <Users className="h-4 w-4" />
                               {t('national_insight_center_info.access.selected_users')}
                               {selectedUsers.length > 0 && (
@@ -374,7 +374,7 @@ export default function NationalInsightCenterInfosCreate({ statItems, statCatego
                               )}
                             </Label>
                           </div>
-                          
+
                           {selectedUsers.length === 0 ? (
                             <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                               {t('national_insight_center_info.access.no_users_selected')}
@@ -423,7 +423,7 @@ export default function NationalInsightCenterInfosCreate({ statItems, statCatego
                     {/* Statistics Tab */}
                     <TabsContent value="stats" className="space-y-6">
                       <div className="mb-6">
-                        <Label htmlFor="category-filter" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right" dir="rtl">
+                        <Label htmlFor="category-filter" dir="rtl" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right">
                           {t('national_insight_center_info.stats.filter_by_category')}
                           <Building2 className="h-4 w-4" />
                         </Label>
@@ -475,7 +475,7 @@ export default function NationalInsightCenterInfosCreate({ statItems, statCatego
               {/* Form Actions */}
               <FooterButtons
                 onCancel={() => window.history.back()}
-                onSubmit={() => {}}
+                onSubmit={() => { }}
                 processing={processing}
                 cancelText={t('national_insight_center_info.create.cancel_button')}
                 submitText={t('national_insight_center_info.create.save_button')}
