@@ -389,4 +389,29 @@ class NationalInsightCenterInfoController extends Controller
             }
         }
     }
+
+    /**
+     * Print the national insight center info.
+     */
+    public function print(NationalInsightCenterInfo $nationalInsightCenterInfo): Response
+    {
+        $this->authorize('view', $nationalInsightCenterInfo);
+        
+        // Load the national insight center info with all necessary relationships
+        $nationalInsightCenterInfo->load([
+            'creator:id,name',
+            'confirmer:id,name',
+            'infoStats.statCategoryItem.category'
+        ]);
+
+        $infos = $nationalInsightCenterInfo->infoItems()
+            ->with(['infoCategory:id,name,code', 'department:id,name,code', 'creator:id,name'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return Inertia::render('NationalInsightCenterInfo/Print', [
+            'nationalInsightCenterInfo' => $nationalInsightCenterInfo,
+            'infos' => $infos,
+        ]);
+    }
 }
