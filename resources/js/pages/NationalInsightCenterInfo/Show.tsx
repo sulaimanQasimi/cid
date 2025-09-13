@@ -30,26 +30,24 @@ interface Info {
     id: number;
     name: string;
   };
-}
-
-interface InfoStat {
-  id: number;
-  stat_category_item: {
+  item_stats?: Array<{
     id: number;
-    name: string;
-    label: string;
-    category: {
+    string_value: string;
+    notes: string | null;
+    stat_category_item: {
       id: number;
       name: string;
       label: string;
-      color: string;
+      category: {
+        id: number;
+        name: string;
+        label: string;
+        color: string;
+      };
     };
-  };
-  integer_value: number | null;
-  string_value: string | null;
-  notes: string | null;
-  created_at: string;
+  }>;
 }
+
 
 interface NationalInsightCenterInfo {
   id: number;
@@ -57,7 +55,6 @@ interface NationalInsightCenterInfo {
   description: string | null;
   created_at: string;
   updated_at: string;
-  infoStats: InfoStat[];
   code: string;
 }
 
@@ -231,93 +228,6 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
           </CardContent>
         </Card>
 
-        {/* Stats Display Card */}
-        <div className="mt-8">
-          <Header
-            title={t('national_insight_center_info.show.stats_title')}
-            description={t('national_insight_center_info.show.stats_description')}
-            icon={<Database className="h-6 w-6 text-white" />}
-            model="national_insight_center_info"
-            routeName={route('national-insight-center-infos.stats', nationalInsightCenterInfo.id)}
-            buttonText={t('national_insight_center_info.show.manage_stats_button')}
-            theme="purple"
-            showButton={canUpdate('national_insight_center_info')}
-          />
-          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 rounded-3xl">
-            <CardContent className="p-0">
-              <div className="overflow-hidden rounded-b-3xl">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-gradient-to-l from-purple-100 dark:from-purple-900 to-purple-200 dark:to-purple-800 border-0">
-                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.show.stats_table.category')}</TableHead>
-                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.show.stats_table.item')}</TableHead>
-                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.show.stats_table.value')}</TableHead>
-                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.show.stats_table.notes')}</TableHead>
-                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.show.stats_table.created_at')}</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {nationalInsightCenterInfo.infoStats && nationalInsightCenterInfo.infoStats.length > 0 ? (
-                      nationalInsightCenterInfo.infoStats.map((stat) => (
-                        <TableRow key={stat.id} className="hover:bg-purple-50/50 dark:hover:bg-purple-900/20 transition-colors duration-300 border-b border-purple-100 dark:border-purple-800">
-                          <TableCell className="py-6 px-6">
-                            <div className="flex items-center gap-3">
-                              <div
-                                className="w-4 h-4 rounded-full"
-                                style={{ backgroundColor: stat.stat_category_item.category.color }}
-                              ></div>
-                              <span className="font-semibold text-purple-800 dark:text-purple-200">
-                                {stat.stat_category_item.category.label}
-                              </span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="font-semibold text-purple-900 dark:text-purple-100 py-6 px-6 text-lg">
-                            {stat.stat_category_item.label}
-                          </TableCell>
-                          <TableCell className="py-6 px-6">
-                            <Badge variant="outline" className="bg-gradient-to-l from-green-100 dark:from-green-800 to-green-200 dark:to-green-700 text-green-800 dark:text-green-200 border-green-300 dark:border-green-600 px-4 py-2 rounded-xl font-semibold">
-                              {stat.integer_value !== null ? stat.integer_value : stat.string_value}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="py-6 px-6">
-                            <span className="text-purple-700 dark:text-purple-300">
-                              {stat.notes || '-'}
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6 font-medium">
-                            {formatPersianDateOnly(stat.created_at)}
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={5} className="h-32">
-                          <div className="flex flex-col items-center justify-center gap-4 text-purple-600 dark:text-purple-400 h-full w-full">
-                            <div className="p-4 bg-purple-100 dark:bg-purple-800 rounded-full flex items-center justify-center">
-                              <Database className="h-16 w-16 text-purple-400 dark:text-purple-300" />
-                            </div>
-                            <p className="text-xl font-bold text-center">{t('national_insight_center_info.show.no_stats')}</p>
-                            <p className="text-purple-500 dark:text-purple-400 text-center">{t('national_insight_center_info.show.no_stats_description')}</p>
-                            <CanUpdate model="national_insight_center_info">
-                              <div className="flex justify-center">
-                                <Button asChild className="bg-gradient-to-l from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105 flex items-center">
-                                  <Link href={route('national-insight-center-infos.stats', nationalInsightCenterInfo.id)} className="flex items-center gap-3">
-                                    <Plus className="h-5 w-5" />
-                                    {t('national_insight_center_info.show.add_first_stat_button')}
-                                  </Link>
-                                </Button>
-                              </div>
-                            </CanUpdate>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
 
         {/* Associated Info Records */}
         <div className="mt-8">
@@ -355,41 +265,146 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
                   <TableBody>
                     {infos.data && infos.data.length > 0 ? (
                       infos.data.map((info) => (
-                        <TableRow key={info.id} className="hover:bg-purple-50/50 dark:hover:bg-purple-900/20 transition-colors duration-300 border-b border-purple-100 dark:border-purple-800">
-                          <TableCell className="font-bold text-purple-900 dark:text-purple-100 py-6 px-6 text-lg">{info.id}</TableCell>
-                          <TableCell className="font-bold text-purple-900 dark:text-purple-100 py-6 px-6 text-lg">{info.name}</TableCell>
-                          <TableCell className="py-6 px-6">
-                            <Badge
-                              variant="outline"
-                              className={`px-4 py-2 rounded-xl font-semibold ${info.confirmed
-                                  ? 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 border-green-300 dark:border-green-600'
-                                  : 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 border-yellow-300 dark:border-yellow-600'
-                                }`}
-                            >
-                              {info.confirmed ? 'Confirmed' : 'Pending'}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6 font-medium">
-                            {formatPersianDateOnly(info.created_at)}
-                          </TableCell>
-                          <TableCell className="py-6 px-6">
-                            <div className="flex items-center gap-2 justify-end">
-                              <CanView model="national_insight_center_info_item">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  asChild
-                                  title={t('national_insight_center_info.show.actions.view')}
-                                  className="h-10 w-10 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-800 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-300 hover:scale-110"
-                                >
-                                  <Link href={route('national-insight-center-info-items.show', info.id)}>
-                                    <ExternalLink className="h-5 w-5" />
-                                  </Link>
-                                </Button>
-                              </CanView>
-                            </div>
-                          </TableCell>
-                        </TableRow>
+                        <React.Fragment key={info.id}>
+                          <TableRow className="hover:bg-purple-50/50 dark:hover:bg-purple-900/20 transition-colors duration-300 border-b border-purple-100 dark:border-purple-800">
+                            <TableCell className="font-bold text-purple-900 dark:text-purple-100 py-6 px-6 text-lg">{info.id}</TableCell>
+                            <TableCell className="font-bold text-purple-900 dark:text-purple-100 py-6 px-6 text-lg">{info.name}</TableCell>
+                            <TableCell className="py-6 px-6">
+                              <Badge
+                                variant="outline"
+                                className={`px-4 py-2 rounded-xl font-semibold ${info.confirmed
+                                    ? 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 border-green-300 dark:border-green-600'
+                                    : 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 border-yellow-300 dark:border-yellow-600'
+                                  }`}
+                              >
+                                {info.confirmed ? 'Confirmed' : 'Pending'}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6 font-medium">
+                              {formatPersianDateOnly(info.created_at)}
+                            </TableCell>
+                            <TableCell className="py-6 px-6">
+                              <div className="flex items-center gap-2 justify-end">
+                                <CanView model="national_insight_center_info_item">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    asChild
+                                    title={t('national_insight_center_info.show.actions.view')}
+                                    className="h-10 w-10 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-800 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-300 hover:scale-110"
+                                  >
+                                    <Link href={route('national-insight-center-info-items.show', info.id)}>
+                                      <ExternalLink className="h-5 w-5" />
+                                    </Link>
+                                  </Button>
+                                </CanView>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                          
+                          {/* Statistics Row */}
+                          {info.item_stats && info.item_stats.length > 0 && (
+                            <TableRow className="bg-purple-25/30 dark:bg-purple-950/20">
+                              <TableCell colSpan={5} className="p-0">
+                                <div className="p-6">
+                                  <h4 className="font-semibold text-purple-800 dark:text-purple-200 mb-4 text-lg">
+                                    {t('national_insight_center_info.show.item_statistics')}
+                                  </h4>
+                                  <div className="overflow-x-auto">
+                                    <table className="w-full border border-purple-200 dark:border-purple-700 rounded-lg" style={{ borderCollapse: 'collapse' }}>
+                                      {/* Group stats by category */}
+                                      {(() => {
+                                        const groupedStats = info.item_stats.reduce((acc, stat) => {
+                                          const categoryId = stat.stat_category_item.category.id;
+                                          if (!acc[categoryId]) {
+                                            acc[categoryId] = {
+                                              category: stat.stat_category_item.category,
+                                              items: []
+                                            };
+                                          }
+                                          acc[categoryId].items.push(stat);
+                                          return acc;
+                                        }, {} as Record<number, { category: any; items: any[] }>);
+
+                                        const categoryEntries = Object.entries(groupedStats);
+                                        
+                                        return (
+                                          <>
+                                            {/* First Row: All Categories */}
+                                            <tr className="border-b border-purple-200 dark:border-purple-700">
+                                              {categoryEntries.map(([categoryId, categoryData]) => (
+                                                <td 
+                                                  key={categoryId}
+                                                  colSpan={categoryData.items.length} 
+                                                  className="font-bold text-center py-3 border-r border-purple-200 dark:border-purple-700 text-purple-800 dark:text-purple-200"
+                                                  style={{ backgroundColor: categoryData.category.color + '20' }}
+                                                >
+                                                  {categoryData.category.label}
+                                                </td>
+                                              ))}
+                                            </tr>
+                                            
+                                            {/* Second Row: Item Labels */}
+                                            <tr className="border-b border-purple-200 dark:border-purple-700">
+                                              {categoryEntries.map(([categoryId, categoryData]) => (
+                                                <React.Fragment key={categoryId}>
+                                                  {categoryData.items.map((stat) => (
+                                                    <th 
+                                                      key={stat.id}
+                                                      className="text-center py-2 font-semibold border-r border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300"
+                                                    >
+                                                      {stat.stat_category_item.label}
+                                                    </th>
+                                                  ))}
+                                                </React.Fragment>
+                                              ))}
+                                            </tr>
+                                            
+                                            {/* Third Row: Values */}
+                                            <tr className="border-b border-purple-200 dark:border-purple-700">
+                                              {categoryEntries.map(([categoryId, categoryData]) => (
+                                                <React.Fragment key={categoryId}>
+                                                  {categoryData.items.map((stat) => (
+                                                    <td 
+                                                      key={stat.id}
+                                                      className="text-center py-2 border-r border-purple-200 dark:border-purple-700"
+                                                    >
+                                                      <Badge variant="outline" className="bg-gradient-to-l from-green-100 dark:from-green-800 to-green-200 dark:to-green-700 text-green-800 dark:text-green-200 border-green-300 dark:border-green-600 px-3 py-1 rounded-lg font-semibold">
+                                                        {stat.string_value}
+                                                      </Badge>
+                                                    </td>
+                                                  ))}
+                                                </React.Fragment>
+                                              ))}
+                                            </tr>
+                                            
+                                            {/* Notes Row (if any) */}
+                                            {info.item_stats.some(stat => stat.notes) && (
+                                              <tr className="border-b border-purple-200 dark:border-purple-700">
+                                                {categoryEntries.map(([categoryId, categoryData]) => (
+                                                  <React.Fragment key={categoryId}>
+                                                    {categoryData.items.map((stat) => (
+                                                      <td 
+                                                        key={`notes-${stat.id}`}
+                                                        className="text-center py-2 text-sm border-r border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-400"
+                                                      >
+                                                        {stat.notes || ''}
+                                                      </td>
+                                                    ))}
+                                                  </React.Fragment>
+                                                ))}
+                                              </tr>
+                                            )}
+                                          </>
+                                        );
+                                      })()}
+                                    </table>
+                                  </div>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </React.Fragment>
                       ))
                     ) : (
                       <TableRow>

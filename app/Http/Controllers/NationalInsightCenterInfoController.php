@@ -176,8 +176,7 @@ class NationalInsightCenterInfoController extends Controller
         // Load the national insight center info with all necessary relationships
         $nationalInsightCenterInfo->load([
             'creator:id,name',
-            'confirmer:id,name',
-            'infoStats.statCategoryItem.category'
+            'confirmer:id,name'
         ]);
 
         $infos = $nationalInsightCenterInfo->infoItems()

@@ -1812,6 +1812,7 @@
     "national_insight_center_info.show.no_info_records": "هیچ معلوماتی وجود ندارد",
     "national_insight_center_info.show.no_info_records_description": "هیچ معلوماتی وجود ندارد",
     "national_insight_center_info.show.create_first_info_button": "افزودن معلومات اولیه",
+    "national_insight_center_info.show.item_statistics": "آمار آیتم",
     "national_insight_center_info.info_items": "معلومات",
     "national_insight_center_info.stats_records": "تحلیل‌ها",
     "national_insight_center_info_item.create.title": "ایجاد آیتم معلومات",
