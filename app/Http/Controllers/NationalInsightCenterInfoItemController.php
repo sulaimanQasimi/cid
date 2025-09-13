@@ -39,7 +39,12 @@ class NationalInsightCenterInfoItemController extends Controller
             'infoCategory:id,name',
             'department:id,name',
             'creator:id,name'
-        ]);
+        ])->whereHas('nationalInsightCenterInfo', function($q) {
+            $q->where('created_by', Auth::id())
+              ->orWhereHas('accesses', function($accessQuery) {
+                  $accessQuery->where('user_id', Auth::id());
+              });
+        });
 
         // Apply search filter
         if (!empty($validated['search'])) {
@@ -62,7 +67,12 @@ class NationalInsightCenterInfoItemController extends Controller
         $items = $query->paginate($perPage);
 
         // Get data for filters
-        $nationalInsightCenterInfos = NationalInsightCenterInfo::orderBy('name')->get();
+        $nationalInsightCenterInfos = NationalInsightCenterInfo::where(function($q) {
+            $q->where('created_by', Auth::id())
+              ->orWhereHas('accesses', function($accessQuery) {
+                  $accessQuery->where('user_id', Auth::id());
+              });
+        })->orderBy('name')->get();
 
         return Inertia::render('NationalInsightCenterInfoItem/Index', [
             'items' => $items,
@@ -84,7 +94,12 @@ class NationalInsightCenterInfoItemController extends Controller
         
         $nationalInsightCenterInfoId = $request->get('national_insight_center_info_id');
         
-        $nationalInsightCenterInfos = NationalInsightCenterInfo::orderBy('name')->get();
+        $nationalInsightCenterInfos = NationalInsightCenterInfo::where(function($q) {
+            $q->where('created_by', Auth::id())
+              ->orWhereHas('accesses', function($accessQuery) {
+                  $accessQuery->where('user_id', Auth::id());
+              });
+        })->orderBy('name')->get();
         $infoCategories = InfoCategory::orderBy('name')->get();
         $provinces = Province::orderBy('name')->with('districts')->get();
         $districts = District::orderBy('name')->with('province')->get();
@@ -181,7 +196,12 @@ class NationalInsightCenterInfoItemController extends Controller
         $this->authorize('update', $item);
 
         // Load data for dropdowns
-        $nationalInsightCenterInfos = NationalInsightCenterInfo::orderBy('name')->get();
+        $nationalInsightCenterInfos = NationalInsightCenterInfo::where(function($q) {
+            $q->where('created_by', Auth::id())
+              ->orWhereHas('accesses', function($accessQuery) {
+                  $accessQuery->where('user_id', Auth::id());
+              });
+        })->orderBy('name')->get();
         $infoCategories = InfoCategory::orderBy('name')->get();
         $provinces = Province::orderBy('name')->with('districts')->get();
      

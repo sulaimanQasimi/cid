@@ -23,6 +23,7 @@ Route::middleware(['auth'])->group(function () {
 
     // National Insight Center Info routes
     Route::resource('national-insight-center-infos', NationalInsightCenterInfoController::class);
+    Route::patch('national-insight-center-infos/{nationalInsightCenterInfo}/confirm', [NationalInsightCenterInfoController::class, 'confirm'])->name('national-insight-center-infos.confirm');
     Route::get('national-insight-center-infos/{nationalInsightCenterInfo}/stats', [NationalInsightCenterInfoController::class, 'manageStats'])->name('national-insight-center-infos.stats');
     Route::put('national-insight-center-infos/{nationalInsightCenterInfo}/stats', [NationalInsightCenterInfoController::class, 'updateStats'])->name('national-insight-center-infos.stats.update');
     Route::get('national-insight-center-infos/{nationalInsightCenterInfo}/print', [NationalInsightCenterInfoController::class, 'print'])->name('national-insight-center-infos.print');

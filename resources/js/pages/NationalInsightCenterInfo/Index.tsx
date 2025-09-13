@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash, Eye, BarChart3, FileText, AlertTriangle, TrendingUp } from 'lucide-react';
+import { Plus, Pencil, Trash, Eye, BarChart3, FileText, AlertTriangle, TrendingUp, CheckCircle } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -39,6 +39,13 @@ interface NationalInsightCenterInfo {
   description: string | null;
   created_at: string;
   updated_at: string;
+  confirmed: boolean;
+  confirmed_at: string | null;
+  confirmed_by: number | null;
+  confirmer?: {
+    id: number;
+    name: string;
+  };
   info_items_count?: number;
   info_stats_count?: number;
 }
@@ -183,6 +190,16 @@ export default function NationalInsightCenterInfosIndex({
     }
   };
 
+  // Handle confirm
+  const handleConfirm = (id: number) => {
+    router.patch(route('national-insight-center-infos.confirm', id), {}, {
+      onSuccess: () => {
+        // Refresh the page to show updated status
+        router.reload();
+      },
+    });
+  };
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={t('national_insight_center_info.page_title')} />
@@ -255,6 +272,7 @@ export default function NationalInsightCenterInfosIndex({
                       <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.id')}</TableHead>
                       <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.name')}</TableHead>
                       <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.description')}</TableHead>
+                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.status')}</TableHead>
                       <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.info_items_count')}</TableHead>
                       <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.stats_count')}</TableHead>
                       <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.created_at')}</TableHead>
@@ -272,6 +290,18 @@ export default function NationalInsightCenterInfosIndex({
                               <span className="text-purple-800 dark:text-purple-200 font-medium">{nationalInsightCenterInfo.description}</span>
                             ) : (
                               <span className="text-purple-600 dark:text-purple-400 font-medium">-</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="py-6 px-6">
+                            {nationalInsightCenterInfo.confirmed ? (
+                              <Badge variant="outline" className="bg-gradient-to-l from-green-100 dark:from-green-800 to-green-200 dark:to-green-700 text-green-800 dark:text-green-200 border-green-300 dark:border-green-600 px-4 py-2 rounded-xl font-semibold flex items-center gap-2">
+                                <CheckCircle className="h-4 w-4" />
+                                {t('national_insight_center_info.confirmed')}
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="bg-gradient-to-l from-yellow-100 dark:from-yellow-800 to-yellow-200 dark:to-yellow-700 text-yellow-800 dark:text-yellow-200 border-yellow-300 dark:border-yellow-600 px-4 py-2 rounded-xl font-semibold">
+                                {t('national_insight_center_info.pending')}
+                              </Badge>
                             )}
                           </TableCell>
                           <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6">
@@ -326,12 +356,26 @@ export default function NationalInsightCenterInfosIndex({
                                   asChild
                                   title={t('national_insight_center_info.actions.edit')}
                                   className="h-10 w-10 rounded-xl hover:bg-green-100 dark:hover:bg-green-800 text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-all duration-300 hover:scale-110"
+                                  disabled={nationalInsightCenterInfo.confirmed}
                                 >
                                   <Link href={route('national-insight-center-infos.edit', nationalInsightCenterInfo.id)}>
                                     <Pencil className="h-5 w-5" />
                                   </Link>
                                 </Button>
                               </CanUpdate>
+                              <CanConfirm model="national_insight_center_info">
+                                {!nationalInsightCenterInfo.confirmed && (
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleConfirm(nationalInsightCenterInfo.id)}
+                                    title={t('national_insight_center_info.actions.confirm')}
+                                    className="h-10 w-10 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-800 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-300 hover:scale-110"
+                                  >
+                                    <CheckCircle className="h-5 w-5" />
+                                  </Button>
+                                )}
+                              </CanConfirm>
                               <CanDelete model="national_insight_center_info">
                                 <Button
                                   variant="ghost"
@@ -339,6 +383,7 @@ export default function NationalInsightCenterInfosIndex({
                                   onClick={() => openDeleteDialog(nationalInsightCenterInfo)}
                                   title={t('national_insight_center_info.actions.delete')}
                                   className="h-10 w-10 rounded-xl text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-100 dark:hover:bg-red-800 transition-all duration-300 hover:scale-110"
+                                  disabled={nationalInsightCenterInfo.confirmed}
                                 >
                                   <Trash className="h-5 w-5" />
                                 </Button>
