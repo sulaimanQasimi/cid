@@ -25,7 +25,7 @@ interface NationalInsightCenterInfo {
 interface InfoCategory {
   id: number;
   name: string;
-  label: string;
+    label: string;
   color: string;
 }
 
@@ -220,7 +220,7 @@ export default function Create({ nationalInsightCenterInfos, infoCategories, pro
                                   className="mr-2 h-3 w-3 rounded-full"
                                   style={{ backgroundColor: category.color }}
                                 ></div>
-                                {category.label}
+                                {category.name}
                               </div>
                             </SelectItem>
                           ))}

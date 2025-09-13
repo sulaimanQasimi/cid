@@ -103,7 +103,6 @@ class NationalInsightCenterInfoItemController extends Controller
         })->orderBy('name')->get();
         $infoCategories = InfoCategory::orderBy('name')->get();
         $provinces = Province::orderBy('name')->with('districts')->get();
-        $districts = District::orderBy('name')->with('province')->get();
 
         return Inertia::render('NationalInsightCenterInfoItem/Create', [
             'nationalInsightCenterInfos' => $nationalInsightCenterInfos,
