@@ -1954,5 +1954,12 @@
     "national_insight_center_info.print.info.pending": "در انتظار",
     "national_insight_center_info.print.info.creator": "ایجادکننده",
     "national_insight_center_info.print.info.created_at": "تاریخ ایجاد",
-    "national_insight_center_info.print.department": "بخش"
+    "national_insight_center_info.print.department": "بخش",
+    "national_insight_center_info.print.code": "کد",
+    "national_insight_center_info.print.status": "وضعیت",
+    "national_insight_center_info.print.created_at": "تاریخ ایجاد",
+    "national_insight_center_info.print.created_by": "ایجاد شده توسط",
+    "national_insight_center_info.print.confirmed_by": "تأیید شده توسط",
+    "national_insight_center_info.print.confirmed_at": "تاریخ تأیید",
+    "national_insight_center_info.print.footer.generated_on": "تاریخ تولید گزارش"
 }
