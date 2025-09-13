@@ -67,6 +67,22 @@ interface InfoItem {
         id: number;
         name: string;
     };
+    itemStats?: Array<{
+        id: number;
+        string_value: string;
+        notes: string | null;
+        stat_category_item: {
+            id: number;
+            name: string;
+            label: string;
+            category: {
+                id: number;
+                name: string;
+                label: string;
+                color: string;
+            };
+        };
+    }>;
 }
 
 interface Props {
@@ -238,6 +254,23 @@ export default function NationalInsightCenterInfoPrint({
                             <p className="text-sm text-justify leading-relaxed">{info.description}</p>
                         </div>
                     )}
+
+                    {info.itemStats.length > 0 && (
+                        <div className="mt-3 p-3 bg-gray-50 print:bg-white print:border print:border-gray-300 rounded">
+                            <h4 className="font-semibold text-black mb-2">{t('national_insight_center_info.print.item_stats')}:</h4>
+                            <table className="w-full print:text-xs" style={{ borderCollapse: 'collapse' }}>
+                                {info.itemStats.map((itemStat, index) => (
+                                    <tr key={itemStat.id} className="border-b border-gray-300 print:border-gray-600">
+                                        <td className="py-1 px-2">{itemStat.stat_category_item.category.label} - {itemStat.stat_category_item.label}</td>
+                                        <td className="py-1 px-2">{itemStat.string_value}</td>
+                                        <td className="py-1 px-2">{itemStat.notes || '-'}</td>
+                                    </tr>
+                                ))}
+                            </table>
+                        </div>
+                    )}
+
+
 
                     {index < infos.length - 1 && <hr className="my-4 border-gray-300 print:border-gray-600" />}
                 </div>

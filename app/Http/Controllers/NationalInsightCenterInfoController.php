@@ -405,7 +405,10 @@ class NationalInsightCenterInfoController extends Controller
             'infoStats.statCategoryItem.category'
         ]);
         $infos = $nationalInsightCenterInfo->infoItems()
-            ->with(['infoCategory:id,name,code', 'department:id,name,code', 'creator:id,name'])
+            ->with(['infoCategory:id,name,code', 'department:id,name,code', 'creator:id,name', 'itemStats' => function($query) {
+                $query->with(['statCategoryItem.category'])
+                      ->orderBy('created_at', 'desc');
+            }])
             ->orderBy('created_at', 'desc')
             ->get();
 

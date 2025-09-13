@@ -10,6 +10,7 @@ use App\Models\District;
 use App\Models\User;
 use App\Models\StatCategory;
 use App\Models\StatCategoryItem;
+use App\Models\NationalInsightCenterInfoItemStat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -179,7 +180,8 @@ class NationalInsightCenterInfoItemController extends Controller
             'district',
             'creator',
             'confirmer',
-            'infoStats.statCategoryItem.category'
+            'infoStats.statCategoryItem.category',
+            'itemStats.statCategoryItem.category'
         ]);
 
         return Inertia::render('NationalInsightCenterInfoItem/Show', [
@@ -396,7 +398,7 @@ class NationalInsightCenterInfoItemController extends Controller
     private function createInfoStats(NationalInsightCenterInfoItem $item, array $stats): void
     {
         foreach ($stats as $stat) {
-            $item->infoStats()->create([
+            $item->itemStats()->create([
                 'stat_category_item_id' => $stat['stat_category_item_id'],
                 'string_value' => $stat['value'],
                 'notes' => $stat['notes'] ?? null,
@@ -411,7 +413,7 @@ class NationalInsightCenterInfoItemController extends Controller
     private function updateInfoStats(NationalInsightCenterInfoItem $item, array $stats): void
     {
         // Delete existing stats
-        $item->infoStats()->delete();
+        $item->itemStats()->delete();
 
         // Create new stats
         $this->createInfoStats($item, $stats);

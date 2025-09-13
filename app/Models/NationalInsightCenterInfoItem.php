@@ -146,4 +146,12 @@ class NationalInsightCenterInfoItem extends Model
     {
         return $this->hasMany(InfoStat::class, 'national_insight_center_info_item_id');
     }
+
+    /**
+     * Get the item stats associated with this item.
+     */
+    public function itemStats(): HasMany
+    {
+        return $this->hasMany(NationalInsightCenterInfoItemStat::class);
+    }
 }
