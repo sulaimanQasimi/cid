@@ -227,29 +227,19 @@ export default function UserIndex({ users, filters }: Props) {
         />
 
         {/* Results Table */}
-        <div className="mt-8">
-          <Header
-            title={t('users.table.title')}
-            description={t('users.table.description')}
-            icon={<TrendingUp className="h-6 w-6 text-white" />}
-            model="user"
-            routeName="users.create"
-            theme="blue"
-            buttonText={t('users.add_user')}
-          />
-          
-          <Card className="overflow-hidden rounded-lg border dark:border-gray-700 dark:bg-gray-800 shadow-sm">
+        <div className="mt-8">          
+          <Card className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-muted/50 dark:bg-muted/30">
-                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('users.table.id')}</TableHead>
-                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('users.table.name')}</TableHead>
-                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('users.table.email')}</TableHead>
-                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('users.table.department')}</TableHead>
-                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('users.table.roles')}</TableHead>
-                    <TableHead className="px-6 py-4 font-semibold text-foreground dark:text-foreground">{t('users.table.created')}</TableHead>
-                    <TableHead className="px-6 py-4 text-right font-semibold text-foreground dark:text-foreground">
+                  <TableRow className="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-600">
+                    <TableHead className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">{t('users.table.id')}</TableHead>
+                    <TableHead className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">{t('users.table.name')}</TableHead>
+                    <TableHead className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">{t('users.table.email')}</TableHead>
+                    <TableHead className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">{t('users.table.department')}</TableHead>
+                    <TableHead className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">{t('users.table.roles')}</TableHead>
+                    <TableHead className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">{t('users.table.created')}</TableHead>
+                    <TableHead className="px-6 py-4 text-right font-semibold text-gray-900 dark:text-gray-100">
                       {t('users.table.actions')}
                     </TableHead>
                   </TableRow>
@@ -259,39 +249,39 @@ export default function UserIndex({ users, filters }: Props) {
                     users.data.map((user) => (
                       <TableRow
                         key={user.id}
-                        className="hover:bg-muted/50 dark:hover:bg-muted/30 border-b border-border dark:border-border"
+                        className="hover:bg-gray-50 dark:hover:bg-gray-700/30 border-b border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800"
                       >
-                        <TableCell className="px-6 py-4 font-medium text-foreground dark:text-foreground">{user.id}</TableCell>
-                        <TableCell className="px-6 py-4 font-medium text-foreground dark:text-foreground">
+                        <TableCell className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">{user.id}</TableCell>
+                        <TableCell className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">
                           <div className="flex items-center space-x-2">
-                            <UserIcon className="h-4 w-4 text-muted-foreground" />
+                            <UserIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                             <span>{user.name}</span>
                           </div>
                         </TableCell>
-                        <TableCell className="px-6 py-4 text-foreground dark:text-foreground">{user.email}</TableCell>
+                        <TableCell className="px-6 py-4 text-gray-900 dark:text-gray-100">{user.email}</TableCell>
                         <TableCell className="px-6 py-4">
                           {user.department ? (
-                            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                            <Badge variant="outline" className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-700">
                               {user.department.name}
                             </Badge>
                           ) : (
-                            <span className="text-muted-foreground dark:text-muted-foreground">-</span>
+                            <span className="text-gray-500 dark:text-gray-400">-</span>
                           )}
                         </TableCell>
                         <TableCell className="px-6 py-4">
                           <div className="flex flex-wrap gap-1">
                             {user.roles && user.roles.length > 0 ? (
                               user.roles.map(role => (
-                                <Badge key={role.id} variant="secondary" className="bg-secondary text-secondary-foreground dark:bg-secondary dark:text-secondary-foreground">
+                                <Badge key={role.id} variant="secondary" className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-600">
                                   {role.name}
                                 </Badge>
                               ))
                             ) : (
-                              <span className="text-muted-foreground dark:text-muted-foreground">-</span>
+                              <span className="text-gray-500 dark:text-gray-400">-</span>
                             )}
                           </div>
                         </TableCell>
-                        <TableCell className="px-6 py-4 text-muted-foreground dark:text-muted-foreground">
+                        <TableCell className="px-6 py-4 text-gray-500 dark:text-gray-400">
                           {formatPersianDate(user.created_at)}
                         </TableCell>
                         <TableCell className="px-6 py-4">
@@ -302,7 +292,7 @@ export default function UserIndex({ users, filters }: Props) {
                                 size="icon"
                                 asChild
                                 title={t('users.actions.view')}
-                                className="h-8 w-8"
+                                className="h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
                               >
                                 <Link href={route('users.show', user.id)}>
                                   <Eye className="h-4 w-4" />
@@ -315,7 +305,7 @@ export default function UserIndex({ users, filters }: Props) {
                                 size="icon"
                                 asChild
                                 title={t('users.actions.edit')}
-                                className="h-8 w-8"
+                                className="h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
                               >
                                 <Link href={route('users.edit', user.id)}>
                                   <Pencil className="h-4 w-4" />
@@ -328,7 +318,7 @@ export default function UserIndex({ users, filters }: Props) {
                                 size="icon"
                                 onClick={() => confirmDelete(user)}
                                 title={t('users.actions.delete')}
-                                className="h-8 w-8"
+                                className="h-8 w-8 hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400"
                               >
                                 <Trash className="h-4 w-4" />
                               </Button>
@@ -338,7 +328,7 @@ export default function UserIndex({ users, filters }: Props) {
                               size="icon"
                               asChild
                               title={t('users.analytics.view_analytics')}
-                              className="h-8 w-8"
+                              className="h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
                             >
                               <Link href={`/analytics/User/${user.id}`}>
                                 <BarChart3 className="h-4 w-4" />
@@ -350,13 +340,13 @@ export default function UserIndex({ users, filters }: Props) {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={7} className="h-32 text-center">
-                        <div className="flex flex-col items-center gap-4 text-muted-foreground dark:text-muted-foreground">
-                          <div className="rounded-full bg-muted dark:bg-black p-4">
-                            <AlertTriangle className="h-8 w-8 text-muted-foreground dark:text-muted-foreground dark:bg-black" />
+                      <TableCell colSpan={7} className="h-32 text-center bg-white dark:bg-gray-800">
+                        <div className="flex flex-col items-center gap-4 text-gray-500 dark:text-gray-400">
+                          <div className="rounded-full bg-gray-100 dark:bg-gray-700 p-4">
+                            <AlertTriangle className="h-8 w-8 text-gray-500 dark:text-gray-400" />
                           </div>
-                          <p className="text-lg font-semibold text-foreground dark:text-foreground">{t('users.no_users')}</p>
-                          <p className="text-sm text-muted-foreground dark:text-muted-foreground">{t('users.no_users_description')}</p>
+                          <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('users.no_users')}</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">{t('users.no_users_description')}</p>
                         </div>
                       </TableCell>
                     </TableRow>

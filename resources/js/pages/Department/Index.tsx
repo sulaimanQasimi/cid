@@ -261,15 +261,6 @@ export default function DepartmentIndex({
 
         {/* Results Table */}
         <div className="mt-8">
-          <Header
-            title={t('departments.table.title')}
-            description={t('departments.table.description')}
-            icon={<TrendingUp className="h-6 w-6 text-white" />}
-            model="department"
-            routeName="departments.create"
-            buttonText={t('departments.add_button')}
-            theme="blue"
-          />
           <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-blue-50/30 dark:to-blue-900/20 border-0 rounded-3xl">
             <CardContent className="p-0">
               <div className="overflow-hidden rounded-b-3xl">

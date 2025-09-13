@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Shield, FileText, User, CheckCircle, AlertCircle, Save, Mail, Lock, Users, Key, Building2 } from 'lucide-react';
+import { ArrowLeft, Shield, FileText, User, CheckCircle, AlertCircle, Mail, Lock, Users, Key, Building2 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useTranslation } from '@/lib/i18n/translate';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +15,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { ChevronDown } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Header from '@/components/template/header';
+import FooterButtons from '@/components/template/FooterButtons';
 
 interface User {
   id: number;
@@ -95,6 +96,10 @@ export default function UserEdit({ user, roles = [], userRoles = [], userPermiss
     put(route('users.update', user.id));
   };
 
+  const handleFormSubmit = () => {
+    put(route('users.update', user.id));
+  };
+
   const toggleRole = (roleId: number) => {
     const currentRoles = [...data.roles];
     const index = currentRoles.indexOf(roleId);
@@ -171,8 +176,8 @@ export default function UserEdit({ user, roles = [], userRoles = [], userPermiss
           showButton={false}
         />
 
-        <Card className="shadow-2xl bg-gradient-to-bl from-white to-blue-50/30 border-0 rounded-3xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 text-white py-6">
+        <Card className="shadow-2xl bg-gradient-to-bl from-white to-blue-50/30 dark:from-gray-800 dark:to-gray-900 border-0 rounded-3xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 text-white py-6">
             <CardTitle className="flex items-center gap-4">
               <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
                 <Shield className="h-6 w-6" />
@@ -185,20 +190,20 @@ export default function UserEdit({ user, roles = [], userRoles = [], userPermiss
           </CardHeader>
           
           <form onSubmit={handleSubmit}>
-            <CardContent className="p-8">
+            <CardContent className="p-8 bg-white dark:bg-gray-800">
               {/* Personal Information Section */}
               <div className="mb-8">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="p-2 bg-blue-100 rounded-xl">
-                    <User className="h-5 w-5 text-blue-600" />
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+                    <User className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   </div>
-                  <h3 className="text-xl font-bold text-blue-900">{t('users.edit.personal_info')}</h3>
+                  <h3 className="text-xl font-bold text-blue-900 dark:text-blue-100">{t('users.edit.personal_info')}</h3>
                 </div>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Name Field */}
                   <div className="space-y-3">
-                    <Label htmlFor="name" className="text-lg font-semibold text-blue-900 flex items-center gap-2">
+                    <Label htmlFor="name" className="text-lg font-semibold text-blue-900 dark:text-blue-100 flex items-center gap-2">
                       <span>{t('users.form.name')}</span>
                       <span className="text-red-500 text-xl">*</span>
                     </Label>
@@ -209,12 +214,12 @@ export default function UserEdit({ user, roles = [], userRoles = [], userPermiss
                         value={data.name}
                         onChange={(e) => setData('name', e.target.value)}
                         required
-                        className="h-12 text-lg border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white rounded-xl shadow-lg pl-10"
+                        className="h-12 text-lg border-blue-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 bg-gradient-to-l from-blue-50 to-white dark:from-gray-700 dark:to-gray-800 text-gray-900 dark:text-gray-100 rounded-xl shadow-lg pl-10"
                         placeholder={t('users.form.name_placeholder')}
                       />
                     </div>
                     {errors.name && (
-                      <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-xl border border-red-200">
+                      <div className="flex items-center gap-2 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-3 rounded-xl border border-red-200 dark:border-red-800">
                         <AlertCircle className="h-4 w-4" />
                         <p className="text-sm font-medium">{errors.name}</p>
                       </div>
@@ -223,7 +228,7 @@ export default function UserEdit({ user, roles = [], userRoles = [], userPermiss
 
                   {/* Email Field */}
                   <div className="space-y-3">
-                    <Label htmlFor="email" className="text-lg font-semibold text-blue-900 flex items-center gap-2">
+                    <Label htmlFor="email" className="text-lg font-semibold text-blue-900 dark:text-blue-100 flex items-center gap-2">
                       <span>{t('users.form.email')}</span>
                       <span className="text-red-500 text-xl">*</span>
                     </Label>
@@ -235,12 +240,12 @@ export default function UserEdit({ user, roles = [], userRoles = [], userPermiss
                         value={data.email}
                         onChange={(e) => setData('email', e.target.value)}
                         required
-                        className="h-12 text-lg border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white rounded-xl shadow-lg pl-10"
+                        className="h-12 text-lg border-blue-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 bg-gradient-to-l from-blue-50 to-white dark:from-gray-700 dark:to-gray-800 text-gray-900 dark:text-gray-100 rounded-xl shadow-lg pl-10"
                         placeholder={t('users.form.email_placeholder')}
                       />
                     </div>
                     {errors.email && (
-                      <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-xl border border-red-200">
+                      <div className="flex items-center gap-2 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-3 rounded-xl border border-red-200 dark:border-red-800">
                         <AlertCircle className="h-4 w-4" />
                         <p className="text-sm font-medium">{errors.email}</p>
                       </div>
@@ -249,7 +254,7 @@ export default function UserEdit({ user, roles = [], userRoles = [], userPermiss
 
                   {/* Department Field */}
                   <div className="space-y-3">
-                    <Label htmlFor="department_id" className="text-lg font-semibold text-blue-900 flex items-center gap-2">
+                    <Label htmlFor="department_id" className="text-lg font-semibold text-blue-900 dark:text-blue-100 flex items-center gap-2">
                       <span>{t('users.form.department')}</span>
                     </Label>
                     <div className="relative">
@@ -258,7 +263,7 @@ export default function UserEdit({ user, roles = [], userRoles = [], userPermiss
                         value={data.department_id?.toString() || ''}
                         onValueChange={(value) => setData('department_id', value ? parseInt(value) : null)}
                       >
-                        <SelectTrigger className="h-12 text-lg border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white rounded-xl shadow-lg pl-10">
+                        <SelectTrigger className="h-12 text-lg border-blue-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 bg-gradient-to-l from-blue-50 to-white dark:from-gray-700 dark:to-gray-800 text-gray-900 dark:text-gray-100 rounded-xl shadow-lg pl-10">
                           <SelectValue placeholder={t('users.form.select_department')} />
                         </SelectTrigger>
                         <SelectContent>
@@ -271,7 +276,7 @@ export default function UserEdit({ user, roles = [], userRoles = [], userPermiss
                       </Select>
                     </div>
                     {errors.department_id && (
-                      <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-xl border border-red-200">
+                      <div className="flex items-center gap-2 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-3 rounded-xl border border-red-200 dark:border-red-800">
                         <AlertCircle className="h-4 w-4" />
                         <p className="text-sm font-medium">{errors.department_id}</p>
                       </div>
@@ -280,21 +285,21 @@ export default function UserEdit({ user, roles = [], userRoles = [], userPermiss
                 </div>
               </div>
 
-              <Separator className="my-8 bg-blue-200" />
+              <Separator className="my-8 bg-blue-200 dark:bg-gray-600" />
 
               {/* Security Information Section */}
               <div className="mb-8">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="p-2 bg-blue-100 rounded-xl">
-                    <Lock className="h-5 w-5 text-blue-600" />
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+                    <Lock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   </div>
-                  <h3 className="text-xl font-bold text-blue-900">{t('users.edit.security_info')}</h3>
+                  <h3 className="text-xl font-bold text-blue-900 dark:text-blue-100">{t('users.edit.security_info')}</h3>
                 </div>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Password Field */}
                   <div className="space-y-3">
-                    <Label htmlFor="password" className="text-lg font-semibold text-blue-900">
+                    <Label htmlFor="password" className="text-lg font-semibold text-blue-900 dark:text-blue-100">
                       {t('users.form.password')}
                     </Label>
                     <div className="relative">
@@ -304,17 +309,17 @@ export default function UserEdit({ user, roles = [], userRoles = [], userPermiss
                         type="password"
                         value={data.password}
                         onChange={(e) => setData('password', e.target.value)}
-                        className="h-12 text-lg border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white rounded-xl shadow-lg pl-10"
+                        className="h-12 text-lg border-blue-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 bg-gradient-to-l from-blue-50 to-white dark:from-gray-700 dark:to-gray-800 text-gray-900 dark:text-gray-100 rounded-xl shadow-lg pl-10"
                         placeholder={t('users.form.password_placeholder')}
                       />
                     </div>
                     {errors.password && (
-                      <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-xl border border-red-200">
+                      <div className="flex items-center gap-2 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-3 rounded-xl border border-red-200 dark:border-red-800">
                         <AlertCircle className="h-4 w-4" />
                         <p className="text-sm font-medium">{errors.password}</p>
                       </div>
                     )}
-                    <div className="flex items-center gap-2 text-blue-600 bg-blue-50 p-3 rounded-xl border border-blue-200">
+                    <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-xl border border-blue-200 dark:border-blue-800">
                       <CheckCircle className="h-4 w-4" />
                       <p className="text-sm font-medium">{t('users.form.password_optional')}</p>
                     </div>
@@ -322,7 +327,7 @@ export default function UserEdit({ user, roles = [], userRoles = [], userPermiss
 
                   {/* Confirm Password Field */}
                   <div className="space-y-3">
-                    <Label htmlFor="password_confirmation" className="text-lg font-semibold text-blue-900">
+                    <Label htmlFor="password_confirmation" className="text-lg font-semibold text-blue-900 dark:text-blue-100">
                       {t('users.form.confirm_password')}
                     </Label>
                     <div className="relative">
@@ -332,7 +337,7 @@ export default function UserEdit({ user, roles = [], userRoles = [], userPermiss
                         type="password"
                         value={data.password_confirmation}
                         onChange={(e) => setData('password_confirmation', e.target.value)}
-                        className="h-12 text-lg border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white rounded-xl shadow-lg pl-10"
+                        className="h-12 text-lg border-blue-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 bg-gradient-to-l from-blue-50 to-white dark:from-gray-700 dark:to-gray-800 text-gray-900 dark:text-gray-100 rounded-xl shadow-lg pl-10"
                         placeholder={t('users.form.confirm_password_placeholder')}
                       />
                     </div>
@@ -343,21 +348,21 @@ export default function UserEdit({ user, roles = [], userRoles = [], userPermiss
               {/* Roles Section */}
               {roles.length > 0 && (
                 <>
-                  <Separator className="my-8 bg-blue-200" />
+                  <Separator className="my-8 bg-blue-200 dark:bg-gray-600" />
                   
                   <div className="mb-8">
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="p-2 bg-blue-100 rounded-xl">
-                        <Users className="h-5 w-5 text-blue-600" />
+                      <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+                        <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                       </div>
-                      <h3 className="text-xl font-bold text-blue-900">{t('users.edit.roles_section')}</h3>
+                      <h3 className="text-xl font-bold text-blue-900 dark:text-blue-100">{t('users.edit.roles_section')}</h3>
                     </div>
                     
-                    <div className="bg-gradient-to-l from-blue-50 to-white border-2 border-blue-200 rounded-2xl p-6 shadow-lg">
-                      <p className="text-blue-700 mb-4 font-medium">{t('users.edit.roles_description')}</p>
+                    <div className="bg-gradient-to-l from-blue-50 to-white dark:from-gray-700 dark:to-gray-800 border-2 border-blue-200 dark:border-gray-600 rounded-2xl p-6 shadow-lg">
+                      <p className="text-blue-700 dark:text-blue-300 mb-4 font-medium">{t('users.edit.roles_description')}</p>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {roles.map(role => (
-                          <div key={role.id} className="flex items-center space-x-3 p-4 bg-white rounded-xl border border-blue-100 hover:bg-blue-50 transition-all duration-300 hover:scale-105 hover:shadow-md">
+                          <div key={role.id} className="flex items-center space-x-3 p-4 bg-white dark:bg-gray-800 rounded-xl border border-blue-100 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700 transition-all duration-300 hover:scale-105 hover:shadow-md">
                             <Checkbox
                               id={`role-${role.id}`}
                               checked={data.roles.includes(role.id)}
@@ -366,7 +371,7 @@ export default function UserEdit({ user, roles = [], userRoles = [], userPermiss
                             />
                             <Label
                               htmlFor={`role-${role.id}`}
-                              className="cursor-pointer font-medium text-blue-900 hover:text-blue-700 transition-colors duration-300 flex-1"
+                              className="cursor-pointer font-medium text-blue-900 dark:text-blue-100 hover:text-blue-700 dark:hover:text-blue-300 transition-colors duration-300 flex-1"
                             >
                               {role.name}
                             </Label>
@@ -374,7 +379,7 @@ export default function UserEdit({ user, roles = [], userRoles = [], userPermiss
                         ))}
                       </div>
                       {errors.roles && (
-                        <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-xl border border-red-200 mt-4">
+                        <div className="flex items-center gap-2 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-3 rounded-xl border border-red-200 dark:border-red-800 mt-4">
                           <AlertCircle className="h-4 w-4" />
                           <p className="text-sm font-medium">{errors.roles}</p>
                         </div>
@@ -387,38 +392,38 @@ export default function UserEdit({ user, roles = [], userRoles = [], userPermiss
               {/* Permissions Section */}
               {Object.keys(groupedPermissions).length > 0 && (
                 <>
-                  <Separator className="my-8 bg-blue-200" />
+                  <Separator className="my-8 bg-blue-200 dark:bg-gray-600" />
                   
                   <div className="mb-8">
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="p-2 bg-blue-100 rounded-xl">
-                        <Key className="h-5 w-5 text-blue-600" />
+                      <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+                        <Key className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                       </div>
-                      <h3 className="text-xl font-bold text-blue-900">{t('users.edit.permissions_section')}</h3>
+                      <h3 className="text-xl font-bold text-blue-900 dark:text-blue-100">{t('users.edit.permissions_section')}</h3>
                     </div>
                     
-                    <div className="bg-gradient-to-l from-blue-50 to-white border-2 border-blue-200 rounded-2xl p-6 shadow-lg">
-                      <p className="text-blue-700 mb-6 font-medium">{t('users.edit.permissions_description')}</p>
+                    <div className="bg-gradient-to-l from-blue-50 to-white dark:from-gray-700 dark:to-gray-800 border-2 border-blue-200 dark:border-gray-600 rounded-2xl p-6 shadow-lg">
+                      <p className="text-blue-700 dark:text-blue-300 mb-6 font-medium">{t('users.edit.permissions_description')}</p>
                       
                       <div className="space-y-4">
                         {Object.entries(groupedPermissions).map(([model, permissions]) => (
-                          <Collapsible key={model} className="border border-blue-200 rounded-xl overflow-hidden">
-                            <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-gradient-to-l from-blue-100 to-blue-200 hover:from-blue-200 hover:to-blue-300 transition-all duration-300">
+                          <Collapsible key={model} className="border border-blue-200 dark:border-gray-600 rounded-xl overflow-hidden">
+                            <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-gradient-to-l from-blue-100 to-blue-200 dark:from-gray-700 dark:to-gray-600 hover:from-blue-200 hover:to-blue-300 dark:hover:from-gray-600 dark:hover:to-gray-500 transition-all duration-300">
                               <div className="flex items-center gap-3">
                                 <div className="p-2 bg-blue-600 rounded-lg">
                                   <Shield className="h-4 w-4 text-white" />
                                 </div>
-                                <h4 className="text-lg font-bold text-blue-900">{getModelDisplayName(model)}</h4>
-                                <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">
+                                <h4 className="text-lg font-bold text-blue-900 dark:text-blue-100">{getModelDisplayName(model)}</h4>
+                                <Badge variant="outline" className="bg-blue-100 dark:bg-gray-600 text-blue-800 dark:text-blue-200 border-blue-300 dark:border-gray-500">
                                   {permissions.length} permissions
                                 </Badge>
                               </div>
-                              <ChevronDown className="h-5 w-5 text-blue-700 transition-transform duration-300" />
+                              <ChevronDown className="h-5 w-5 text-blue-700 dark:text-blue-300 transition-transform duration-300" />
                             </CollapsibleTrigger>
-                            <CollapsibleContent className="p-4 bg-white">
+                            <CollapsibleContent className="p-4 bg-white dark:bg-gray-800">
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                 {permissions.map(permission => (
-                                  <div key={permission.id} className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg border border-blue-100 hover:bg-blue-100 transition-all duration-300">
+                                  <div key={permission.id} className="flex items-center space-x-3 p-3 bg-blue-50 dark:bg-gray-700 rounded-lg border border-blue-100 dark:border-gray-600 hover:bg-blue-100 dark:hover:bg-gray-600 transition-all duration-300">
                                     <Checkbox
                                       id={`permission-${permission.id}`}
                                       checked={data.permissions.includes(permission.id)}
@@ -427,7 +432,7 @@ export default function UserEdit({ user, roles = [], userRoles = [], userPermiss
                                     />
                                     <Label
                                       htmlFor={`permission-${permission.id}`}
-                                      className="cursor-pointer text-sm font-medium text-blue-900 hover:text-blue-700 transition-colors duration-300 flex-1"
+                                      className="cursor-pointer text-sm font-medium text-blue-900 dark:text-blue-100 hover:text-blue-700 dark:hover:text-blue-300 transition-colors duration-300 flex-1"
                                       title={permission.name}
                                     >
                                       {permission.label}
@@ -441,7 +446,7 @@ export default function UserEdit({ user, roles = [], userRoles = [], userPermiss
                       </div>
                       
                       {errors.permissions && (
-                        <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-xl border border-red-200 mt-4">
+                        <div className="flex items-center gap-2 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-3 rounded-xl border border-red-200 dark:border-red-800 mt-4">
                           <AlertCircle className="h-4 w-4" />
                           <p className="text-sm font-medium">{errors.permissions}</p>
                         </div>
@@ -452,35 +457,14 @@ export default function UserEdit({ user, roles = [], userRoles = [], userPermiss
               )}
             </CardContent>
 
-            <CardFooter className="bg-gradient-to-l from-blue-50 to-white p-6 border-t border-blue-200">
-              <div className="flex justify-end space-x-4 w-full">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => window.history.back()}
-                  className="px-8 py-3 text-lg font-semibold border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 rounded-xl transition-all duration-300 hover:scale-105"
-                >
-                  {t('common.cancel')}
-                </Button>
-                <Button 
-                  type="submit" 
-                  disabled={processing}
-                  className="px-8 py-3 text-lg font-semibold bg-gradient-to-l from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {processing ? (
-                    <div className="flex items-center gap-2">
-                      <Save className="h-5 w-5 animate-spin" />
-                      {t('common.updating')}
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <Save className="h-5 w-5" />
-                      {t('users.edit.button')}
-                    </div>
-                  )}
-                </Button>
-              </div>
-            </CardFooter>
+            <FooterButtons
+                onCancel={() => window.history.back()}
+                onSubmit={handleFormSubmit}
+                processing={processing}
+                cancelText={t('common.cancel')}
+                submitText={t('users.edit.button')}
+                savingText={t('common.updating')}
+              />
           </form>
         </Card>
       </div>
