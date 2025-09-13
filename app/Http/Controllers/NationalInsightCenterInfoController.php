@@ -83,22 +83,9 @@ class NationalInsightCenterInfoController extends Controller
     {
         $this->authorize('create', NationalInsightCenterInfo::class);
         
-        $statItems = StatCategoryItem::with('category')
-            ->whereHas('category', function($query) {
-                $query->where('status', 'active');
-            })
-            ->orderBy('name')
-            ->get();
-
-        $statCategories = StatCategory::where('status', 'active')
-            ->orderBy('label')
-            ->get();
-
         $users = User::orderBy('name')->get();
 
         return Inertia::render('NationalInsightCenterInfo/Create', [
-            'statItems' => $statItems,
-            'statCategories' => $statCategories,
             'users' => $users,
         ]);
     }
@@ -114,10 +101,6 @@ class NationalInsightCenterInfoController extends Controller
             'name' => 'required|string|max:255|unique:national_insight_center_infos',
             'code' => 'nullable|string|max:50|unique:national_insight_center_infos',
             'description' => 'nullable|string',
-            'stats' => 'nullable|array',
-            'stats.*.stat_category_item_id' => 'required|exists:stat_category_items,id',
-            'stats.*.value' => 'required|string|max:255',
-            'stats.*.notes' => 'nullable|string|max:1000',
             'access_users' => 'nullable|array',
             'access_users.*' => 'integer|exists:users,id',
         ]);
@@ -131,10 +114,6 @@ class NationalInsightCenterInfoController extends Controller
                     'created_by' => Auth::id(),
                 ]);
 
-                // Create associated stats
-                if (!empty($validated['stats'])) {
-                    $this->createInfoStats($nationalInsightCenterInfo, $validated['stats']);
-                }
 
                 // Create access permissions
                 if (isset($validated['access_users']) && is_array($validated['access_users'])) {
@@ -215,26 +194,13 @@ class NationalInsightCenterInfoController extends Controller
     {
         $this->authorize('update', $nationalInsightCenterInfo);
         
-        $statItems = StatCategoryItem::with('category')
-            ->whereHas('category', function($query) {
-                $query->where('status', 'active');
-            })
-            ->orderBy('name')
-            ->get();
-
-        $statCategories = StatCategory::where('status', 'active')
-            ->orderBy('label')
-            ->get();
-
         $users = User::orderBy('name')->get();
 
-        // Load existing stats and access users
-        $nationalInsightCenterInfo->load(['infoStats.statCategoryItem.category', 'accesses.user:id,name', 'confirmer:id,name']);
+        // Load existing access users
+        $nationalInsightCenterInfo->load(['accesses.user:id,name', 'confirmer:id,name']);
 
         return Inertia::render('NationalInsightCenterInfo/Edit', [
             'nationalInsightCenterInfo' => $nationalInsightCenterInfo,
-            'statItems' => $statItems,
-            'statCategories' => $statCategories,
             'users' => $users,
         ]);
     }
@@ -250,10 +216,6 @@ class NationalInsightCenterInfoController extends Controller
             'name' => ['required', 'string', 'max:255', Rule::unique('national_insight_center_infos')->ignore($nationalInsightCenterInfo->id)],
             'code' => ['nullable', 'string', 'max:50', Rule::unique('national_insight_center_infos')->ignore($nationalInsightCenterInfo->id)],
             'description' => 'nullable|string',
-            'stats' => 'nullable|array',
-            'stats.*.stat_category_item_id' => 'required|exists:stat_category_items,id',
-            'stats.*.value' => 'required|string|max:255',
-            'stats.*.notes' => 'nullable|string|max:1000',
             'access_users' => 'nullable|array',
             'access_users.*' => 'integer|exists:users,id',
         ]);
@@ -267,10 +229,6 @@ class NationalInsightCenterInfoController extends Controller
                     'updated_by' => Auth::id(),
                 ]);
 
-                // Update associated stats
-                if (isset($validated['stats'])) {
-                    $this->updateInfoStats($nationalInsightCenterInfo, $validated['stats']);
-                }
 
                 // Update access permissions
                 if (isset($validated['access_users'])) {
@@ -352,32 +310,6 @@ class NationalInsightCenterInfoController extends Controller
         }
     }
 
-    /**
-     * Create info stats for the national insight center info.
-     */
-    private function createInfoStats(NationalInsightCenterInfo $nationalInsightCenterInfo, array $stats): void
-    {
-        foreach ($stats as $stat) {
-            $nationalInsightCenterInfo->infoStats()->create([
-                'stat_category_item_id' => $stat['stat_category_item_id'],
-                'string_value' => $stat['value'],
-                'notes' => $stat['notes'] ?? null,
-                'created_by' => Auth::id(),
-            ]);
-        }
-    }
-
-    /**
-     * Update info stats for the national insight center info.
-     */
-    private function updateInfoStats(NationalInsightCenterInfo $nationalInsightCenterInfo, array $stats): void
-    {
-        // Delete existing stats
-        $nationalInsightCenterInfo->infoStats()->delete();
-
-        // Create new stats
-        $this->createInfoStats($nationalInsightCenterInfo, $stats);
-    }
 
     /**
      * Update access permissions for the national insight center info.
