@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Pencil, Trash, ExternalLink, FileText, BarChart3, TrendingUp, AlertTriangle, Plus, Database, Settings, Printer } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { useTranslation } from '@/lib/i18n/translate';
@@ -87,6 +88,8 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
   const { t } = useTranslation();
   const { canCreate, canView, canUpdate, canDelete } = usePermissions();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+  const [selectedItem, setSelectedItem] = React.useState<Info | null>(null);
+  const [isItemModalOpen, setIsItemModalOpen] = React.useState(false);
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -105,6 +108,11 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
         setIsDeleteDialogOpen(false);
       },
     });
+  };
+
+  const handleViewItem = (item: Info) => {
+    setSelectedItem(item);
+    setIsItemModalOpen(true);
   };
 
   return (
@@ -265,146 +273,50 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
                   <TableBody>
                     {infos.data && infos.data.length > 0 ? (
                       infos.data.map((info) => (
-                        <React.Fragment key={info.id}>
-                          <TableRow className="hover:bg-purple-50/50 dark:hover:bg-purple-900/20 transition-colors duration-300 border-b border-purple-100 dark:border-purple-800">
-                            <TableCell className="font-bold text-purple-900 dark:text-purple-100 py-6 px-6 text-lg">{info.id}</TableCell>
-                            <TableCell className="font-bold text-purple-900 dark:text-purple-100 py-6 px-6 text-lg">{info.name}</TableCell>
-                            <TableCell className="py-6 px-6">
-                              <Badge
-                                variant="outline"
-                                className={`px-4 py-2 rounded-xl font-semibold ${info.confirmed
-                                    ? 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 border-green-300 dark:border-green-600'
-                                    : 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 border-yellow-300 dark:border-yellow-600'
-                                  }`}
+                        <TableRow key={info.id} className="hover:bg-purple-50/50 dark:hover:bg-purple-900/20 transition-colors duration-300 border-b border-purple-100 dark:border-purple-800">
+                          <TableCell className="font-bold text-purple-900 dark:text-purple-100 py-6 px-6 text-lg">{info.id}</TableCell>
+                          <TableCell className="font-bold text-purple-900 dark:text-purple-100 py-6 px-6 text-lg">{info.name}</TableCell>
+                          <TableCell className="py-6 px-6">
+                            <Badge
+                              variant="outline"
+                              className={`px-4 py-2 rounded-xl font-semibold ${info.confirmed
+                                  ? 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 border-green-300 dark:border-green-600'
+                                  : 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 border-yellow-300 dark:border-yellow-600'
+                                }`}
+                            >
+                              {info.confirmed ? 'Confirmed' : 'Pending'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6 font-medium">
+                            {formatPersianDateOnly(info.created_at)}
+                          </TableCell>
+                          <TableCell className="py-6 px-6">
+                            <div className="flex items-center gap-2 justify-end">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleViewItem(info)}
+                                title={t('national_insight_center_info.show.actions.view_details')}
+                                className="h-10 w-10 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-800 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-300 hover:scale-110"
                               >
-                                {info.confirmed ? 'Confirmed' : 'Pending'}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6 font-medium">
-                              {formatPersianDateOnly(info.created_at)}
-                            </TableCell>
-                            <TableCell className="py-6 px-6">
-                              <div className="flex items-center gap-2 justify-end">
-                                <CanView model="national_insight_center_info_item">
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    asChild
-                                    title={t('national_insight_center_info.show.actions.view')}
-                                    className="h-10 w-10 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-800 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-300 hover:scale-110"
-                                  >
-                                    <Link href={route('national-insight-center-info-items.show', info.id)}>
-                                      <ExternalLink className="h-5 w-5" />
-                                    </Link>
-                                  </Button>
-                                </CanView>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                          
-                          {/* Statistics Row */}
-                          {info.item_stats && info.item_stats.length > 0 && (
-                            <TableRow className="bg-purple-25/30 dark:bg-purple-950/20">
-                              <TableCell colSpan={5} className="p-0">
-                                <div className="p-6">
-                                  <h4 className="font-semibold text-purple-800 dark:text-purple-200 mb-4 text-lg">
-                                    {t('national_insight_center_info.show.item_statistics')}
-                                  </h4>
-                                  <div className="overflow-x-auto">
-                                    <table className="w-full border border-purple-200 dark:border-purple-700 rounded-lg" style={{ borderCollapse: 'collapse' }}>
-                                      {/* Group stats by category */}
-                                      {(() => {
-                                        const groupedStats = info.item_stats.reduce((acc, stat) => {
-                                          const categoryId = stat.stat_category_item.category.id;
-                                          if (!acc[categoryId]) {
-                                            acc[categoryId] = {
-                                              category: stat.stat_category_item.category,
-                                              items: []
-                                            };
-                                          }
-                                          acc[categoryId].items.push(stat);
-                                          return acc;
-                                        }, {} as Record<number, { category: any; items: any[] }>);
-
-                                        const categoryEntries = Object.entries(groupedStats);
-                                        
-                                        return (
-                                          <>
-                                            {/* First Row: All Categories */}
-                                            <tr className="border-b border-purple-200 dark:border-purple-700">
-                                              {categoryEntries.map(([categoryId, categoryData]) => (
-                                                <td 
-                                                  key={categoryId}
-                                                  colSpan={categoryData.items.length} 
-                                                  className="font-bold text-center py-3 border-r border-purple-200 dark:border-purple-700 text-purple-800 dark:text-purple-200"
-                                                  style={{ backgroundColor: categoryData.category.color + '20' }}
-                                                >
-                                                  {categoryData.category.label}
-                                                </td>
-                                              ))}
-                                            </tr>
-                                            
-                                            {/* Second Row: Item Labels */}
-                                            <tr className="border-b border-purple-200 dark:border-purple-700">
-                                              {categoryEntries.map(([categoryId, categoryData]) => (
-                                                <React.Fragment key={categoryId}>
-                                                  {categoryData.items.map((stat) => (
-                                                    <th 
-                                                      key={stat.id}
-                                                      className="text-center py-2 font-semibold border-r border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300"
-                                                    >
-                                                      {stat.stat_category_item.label}
-                                                    </th>
-                                                  ))}
-                                                </React.Fragment>
-                                              ))}
-                                            </tr>
-                                            
-                                            {/* Third Row: Values */}
-                                            <tr className="border-b border-purple-200 dark:border-purple-700">
-                                              {categoryEntries.map(([categoryId, categoryData]) => (
-                                                <React.Fragment key={categoryId}>
-                                                  {categoryData.items.map((stat) => (
-                                                    <td 
-                                                      key={stat.id}
-                                                      className="text-center py-2 border-r border-purple-200 dark:border-purple-700"
-                                                    >
-                                                      <Badge variant="outline" className="bg-gradient-to-l from-green-100 dark:from-green-800 to-green-200 dark:to-green-700 text-green-800 dark:text-green-200 border-green-300 dark:border-green-600 px-3 py-1 rounded-lg font-semibold">
-                                                        {stat.string_value}
-                                                      </Badge>
-                                                    </td>
-                                                  ))}
-                                                </React.Fragment>
-                                              ))}
-                                            </tr>
-                                            
-                                            {/* Notes Row (if any) */}
-                                            {info.item_stats.some(stat => stat.notes) && (
-                                              <tr className="border-b border-purple-200 dark:border-purple-700">
-                                                {categoryEntries.map(([categoryId, categoryData]) => (
-                                                  <React.Fragment key={categoryId}>
-                                                    {categoryData.items.map((stat) => (
-                                                      <td 
-                                                        key={`notes-${stat.id}`}
-                                                        className="text-center py-2 text-sm border-r border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-400"
-                                                      >
-                                                        {stat.notes || ''}
-                                                      </td>
-                                                    ))}
-                                                  </React.Fragment>
-                                                ))}
-                                              </tr>
-                                            )}
-                                          </>
-                                        );
-                                      })()}
-                                    </table>
-                                  </div>
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          )}
-                        </React.Fragment>
+                                <BarChart3 className="h-5 w-5" />
+                              </Button>
+                              <CanView model="national_insight_center_info_item">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  asChild
+                                  title={t('national_insight_center_info.show.actions.view')}
+                                  className="h-10 w-10 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-800 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-300 hover:scale-110"
+                                >
+                                  <Link href={route('national-insight-center-info-items.show', info.id)}>
+                                    <ExternalLink className="h-5 w-5" />
+                                  </Link>
+                                </Button>
+                              </CanView>
+                            </div>
+                          </TableCell>
+                        </TableRow>
                       ))
                     ) : (
                       <TableRow>
@@ -437,6 +349,205 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
         </div>
 
       </div>
+
+      {/* Item Details Modal */}
+      <Dialog open={isItemModalOpen} onOpenChange={setIsItemModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-purple-800 dark:text-purple-200">
+              {selectedItem?.name}
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedItem && (
+            <div className="space-y-6">
+              {/* Basic Information */}
+              <Card className="bg-white dark:bg-gray-800 border-purple-200 dark:border-purple-700 shadow-lg dark:shadow-gray-900/20">
+                <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 border-b border-purple-200 dark:border-purple-700">
+                  <CardTitle className="text-lg text-purple-800 dark:text-purple-200">
+                    {t('national_insight_center_info.modal.basic_info')}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4 p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-sm font-semibold text-purple-700 dark:text-purple-300">
+                        {t('national_insight_center_info.modal.id')}:
+                      </label>
+                      <p className="text-purple-900 dark:text-purple-100 font-medium bg-purple-50 dark:bg-purple-900/20 px-3 py-2 rounded-lg border border-purple-200 dark:border-purple-700">
+                        {selectedItem.id}
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-sm font-semibold text-purple-700 dark:text-purple-300">
+                        {t('national_insight_center_info.modal.status')}:
+                      </label>
+                      <div className="mt-1">
+                        <Badge
+                          variant="outline"
+                          className={`${selectedItem.confirmed
+                              ? 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 border-green-300 dark:border-green-600'
+                              : 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 border-yellow-300 dark:border-yellow-600'
+                            }`}
+                        >
+                          {selectedItem.confirmed ? t('national_insight_center_info.confirmed') : t('national_insight_center_info.pending')}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-sm font-semibold text-purple-700 dark:text-purple-300">
+                        {t('national_insight_center_info.modal.created_at')}:
+                      </label>
+                      <p className="text-purple-900 dark:text-purple-100 bg-purple-50 dark:bg-purple-900/20 px-3 py-2 rounded-lg border border-purple-200 dark:border-purple-700">
+                        {formatPersianDateOnly(selectedItem.created_at)}
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-sm font-semibold text-purple-700 dark:text-purple-300">
+                        {t('national_insight_center_info.modal.info_category')}:
+                      </label>
+                      <p className="text-purple-900 dark:text-purple-100 bg-purple-50 dark:bg-purple-900/20 px-3 py-2 rounded-lg border border-purple-200 dark:border-purple-700">
+                        {selectedItem.info_category?.name || '-'}
+                      </p>
+                    </div>
+                  </div>
+                  {selectedItem.description && (
+                    <div className="space-y-1">
+                      <label className="text-sm font-semibold text-purple-700 dark:text-purple-300">
+                        {t('national_insight_center_info.modal.description')}:
+                      </label>
+                      <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-700">
+                        <p className="text-purple-900 dark:text-purple-100 text-justify leading-relaxed">
+                          {selectedItem.description}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Statistics */}
+              {selectedItem.item_stats && selectedItem.item_stats.length > 0 && (
+                <Card className="bg-white dark:bg-gray-800 border-purple-200 dark:border-purple-700 shadow-lg dark:shadow-gray-900/20">
+                  <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 border-b border-purple-200 dark:border-purple-700">
+                    <CardTitle className="text-lg text-purple-800 dark:text-purple-200 flex items-center gap-2">
+                      <BarChart3 className="h-5 w-5" />
+                      {t('national_insight_center_info.modal.statistics')}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="overflow-x-auto">
+                      <table className="w-full border border-purple-200 dark:border-purple-700 rounded-lg bg-white dark:bg-gray-800" style={{ borderCollapse: 'collapse' }}>
+                        {/* Group stats by category */}
+                        {(() => {
+                          const groupedStats = selectedItem.item_stats.reduce((acc, stat) => {
+                            const categoryId = stat.stat_category_item.category.id;
+                            if (!acc[categoryId]) {
+                              acc[categoryId] = {
+                                category: stat.stat_category_item.category,
+                                items: []
+                              };
+                            }
+                            acc[categoryId].items.push(stat);
+                            return acc;
+                          }, {} as Record<number, { category: any; items: any[] }>);
+
+                          const categoryEntries = Object.entries(groupedStats);
+                          
+                          return (
+                            <>
+                              {/* First Row: All Categories */}
+                              <tr className="border-b border-purple-200 dark:border-purple-700 bg-purple-50 dark:bg-purple-900/20">
+                                {categoryEntries.map(([categoryId, categoryData]) => (
+                                  <td 
+                                    key={categoryId}
+                                    colSpan={categoryData.items.length} 
+                                    className="font-bold text-center py-3 border-r border-purple-200 dark:border-purple-700 text-purple-800 dark:text-purple-200"
+                                    style={{ backgroundColor: categoryData.category.color + '20' }}
+                                  >
+                                    {categoryData.category.label}
+                                  </td>
+                                ))}
+                              </tr>
+                              
+                              {/* Second Row: Item Labels */}
+                              <tr className="border-b border-purple-200 dark:border-purple-700 bg-purple-25 dark:bg-purple-900/10">
+                                {categoryEntries.map(([categoryId, categoryData]) => (
+                                  <React.Fragment key={categoryId}>
+                                    {categoryData.items.map((stat) => (
+                                      <th 
+                                        key={stat.id}
+                                        className="text-center py-2 font-semibold border-r border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300 bg-white dark:bg-gray-800"
+                                      >
+                                        {stat.stat_category_item.label}
+                                      </th>
+                                    ))}
+                                  </React.Fragment>
+                                ))}
+                              </tr>
+                              
+                              {/* Third Row: Values */}
+                              <tr className="border-b border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-800">
+                                {categoryEntries.map(([categoryId, categoryData]) => (
+                                  <React.Fragment key={categoryId}>
+                                    {categoryData.items.map((stat) => (
+                                      <td 
+                                        key={stat.id}
+                                        className="text-center py-2 border-r border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-800"
+                                      >
+                                        <Badge variant="outline" className="bg-gradient-to-l from-green-100 dark:from-green-800 to-green-200 dark:to-green-700 text-green-800 dark:text-green-200 border-green-300 dark:border-green-600 px-3 py-1 rounded-lg font-semibold">
+                                          {stat.string_value}
+                                        </Badge>
+                                      </td>
+                                    ))}
+                                  </React.Fragment>
+                                ))}
+                              </tr>
+                              
+                              {/* Notes Row (if any) */}
+                              {selectedItem.item_stats.some(stat => stat.notes) && (
+                                <tr className="border-b border-purple-200 dark:border-purple-700 bg-gray-50 dark:bg-gray-700/50">
+                                  {categoryEntries.map(([categoryId, categoryData]) => (
+                                    <React.Fragment key={categoryId}>
+                                      {categoryData.items.map((stat) => (
+                                        <td 
+                                          key={`notes-${stat.id}`}
+                                          className="text-center py-2 text-sm border-r border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-400 bg-gray-50 dark:bg-gray-700/50"
+                                        >
+                                          {stat.notes || ''}
+                                        </td>
+                                      ))}
+                                    </React.Fragment>
+                                  ))}
+                                </tr>
+                              )}
+                            </>
+                          );
+                        })()}
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* No Statistics Message */}
+              {(!selectedItem.item_stats || selectedItem.item_stats.length === 0) && (
+                <Card className="bg-white dark:bg-gray-800 border-purple-200 dark:border-purple-700 shadow-lg dark:shadow-gray-900/20">
+                  <CardContent className="text-center py-8">
+                    <div className="flex flex-col items-center gap-4 text-purple-600 dark:text-purple-400">
+                      <div className="p-4 bg-purple-100 dark:bg-purple-800/50 rounded-full flex items-center justify-center border border-purple-200 dark:border-purple-700">
+                        <BarChart3 className="h-12 w-12 text-purple-400 dark:text-purple-300" />
+                      </div>
+                      <p className="text-lg font-bold text-purple-800 dark:text-purple-200">{t('national_insight_center_info.modal.no_statistics')}</p>
+                      <p className="text-purple-500 dark:text-purple-400 max-w-md">{t('national_insight_center_info.modal.no_statistics_description')}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 }
