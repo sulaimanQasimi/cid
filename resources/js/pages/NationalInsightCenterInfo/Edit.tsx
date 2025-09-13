@@ -232,7 +232,7 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
   };
 
   // Filter users based on search term
-  const filteredUsers = users.filter(user => 
+  const filteredUsers = users.filter(user =>
     user.name.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(userSearchTerm.toLowerCase())
   );
@@ -273,7 +273,7 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
             <div className="grid gap-8">
               <Card className="shadow-2xl bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 overflow-hidden">
                 <CardContent className="p-8">
-                  <Tabs defaultValue="basic" className="w-full">
+                  <Tabs defaultValue="basic" className="w-full" dir="rtl">
                     <TabsList className="grid w-full grid-cols-3 mb-8">
                       <TabsTrigger value="basic" className="flex items-center gap-2">
                         <FileText className="h-4 w-4" />
@@ -293,7 +293,7 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
                     <TabsContent value="basic" className="space-y-8">
                       {/* Name Field */}
                       <div className="space-y-4">
-                        <Label htmlFor="name" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2 text-right">
+                        <Label htmlFor="name" dir="rtl" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2 text-right">
                           <FileText className="h-4 w-4" />
                           {t('national_insight_center_info.name_label')} *
                         </Label>
@@ -317,7 +317,7 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
 
                       {/* Code Field */}
                       <div className="space-y-4">
-                        <Label htmlFor="code" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2 text-right">
+                        <Label htmlFor="code" dir="rtl" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2 text-right">
                           <BarChart3 className="h-4 w-4" />
                           {t('national_insight_center_info.code_label')}
                         </Label>
@@ -340,7 +340,7 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
 
                       {/* Description Field */}
                       <div className="space-y-4">
-                        <Label htmlFor="description" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2 text-right">
+                        <Label htmlFor="description" dir="rtl" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2 text-right">
                           <FileText className="h-4 w-4" />
                           {t('national_insight_center_info.description_label')}
                         </Label>
@@ -378,7 +378,7 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
 
                         {/* User Search */}
                         <div className="space-y-4">
-                          <Label htmlFor="user-search" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right">
+                          <Label htmlFor="user-search" dir="rtl" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right">
                             <Search className="h-4 w-4" />
                             {t('national_insight_center_info.access.search_users')}
                           </Label>
@@ -396,7 +396,7 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
                         {/* User Selection */}
                         {filteredUsers.length > 0 && (
                           <div className="space-y-4">
-                            <Label className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right">
+                            <Label dir="rtl" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right">
                               <User className="h-4 w-4" />
                               {t('national_insight_center_info.access.select_users')}
                             </Label>
@@ -427,7 +427,7 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
                         {/* Selected Users */}
                         <div className="mt-6">
                           <div className="flex items-center justify-between mb-4">
-                            <Label className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right">
+                            <Label dir="rtl" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right">
                               <Users className="h-4 w-4" />
                               {t('national_insight_center_info.access.selected_users')}
                               {selectedUsers.length > 0 && (
@@ -437,7 +437,7 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
                               )}
                             </Label>
                           </div>
-                          
+
                           {selectedUsers.length === 0 ? (
                             <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                               {t('national_insight_center_info.access.no_users_selected')}
@@ -486,7 +486,7 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
                     {/* Statistics Tab */}
                     <TabsContent value="stats" className="space-y-6">
                       <div className="mb-6">
-                        <Label htmlFor="category-filter" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right" dir="rtl">
+                        <Label htmlFor="category-filter" dir="rtl" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right">
                           {t('national_insight_center_info.stats.filter_by_category')}
                           <Building2 className="h-4 w-4" />
                         </Label>
@@ -538,7 +538,7 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
               {/* Form Actions */}
               <FooterButtons
                 onCancel={() => window.history.back()}
-                onSubmit={() => {}}
+                onSubmit={() => { }}
                 processing={processing}
                 cancelText={t('national_insight_center_info.edit.cancel_button')}
                 submitText={t('national_insight_center_info.edit.save_button')}
