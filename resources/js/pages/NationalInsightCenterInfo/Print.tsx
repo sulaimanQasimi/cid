@@ -260,10 +260,17 @@ export default function NationalInsightCenterInfoPrint({
                     {info.item_stats && info.item_stats.length > 0 ? (
                         <div className="mt-4">
                             <h4 className="font-semibold text-black mb-2">{t('national_insight_center_info.print.statistics')}:</h4>
+                            {/* Debug: Show structure */}
+                            <div className="text-xs text-gray-500 mb-2">
+                                Debug: {info.item_stats.length} items, Categories: {Object.keys(info.item_stats.reduce((acc: Record<number, string>, stat) => {
+                                    acc[stat.stat_category_item.category.id] = stat.stat_category_item.category.label;
+                                    return acc;
+                                }, {})).length}
+                            </div>
                             <table className="w-full print:text-xs border border-gray-300 print:border-gray-600" style={{ borderCollapse: 'collapse' }}>
                                 {/* Group stats by category */}
-                                {Object.entries(
-                                    info.item_stats.reduce((acc, stat) => {
+                                {(() => {
+                                    const groupedStats = info.item_stats.reduce((acc, stat) => {
                                         const categoryId = stat.stat_category_item.category.id;
                                         if (!acc[categoryId]) {
                                             acc[categoryId] = {
@@ -273,51 +280,78 @@ export default function NationalInsightCenterInfoPrint({
                                         }
                                         acc[categoryId].items.push(stat);
                                         return acc;
-                                    }, {} as Record<number, { category: any; items: any[] }>)
-                                ).map(([categoryId, categoryData]) => (
-                                    <React.Fragment key={categoryId}>
-                                        {/* Category Row */}
-                                        <tr className="border-b border-gray-300 print:border-gray-600">
-                                            <td 
-                                                colSpan={categoryData.items.length * 2} 
-                                                className="font-bold text-center py-2 bg-gray-100 print:bg-gray-200"
-                                                style={{ backgroundColor: categoryData.category.color + '20' }}
-                                            >
-                                                {categoryData.category.label}
-                                            </td>
-                                        </tr>
-                                        
-                                        {/* Item Labels Row */}
-                                        <tr className="border-b border-gray-300 print:border-gray-600">
-                                            {categoryData.items.map((stat) => (
-                                                <React.Fragment key={stat.id}>
-                                                    <th className="text-center py-1 font-semibold border-r border-gray-300 print:border-gray-600">
-                                                        {stat.stat_category_item.label}
-                                                    </th>
-                                                    <td className="text-center py-1 border-r border-gray-300 print:border-gray-600">
-                                                        {stat.string_value}
-                                                    </td>
-                                                </React.Fragment>
-                                            ))}
-                                        </tr>
-                                        
-                                        {/* Notes Row (if any) */}
-                                        {categoryData.items.some(stat => stat.notes) && (
+                                    }, {} as Record<number, { category: any; items: any[] }>);
+
+                                    const categoryEntries = Object.entries(groupedStats);
+                                    
+                                    return (
+                                        <>
+                                            {/* First Row: All Categories */}
                                             <tr className="border-b border-gray-300 print:border-gray-600">
-                                                {categoryData.items.map((stat) => (
-                                                    <React.Fragment key={`notes-${stat.id}`}>
-                                                        <td className="text-center py-1 text-xs border-r border-gray-300 print:border-gray-600">
-                                                            {stat.notes ? 'یادداشت' : ''}
-                                                        </td>
-                                                        <td className="text-center py-1 text-xs border-r border-gray-300 print:border-gray-600">
-                                                            {stat.notes || ''}
-                                                        </td>
+                                                {categoryEntries.map(([categoryId, categoryData]) => (
+                                                    <td 
+                                                        key={categoryId}
+                                                        colSpan={categoryData.items.length} 
+                                                        className="font-bold text-center py-2 border-r border-gray-300 print:border-gray-600"
+                                                        style={{ backgroundColor: categoryData.category.color + '20' }}
+                                                    >
+                                                        {categoryData.category.label}
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                            
+                                            {/* Second Row: Item Labels */}
+                                            <tr className="border-b border-gray-300 print:border-gray-600">
+                                                {categoryEntries.map(([categoryId, categoryData]) => (
+                                                    <React.Fragment key={categoryId}>
+                                                        {categoryData.items.map((stat) => (
+                                                            <th 
+                                                                key={stat.id}
+                                                                className="text-center py-1 font-semibold border-r border-gray-300 print:border-gray-600"
+                                                            >
+                                                                {stat.stat_category_item.label}
+                                                            </th>
+                                                        ))}
                                                     </React.Fragment>
                                                 ))}
                                             </tr>
-                                        )}
-                                    </React.Fragment>
-                                ))}
+                                            
+                                            {/* Third Row: Values */}
+                                            <tr className="border-b border-gray-300 print:border-gray-600">
+                                                {categoryEntries.map(([categoryId, categoryData]) => (
+                                                    <React.Fragment key={categoryId}>
+                                                        {categoryData.items.map((stat) => (
+                                                            <td 
+                                                                key={stat.id}
+                                                                className="text-center py-1 border-r border-gray-300 print:border-gray-600"
+                                                            >
+                                                                {stat.string_value}
+                                                            </td>
+                                                        ))}
+                                                    </React.Fragment>
+                                                ))}
+                                            </tr>
+                                            
+                                            {/* Notes Row (if any) */}
+                                            {info.item_stats.some(stat => stat.notes) && (
+                                                <tr className="border-b border-gray-300 print:border-gray-600">
+                                                    {categoryEntries.map(([categoryId, categoryData]) => (
+                                                        <React.Fragment key={categoryId}>
+                                                            {categoryData.items.map((stat) => (
+                                                                <td 
+                                                                    key={`notes-${stat.id}`}
+                                                                    className="text-center py-1 text-xs border-r border-gray-300 print:border-gray-600"
+                                                                >
+                                                                    {stat.notes || ''}
+                                                                </td>
+                                                            ))}
+                                                        </React.Fragment>
+                                                    ))}
+                                                </tr>
+                                            )}
+                                        </>
+                                    );
+                                })()}
                             </table>
                         </div>
                     ) : (
