@@ -26,7 +26,7 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('national-insight-center-infos/{nationalInsightCenterInfo}/confirm', [NationalInsightCenterInfoController::class, 'confirm'])->name('national-insight-center-infos.confirm');
     Route::get('national-insight-center-infos/{nationalInsightCenterInfo}/stats', [NationalInsightCenterInfoController::class, 'manageStats'])->name('national-insight-center-infos.stats');
     Route::put('national-insight-center-infos/{nationalInsightCenterInfo}/stats', [NationalInsightCenterInfoController::class, 'updateStats'])->name('national-insight-center-infos.stats.update');
-    Route::get('national-insight-center-infos/{nationalInsightCenterInfo}/print', [NationalInsightCenterInfoController::class, 'print'])->name('national-insight-center-infos.print');
+    Route::get('national-insight-center-infos/{nationalInsightCenterInfo}/print', [NationalInsightCenterInfoController::class, 'print'])->name('national-insight-center-infos.print')->middleware('can:print,nationalInsightCenterInfo');
 
     // National Insight Center Info Item routes
     Route::resource('national-insight-center-info-items', NationalInsightCenterInfoItemController::class)

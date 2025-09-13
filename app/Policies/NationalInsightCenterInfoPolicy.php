@@ -75,6 +75,16 @@ class NationalInsightCenterInfoPolicy
     }
 
     /**
+     * Determine whether the user can print the model.
+     */
+    public function print(User $user, NationalInsightCenterInfo $nationalInsightCenterInfo): bool
+    {
+        // Creator can always print, or user with print permission
+        return $nationalInsightCenterInfo->created_by === $user->id || 
+               $user->hasPermissionTo('national_insight_center_info.print');
+    }
+
+    /**
      * Determine whether the user can restore the model.
      */
     public function restore(User $user, NationalInsightCenterInfo $nationalInsightCenterInfo): bool

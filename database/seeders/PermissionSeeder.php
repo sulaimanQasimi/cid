@@ -108,6 +108,7 @@ class PermissionSeeder extends Seeder
             ['name' => 'national_insight_center_info.update', 'label' => 'ویرایش اطلاعات مرکز ملی بصیر'],
             ['name' => 'national_insight_center_info.delete', 'label' => 'حذف اطلاعات مرکز ملی بصیر'],
             ['name' => 'national_insight_center_info.confirm', 'label' => 'تایید اطلاعات مرکز ملی بصیر'],
+            ['name' => 'national_insight_center_info.print', 'label' => 'چاپ اطلاعات مرکز ملی بصیر'],
             ['name' => 'national_insight_center_info.restore', 'label' => 'بازیابی اطلاعات مرکز ملی بصیر'],
             ['name' => 'national_insight_center_info.force_delete', 'label' => 'حذف دائمی اطلاعات مرکز ملی بصیر'],
 
