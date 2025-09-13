@@ -375,11 +375,11 @@ export function AppSidebar() {
                         <SidebarMenuButton
                             size="lg"
                             asChild
-                            className="bg-blue-600 hover:bg-blue-700 transition-colors justify-start text-white"
+                            className="bg-purple-600 hover:bg-purple-700 transition-colors justify-start text-white"
                         >
                             <Link href="/dashboard" prefetch>
                                 <div className="flex items-center gap-3 w-full">
-                                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg">
+                                    <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center shadow-lg">
                                         <ShieldCheck className="h-4 w-4 text-white" />
                                     </div>
                                     <div className="flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
