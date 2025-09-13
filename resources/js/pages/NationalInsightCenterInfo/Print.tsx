@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Head } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, FileText } from 'lucide-react';
+import { ArrowLeft, FileText, User, Calendar, CheckCircle, Clock, Building2, Tag, FileCheck, BarChart3, Info } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/translate';
 import { formatPersianDateOnly, formatPersianDateTime } from '@/lib/utils/date';
 import QRCode from 'qrcode';
@@ -201,23 +201,44 @@ export default function NationalInsightCenterInfoPrint({
 
             <table className="w-full mt-4 print:text-xs" style={{ borderCollapse: 'collapse' }}>
                 <tr className="text-sm border-b border-gray-900 print:border-gray-800">
-                    <th className="text-left pr-2 font-semibold">{t('national_insight_center_info.print.code')}:</th>
+                    <th className="text-left pr-2 font-semibold flex items-center gap-1">
+                        <Tag className="h-3 w-3" />
+                        {t('national_insight_center_info.print.code')}:
+                    </th>
                     <td className="pr-4">{nationalInsightCenterInfo.code}</td>
-                    <th className="text-left pr-2 font-semibold">{t('national_insight_center_info.print.status')}:</th>
+                    <th className="text-left pr-2 font-semibold flex items-center gap-1">
+                        {nationalInsightCenterInfo.confirmed ? <CheckCircle className="h-3 w-3 text-green-600" /> : <Clock className="h-3 w-3 text-yellow-600" />}
+                        {t('national_insight_center_info.print.status')}:
+                    </th>
                     <td className="pr-4">{nationalInsightCenterInfo.confirmed ? t('national_insight_center_info.confirmed') : t('national_insight_center_info.pending')}</td>
-                    <th className="text-left pr-2 font-semibold">{t('national_insight_center_info.print.created_at')}:</th>
+                    <th className="text-left pr-2 font-semibold flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {t('national_insight_center_info.print.created_at')}:
+                    </th>
                     <td className="pr-4">{formatPersianDateOnly(nationalInsightCenterInfo.created_at)}</td>
                 </tr>
                 <tr className="text-sm border-b border-gray-900 print:border-gray-800">
-                    <th className="text-left pr-2 font-semibold">{t('national_insight_center_info.print.created_by')}:</th>
+                    <th className="text-left pr-2 font-semibold flex items-center gap-1">
+                        <User className="h-3 w-3" />
+                        {t('national_insight_center_info.print.created_by')}:
+                    </th>
                     <td className="pr-4">{nationalInsightCenterInfo.creator?.name}</td>
-                    <th className="text-left pr-2 font-semibold">{t('national_insight_center_info.print.confirmed_by')}:</th>
+                    <th className="text-left pr-2 font-semibold flex items-center gap-1">
+                        <FileCheck className="h-3 w-3" />
+                        {t('national_insight_center_info.print.confirmed_by')}:
+                    </th>
                     <td className="pr-4">{nationalInsightCenterInfo.confirmer?.name || '-'}</td>
-                    <th className="text-left pr-2 font-semibold">{t('national_insight_center_info.print.confirmed_at')}:</th>
+                    <th className="text-left pr-2 font-semibold flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {t('national_insight_center_info.print.confirmed_at')}:
+                    </th>
                     <td className="pr-4">{nationalInsightCenterInfo.confirmed_at ? formatPersianDateOnly(nationalInsightCenterInfo.confirmed_at) : '-'}</td>
                 </tr>
                 <tr className="text-sm pt-2 py-2">
-                    <th className="text-left pr-2 font-semibold">{t('national_insight_center_info.print.info.department')}:</th>
+                    <th className="text-left pr-2 font-semibold flex items-center gap-1">
+                        <Building2 className="h-3 w-3" />
+                        {t('national_insight_center_info.print.info.department')}:
+                    </th>
                     <td colSpan={5}>{nationalInsightCenterInfo.creator?.department?.name || '-'}</td>
                 </tr>
             </table>
@@ -232,34 +253,58 @@ export default function NationalInsightCenterInfoPrint({
 
                     <table className="w-full print:text-xs" style={{ borderCollapse: 'collapse' }}>
                         <tr className="border-b border-gray-300 print:border-gray-600">
-                            <th className="text-left pr-2 font-semibold py-1">{t('national_insight_center_info.print.info.info_category')}:</th>
+                            <th className="text-left pr-2 font-semibold py-1 flex items-center gap-1">
+                                <Tag className="h-3 w-3" />
+                                {t('national_insight_center_info.print.info.info_category')}:
+                            </th>
                             <td className="pr-4 py-1">{info.info_category?.name || '-'}</td>
-                            <th className="text-left pr-2 font-semibold py-1">{t('national_insight_center_info.print.info.department')}:</th>
+                            <th className="text-left pr-2 font-semibold py-1 flex items-center gap-1">
+                                <Building2 className="h-3 w-3" />
+                                {t('national_insight_center_info.print.info.department')}:
+                            </th>
                             <td className="pr-4 py-1">{info.department?.name || '-'}</td>
-                            <th className="text-left pr-2 font-semibold py-1">{t('national_insight_center_info.print.info.creator')}:</th>
+                            <th className="text-left pr-2 font-semibold py-1 flex items-center gap-1">
+                                <User className="h-3 w-3" />
+                                {t('national_insight_center_info.print.info.creator')}:
+                            </th>
                             <td className="pr-4 py-1">{info.creator?.name || '-'}</td>
                         </tr>
                         <tr className="border-b border-gray-300 print:border-gray-600">
-                            <th className="text-left pr-2 font-semibold py-1">{t('national_insight_center_info.print.info.confirmed')}:</th>
+                            <th className="text-left pr-2 font-semibold py-1 flex items-center gap-1">
+                                {info.confirmed ? <CheckCircle className="h-3 w-3 text-green-600" /> : <Clock className="h-3 w-3 text-yellow-600" />}
+                                {t('national_insight_center_info.print.info.confirmed')}:
+                            </th>
                             <td className="pr-4 py-1">{info.confirmed ? t('national_insight_center_info.print.info.confirmed') : t('national_insight_center_info.print.info.pending')}</td>
-                            <th className="text-left pr-2 font-semibold py-1">{t('national_insight_center_info.print.info.created_at')}:</th>
+                            <th className="text-left pr-2 font-semibold py-1 flex items-center gap-1">
+                                <Calendar className="h-3 w-3" />
+                                {t('national_insight_center_info.print.info.created_at')}:
+                            </th>
                             <td className="pr-4 py-1">{formatPersianDateOnly(info.created_at)}</td>
-                            <th className="text-left pr-2 font-semibold py-1">{t('national_insight_center_info.print.registration_number')}:</th>
+                            <th className="text-left pr-2 font-semibold py-1 flex items-center gap-1">
+                                <FileCheck className="h-3 w-3" />
+                                {t('national_insight_center_info.print.registration_number')}:
+                            </th>
                             <td className="pr-4 py-1">{info.registration_number || '-'}</td>
                         </tr>
                     </table>
 
                     {info.description && (
                         <div className="mt-3 p-3 bg-gray-50 print:bg-white print:border print:border-gray-300 rounded">
-                            <h4 className="font-semibold text-black mb-2">{t('national_insight_center_info.print.description')}:</h4>
+                            <h4 className="font-semibold text-black mb-2 flex items-center gap-2">
+                                <Info className="h-4 w-4" />
+                                {t('national_insight_center_info.print.description')}:
+                            </h4>
                             <p className="text-sm text-justify leading-relaxed">{info.description}</p>
                         </div>
                     )}
 
 
-                    {info.item_stats && info.item_stats.length > 0 ? (
+                    {info.item_stats && info.item_stats.length > 0 && (
                         <div className="mt-4">
-                            <h4 className="font-semibold text-black mb-2">{t('national_insight_center_info.print.statistics')}:</h4>
+                            <h4 className="font-semibold text-black mb-2 flex items-center gap-2">
+                                <BarChart3 className="h-4 w-4" />
+                                {t('national_insight_center_info.print.statistics')}:
+                            </h4>
                             <table className="w-full print:text-xs border border-gray-300 print:border-gray-600" style={{ borderCollapse: 'collapse' }}>
                                 {/* Group stats by category */}
                                 {(() => {
@@ -347,11 +392,6 @@ export default function NationalInsightCenterInfoPrint({
                                 })()}
                             </table>
                         </div>
-                    ) : (
-                        <div className="mt-4">
-                            <h4 className="font-semibold text-black mb-2">{t('national_insight_center_info.print.statistics')}:</h4>
-                            <p className="text-sm text-gray-500">No statistics available for this item.</p>
-                        </div>
                     )}
 
 
@@ -363,7 +403,10 @@ export default function NationalInsightCenterInfoPrint({
             {/* Footer */}
             <div className="mt-8 pt-4 border-t border-gray-300 print:border-gray-600 print:mt-12">
                 <div className="text-center text-sm text-gray-600 print:text-gray-800">
-                    <p>{t('national_insight_center_info.print.footer.generated_on')}: {formatPersianDateTime(new Date().toISOString())}</p>
+                    <p className="flex items-center justify-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        {t('national_insight_center_info.print.footer.generated_on')}: {formatPersianDateTime(new Date().toISOString())}
+                    </p>
                 </div>
             </div>
 
