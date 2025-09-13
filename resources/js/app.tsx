@@ -104,14 +104,14 @@ const disableKeyboardShortcuts = () => {
     }
     
     // Disable F1-F11 function keys
-    if (e.key.startsWith('F') && e.key.length <= 3) {
-      const fKeyNumber = parseInt(e.key.substring(1));
-      if (fKeyNumber >= 1 && fKeyNumber <= 11) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
-    }
+    // if (e.key.startsWith('F') && e.key.length <= 3) {
+    //   const fKeyNumber = parseInt(e.key.substring(1));
+    //   if (fKeyNumber >= 1 && fKeyNumber <= 11) {
+    //     e.preventDefault();
+    //     e.stopPropagation();
+    //     return false;
+    //   }
+    // }
     
     // Disable Ctrl+Shift+K (Firefox console)
     if (e.ctrlKey && e.shiftKey && e.key === 'K') {

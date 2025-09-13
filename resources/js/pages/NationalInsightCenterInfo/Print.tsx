@@ -67,7 +67,7 @@ interface InfoItem {
         id: number;
         name: string;
     };
-    itemStats?: Array<{
+    item_stats?: Array<{
         id: number;
         string_value: string;
         notes: string | null;
@@ -96,6 +96,7 @@ export default function NationalInsightCenterInfoPrint({
 }: Props) {
     const { t } = useTranslation();
     const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
+
 
     useEffect(() => {
         const generateQRCode = async () => {
@@ -255,18 +256,74 @@ export default function NationalInsightCenterInfoPrint({
                         </div>
                     )}
 
-                    {info.itemStats.length > 0 && (
-                        <div className="mt-3 p-3 bg-gray-50 print:bg-white print:border print:border-gray-300 rounded">
-                            <h4 className="font-semibold text-black mb-2">{t('national_insight_center_info.print.item_stats')}:</h4>
-                            <table className="w-full print:text-xs" style={{ borderCollapse: 'collapse' }}>
-                                {info.itemStats.map((itemStat, index) => (
-                                    <tr key={itemStat.id} className="border-b border-gray-300 print:border-gray-600">
-                                        <td className="py-1 px-2">{itemStat.stat_category_item.category.label} - {itemStat.stat_category_item.label}</td>
-                                        <td className="py-1 px-2">{itemStat.string_value}</td>
-                                        <td className="py-1 px-2">{itemStat.notes || '-'}</td>
-                                    </tr>
+
+                    {info.item_stats && info.item_stats.length > 0 ? (
+                        <div className="mt-4">
+                            <h4 className="font-semibold text-black mb-2">{t('national_insight_center_info.print.statistics')}:</h4>
+                            <table className="w-full print:text-xs border border-gray-300 print:border-gray-600" style={{ borderCollapse: 'collapse' }}>
+                                {/* Group stats by category */}
+                                {Object.entries(
+                                    info.item_stats.reduce((acc, stat) => {
+                                        const categoryId = stat.stat_category_item.category.id;
+                                        if (!acc[categoryId]) {
+                                            acc[categoryId] = {
+                                                category: stat.stat_category_item.category,
+                                                items: []
+                                            };
+                                        }
+                                        acc[categoryId].items.push(stat);
+                                        return acc;
+                                    }, {} as Record<number, { category: any; items: any[] }>)
+                                ).map(([categoryId, categoryData]) => (
+                                    <React.Fragment key={categoryId}>
+                                        {/* Category Row */}
+                                        <tr className="border-b border-gray-300 print:border-gray-600">
+                                            <td 
+                                                colSpan={categoryData.items.length * 2} 
+                                                className="font-bold text-center py-2 bg-gray-100 print:bg-gray-200"
+                                                style={{ backgroundColor: categoryData.category.color + '20' }}
+                                            >
+                                                {categoryData.category.label}
+                                            </td>
+                                        </tr>
+                                        
+                                        {/* Item Labels Row */}
+                                        <tr className="border-b border-gray-300 print:border-gray-600">
+                                            {categoryData.items.map((stat) => (
+                                                <React.Fragment key={stat.id}>
+                                                    <th className="text-center py-1 font-semibold border-r border-gray-300 print:border-gray-600">
+                                                        {stat.stat_category_item.label}
+                                                    </th>
+                                                    <td className="text-center py-1 border-r border-gray-300 print:border-gray-600">
+                                                        {stat.string_value}
+                                                    </td>
+                                                </React.Fragment>
+                                            ))}
+                                        </tr>
+                                        
+                                        {/* Notes Row (if any) */}
+                                        {categoryData.items.some(stat => stat.notes) && (
+                                            <tr className="border-b border-gray-300 print:border-gray-600">
+                                                {categoryData.items.map((stat) => (
+                                                    <React.Fragment key={`notes-${stat.id}`}>
+                                                        <td className="text-center py-1 text-xs border-r border-gray-300 print:border-gray-600">
+                                                            {stat.notes ? 'یادداشت' : ''}
+                                                        </td>
+                                                        <td className="text-center py-1 text-xs border-r border-gray-300 print:border-gray-600">
+                                                            {stat.notes || ''}
+                                                        </td>
+                                                    </React.Fragment>
+                                                ))}
+                                            </tr>
+                                        )}
+                                    </React.Fragment>
                                 ))}
                             </table>
+                        </div>
+                    ) : (
+                        <div className="mt-4">
+                            <h4 className="font-semibold text-black mb-2">{t('national_insight_center_info.print.statistics')}:</h4>
+                            <p className="text-sm text-gray-500">No statistics available for this item.</p>
                         </div>
                     )}
 

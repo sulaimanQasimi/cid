@@ -1961,5 +1961,6 @@
     "national_insight_center_info.print.created_by": "ایجاد شده توسط",
     "national_insight_center_info.print.confirmed_by": "تأیید شده توسط",
     "national_insight_center_info.print.confirmed_at": "تاریخ تأیید",
-    "national_insight_center_info.print.footer.generated_on": "تاریخ تولید گزارش"
+    "national_insight_center_info.print.footer.generated_on": "تاریخ تولید گزارش",
+    "national_insight_center_info.print.item_stats": "آمار آیتم"
 }

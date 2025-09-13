@@ -33,6 +33,7 @@ class NationalInsightCenterInfoItem extends Model
         'created_by',
         'confirmed',
         'confirmed_by',
+        'confirmed_at',
     ];
 
     /**
@@ -43,6 +44,7 @@ class NationalInsightCenterInfoItem extends Model
     protected $casts = [
         'date' => 'date',
         'confirmed' => 'boolean',
+        'confirmed_at' => 'datetime',
     ];
 
     protected $appends = [
