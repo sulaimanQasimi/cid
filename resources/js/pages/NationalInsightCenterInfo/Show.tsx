@@ -154,37 +154,33 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
           showButton={false}
           actionButtons={
             <>
-              <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
-                <Link href={route('national-insight-center-infos.index')} className="flex items-center gap-3">
-                  <ArrowLeft className="h-5 w-5" />
-                  {t('national_insight_center_info.show.back_button')}
-                </Link>
-              </Button>
-              <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
-                <Link href={route('national-insight-center-infos.print', nationalInsightCenterInfo.id)} className="flex items-center gap-3">
-                  <Printer className="h-5 w-5" />
-                  {t('national_insight_center_info.show.print_button')}
-                </Link>
-              </Button>
-              <CanUpdate model="national_insight_center_info">
-                <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
-                  <Link href={route('national-insight-center-infos.edit', nationalInsightCenterInfo.id)} className="flex items-center gap-3">
-                    <Pencil className="h-5 w-5" />
-                    {t('national_insight_center_info.show.edit_button')}
-                  </Link>
-                </Button>
-              </CanUpdate>
               <CanDelete model="national_insight_center_info">
                 <Button
                   size="lg"
                   variant="destructive"
                   onClick={() => setIsDeleteDialogOpen(true)}
-                  className="bg-red-500/20 backdrop-blur-md border-red-300/30 text-white hover:bg-red-500/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105"
+                  className="bg-red-500/20 backdrop-blur-md border-red-300/30 text-white hover:bg-red-500/30 shadow-2xl rounded-2xl px-4 py-3 transition-all duration-300 hover:scale-105"
                 >
-                  <Trash className="h-5 w-5 mr-2" />
-                  {t('national_insight_center_info.show.delete_button')}
+                  <Trash className="h-5 w-5" />
                 </Button>
               </CanDelete>
+              <CanUpdate model="national_insight_center_info">
+                <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-4 py-3 transition-all duration-300 hover:scale-105">
+                  <Link href={route('national-insight-center-infos.edit', nationalInsightCenterInfo.id)} className="flex items-center">
+                    <Pencil className="h-5 w-5" />
+                  </Link>
+                </Button>
+              </CanUpdate>
+              <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-4 py-3 transition-all duration-300 hover:scale-105">
+                <Link href={route('national-insight-center-infos.print', nationalInsightCenterInfo.id)} className="flex items-center">
+                  <Printer className="h-5 w-5" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-4 py-3 transition-all duration-300 hover:scale-105">
+                <Link href={route('national-insight-center-infos.index')} className="flex items-center">
+                  <ArrowLeft className="h-5 w-5" />
+                </Link>
+              </Button>
             </>
           }
         />
@@ -352,40 +348,40 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
 
       {/* Item Details Modal */}
       <Dialog open={isItemModalOpen} onOpenChange={setIsItemModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-purple-800 dark:text-purple-200">
+        <DialogContent className="max-w-5xl max-h-[95vh] overflow-y-auto bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700">
+          <DialogHeader className="pb-4">
+            <DialogTitle className="text-xl font-bold text-purple-800 dark:text-purple-200">
               {selectedItem?.name}
             </DialogTitle>
           </DialogHeader>
           
           {selectedItem && (
-            <div className="space-y-6">
+            <div className="space-y-4">
               {/* Basic Information */}
               <Card className="bg-white dark:bg-gray-800 border-purple-200 dark:border-purple-700 shadow-lg dark:shadow-gray-900/20">
-                <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 border-b border-purple-200 dark:border-purple-700">
-                  <CardTitle className="text-lg text-purple-800 dark:text-purple-200">
+                <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 border-b border-purple-200 dark:border-purple-700 py-3">
+                  <CardTitle className="text-base text-purple-800 dark:text-purple-200">
                     {t('national_insight_center_info.modal.basic_info')}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4 p-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-sm font-semibold text-purple-700 dark:text-purple-300">
+                <CardContent className="space-y-3 p-4">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div>
+                      <label className="text-xs font-semibold text-purple-700 dark:text-purple-300">
                         {t('national_insight_center_info.modal.id')}:
                       </label>
-                      <p className="text-purple-900 dark:text-purple-100 font-medium bg-purple-50 dark:bg-purple-900/20 px-3 py-2 rounded-lg border border-purple-200 dark:border-purple-700">
+                      <p className="text-purple-900 dark:text-purple-100 font-medium bg-purple-50 dark:bg-purple-900/20 px-2 py-1 rounded border border-purple-200 dark:border-purple-700 text-sm">
                         {selectedItem.id}
                       </p>
                     </div>
-                    <div className="space-y-1">
-                      <label className="text-sm font-semibold text-purple-700 dark:text-purple-300">
+                    <div>
+                      <label className="text-xs font-semibold text-purple-700 dark:text-purple-300">
                         {t('national_insight_center_info.modal.status')}:
                       </label>
                       <div className="mt-1">
                         <Badge
                           variant="outline"
-                          className={`${selectedItem.confirmed
+                          className={`text-xs ${selectedItem.confirmed
                               ? 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 border-green-300 dark:border-green-600'
                               : 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 border-yellow-300 dark:border-yellow-600'
                             }`}
@@ -394,30 +390,30 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
                         </Badge>
                       </div>
                     </div>
-                    <div className="space-y-1">
-                      <label className="text-sm font-semibold text-purple-700 dark:text-purple-300">
+                    <div>
+                      <label className="text-xs font-semibold text-purple-700 dark:text-purple-300">
                         {t('national_insight_center_info.modal.created_at')}:
                       </label>
-                      <p className="text-purple-900 dark:text-purple-100 bg-purple-50 dark:bg-purple-900/20 px-3 py-2 rounded-lg border border-purple-200 dark:border-purple-700">
+                      <p className="text-purple-900 dark:text-purple-100 bg-purple-50 dark:bg-purple-900/20 px-2 py-1 rounded border border-purple-200 dark:border-purple-700 text-sm">
                         {formatPersianDateOnly(selectedItem.created_at)}
                       </p>
                     </div>
-                    <div className="space-y-1">
-                      <label className="text-sm font-semibold text-purple-700 dark:text-purple-300">
+                    <div>
+                      <label className="text-xs font-semibold text-purple-700 dark:text-purple-300">
                         {t('national_insight_center_info.modal.info_category')}:
                       </label>
-                      <p className="text-purple-900 dark:text-purple-100 bg-purple-50 dark:bg-purple-900/20 px-3 py-2 rounded-lg border border-purple-200 dark:border-purple-700">
+                      <p className="text-purple-900 dark:text-purple-100 bg-purple-50 dark:bg-purple-900/20 px-2 py-1 rounded border border-purple-200 dark:border-purple-700 text-sm">
                         {selectedItem.info_category?.name || '-'}
                       </p>
                     </div>
                   </div>
                   {selectedItem.description && (
-                    <div className="space-y-1">
-                      <label className="text-sm font-semibold text-purple-700 dark:text-purple-300">
+                    <div>
+                      <label className="text-xs font-semibold text-purple-700 dark:text-purple-300">
                         {t('national_insight_center_info.modal.description')}:
                       </label>
-                      <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-700">
-                        <p className="text-purple-900 dark:text-purple-100 text-justify leading-relaxed">
+                      <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded border border-purple-200 dark:border-purple-700 mt-1">
+                        <p className="text-purple-900 dark:text-purple-100 text-justify leading-relaxed text-sm">
                           {selectedItem.description}
                         </p>
                       </div>
@@ -429,15 +425,15 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
               {/* Statistics */}
               {selectedItem.item_stats && selectedItem.item_stats.length > 0 && (
                 <Card className="bg-white dark:bg-gray-800 border-purple-200 dark:border-purple-700 shadow-lg dark:shadow-gray-900/20">
-                  <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 border-b border-purple-200 dark:border-purple-700">
-                    <CardTitle className="text-lg text-purple-800 dark:text-purple-200 flex items-center gap-2">
-                      <BarChart3 className="h-5 w-5" />
+                  <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 border-b border-purple-200 dark:border-purple-700 py-3">
+                    <CardTitle className="text-base text-purple-800 dark:text-purple-200 flex items-center gap-2">
+                      <BarChart3 className="h-4 w-4" />
                       {t('national_insight_center_info.modal.statistics')}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="p-6">
+                  <CardContent className="p-4">
                     <div className="overflow-x-auto">
-                      <table className="w-full border border-purple-200 dark:border-purple-700 rounded-lg bg-white dark:bg-gray-800" style={{ borderCollapse: 'collapse' }}>
+                      <table className="w-full border border-purple-200 dark:border-purple-700 rounded-lg bg-white dark:bg-gray-800 text-sm" style={{ borderCollapse: 'collapse' }}>
                         {/* Group stats by category */}
                         {(() => {
                           const groupedStats = selectedItem.item_stats.reduce((acc, stat) => {
@@ -462,7 +458,7 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
                                   <td 
                                     key={categoryId}
                                     colSpan={categoryData.items.length} 
-                                    className="font-bold text-center py-3 border-r border-purple-200 dark:border-purple-700 text-purple-800 dark:text-purple-200"
+                                    className="font-bold text-center py-2 border-r border-purple-200 dark:border-purple-700 text-purple-800 dark:text-purple-200 text-sm"
                                     style={{ backgroundColor: categoryData.category.color + '20' }}
                                   >
                                     {categoryData.category.label}
@@ -477,7 +473,7 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
                                     {categoryData.items.map((stat) => (
                                       <th 
                                         key={stat.id}
-                                        className="text-center py-2 font-semibold border-r border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300 bg-white dark:bg-gray-800"
+                                        className="text-center py-1 font-semibold border-r border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300 bg-white dark:bg-gray-800 text-xs"
                                       >
                                         {stat.stat_category_item.label}
                                       </th>
@@ -493,9 +489,9 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
                                     {categoryData.items.map((stat) => (
                                       <td 
                                         key={stat.id}
-                                        className="text-center py-2 border-r border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-800"
+                                        className="text-center py-1 border-r border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-800"
                                       >
-                                        <Badge variant="outline" className="bg-gradient-to-l from-green-100 dark:from-green-800 to-green-200 dark:to-green-700 text-green-800 dark:text-green-200 border-green-300 dark:border-green-600 px-3 py-1 rounded-lg font-semibold">
+                                        <Badge variant="outline" className="bg-gradient-to-l from-green-100 dark:from-green-800 to-green-200 dark:to-green-700 text-green-800 dark:text-green-200 border-green-300 dark:border-green-600 px-2 py-0.5 rounded text-xs font-semibold">
                                           {stat.string_value}
                                         </Badge>
                                       </td>
@@ -512,7 +508,7 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
                                       {categoryData.items.map((stat) => (
                                         <td 
                                           key={`notes-${stat.id}`}
-                                          className="text-center py-2 text-sm border-r border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-400 bg-gray-50 dark:bg-gray-700/50"
+                                          className="text-center py-1 text-xs border-r border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-400 bg-gray-50 dark:bg-gray-700/50"
                                         >
                                           {stat.notes || ''}
                                         </td>
@@ -533,13 +529,13 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
               {/* No Statistics Message */}
               {(!selectedItem.item_stats || selectedItem.item_stats.length === 0) && (
                 <Card className="bg-white dark:bg-gray-800 border-purple-200 dark:border-purple-700 shadow-lg dark:shadow-gray-900/20">
-                  <CardContent className="text-center py-8">
-                    <div className="flex flex-col items-center gap-4 text-purple-600 dark:text-purple-400">
-                      <div className="p-4 bg-purple-100 dark:bg-purple-800/50 rounded-full flex items-center justify-center border border-purple-200 dark:border-purple-700">
-                        <BarChart3 className="h-12 w-12 text-purple-400 dark:text-purple-300" />
+                  <CardContent className="text-center py-4">
+                    <div className="flex flex-col items-center gap-3 text-purple-600 dark:text-purple-400">
+                      <div className="p-3 bg-purple-100 dark:bg-purple-800/50 rounded-full flex items-center justify-center border border-purple-200 dark:border-purple-700">
+                        <BarChart3 className="h-8 w-8 text-purple-400 dark:text-purple-300" />
                       </div>
-                      <p className="text-lg font-bold text-purple-800 dark:text-purple-200">{t('national_insight_center_info.modal.no_statistics')}</p>
-                      <p className="text-purple-500 dark:text-purple-400 max-w-md">{t('national_insight_center_info.modal.no_statistics_description')}</p>
+                      <p className="text-base font-bold text-purple-800 dark:text-purple-200">{t('national_insight_center_info.modal.no_statistics')}</p>
+                      <p className="text-purple-500 dark:text-purple-400 max-w-md text-sm">{t('national_insight_center_info.modal.no_statistics_description')}</p>
                     </div>
                   </CardContent>
                 </Card>
