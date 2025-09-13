@@ -260,13 +260,6 @@ export default function NationalInsightCenterInfoPrint({
                     {info.item_stats && info.item_stats.length > 0 ? (
                         <div className="mt-4">
                             <h4 className="font-semibold text-black mb-2">{t('national_insight_center_info.print.statistics')}:</h4>
-                            {/* Debug: Show structure */}
-                            <div className="text-xs text-gray-500 mb-2">
-                                Debug: {info.item_stats.length} items, Categories: {Object.keys(info.item_stats.reduce((acc: Record<number, string>, stat) => {
-                                    acc[stat.stat_category_item.category.id] = stat.stat_category_item.category.label;
-                                    return acc;
-                                }, {})).length}
-                            </div>
                             <table className="w-full print:text-xs border border-gray-300 print:border-gray-600" style={{ borderCollapse: 'collapse' }}>
                                 {/* Group stats by category */}
                                 {(() => {
