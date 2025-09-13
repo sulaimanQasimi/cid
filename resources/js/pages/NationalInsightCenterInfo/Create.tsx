@@ -7,39 +7,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, FileText, BarChart3, Save, X, AlertTriangle, Building2, Users, Search, ArrowRight, Trash, User, Shield } from 'lucide-react';
+import { ArrowLeft, FileText, Save, X, Users, Search, ArrowRight, Trash, User, Shield, BarChart3 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/translate';
 import { usePermissions } from '@/hooks/use-permissions';
 import { CanCreate } from '@/components/ui/permission-guard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import TreeViewStatSelector from '@/components/reports/TreeViewStatSelector';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import Header from '@/components/template/header';
 import FooterButtons from '@/components/template/FooterButtons';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-interface StatCategory {
-  id: number;
-  name: string;
-  label: string;
-  color: string;
-  status: string;
-}
-
-interface StatCategoryItem {
-  id: number;
-  name: string;
-  label: string;
-  color: string | null;
-  parent_id: number | null;
-  category: {
-    id: number;
-    name: string;
-    label: string;
-    color: string;
-  };
-}
 
 interface User {
   id: number;
@@ -48,8 +26,6 @@ interface User {
 }
 
 interface CreateProps {
-  statItems: StatCategoryItem[];
-  statCategories: StatCategory[];
   users: User[];
 }
 
@@ -58,14 +34,9 @@ type NationalInsightCenterInfoFormData = {
   code?: string;
   description?: string;
   access_users?: number[];
-  stats?: Array<{
-    stat_category_item_id: number;
-    value: string;
-    notes?: string;
-  }>;
 };
 
-export default function NationalInsightCenterInfosCreate({ statItems, statCategories, users }: CreateProps) {
+export default function NationalInsightCenterInfosCreate({ users }: CreateProps) {
   const { t } = useTranslation();
   const { canCreate } = usePermissions();
 
@@ -76,13 +47,7 @@ export default function NationalInsightCenterInfosCreate({ statItems, statCatego
     access_users: [] as number[],
   });
 
-  // State for managing statistical data
-  const [statsData, setStatsData] = useState<{
-    [key: number]: { value: string; notes: string | null };
-  }>({});
 
-  // Add state for category filter
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
   // Access control state
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
@@ -106,53 +71,10 @@ export default function NationalInsightCenterInfosCreate({ statItems, statCatego
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Prepare stats data for submission
-    const stats = Object.entries(statsData)
-      .filter(([_, { value }]) => value.trim() !== '')
-      .map(([itemId, { value, notes }]) => ({
-        stat_category_item_id: parseInt(itemId),
-        value,
-        notes: notes || undefined,
-      }));
-
-    // Add stats to form data
-    if (stats.length > 0) {
-      setData('stats', stats);
-    }
-
     // Submit the form
     post(route('national-insight-center-infos.store'));
   };
 
-  // Group stat items by category for the dropdown filter
-  const categoriesForFilter = statCategories.map(category => ({
-    id: category.id,
-    label: category.label,
-    color: category.color
-  }));
-
-  // Filter stat items by category if one is selected
-  const filteredStatItems = selectedCategory
-    ? statItems.filter(item => item.category.id === selectedCategory)
-    : statItems;
-
-  // Handle stat input change
-  function handleStatChange(itemId: number, value: string) {
-    setStatsData(prev => ({
-      ...prev,
-      [itemId]: { ...prev[itemId] || { notes: null }, value }
-    }));
-  }
-
-  // Handle stat notes change
-  function handleNotesChange(itemId: number, notes: string) {
-    setStatsData(prev => ({
-      ...prev,
-      [itemId]: { ...prev[itemId] || { value: '' }, notes: notes || null }
-    }));
-  }
-
-  const statsCount = Object.keys(statsData).length;
 
   // Access control functions
   const handleUserSelect = (userId: number) => {
@@ -219,10 +141,6 @@ export default function NationalInsightCenterInfosCreate({ statItems, statCatego
                       <TabsTrigger value="access" className="flex items-center gap-2">
                         <Shield className="h-4 w-4" />
                         {t('national_insight_center_info.access_control')}
-                      </TabsTrigger>
-                      <TabsTrigger value="stats" className="flex items-center gap-2">
-                        <BarChart3 className="h-4 w-4" />
-                        {t('national_insight_center_info.statistics')}
                       </TabsTrigger>
                     </TabsList>
 
@@ -420,54 +338,6 @@ export default function NationalInsightCenterInfosCreate({ statItems, statCatego
                       </div>
                     </TabsContent>
 
-                    {/* Statistics Tab */}
-                    <TabsContent value="stats" className="space-y-6">
-                      <div className="mb-6">
-                        <Label htmlFor="category-filter" dir="rtl" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right">
-                          {t('national_insight_center_info.stats.filter_by_category')}
-                          <Building2 className="h-4 w-4" />
-                        </Label>
-                        <Select
-                          value={selectedCategory?.toString() || 'all'}
-                          onValueChange={(value) => setSelectedCategory(value !== 'all' ? parseInt(value) : null)}
-                        >
-                          <SelectTrigger id="category-filter" className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right">
-                            <SelectValue placeholder={t('incidents.filters.all_categories')} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">{t('incidents.filters.all_categories')}</SelectItem>
-                            {categoriesForFilter.map((category) => (
-                              <SelectItem key={category.id} value={category.id.toString()}>
-                                <div className="flex items-center">
-                                  <div
-                                    className="mr-2 h-3 w-3 rounded-full"
-                                    style={{ backgroundColor: category.color }}
-                                  ></div>
-                                  {category.label}
-                                </div>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      {filteredStatItems.length > 0 ? (
-                        <TreeViewStatSelector
-                          items={filteredStatItems}
-                          statsData={statsData}
-                          onValueChange={handleStatChange}
-                          onNotesChange={handleNotesChange}
-                        />
-                      ) : (
-                        <div className="text-center py-8">
-                          <div className="p-4 bg-purple-100 dark:bg-purple-800/30 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                            <AlertTriangle className="h-8 w-8 text-purple-400 dark:text-purple-500" />
-                          </div>
-                          <p className="text-lg font-semibold text-purple-800 dark:text-purple-200 mb-2">{t('national_insight_center_info.stats.no_items')}</p>
-                          <p className="text-purple-600 dark:text-purple-400">{t('national_insight_center_info.stats.no_items_description')}</p>
-                        </div>
-                      )}
-                    </TabsContent>
                   </Tabs>
                 </CardContent>
               </Card>

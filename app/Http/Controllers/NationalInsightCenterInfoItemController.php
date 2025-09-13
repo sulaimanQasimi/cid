@@ -103,7 +103,6 @@ class NationalInsightCenterInfoItemController extends Controller
         })->orderBy('name')->get();
         $infoCategories = InfoCategory::orderBy('name')->get();
         $provinces = Province::orderBy('name')->with('districts')->get();
-        $districts = District::orderBy('name')->with('province')->get();
 
         return Inertia::render('NationalInsightCenterInfoItem/Create', [
             'nationalInsightCenterInfos' => $nationalInsightCenterInfos,
@@ -180,7 +179,6 @@ class NationalInsightCenterInfoItemController extends Controller
             'district',
             'creator',
             'confirmer',
-            'infoStats.statCategoryItem.category',
             'itemStats.statCategoryItem.category'
         ]);
 
@@ -346,7 +344,7 @@ class NationalInsightCenterInfoItemController extends Controller
             ->get();
 
         // Load existing stats
-        $item->load(['infoStats.statCategoryItem.category']);
+        $item->load(['itemStats.statCategoryItem.category']);
 
         return Inertia::render('NationalInsightCenterInfoItem/ManageStats', [
             'item' => $item,

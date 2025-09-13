@@ -66,7 +66,7 @@ interface InfoStat {
   stat_category_item_id: number;
   string_value: string;
   notes: string | null;
-  stat_category_item: {
+  statCategoryItem: {
     id: number;
     name: string;
     label: string;
@@ -94,7 +94,7 @@ interface NationalInsightCenterInfoItem {
   district: District | null;
   creator: User | null;
   confirmer: User | null;
-  infoStats: InfoStat[];
+  itemStats: InfoStat[];
 }
 
 interface ShowProps {
@@ -159,44 +159,11 @@ export default function Show({ item }: ShowProps) {
           showButton={canUpdate('national_insight_center_info_item')}
           actionButtons={
             <>
-              <CanUpdate model="national_insight_center_info_item">
-                <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
-                  <Link href={route('national-insight-center-info-items.edit', item.id)} className="flex items-center gap-3">
-                    <Edit className="h-5 w-5" />
-                    {t('national_insight_center_info_item.show.edit_button')}
-                  </Link>
-                </Button>
-              </CanUpdate>
-
-              <CanUpdate model="national_insight_center_info_item">
-                <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
-                  <Link href={route('national-insight-center-info-items.stats', item.id)} className="flex items-center gap-3">
-                    <BarChart3 className="h-5 w-5" />
-                    {t('national_insight_center_info_item.show.stats_button')}
-                  </Link>
-                </Button>
-              </CanUpdate>
-
-              {!item.confirmed && (
-                <CanConfirm model="national_insight_center_info_item">
-                  <Button
-                    onClick={handleConfirm}
-                    variant="outline"
-                    size="lg"
-                    className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105"
-                  >
-                    <CheckCircle className="h-5 w-5 mr-2" />
-                    {t('national_insight_center_info_item.show.confirm_button')}
-                  </Button>
-                </CanConfirm>
-              )}
-
               <CanDelete model="national_insight_center_info_item">
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="outline" size="lg" className="bg-red-500/20 backdrop-blur-md border-red-400/30 text-white hover:bg-red-500/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
-                      <Trash2 className="h-5 w-5 mr-2" />
-                      {t('national_insight_center_info_item.show.delete_button')}
+                    <Button variant="outline" size="lg" className="bg-red-500/20 backdrop-blur-md border-red-400/30 text-white hover:bg-red-500/30 shadow-2xl rounded-2xl px-4 py-3 transition-all duration-300 hover:scale-105">
+                      <Trash2 className="h-5 w-5" />
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
@@ -215,6 +182,35 @@ export default function Show({ item }: ShowProps) {
                   </AlertDialogContent>
                 </AlertDialog>
               </CanDelete>
+
+              {!item.confirmed && (
+                <CanConfirm model="national_insight_center_info_item">
+                  <Button
+                    onClick={handleConfirm}
+                    variant="outline"
+                    size="lg"
+                    className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-4 py-3 transition-all duration-300 hover:scale-105"
+                  >
+                    <CheckCircle className="h-5 w-5" />
+                  </Button>
+                </CanConfirm>
+              )}
+
+              <CanUpdate model="national_insight_center_info_item">
+                <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-4 py-3 transition-all duration-300 hover:scale-105">
+                  <Link href={route('national-insight-center-info-items.stats', item.id)} className="flex items-center">
+                    <BarChart3 className="h-5 w-5" />
+                  </Link>
+                </Button>
+              </CanUpdate>
+
+              <CanUpdate model="national_insight_center_info_item">
+                <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-4 py-3 transition-all duration-300 hover:scale-105">
+                  <Link href={route('national-insight-center-info-items.edit', item.id)} className="flex items-center">
+                    <Edit className="h-5 w-5" />
+                  </Link>
+                </Button>
+              </CanUpdate>
             </>
           }
         />
@@ -340,7 +336,7 @@ export default function Show({ item }: ShowProps) {
           </Card>
 
           {/* Statistics */}
-          {item.infoStats && item.infoStats.length > 0 && (
+          {item.itemStats && item.itemStats.length > 0 && (
             <Card className="shadow-2xl bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 overflow-hidden">
               <CardHeader className="bg-gradient-to-r from-purple-600 to-purple-700 text-white p-6">
                 <CardTitle className="text-xl font-bold flex items-center gap-3">
@@ -350,16 +346,16 @@ export default function Show({ item }: ShowProps) {
               </CardHeader>
               <CardContent className="p-6">
                 <div className="space-y-4">
-                  {item.infoStats.map((stat) => (
+                  {item.itemStats.map((stat) => (
                     <div key={stat.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-800/50">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <div 
                             className="w-3 h-3 rounded-full"
-                            style={{ backgroundColor: stat.stat_category_item.category.color }}
+                            style={{ backgroundColor: stat.statCategoryItem.category.color }}
                           ></div>
                           <span className="font-semibold text-gray-900 dark:text-white">
-                            {stat.stat_category_item.category.label} - {stat.stat_category_item.label}
+                            {stat.statCategoryItem.category.label} - {stat.statCategoryItem.label}
                           </span>
                         </div>
                       </div>
