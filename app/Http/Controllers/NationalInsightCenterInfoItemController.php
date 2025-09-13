@@ -180,7 +180,6 @@ class NationalInsightCenterInfoItemController extends Controller
             'district',
             'creator',
             'confirmer',
-            'infoStats.statCategoryItem.category',
             'itemStats.statCategoryItem.category'
         ]);
 
@@ -346,7 +345,7 @@ class NationalInsightCenterInfoItemController extends Controller
             ->get();
 
         // Load existing stats
-        $item->load(['infoStats.statCategoryItem.category']);
+        $item->load(['itemStats.statCategoryItem.category']);
 
         return Inertia::render('NationalInsightCenterInfoItem/ManageStats', [
             'item' => $item,

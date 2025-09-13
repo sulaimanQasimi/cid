@@ -41,7 +41,7 @@ interface InfoStat {
   stat_category_item_id: number;
   string_value: string;
   notes: string | null;
-  stat_category_item: {
+  statCategoryItem: {
     id: number;
     name: string;
     label: string;
@@ -56,12 +56,12 @@ interface InfoStat {
 
 interface NationalInsightCenterInfoItem {
   id: number;
-  name: string;
-  code: string;
+  title: string;
+  registration_number: string;
   description: string | null;
   created_at: string;
   updated_at: string;
-  infoStats: InfoStat[];
+  itemStats: InfoStat[];
 }
 
 interface ManageStatsProps {
@@ -91,8 +91,8 @@ export default function ManageStats({ item, statItems, statCategories }: ManageS
     [key: number]: { value: string; notes: string | null };
   }>(() => {
     const initialStatsData: { [key: number]: { value: string; notes: string | null } } = {};
-    item.infoStats?.forEach(stat => {
-      initialStatsData[stat.stat_category_item_id] = {
+    item.itemStats?.forEach(stat => {
+      initialStatsData[stat.statCategoryItem.id] = {
         value: stat.string_value || '',
         notes: stat.notes
       };
@@ -109,7 +109,7 @@ export default function ManageStats({ item, statItems, statCategories }: ManageS
       href: route('national-insight-center-infos.index'),
     },
     {
-      title: item.name,
+      title: item.title,
       href: route('national-insight-center-info-items.show', item.id),
     },
     {
@@ -118,8 +118,10 @@ export default function ManageStats({ item, statItems, statCategories }: ManageS
     },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
 
     // Prepare stats data for submission
     const stats = Object.entries(statsData)
@@ -130,12 +132,8 @@ export default function ManageStats({ item, statItems, statCategories }: ManageS
         notes: notes || undefined,
       }));
 
-    // Add stats to form data
-    if (stats.length > 0) {
-      setData('stats', stats);
-    }
-
-    // Submit the form
+    // Set the data and submit
+    setData('stats', stats);
     put(route('national-insight-center-info-items.stats.update', item.id));
   };
 
@@ -171,11 +169,11 @@ export default function ManageStats({ item, statItems, statCategories }: ManageS
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title={t('national_insight_center_info_item.stats.title', { name: item.name })} />
+      <Head title={t('national_insight_center_info_item.stats.title', { name: item.title })} />
 
       <div className="container px-0 py-6">
         <Header
-          title={t('national_insight_center_info_item.stats.title', { name: item.name })}
+          title={t('national_insight_center_info_item.stats.title', { name: item.title })}
           description={t('national_insight_center_info_item.stats.description')}
           icon={<BarChart3 className="h-6 w-6 text-white" />}
           model="national_insight_center_info_item"
@@ -256,7 +254,7 @@ export default function ManageStats({ item, statItems, statCategories }: ManageS
               {/* Form Actions */}
               <FooterButtons
                 onCancel={() => window.history.back()}
-                onSubmit={() => {}}
+                onSubmit={handleSubmit}
                 processing={processing}
                 cancelText={t('national_insight_center_info_item.stats.cancel_button')}
                 submitText={t('national_insight_center_info_item.stats.save_button')}
