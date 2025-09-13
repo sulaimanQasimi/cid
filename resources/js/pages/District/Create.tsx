@@ -1,5 +1,5 @@
 import Header from '@/components/template/header';
-import { Button } from '@/components/ui/button';
+import FooterButtons from '@/components/template/FooterButtons';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,7 +11,7 @@ import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/lib/i18n/translate';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
-import { FileText, MapPin, Save, X } from 'lucide-react';
+import { FileText, MapPin, X } from 'lucide-react';
 import React from 'react';
 
 interface ProvinceData {
@@ -201,37 +201,19 @@ export default function Create({ provinces }: CreateProps) {
                             </CardContent>
                         </form>
                         
-                        {/* Footer Buttons */}
-                        <div className="border-t border-purple-200 dark:border-purple-700 bg-gradient-to-l from-purple-50 to-white dark:from-purple-900/20 dark:to-gray-800 px-8 py-6">
-                            <div className="flex items-center justify-end gap-4">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={() => window.history.back()}
-                                    className="h-12 rounded-xl border-purple-300 dark:border-purple-600 px-8 text-lg font-semibold text-purple-700 dark:text-purple-300 transition-all duration-300 hover:scale-105 hover:border-purple-400 dark:hover:border-purple-500 hover:bg-purple-100 dark:hover:bg-purple-800/30"
-                                >
-                                    {t('common.cancel')}
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    form="district-form"
-                                    disabled={processing}
-                                    className="h-12 rounded-xl bg-gradient-to-l from-purple-500 to-purple-600 dark:from-purple-600 dark:to-purple-700 px-8 text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl dark:hover:shadow-purple-500/25"
-                                >
-                                    {processing ? (
-                                        <div className="flex items-center gap-2">
-                                            <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                                            {t('common.saving')}
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center gap-2">
-                                            <Save className="h-5 w-5" />
-                                            {t('common.save')}
-                                        </div>
-                                    )}
-                                </Button>
-                            </div>
-                        </div>
+                        <FooterButtons
+                            onCancel={() => window.history.back()}
+                            onSubmit={() => {
+                                const form = document.getElementById('district-form') as HTMLFormElement;
+                                if (form) {
+                                    form.requestSubmit();
+                                }
+                            }}
+                            processing={processing}
+                            cancelText={t('common.cancel')}
+                            submitText={t('common.save')}
+                            savingText={t('common.saving')}
+                        />
                     </Card>
                 </CanCreate>
             </div>
