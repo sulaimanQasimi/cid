@@ -43,27 +43,20 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
             return (
                 <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
-                        asChild
                         tooltip={{ children: item.title }}
                         isActive={isActive}
                         className="mx-3 my-1 text-blue-900 dark:text-blue-300 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 data-[active=true]:bg-blue-400 dark:data-[active=true]:bg-blue-600 data-[active=true]:text-white dark:data-[active=true]:text-white transition-colors rounded-md"
+                        onClick={() => toggleSubmenu(item.title)}
                     >
-                        <Link href={item.href || '#'} prefetch>
-                            <div className="flex items-center gap-3 w-full">
-                                {item.icon && <item.icon className="h-4 w-4 text-blue-900 dark:text-blue-300 group-hover:text-blue-900 dark:group-hover:text-blue-200 group-data-[active=true]:text-black dark:group-data-[active=true]:text-white" />}
-                                {!isCollapsed && <span className="text-sm font-medium">{item.title}</span>}
-                            </div>
-                            {!isCollapsed && item.items && item.items.length > 0 && (
-                                <ChevronDown 
-                                    className={`ml-10 h-4 w-4 text-blue-900 dark:text-blue-300 group-hover:text-blue-900 dark:group-hover:text-blue-200 group-data-[active=true]:text-black dark:group-data-[active=true]:text-white transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        toggleSubmenu(item.title);
-                                    }}
-                                />
-                            )}
-                        </Link>
+                        <div className="flex items-center gap-3 w-full">
+                            {item.icon && <item.icon className="h-4 w-4 text-blue-900 dark:text-blue-300 group-hover:text-blue-900 dark:group-hover:text-blue-200 group-data-[active=true]:text-black dark:group-data-[active=true]:text-white" />}
+                            {!isCollapsed && <span className="text-sm font-medium">{item.title}</span>}
+                        </div>
+                        {!isCollapsed && item.items && item.items.length > 0 && (
+                            <ChevronDown 
+                                className={`ml-4 mr-2 h-4 w-4 text-blue-900 dark:text-blue-300 group-hover:text-blue-900 dark:group-hover:text-blue-200 group-data-[active=true]:text-black dark:group-data-[active=true]:text-white transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                            />
+                        )}
                     </SidebarMenuButton>
 
                     {isOpen && !isCollapsed && item.items && item.items.length > 0 && (
