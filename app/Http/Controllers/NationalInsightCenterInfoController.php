@@ -38,7 +38,7 @@ class NationalInsightCenterInfoController extends Controller
             'page' => 'nullable|integer|min:1'
         ]);
 
-        $query = NationalInsightCenterInfo::with(['creator:id,name'])
+        $query = NationalInsightCenterInfo::with(['creator:id,name', 'confirmer:id,name'])
             ->withCount(['infoItems', 'infoStats'])
             ->where(function($q) {
                 $q->where('created_by', Auth::id())
@@ -176,6 +176,7 @@ class NationalInsightCenterInfoController extends Controller
         // Load the national insight center info with all necessary relationships
         $nationalInsightCenterInfo->load([
             'creator:id,name',
+            'confirmer:id,name',
             'infoStats.statCategoryItem.category'
         ]);
 
@@ -222,7 +223,7 @@ class NationalInsightCenterInfoController extends Controller
         $users = User::orderBy('name')->get();
 
         // Load existing stats and access users
-        $nationalInsightCenterInfo->load(['infoStats.statCategoryItem.category', 'accesses.user:id,name']);
+        $nationalInsightCenterInfo->load(['infoStats.statCategoryItem.category', 'accesses.user:id,name', 'confirmer:id,name']);
 
         return Inertia::render('NationalInsightCenterInfo/Edit', [
             'nationalInsightCenterInfo' => $nationalInsightCenterInfo,
@@ -312,6 +313,36 @@ class NationalInsightCenterInfoController extends Controller
             return redirect()
                 ->back()
                 ->with('error', 'Failed to delete national insight center info. Please try again.');
+        }
+    }
+
+    /**
+     * Confirm the national insight center info.
+     */
+    public function confirm(NationalInsightCenterInfo $nationalInsightCenterInfo): RedirectResponse
+    {
+        $this->authorize('confirm', $nationalInsightCenterInfo);
+
+        try {
+            $nationalInsightCenterInfo->update([
+                'confirmed' => true,
+                'confirmed_by' => Auth::id(),
+                'confirmed_at' => now(),
+            ]);
+
+            return redirect()
+                ->back()
+                ->with('success', 'National Insight Center Info confirmed successfully.');
+
+        } catch (\Exception $e) {
+            Log::error('Failed to confirm national insight center info', [
+                'error' => $e->getMessage(),
+                'national_insight_center_info_id' => $nationalInsightCenterInfo->id
+            ]);
+
+            return redirect()
+                ->back()
+                ->with('error', 'Failed to confirm national insight center info. Please try again.');
         }
     }
 

@@ -40,6 +40,11 @@ class NationalInsightCenterInfoPolicy
      */
     public function update(User $user, NationalInsightCenterInfo $nationalInsightCenterInfo): bool
     {
+        // Cannot update if confirmed
+        if ($nationalInsightCenterInfo->confirmed) {
+            return false;
+        }
+        
         return $user->hasPermissionTo('national_insight_center_info.update') && 
                ($nationalInsightCenterInfo->created_by === $user->id || $nationalInsightCenterInfo->hasAccess($user));
     }
@@ -49,6 +54,11 @@ class NationalInsightCenterInfoPolicy
      */
     public function delete(User $user, NationalInsightCenterInfo $nationalInsightCenterInfo): bool
     {
+        // Cannot delete if confirmed
+        if ($nationalInsightCenterInfo->confirmed) {
+            return false;
+        }
+        
         return $user->hasPermissionTo('national_insight_center_info.delete') && 
                $nationalInsightCenterInfo->created_by === $user->id;
     }
@@ -58,7 +68,10 @@ class NationalInsightCenterInfoPolicy
      */
     public function confirm(User $user, NationalInsightCenterInfo $nationalInsightCenterInfo): bool
     {
-        return $user->hasPermissionTo('national_insight_center_info.confirm');
+        // Only the creator can confirm and only if not already confirmed
+        return $user->hasPermissionTo('national_insight_center_info.confirm') && 
+               $nationalInsightCenterInfo->created_by === $user->id && 
+               !$nationalInsightCenterInfo->confirmed;
     }
 
     /**
@@ -66,6 +79,11 @@ class NationalInsightCenterInfoPolicy
      */
     public function restore(User $user, NationalInsightCenterInfo $nationalInsightCenterInfo): bool
     {
+        // Cannot restore if confirmed
+        if ($nationalInsightCenterInfo->confirmed) {
+            return false;
+        }
+        
         return $user->hasPermissionTo('national_insight_center_info.restore') && 
                $nationalInsightCenterInfo->created_by === $user->id;
     }
@@ -75,6 +93,11 @@ class NationalInsightCenterInfoPolicy
      */
     public function forceDelete(User $user, NationalInsightCenterInfo $nationalInsightCenterInfo): bool
     {
+        // Cannot force delete if confirmed
+        if ($nationalInsightCenterInfo->confirmed) {
+            return false;
+        }
+        
         return $user->hasPermissionTo('national_insight_center_info.force_delete') && 
                $nationalInsightCenterInfo->created_by === $user->id;
     }

@@ -31,8 +31,13 @@ class NationalInsightCenterInfoItemPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(User $user, NationalInsightCenterInfoItem $nationalInsightCenterInfoItem = null): bool
     {
+        // Cannot create if parent is confirmed
+        if ($nationalInsightCenterInfoItem && $nationalInsightCenterInfoItem->nationalInsightCenterInfo->confirmed) {
+            return false;
+        }
+        
         return $user->hasPermissionTo('national_insight_center_info_item.create');
     }
 
@@ -41,6 +46,11 @@ class NationalInsightCenterInfoItemPolicy
      */
     public function update(User $user, NationalInsightCenterInfoItem $nationalInsightCenterInfoItem): bool
     {
+        // Cannot update if parent is confirmed
+        if ($nationalInsightCenterInfoItem->nationalInsightCenterInfo->confirmed) {
+            return false;
+        }
+        
         return $user->hasPermissionTo('national_insight_center_info_item.update') && 
                ($nationalInsightCenterInfoItem->created_by === $user->id || 
                 $nationalInsightCenterInfoItem->nationalInsightCenterInfo->hasAccess($user));
@@ -51,6 +61,11 @@ class NationalInsightCenterInfoItemPolicy
      */
     public function delete(User $user, NationalInsightCenterInfoItem $nationalInsightCenterInfoItem): bool
     {
+        // Cannot delete if parent is confirmed
+        if ($nationalInsightCenterInfoItem->nationalInsightCenterInfo->confirmed) {
+            return false;
+        }
+        
         return $user->hasPermissionTo('national_insight_center_info_item.delete') && 
                ($nationalInsightCenterInfoItem->created_by === $user->id || 
                 $nationalInsightCenterInfoItem->nationalInsightCenterInfo->hasAccess($user));
@@ -69,6 +84,11 @@ class NationalInsightCenterInfoItemPolicy
      */
     public function restore(User $user, NationalInsightCenterInfoItem $nationalInsightCenterInfoItem): bool
     {
+        // Cannot restore if parent is confirmed
+        if ($nationalInsightCenterInfoItem->nationalInsightCenterInfo->confirmed) {
+            return false;
+        }
+        
         return $user->hasPermissionTo('national_insight_center_info_item.restore') && 
                ($nationalInsightCenterInfoItem->created_by === $user->id || 
                 $nationalInsightCenterInfoItem->nationalInsightCenterInfo->hasAccess($user));
@@ -79,6 +99,11 @@ class NationalInsightCenterInfoItemPolicy
      */
     public function forceDelete(User $user, NationalInsightCenterInfoItem $nationalInsightCenterInfoItem): bool
     {
+        // Cannot force delete if parent is confirmed
+        if ($nationalInsightCenterInfoItem->nationalInsightCenterInfo->confirmed) {
+            return false;
+        }
+        
         return $user->hasPermissionTo('national_insight_center_info_item.force_delete') && 
                ($nationalInsightCenterInfoItem->created_by === $user->id || 
                 $nationalInsightCenterInfoItem->nationalInsightCenterInfo->hasAccess($user));

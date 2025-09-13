@@ -25,6 +25,19 @@ class NationalInsightCenterInfo extends Model
         'description',
         'created_by',
         'updated_by',
+        'confirmed',
+        'confirmed_by',
+        'confirmed_at',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'confirmed' => 'boolean',
+        'confirmed_at' => 'datetime',
     ];
 
     /**
@@ -40,6 +53,7 @@ class NationalInsightCenterInfo extends Model
                 'created' => 'اطلاعات مرکز بینش ملی جدید ایجاد شد',
                 'updated' => 'اطلاعات مرکز بینش ملی بروزرسانی شد',
                 'deleted' => 'اطلاعات مرکز بینش ملی حذف شد',
+                'confirmed' => 'اطلاعات مرکز بینش ملی تأیید شد',
                 default => "عملیات {$eventName} روی اطلاعات مرکز بینش ملی انجام شد"
             });
     }
@@ -53,6 +67,7 @@ class NationalInsightCenterInfo extends Model
             'created' => 'اطلاعات مرکز بینش ملی جدید ایجاد شد',
             'updated' => 'اطلاعات مرکز بینش ملی بروزرسانی شد',
             'deleted' => 'اطلاعات مرکز بینش ملی حذف شد',
+            'confirmed' => 'اطلاعات مرکز بینش ملی تأیید شد',
             default => "عملیات {$eventName} روی اطلاعات مرکز بینش ملی انجام شد"
         };
     }
@@ -87,6 +102,14 @@ class NationalInsightCenterInfo extends Model
     public function updater(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    /**
+     * Get the user that confirmed this national insight center info.
+     */
+    public function confirmer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'confirmed_by');
     }
 
     /**
