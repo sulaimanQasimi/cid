@@ -410,8 +410,17 @@ class InfoTypeController extends Controller
             }
         ]);
 
+        // Load all infos with comprehensive relationships
         $infos = $infoType->infos()
-            ->with(['infoType:id,name', 'infoCategory:id,name'])
+            ->with([
+                'infoType:id,name',
+                'infoCategory:id,name,code',
+                'department:id,name,code',
+                'creator:id,name',
+                'confirmer:id,name',
+                'province:id,name',
+                'district:id,name'
+            ])
             ->orderBy('created_at', 'desc')
             ->get();
 
