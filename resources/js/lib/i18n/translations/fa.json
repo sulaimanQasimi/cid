@@ -1990,5 +1990,17 @@
     "national_insight_center_info.delete_dialog.confirm":"تأیید حذف",
     "national_insight_center_info.delete_dialog.delete":"حذف مرکز ملی بصیرت",
     "national_insight_center_info.delete_dialog.delete_button":"حذف مرکز ملی بصیرت",
-    "national_insight_center_info.delete_dialog.cancel_button":"انصراف"
+    "national_insight_center_info.delete_dialog.cancel_button":"انصراف",
+    "info_types.print.header_title":"گزارش تحلیلی و تفصيلي",
+    "info_types.print.code_label":"کد",
+    "info_types.print.category_label":"دسته",
+    "info_types.print.created_by_label":"ایجادکننده",
+    "info_types.print.confirmed_by_label":"تأیید شده توسط",
+    "info_types.print.confirmed_at_label":"تاریخ تأیید",
+    "info_types.print.department_label":"بخش",
+    "info_types.print.created_at_label":"تاریخ ایجاد",
+    "info_types.print.updated_at_label":"تاریخ بروزرسانی",
+    "info_types.print.province_label":"ولایت",
+    "info_types.print.district_label":"ولسوالی",
+    "info_types.print.info_type_label":"تحلیلی و تفصيلي"
 }
