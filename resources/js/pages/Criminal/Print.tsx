@@ -377,7 +377,7 @@ export default function CriminalPrint({ criminal }: Props) {
                 onClick={() => setShowSettingsModal(false)}
                 className="text-gray-500 hover:text-gray-700 focus:outline-none"
               >
-                 <X className="h-5 w-5" />
+                <X className="h-5 w-5" />
               </button>
             </div>
 
@@ -435,13 +435,13 @@ export default function CriminalPrint({ criminal }: Props) {
                 <div className="space-y-4">
                   <div className="flex items-center">
                     <Palette className="mr-2 h-5 w-5 text-primary" />
-                   <h3 className="text-md font-medium">{t('criminal.print.settings.colors.title')}</h3>
+                    <h3 className="text-md font-medium">{t('criminal.print.settings.colors.title')}</h3>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                       {t('criminal.print.settings.colors.header')}
+                        {t('criminal.print.settings.colors.header')}
                       </label>
                       <div className="flex items-center space-x-2">
                         <div className="relative">
@@ -469,7 +469,7 @@ export default function CriminalPrint({ criminal }: Props) {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                       {t('criminal.print.settings.colors.text')}
+                        {t('criminal.print.settings.colors.text')}
                       </label>
                       <div className="flex items-center space-x-2">
                         <div className="relative">
@@ -497,7 +497,7 @@ export default function CriminalPrint({ criminal }: Props) {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                       {t('criminal.print.settings.colors.accent')}
+                        {t('criminal.print.settings.colors.accent')}
                       </label>
                       <div className="flex items-center space-x-2">
                         <div className="relative">
@@ -531,13 +531,13 @@ export default function CriminalPrint({ criminal }: Props) {
                 <div className="space-y-4">
                   <div className="flex items-center">
                     <Type className="mr-2 h-5 w-5 text-primary" />
-                   <h3 className="text-md font-medium">{t('criminal.print.settings.typography.title')}</h3>
+                    <h3 className="text-md font-medium">{t('criminal.print.settings.typography.title')}</h3>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                       {t('criminal.print.settings.typography.font_family')}
+                        {t('criminal.print.settings.typography.font_family')}
                       </label>
                       <select
                         value={printSettings.fontFamily}
@@ -554,7 +554,7 @@ export default function CriminalPrint({ criminal }: Props) {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                       {t('criminal.print.settings.typography.font_size')}
+                        {t('criminal.print.settings.typography.font_size')}
                       </label>
                       <div className="flex items-center">
                         <input
@@ -579,13 +579,13 @@ export default function CriminalPrint({ criminal }: Props) {
                 <div className="space-y-4">
                   <div className="flex items-center">
                     <Layout className="mr-2 h-5 w-5 text-primary" />
-                   <h3 className="text-md font-medium">{t('criminal.print.settings.layout.title')}</h3>
+                    <h3 className="text-md font-medium">{t('criminal.print.settings.layout.title')}</h3>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                       {t('criminal.print.settings.layout.page_size')}
+                        {t('criminal.print.settings.layout.page_size')}
                       </label>
                       <select
                         value={printSettings.pageSize}
@@ -600,7 +600,7 @@ export default function CriminalPrint({ criminal }: Props) {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                       {t('criminal.print.settings.layout.orientation')}
+                        {t('criminal.print.settings.layout.orientation')}
                       </label>
                       <select
                         value={printSettings.orientation}
@@ -614,7 +614,7 @@ export default function CriminalPrint({ criminal }: Props) {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                       {t('criminal.print.settings.layout.margins')}
+                        {t('criminal.print.settings.layout.margins')}
                       </label>
                       <select
                         value={printSettings.margins}
@@ -635,21 +635,21 @@ export default function CriminalPrint({ criminal }: Props) {
                 <div className="space-y-4">
                   <div className="flex items-center">
                     <Tag className="mr-2 h-5 w-5 text-primary" />
-                   <h3 className="text-md font-medium">{t('criminal.print.settings.labels.title')}</h3>
+                    <h3 className="text-md font-medium">{t('criminal.print.settings.labels.title')}</h3>
                   </div>
 
                   <div className="grid grid-cols-1 gap-4">
                     <div className="border rounded-lg p-4 bg-gray-50">
-                       <h4 className="font-medium text-gray-700 mb-2">{t('criminal.print.settings.labels.report_header')}</h4>
+                      <h4 className="font-medium text-gray-700 mb-2">{t('criminal.print.settings.labels.report_header')}</h4>
                       <div className="grid grid-cols-1 gap-3">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                             {t('criminal.print.settings.labels.report_title')}
+                            {t('criminal.print.settings.labels.report_title')}
                           </label>
                           <input
                             type="text"
                             value={printSettings.labels.reportTitle}
-                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, reportTitle: e.target.value})}
+                            onChange={(e) => handleSettingsChange('labels', { ...printSettings.labels, reportTitle: e.target.value })}
                             className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                           />
                         </div>
@@ -657,60 +657,60 @@ export default function CriminalPrint({ criminal }: Props) {
                     </div>
 
                     <div className="border rounded-lg p-4 bg-gray-50">
-                       <h4 className="font-medium text-gray-700 mb-2">{t('criminal.print.settings.labels.personal_information')}</h4>
+                      <h4 className="font-medium text-gray-700 mb-2">{t('criminal.print.settings.labels.personal_information')}</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                             {t('criminal.print.settings.labels.name')}
+                            {t('criminal.print.settings.labels.name')}
                           </label>
                           <input
                             type="text"
                             value={printSettings.labels.name}
-                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, name: e.target.value})}
+                            onChange={(e) => handleSettingsChange('labels', { ...printSettings.labels, name: e.target.value })}
                             className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                             {t('criminal.print.settings.labels.father_name')}
+                            {t('criminal.print.settings.labels.father_name')}
                           </label>
                           <input
                             type="text"
                             value={printSettings.labels.fatherName}
-                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, fatherName: e.target.value})}
+                            onChange={(e) => handleSettingsChange('labels', { ...printSettings.labels, fatherName: e.target.value })}
                             className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                             {t('criminal.print.settings.labels.grandfather_name')}
+                            {t('criminal.print.settings.labels.grandfather_name')}
                           </label>
                           <input
                             type="text"
                             value={printSettings.labels.grandfatherName}
-                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, grandfatherName: e.target.value})}
+                            onChange={(e) => handleSettingsChange('labels', { ...printSettings.labels, grandfatherName: e.target.value })}
                             className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                             {t('criminal.print.settings.labels.id_card_number')}
+                            {t('criminal.print.settings.labels.id_card_number')}
                           </label>
                           <input
                             type="text"
                             value={printSettings.labels.idCard}
-                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, idCard: e.target.value})}
+                            onChange={(e) => handleSettingsChange('labels', { ...printSettings.labels, idCard: e.target.value })}
                             className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                             {t('criminal.print.settings.labels.phone_number')}
+                            {t('criminal.print.settings.labels.phone_number')}
                           </label>
                           <input
                             type="text"
                             value={printSettings.labels.phoneNumber}
-                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, phoneNumber: e.target.value})}
+                            onChange={(e) => handleSettingsChange('labels', { ...printSettings.labels, phoneNumber: e.target.value })}
                             className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                           />
                         </div>
@@ -718,27 +718,27 @@ export default function CriminalPrint({ criminal }: Props) {
                     </div>
 
                     <div className="border rounded-lg p-4 bg-gray-50">
-                       <h4 className="font-medium text-gray-700 mb-2">{t('criminal.print.settings.labels.residence_information')}</h4>
+                      <h4 className="font-medium text-gray-700 mb-2">{t('criminal.print.settings.labels.residence_information')}</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                             {t('criminal.print.settings.labels.original_residence')}
+                            {t('criminal.print.settings.labels.original_residence')}
                           </label>
                           <input
                             type="text"
                             value={printSettings.labels.originalResidence}
-                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, originalResidence: e.target.value})}
+                            onChange={(e) => handleSettingsChange('labels', { ...printSettings.labels, originalResidence: e.target.value })}
                             className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                             {t('criminal.print.settings.labels.current_residence')}
+                            {t('criminal.print.settings.labels.current_residence')}
                           </label>
                           <input
                             type="text"
                             value={printSettings.labels.currentResidence}
-                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, currentResidence: e.target.value})}
+                            onChange={(e) => handleSettingsChange('labels', { ...printSettings.labels, currentResidence: e.target.value })}
                             className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                           />
                         </div>
@@ -746,38 +746,38 @@ export default function CriminalPrint({ criminal }: Props) {
                     </div>
 
                     <div className="border rounded-lg p-4 bg-gray-50">
-                       <h4 className="font-medium text-gray-700 mb-2">{t('criminal.print.settings.labels.crime_information')}</h4>
+                      <h4 className="font-medium text-gray-700 mb-2">{t('criminal.print.settings.labels.crime_information')}</h4>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                             {t('criminal.print.settings.labels.crime_type')}
+                            {t('criminal.print.settings.labels.crime_type')}
                           </label>
                           <input
                             type="text"
                             value={printSettings.labels.crimeType}
-                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, crimeType: e.target.value})}
+                            onChange={(e) => handleSettingsChange('labels', { ...printSettings.labels, crimeType: e.target.value })}
                             className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                             {t('criminal.print.settings.labels.arrest_date')}
+                            {t('criminal.print.settings.labels.arrest_date')}
                           </label>
                           <input
                             type="text"
                             value={printSettings.labels.arrestDate}
-                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, arrestDate: e.target.value})}
+                            onChange={(e) => handleSettingsChange('labels', { ...printSettings.labels, arrestDate: e.target.value })}
                             className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                             {t('criminal.print.settings.labels.arrest_location')}
+                            {t('criminal.print.settings.labels.arrest_location')}
                           </label>
                           <input
                             type="text"
                             value={printSettings.labels.arrestLocation}
-                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, arrestLocation: e.target.value})}
+                            onChange={(e) => handleSettingsChange('labels', { ...printSettings.labels, arrestLocation: e.target.value })}
                             className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                           />
                         </div>
@@ -785,38 +785,38 @@ export default function CriminalPrint({ criminal }: Props) {
                     </div>
 
                     <div className="border rounded-lg p-4 bg-gray-50">
-                       <h4 className="font-medium text-gray-700 mb-2">{t('criminal.print.settings.labels.investigation_details')}</h4>
+                      <h4 className="font-medium text-gray-700 mb-2">{t('criminal.print.settings.labels.investigation_details')}</h4>
                       <div className="grid grid-cols-1 gap-3">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                             {t('criminal.print.settings.labels.investigation_title')}
+                            {t('criminal.print.settings.labels.investigation_title')}
                           </label>
                           <input
                             type="text"
                             value={printSettings.labels.investigationTitle}
-                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, investigationTitle: e.target.value})}
+                            onChange={(e) => handleSettingsChange('labels', { ...printSettings.labels, investigationTitle: e.target.value })}
                             className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                             {t('criminal.print.settings.labels.final_verdict')}
+                            {t('criminal.print.settings.labels.final_verdict')}
                           </label>
                           <input
                             type="text"
                             value={printSettings.labels.finalVerdict}
-                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, finalVerdict: e.target.value})}
+                            onChange={(e) => handleSettingsChange('labels', { ...printSettings.labels, finalVerdict: e.target.value })}
                             className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                             {t('criminal.print.settings.labels.notes')}
+                            {t('criminal.print.settings.labels.notes')}
                           </label>
                           <input
                             type="text"
                             value={printSettings.labels.notes}
-                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, notes: e.target.value})}
+                            onChange={(e) => handleSettingsChange('labels', { ...printSettings.labels, notes: e.target.value })}
                             className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                           />
                         </div>
@@ -824,27 +824,27 @@ export default function CriminalPrint({ criminal }: Props) {
                     </div>
 
                     <div className="border rounded-lg p-4 bg-gray-50">
-                       <h4 className="font-medium text-gray-700 mb-2">{t('criminal.print.settings.labels.footer_information')}</h4>
+                      <h4 className="font-medium text-gray-700 mb-2">{t('criminal.print.settings.labels.footer_information')}</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                             {t('criminal.print.settings.labels.investigator')}
+                            {t('criminal.print.settings.labels.investigator')}
                           </label>
                           <input
                             type="text"
                             value={printSettings.labels.investigator}
-                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, investigator: e.target.value})}
+                            onChange={(e) => handleSettingsChange('labels', { ...printSettings.labels, investigator: e.target.value })}
                             className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                             {t('criminal.print.settings.labels.director_signature')}
+                            {t('criminal.print.settings.labels.director_signature')}
                           </label>
                           <input
                             type="text"
                             value={printSettings.labels.directorSignature}
-                            onChange={(e) => handleSettingsChange('labels', {...printSettings.labels, directorSignature: e.target.value})}
+                            onChange={(e) => handleSettingsChange('labels', { ...printSettings.labels, directorSignature: e.target.value })}
                             className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                           />
                         </div>
@@ -928,7 +928,7 @@ export default function CriminalPrint({ criminal }: Props) {
               <div className="w-24 text-center">
                 {criminal.department?.code && (
                   <div className="text-xs font-semibold text-neutral-500 border rounded-md py-1 px-2"
-                       style={{ borderColor: `${printSettings.accentColor}20` }}>
+                    style={{ borderColor: `${printSettings.accentColor}20` }}>
                     {criminal.department.code}
                   </div>
                 )}
@@ -936,7 +936,7 @@ export default function CriminalPrint({ criminal }: Props) {
               <h1 className="text-2xl font-bold" style={{ color: printSettings.accentColor }}>{printSettings.labels.reportTitle}</h1>
               <div className="w-24 text-center">
                 <div className="text-xs font-semibold text-neutral-500 border rounded-md py-1 px-2"
-                     style={{ borderColor: `${printSettings.accentColor}20` }}>
+                  style={{ borderColor: `${printSettings.accentColor}20` }}>
                   {formatDate(criminal.created_at)}
                 </div>
               </div>
