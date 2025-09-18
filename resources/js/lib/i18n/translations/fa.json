@@ -2046,6 +2046,22 @@
     "criminal.print.settings.date_format.gregorian": "میلادی (Gregorian)",
     "criminal.print.settings.date_format.hijri": "هجری (Hijri)",
     "criminal.print.settings.date_format.persian": "شمسی (Persian)",
+    "info_types.print.settings_button": "تنظیمات چاپ",
+    "info_types.print.settings.title": "تنظیمات چاپ",
+    "info_types.print.settings.tabs.colors": "رنگ ها",
+    "info_types.print.settings.tabs.typography": "نوع فونت",
+    "info_types.print.settings.tabs.layout": "طرح",
+    "info_types.print.settings.tabs.labels": "برچسب ها",
+    "info_types.print.settings.tabs.date_format": "فرمت تاریخ",
+    "info_types.print.settings.colors.title": "رنگ ها",
+    "info_types.print.settings.colors.header": "عنوان",
+    "info_types.print.settings.colors.text": "متن",
+    "info_types.print.settings.colors.accent": "اکسانت",
+    "info_types.print.settings.date_format.title": "فرمت تاریخ",
+    "info_types.print.settings.date_format.gregorian": "میلادی (Gregorian)",
+    "info_types.print.settings.date_format.hijri": "هجری (Hijri)",
+    "info_types.print.settings.date_format.persian": "شمسی (Persian)",
+    "info_types.print.settings.apply_and_print": "اعمال و چاپ",
     "incidents.incident_date": "تاریخ پیشانی",
     "incidents.severity": "شدت",
     "incidents.location": "محل",
@@ -2054,5 +2070,7 @@
     "incident_reports.print.generated_on": "تاریخ تولید گزارش",
     "incidents.district": "ولسوالی",
     "incident_reports.print.print_button": "چاپ کول",
-    "incident_reports.print.back_button": "بازگشت"
+    "incident_reports.print.back_button": "بازگشت",
+    "info_types.print.no_description": "توضیحات ندارد"
+
 }
