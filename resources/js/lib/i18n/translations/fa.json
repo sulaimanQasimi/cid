@@ -2045,5 +2045,12 @@
     "criminal.print.settings.date_format.title": "فرمت تاریخ",
     "criminal.print.settings.date_format.gregorian": "میلادی (Gregorian)",
     "criminal.print.settings.date_format.hijri": "هجری (Hijri)",
-    "criminal.print.settings.date_format.persian": "شمسی (Persian)"
+    "criminal.print.settings.date_format.persian": "شمسی (Persian)",
+    "incidents.incident_date": "تاریخ پیشانی",
+    "incidents.severity": "شدت",
+    "incidents.location": "محل",
+    "incidents.category": "دسته",
+    "incidents.description": "توضیحات",
+    "incident_reports.print.generated_on": "تاریخ تولید گزارش",
+    "incidents.district": "ولسوالی"
 }
