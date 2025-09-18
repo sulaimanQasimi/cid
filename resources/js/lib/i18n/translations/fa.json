@@ -2040,5 +2040,10 @@
     "criminal.print.settings.labels.notes": "یادداشت‌ها",
     "criminal.print.settings.labels.footer_information": "اطلاعات پاورقی",
     "criminal.print.settings.labels.investigator": "نام محقق",
-    "criminal.print.settings.labels.director_signature": "امضای مدیر تحقیق"
+    "criminal.print.settings.labels.director_signature": "امضای مدیر تحقیق",
+    "criminal.print.settings.tabs.date_format": "فرمت تاریخ",
+    "criminal.print.settings.date_format.title": "فرمت تاریخ",
+    "criminal.print.settings.date_format.gregorian": "میلادی (Gregorian)",
+    "criminal.print.settings.date_format.hijri": "هجری (Hijri)",
+    "criminal.print.settings.date_format.persian": "شمسی (Persian)"
 }

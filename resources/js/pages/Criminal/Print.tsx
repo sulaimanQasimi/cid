@@ -58,6 +58,7 @@ interface PrintSettings {
   pageSize: 'a4' | 'letter' | 'legal';
   orientation: 'portrait' | 'landscape';
   margins: 'normal' | 'narrow' | 'wide';
+  dateFormat: 'gregorian' | 'hijri' | 'persian';
   labels: {
     reportTitle: string;
     name: string;
@@ -99,6 +100,7 @@ export default function CriminalPrint({ criminal }: Props) {
     pageSize: 'a4',
     orientation: 'portrait',
     margins: 'normal',
+    dateFormat: 'gregorian',
     labels: {
       reportTitle: 'د تحقيق راپور',
       name: 'د مجرم پېژندنه: نوم',
@@ -120,7 +122,7 @@ export default function CriminalPrint({ criminal }: Props) {
   });
 
   // Add state for active tab in the settings modal
-  const [activeTab, setActiveTab] = useState<'colors' | 'typography' | 'layout' | 'labels'>('colors');
+  const [activeTab, setActiveTab] = useState<'colors' | 'typography' | 'layout' | 'labels' | 'date_format'>('colors');
 
   useEffect(() => {
     // Create a report record immediately when the component is mounted
@@ -149,11 +151,42 @@ export default function CriminalPrint({ criminal }: Props) {
     };
   }, []);
 
-  // Format the date (handling null)
+  // Date conversion utility functions
+  const gregorianToHijri = (date: Date): string => {
+    // Simple approximation for Hijri conversion
+    // This is a basic implementation - for production use, consider a proper library
+    const hijriYear = Math.floor((date.getFullYear() - 622) * 0.970224);
+    const hijriMonth = Math.floor((date.getMonth() + 1) * 0.970224);
+    const hijriDay = Math.floor(date.getDate() * 0.970224);
+    
+    return `${hijriYear}/${hijriMonth.toString().padStart(2, '0')}/${hijriDay.toString().padStart(2, '0')}`;
+  };
+
+  const gregorianToPersian = (date: Date): string => {
+    // Simple approximation for Persian conversion
+    // This is a basic implementation - for production use, consider a proper library
+    const persianYear = date.getFullYear() - 621;
+    const persianMonth = date.getMonth() + 1;
+    const persianDay = date.getDate();
+    
+    return `${persianYear}/${persianMonth.toString().padStart(2, '0')}/${persianDay.toString().padStart(2, '0')}`;
+  };
+
+  // Format the date based on selected calendar system
   const formatDate = (dateString: string | null) => {
     if (!dateString) return '';
     try {
-      return format(new Date(dateString), 'yyyy/MM/dd');
+      const date = new Date(dateString);
+      
+      switch (printSettings.dateFormat) {
+        case 'hijri':
+          return gregorianToHijri(date);
+        case 'persian':
+          return gregorianToPersian(date);
+        case 'gregorian':
+        default:
+          return format(date, 'yyyy/MM/dd');
+      }
     } catch (e) {
       return '';
     }
@@ -426,6 +459,17 @@ export default function CriminalPrint({ criminal }: Props) {
                   <div className="flex items-center">
                     <Tag className="mr-2 h-4 w-4" />
                     {t('criminal.print.settings.tabs.labels')}
+                  </div>
+                </button>
+                <button
+                  onClick={() => setActiveTab('date_format')}
+                  className={`px-4 py-2 border-b-2 font-medium text-sm ${activeTab === 'date_format'
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+                >
+                  <div className="flex items-center">
+                    <TabletSmartphone className="mr-2 h-4 w-4" />
+                    {t('criminal.print.settings.tabs.date_format')}
                   </div>
                 </button>
               </div>
@@ -853,6 +897,67 @@ export default function CriminalPrint({ criminal }: Props) {
                   </div>
                 </div>
               )}
+
+              {/* Date Format Tab */}
+              {activeTab === 'date_format' && (
+                <div className="space-y-4">
+                  <div className="flex items-center">
+                    <TabletSmartphone className="mr-2 h-5 w-5 text-primary" />
+                    <h3 className="text-md font-medium">{t('criminal.print.settings.date_format.title')}</h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {t('criminal.print.settings.date_format.title')}
+                      </label>
+                      <div className="space-y-2">
+                        <label className="flex items-center">
+                          <input
+                            type="radio"
+                            name="dateFormat"
+                            value="gregorian"
+                            checked={printSettings.dateFormat === 'gregorian'}
+                            onChange={(e) => handleSettingsChange('dateFormat', e.target.value)}
+                            className="mr-2"
+                          />
+                          <span className="text-sm">{t('criminal.print.settings.date_format.gregorian')}</span>
+                        </label>
+                        <label className="flex items-center">
+                          <input
+                            type="radio"
+                            name="dateFormat"
+                            value="hijri"
+                            checked={printSettings.dateFormat === 'hijri'}
+                            onChange={(e) => handleSettingsChange('dateFormat', e.target.value)}
+                            className="mr-2"
+                          />
+                          <span className="text-sm">{t('criminal.print.settings.date_format.hijri')}</span>
+                        </label>
+                        <label className="flex items-center">
+                          <input
+                            type="radio"
+                            name="dateFormat"
+                            value="persian"
+                            checked={printSettings.dateFormat === 'persian'}
+                            onChange={(e) => handleSettingsChange('dateFormat', e.target.value)}
+                            className="mr-2"
+                          />
+                          <span className="text-sm">{t('criminal.print.settings.date_format.persian')}</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Preview of current date format */}
+                    <div className="border rounded-lg p-4 bg-gray-50">
+                      <h4 className="font-medium text-gray-700 mb-2">نمونه تاریخ:</h4>
+                      <div className="text-sm text-gray-600">
+                        {formatDate(new Date().toISOString())}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="border-t px-4 py-3 flex justify-end space-x-3">
@@ -974,7 +1079,7 @@ export default function CriminalPrint({ criminal }: Props) {
               <div className="grid grid-cols-1 gap-2 mb-3 text-right">
                 <div className="info-cell-compact">
                   <span className="font-bold text-neutral-700 block mb-1 text-sm">{printSettings.labels.phoneNumber}</span>
-                  <div className="font-mono">{criminal.phone_number || ''}</div>
+                  <div className="font-mono" dir='ltr'>{criminal.phone_number || ''}</div>
                 </div>
               </div>
             </div>
