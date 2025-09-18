@@ -119,20 +119,6 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
 
     // Incident Management
     const incidentItems: NavItem[] = [];
-    if (auth.permissions.includes('incident.view_any')) {
-        incidentItems.push({
-            title: t('sidebar.active_incidents'),
-            href: '/incidents',
-            icon: AlertCircle
-        });
-    }
-    if (auth.is_admin) {
-        incidentItems.push({
-            title: t('incident_reports-access'),
-            href: '/incident-report-access',
-            icon: FileBarChart
-        });
-    }
     if (auth.permissions.includes('incident_report.view_any')) {
         incidentItems.push({
             title: t('sidebar.incident_reports'),

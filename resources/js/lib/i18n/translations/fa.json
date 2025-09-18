@@ -2052,5 +2052,7 @@
     "incidents.category": "دسته",
     "incidents.description": "توضیحات",
     "incident_reports.print.generated_on": "تاریخ تولید گزارش",
-    "incidents.district": "ولسوالی"
+    "incidents.district": "ولسوالی",
+    "incident_reports.print.print_button": "چاپ کول",
+    "incident_reports.print.back_button": "بازگشت"
 }
