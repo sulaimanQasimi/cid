@@ -45,19 +45,19 @@ class User extends Authenticatable
 
     public function canCreateChats(): bool
     {
-        return $this->hasAnyRole(['superadmin', 'admin']);
+        return true;
     }
 
     public function canUpdateChats(): bool
     {
-        return $this->hasAnyRole(['superadmin', 'admin']);
+        return true;
     }
     
     
 
     public function canCreateGroups(): bool
     {
-        return $this->hasAnyRole(['superadmin', 'admin']);
+        return true;
     }
 
     /**
