@@ -247,24 +247,24 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
           sortOptions={sortOptions}
           perPageOptions={perPageOptions}
           title={t('incident_reports.search_filters')}
-          description="Find and filter incident reports"
+          description={t('incident_reports.search_filters_description')}
           className="shadow-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl"
         />
 
         {/* Results Table */}
         <div className="mt-8">
-          <Card className="shadow-2xl overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl">
-            <CardHeader className="bg-gradient-to-l from-stone-500 to-stone-600 text-white py-6">
-              <CardTitle className="flex items-center gap-4">
-                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
-                  <TrendingUp className="h-6 w-6" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold">{t('incident_reports.table.title')}</div>
-                  <div className="text-stone-100 text-sm font-medium">Incident reports overview</div>
-                </div>
-              </CardTitle>
-            </CardHeader>
+          <Header
+            title={t('incident_reports.table.title')}
+            description={t('incident_reports.table.overview')}
+            icon={<TrendingUp className="h-6 w-6 text-white" />}
+            model="incident_report"
+            theme="stone"
+            showBackButton={false}
+            showButton={false}
+            routeName=""
+            buttonText=""
+          />
+          <Card className="shadow-2xl overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl mt-6">
             <CardContent className="p-0">
               <div className="overflow-hidden rounded-b-3xl">
                 <table className="w-full caption-bottom text-sm">
@@ -329,7 +329,7 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
                               <AlertTriangle className="h-16 w-16 text-gray-400" />
                             </div>
                             <p className="text-xl font-bold">{t('incident_reports.no_reports')}</p>
-                            <p className="text-gray-500 dark:text-gray-400">No incident reports found</p>
+                            <p className="text-gray-500 dark:text-gray-400">{t('incident_reports.no_reports_found')}</p>
                           </div>
                         </td>
                       </tr>
