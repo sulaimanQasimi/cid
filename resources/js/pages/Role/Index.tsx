@@ -168,7 +168,7 @@ export default function Index({ auth, roles, permissions }: RoleIndexProps) {
                       variant="outline"
                       size="sm"
                       asChild
-                      className="flex-1 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="flex-1 text-gray-700 dark:bg-blue-900 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <Link href={route('roles.edit', role.id)} className="flex items-center gap-2">
                         <Pencil className="h-4 w-4" />
@@ -180,7 +180,7 @@ export default function Index({ auth, roles, permissions }: RoleIndexProps) {
                         variant="outline"
                         size="sm"
                         onClick={() => confirmDelete(role)}
-                        className="text-red-600 dark:text-red-400 border-red-300 dark:border-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                        className="text-red-600 dark:text-red-400 dark:bg-gray-700 dark:text-red-400 border-red-300 dark:border-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                       >
                         <Trash className="h-4 w-4" />
                       </Button>

@@ -26,6 +26,7 @@ import { Separator } from '@/components/ui/separator';
 import { useTranslation } from '@/lib/i18n/translate';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import Header from '@/components/template/header';
 
 interface EditIncidentProps {
   incident: {
@@ -114,14 +115,14 @@ export default function Edit({ incident, districts, categories, reports }: EditI
       <Head title={t('incidents.edit_title', { name: incident.title })} />
       <div className="container px-0 py-6">
         {/* Header with gradient background */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-l from-blue-600 via-indigo-600 to-purple-600 p-8 text-white shadow-2xl mb-8">
+        <div className="relative overflow-hidden  bg-gradient-to-l from-blue-600 via-indigo-600 to-purple-600 p-8 text-white shadow-2xl mb-8">
           <div className="absolute inset-0 bg-black/10"></div>
-          <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 -translate-x-32"></div>
-          <div className="absolute bottom-0 right-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 translate-x-24"></div>
+          <div className="absolute top-0 left-0 w-64 h-64 bg-white/10  -translate-y-32 -translate-x-32"></div>
+          <div className="absolute bottom-0 right-0 w-48 h-48 bg-white/5  translate-y-24 translate-x-24"></div>
           
           <div className="relative z-10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
             <div className="flex items-center gap-6">
-              <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl border border-white/30">
+              <div className="p-4 bg-white/20 backdrop-blur-sm  border border-white/30">
                 <Shield className="h-8 w-8 text-white" />
               </div>
               <div>
@@ -133,7 +134,7 @@ export default function Edit({ incident, districts, categories, reports }: EditI
               </div>
             </div>
             
-            <Button asChild className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 rounded-full shadow-lg">
+            <Button asChild className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30  shadow-lg">
               <Link href={route('incidents.show', incident.id)}>
                 <ArrowRight className="ml-2 h-4 w-4" />
                 {t('incidents.back_to_incident')}
@@ -144,7 +145,7 @@ export default function Edit({ incident, districts, categories, reports }: EditI
 
         <form onSubmit={submit}>
         {incident.is_confirmed && (
-          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
+          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 ">
             <div className="flex items-center gap-3">
               <AlertTriangle className="h-5 w-5 text-yellow-600" />
               <div>
@@ -154,18 +155,20 @@ export default function Edit({ incident, districts, categories, reports }: EditI
             </div>
           </div>
         )}
+        <Header
+          title={t('incidents.basic_info')}
+          description={t('incidents.basic_info_description')}
+          icon={<FileText className="h-5 w-5" />}
+          model="incidents"
+          routeName={() => route('incidents.index')}
+          buttonText={t('common.back')}
+          theme="blue"
+          showBackButton={true}
+          backRouteName={() => route('incidents.index')}
+          backButtonText={t('common.back')}
+          showButton={false}
+        />
         <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30">
-          <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 text-white border-b pb-4">
-            <CardTitle className="flex items-center gap-3 text-lg">
-              <div className="p-2 bg-white/20 rounded-lg">
-                <FileText className="h-5 w-5" />
-              </div>
-              {t('incidents.basic_info')}
-            </CardTitle>
-            <CardDescription className="text-blue-100">
-              {t('incidents.basic_info_description')}
-            </CardDescription>
-          </CardHeader>
           <CardContent className="p-6 space-y-6">
             <div className="grid gap-6 sm:grid-cols-2">
               <div className="space-y-3">
@@ -182,7 +185,7 @@ export default function Edit({ incident, districts, categories, reports }: EditI
                   required
                   className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
                 />
-                {errors.title && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                {errors.title && <p className="text-sm text-red-500 font-medium bg-red-50 p-2  border border-red-200 flex items-center gap-2 text-right">
                   <AlertTriangle className="h-4 w-4" />
                   {errors.title}
                 </p>}
@@ -202,7 +205,7 @@ export default function Edit({ incident, districts, categories, reports }: EditI
                   required
                   className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
                 />
-                {errors.incident_type && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                {errors.incident_type && <p className="text-sm text-red-500 font-medium bg-red-50 p-2  border border-red-200 flex items-center gap-2 text-right">
                   <AlertTriangle className="h-4 w-4" />
                   {errors.incident_type}
                 </p>}
@@ -224,7 +227,7 @@ export default function Edit({ incident, districts, categories, reports }: EditI
                 required
                 className="min-h-[120px] resize-none border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
               />
-              {errors.description && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+              {errors.description && <p className="text-sm text-red-500 font-medium bg-red-50 p-2  border border-red-200 flex items-center gap-2 text-right">
                 <AlertTriangle className="h-4 w-4" />
                 {errors.description}
               </p>}
@@ -248,7 +251,7 @@ export default function Edit({ incident, districts, categories, reports }: EditI
                   />
                   <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-400 pointer-events-none" />
                 </div>
-                {errors.incident_date && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                {errors.incident_date && <p className="text-sm text-red-500 font-medium bg-red-50 p-2  border border-red-200 flex items-center gap-2 text-right">
                   <AlertTriangle className="h-4 w-4" />
                   {errors.incident_date}
                 </p>}
@@ -269,7 +272,7 @@ export default function Edit({ incident, districts, categories, reports }: EditI
                   />
                   <Clock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-400 pointer-events-none" />
                 </div>
-                {errors.incident_time && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                {errors.incident_time && <p className="text-sm text-red-500 font-medium bg-red-50 p-2  border border-red-200 flex items-center gap-2 text-right">
                   <AlertTriangle className="h-4 w-4" />
                   {errors.incident_time}
                 </p>}
@@ -278,15 +281,20 @@ export default function Edit({ incident, districts, categories, reports }: EditI
           </CardContent>
         </Card>
 
+        <Header
+          title={t('incidents.location_classification')}
+          description=""
+          icon={<MapPin className="h-5 w-5" />}
+          model="incidents"
+          routeName={() => route('incidents.index')}
+          buttonText={t('common.back')}
+          theme="blue"
+          showBackButton={true}
+          backRouteName={() => route('incidents.index')}
+          backButtonText={t('common.back')}
+          showButton={false}
+        />
         <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30">
-          <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 text-white border-b pb-4">
-            <CardTitle className="flex items-center gap-3 text-lg">
-              <div className="p-2 bg-white/20 rounded-lg">
-                <MapPin className="h-5 w-5" />
-              </div>
-              {t('incidents.location_classification')}
-            </CardTitle>
-          </CardHeader>
           <CardContent className="p-6 space-y-6">
             <div className="grid gap-6 sm:grid-cols-2">
               <div className="space-y-3">
@@ -311,7 +319,7 @@ export default function Edit({ incident, districts, categories, reports }: EditI
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.district_id && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                {errors.district_id && <p className="text-sm text-red-500 font-medium bg-red-50 p-2  border border-red-200 flex items-center gap-2 text-right">
                   <AlertTriangle className="h-4 w-4" />
                   {errors.district_id}
                 </p>}
@@ -339,7 +347,7 @@ export default function Edit({ incident, districts, categories, reports }: EditI
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.incident_category_id && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                {errors.incident_category_id && <p className="text-sm text-red-500 font-medium bg-red-50 p-2  border border-red-200 flex items-center gap-2 text-right">
                   <AlertTriangle className="h-4 w-4" />
                   {errors.incident_category_id}
                 </p>}
@@ -358,7 +366,7 @@ export default function Edit({ incident, districts, categories, reports }: EditI
                 placeholder={t('incidents.form.location_placeholder')}
                 className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
               />
-              {errors.location && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+              {errors.location && <p className="text-sm text-red-500 font-medium bg-red-50 p-2  border border-red-200 flex items-center gap-2 text-right">
                 <AlertTriangle className="h-4 w-4" />
                 {errors.location}
               </p>}
@@ -376,7 +384,7 @@ export default function Edit({ incident, districts, categories, reports }: EditI
                 placeholder={t('incidents.form.coordinates_placeholder')}
                 className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
               />
-              {errors.coordinates && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+              {errors.coordinates && <p className="text-sm text-red-500 font-medium bg-red-50 p-2  border border-red-200 flex items-center gap-2 text-right">
                 <AlertTriangle className="h-4 w-4" />
                 {errors.coordinates}
               </p>}
@@ -387,7 +395,7 @@ export default function Edit({ incident, districts, categories, reports }: EditI
         <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30">
           <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 text-white border-b pb-4">
             <CardTitle className="flex items-center gap-3 text-lg">
-              <div className="p-2 bg-white/20 rounded-lg">
+              <div className="p-2 bg-white/20 ">
                 <AlertCircle className="h-5 w-5" />
               </div>
               {t('incidents.impact_status')}
@@ -408,7 +416,7 @@ export default function Edit({ incident, districts, categories, reports }: EditI
                   onChange={e => setData('casualties', e.target.value)}
                   className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
                 />
-                {errors.casualties && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                {errors.casualties && <p className="text-sm text-red-500 font-medium bg-red-50 p-2  border border-red-200 flex items-center gap-2 text-right">
                   <AlertTriangle className="h-4 w-4" />
                   {errors.casualties}
                 </p>}
@@ -427,7 +435,7 @@ export default function Edit({ incident, districts, categories, reports }: EditI
                   onChange={e => setData('injuries', e.target.value)}
                   className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
                 />
-                {errors.injuries && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                {errors.injuries && <p className="text-sm text-red-500 font-medium bg-red-50 p-2  border border-red-200 flex items-center gap-2 text-right">
                   <AlertTriangle className="h-4 w-4" />
                   {errors.injuries}
                 </p>}
@@ -455,7 +463,7 @@ export default function Edit({ incident, districts, categories, reports }: EditI
                   <SelectItem value="closed">{t('incidents.status.closed')}</SelectItem>
                 </SelectContent>
               </Select>
-              {errors.status && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+              {errors.status && <p className="text-sm text-red-500 font-medium bg-red-50 p-2  border border-red-200 flex items-center gap-2 text-right">
                 <AlertTriangle className="h-4 w-4" />
                 {errors.status}
               </p>}
@@ -484,7 +492,7 @@ export default function Edit({ incident, districts, categories, reports }: EditI
                   ))}
                 </SelectContent>
               </Select>
-              {errors.incident_report_id && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+              {errors.incident_report_id && <p className="text-sm text-red-500 font-medium bg-red-50 p-2  border border-red-200 flex items-center gap-2 text-right">
                 <AlertTriangle className="h-4 w-4" />
                 {errors.incident_report_id}
               </p>}
@@ -495,7 +503,7 @@ export default function Edit({ incident, districts, categories, reports }: EditI
             <Button
               variant="outline"
               asChild
-              className="rounded-full border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 shadow-lg"
+              className=" border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 shadow-lg"
             >
               <Link href={route('incidents.show', incident.id)}>
                 {t('common.cancel')}
@@ -504,7 +512,7 @@ export default function Edit({ incident, districts, categories, reports }: EditI
             <Button
               type="submit"
               disabled={processing}
-              className="rounded-full px-8 font-medium bg-gradient-to-l from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+              className=" px-8 font-medium bg-gradient-to-l from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
             >
               <Save className="mr-2 h-4 w-4" />
               {processing ? t('incidents.updating') : t('incidents.update_incident')}

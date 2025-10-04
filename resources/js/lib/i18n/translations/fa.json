@@ -214,6 +214,7 @@
     "users.table.actions":"عملیات",
     "users.actions.view":"کتل",
     "users.actions.edit":"سمول",
+    "roles.role_name_placeholder":"نام نقش (اختیاری)",
     "users.actions.delete":"ړنګول",
     "users.no_records":"هیڅ کارونکي ونه موندل شول",
     "users.pagination":"پاڼه {{current}} له {{total}} څخه",
