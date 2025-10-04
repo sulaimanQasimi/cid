@@ -133,12 +133,12 @@ export default function NationalInsightCenterInfosCreate({ users }: CreateProps)
               <Card className="shadow-2xl bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 overflow-hidden">
                 <CardContent className="p-8">
                   <Tabs defaultValue="basic" className="w-full" dir="rtl">
-                    <TabsList className="grid w-full grid-cols-3 mb-8">
-                      <TabsTrigger value="basic" className="flex items-center gap-2">
+                    <TabsList className="grid w-full grid-cols-3 mb-8 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                      <TabsTrigger value="basic" className="flex items-center gap-2 data-[state=active]:bg-purple-600 data-[state=active]:text-white dark:data-[state=active]:bg-purple-700 dark:data-[state=active]:text-white hover:bg-purple-100 dark:hover:bg-gray-700 transition-colors">
                         <FileText className="h-4 w-4" />
                         {t('national_insight_center_info.basic_info')}
                       </TabsTrigger>
-                      <TabsTrigger value="access" className="flex items-center gap-2">
+                      <TabsTrigger value="access" className="flex items-center gap-2 data-[state=active]:bg-purple-600 data-[state=active]:text-white dark:data-[state=active]:bg-purple-700 dark:data-[state=active]:text-white hover:bg-purple-100 dark:hover:bg-gray-700 transition-colors">
                         <Shield className="h-4 w-4" />
                         {t('national_insight_center_info.access_control')}
                       </TabsTrigger>
