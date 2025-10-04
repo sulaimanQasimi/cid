@@ -123,9 +123,9 @@ export default function SearchFilters({
 
             <div className={`overflow-hidden transition-all duration-200 ${isFiltersOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
                 <CardContent className="p-4 bg-gradient-to-br from-white/50 to-gray-50/50 dark:from-gray-800/50 dark:to-gray-900/50">
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    <div className="flex flex-wrap items-center gap-4">
                         {/* Search Bar */}
-                        <div className="md:col-span-2">
+                        <div className="flex-shrink-0">
                             <SearchBar
                                 placeholder={searchPlaceholder}
                                 value={searchQuery}
@@ -136,7 +136,7 @@ export default function SearchFilters({
 
                         {/* Type Filter */}
                         {types.length > 0 && (
-                            <div>
+                            <div className="flex-shrink-0">
                                 <FilterSelect
                                     placeholder={t('common.filter_by_type')}
                                     value={filters.type || '_all'}
@@ -148,7 +148,7 @@ export default function SearchFilters({
 
                         {/* Category Filter */}
                         {categories.length > 0 && (
-                            <div>
+                            <div className="flex-shrink-0">
                                 <FilterSelect
                                     placeholder={t('common.filter_by_category')}
                                     value={filters.category || '_all'}
@@ -160,7 +160,7 @@ export default function SearchFilters({
 
                         {/* Department Filter */}
                         {departments.length > 0 && (
-                            <div>
+                            <div className="flex-shrink-0">
                                 <FilterSelect
                                     placeholder={t('common.filter_by_department')}
                                     value={filters.department || '_all'}
@@ -171,7 +171,7 @@ export default function SearchFilters({
                         )}
 
                         {/* Sort Options */}
-                        <div>
+                        <div className="flex-shrink-0">
                             <FilterSelect
                                 placeholder={t('common.sort_by')}
                                 value={filters.sort || 'name'}
@@ -180,45 +180,42 @@ export default function SearchFilters({
                             />
                         </div>
 
-                        {/* Direction & Per Page Row */}
-                        <div className="grid grid-cols-3 gap-3 md:col-span-2 lg:col-span-4">
-                            {/* Direction Button */}
-                            <div>
-                                <Button
-                                    variant="outline"
-                                    onClick={onDirectionChange}
-                                    title={t(`common.sort_${(filters.direction || 'asc') === 'asc' ? 'ascending' : 'descending'}`)}
-                                    className="h-10 w-full bg-purple-700  dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-200"
-                                >
-                                    <ArrowUpDown className={`mr-2 h-4 w-4 ${(filters.direction || 'asc') === 'asc' ? '' : 'rotate-180 transform'}`} />
-                                    {(filters.direction || 'asc') === 'asc' ? t('common.sort_ascending') : t('common.sort_descending')}
-                                </Button>
-                            </div>
+                        {/* Direction Button */}
+                        <div className="flex-shrink-0">
+                            <Button
+                                variant="outline"
+                                onClick={onDirectionChange}
+                                title={t(`common.sort_${(filters.direction || 'asc') === 'asc' ? 'ascending' : 'descending'}`)}
+                                className="h-10 w-32 bg-purple-700 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-200"
+                            >
+                                <ArrowUpDown className={`mr-2 h-4 w-4 ${(filters.direction || 'asc') === 'asc' ? '' : 'rotate-180 transform'}`} />
+                                {(filters.direction || 'asc') === 'asc' ? t('common.sort_ascending') : t('common.sort_descending')}
+                            </Button>
+                        </div>
 
-                            {/* Per Page Options */}
-                            <div>
-                                <FilterSelect
-                                    placeholder={t('common.items_per_page')}
-                                    value={(filters.per_page || 10).toString()}
-                                    onValueChange={onPerPageChange}
-                                    options={perPageOptions.map(option => ({
-                                        value: option.value.toString(),
-                                        label: option.label
-                                    }))}
-                                />
-                            </div>
+                        {/* Per Page Options */}
+                        <div className="flex-shrink-0">
+                            <FilterSelect
+                                placeholder={t('common.items_per_page')}
+                                value={(filters.per_page || 10).toString()}
+                                onValueChange={onPerPageChange}
+                                options={perPageOptions.map(option => ({
+                                    value: option.value.toString(),
+                                    label: option.label
+                                }))}
+                            />
+                        </div>
 
-                            {/* Quick Actions */}
-                            <div className="flex gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={onResetFilters}
-                                    className="h-10 border-gray-300 dark:border-gray-600 px-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/30 hover:border-red-400 dark:hover:border-red-500 hover:text-red-700 dark:hover:text-red-300 transition-all duration-200"
-                                >
-                                    <FilterX className="h-4 w-4" />
-                                </Button>
-                            </div>
+                        {/* Quick Actions */}
+                        <div className="flex-shrink-0">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={onResetFilters}
+                                className="h-10 w-10 border-gray-300 dark:bg-blue-900 dark:border-gray-600 px-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/30 hover:border-red-400 dark:hover:border-red-500 hover:text-red-700 dark:hover:text-red-300 transition-all duration-200"
+                            >
+                                <FilterX className="h-4 w-4" />
+                            </Button>
                         </div>
                     </div>
                 </CardContent>

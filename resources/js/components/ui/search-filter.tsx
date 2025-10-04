@@ -39,7 +39,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
         type="text"
         value={searchTerm}
         onChange={handleInputChange}
-        className="h-10 w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 pl-10 pr-10 text-sm shadow-sm focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 rounded-none"
+        className="h-10 w-64 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 pl-10 pr-10 text-sm shadow-sm focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 rounded-md"
         placeholder={placeholder}
       />
       {searchTerm && (
