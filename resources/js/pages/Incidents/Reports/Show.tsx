@@ -498,18 +498,20 @@ export default function Show({ report, incidents, reportStats, statCategories }:
             </TabsList>
 
             <TabsContent value="incidents">
+              <Header
+                title={t('incidents.page_title')}
+                description={t('incident_reports.incidents.card_description')}
+                icon={<AlertTriangle className="h-5 w-5" />}
+                model="incident_reports"
+                routeName={() => route('incident-reports.index')}
+                buttonText={t('common.back')}
+                theme="violet"
+                showBackButton={true}
+                backRouteName={() => route('incident-reports.index')}
+                backButtonText={t('common.back')}
+                showButton={false}
+              />
               <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-violet-50/30 dark:to-violet-900/20">
-                <CardHeader className="bg-gradient-to-l from-violet-500 dark:from-violet-600 to-violet-600 dark:to-violet-700 text-white border-b pb-4">
-                  <CardTitle className="flex items-center gap-3 text-lg">
-                    <div className="p-2 bg-white/20 rounded-lg">
-                      <AlertTriangle className="h-5 w-5" />
-                    </div>
-                    {t('incidents.page_title')}
-                  </CardTitle>
-                  <CardDescription className="text-violet-100">
-                    {t('incident_reports.incidents.card_description')}
-                  </CardDescription>
-                </CardHeader>
                 <CardContent className="p-6">
                   <div className="flex justify-end mb-4">
                     <Button asChild className="bg-gradient-to-l from-violet-500 to-violet-600 hover:from-violet-600 hover:to-violet-700 text-white shadow-lg dark:from-violet-600 dark:to-violet-700 dark:hover:from-violet-700 dark:hover:to-violet-800">
@@ -581,18 +583,20 @@ export default function Show({ report, incidents, reportStats, statCategories }:
             </TabsContent>
 
             <TabsContent value="stats">
+              <Header
+                title={t('incident_reports.stats.title')}
+                description={t('incident_reports.stats.description')}
+                icon={<ChartBar className="h-5 w-5" />}
+                model="incident_reports"
+                routeName={() => route('incident-reports.index')}
+                buttonText={t('common.back')}
+                theme="violet"
+                showBackButton={true}
+                backRouteName={() => route('incident-reports.index')}
+                backButtonText={t('common.back')}
+                showButton={false}
+              />
               <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-violet-50/30 dark:to-violet-900/20">
-                <CardHeader className="bg-gradient-to-l from-violet-500 dark:from-violet-600 to-violet-600 dark:to-violet-700 text-white border-b pb-4">
-                  <CardTitle className="flex items-center gap-3 text-lg">
-                    <div className="p-2 bg-white/20 rounded-lg">
-                      <ChartBar className="h-5 w-5" />
-                    </div>
-                    {t('incident_reports.stats.title')}
-                  </CardTitle>
-                  <CardDescription className="text-violet-100">
-                    {t('incident_reports.stats.description')}
-                  </CardDescription>
-                </CardHeader>
                 <CardContent className="p-6">
                   {incidentReportAccess.canUpdateIncidentReport && (
                     <div className="flex justify-end mb-4">

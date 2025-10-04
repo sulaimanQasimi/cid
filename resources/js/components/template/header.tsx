@@ -109,7 +109,7 @@ export default function Header({ title, description, icon, model, routeName, but
     return (
         <div className={`mb-6 ${currentTheme.bg} shadow-sm`}>
             <div className="px-6 py-4">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between" dir="rtl">
                     {/* Title Section */}
                     <div className="flex items-center gap-3">
                         <div className={`${currentTheme.iconBg} p-2 rounded-lg text-white`}>
