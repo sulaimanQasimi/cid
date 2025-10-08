@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import PersianDatePicker from '@/components/ui/PersianDatePicker';
 
 import { Shield, FileText, BookText, AlertTriangle, Calendar, Clock, Users, Building2, MapPin, Phone, IdCard, Home, Gavel, FileCheck, ArrowLeft } from 'lucide-react';
 import { Link } from '@inertiajs/react';
@@ -79,7 +80,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Create({ securityLevels, statItems, statCategories }: CreateProps) {
   const { t } = useTranslation();
   const { data, setData, post, processing, errors } = useForm<ReportFormData>({
-    report_date: new Date().toISOString().split('T')[0],
+    report_date: '',
     security_level: 'normal',
     details: '',
     report_status: 'submitted',
@@ -222,26 +223,16 @@ export default function Create({ securityLevels, statItems, statCategories }: Cr
                   </div>
 
                   <div className="space-y-3">
-                    <Label htmlFor="report_date" className="text-base font-medium flex items-center gap-2 text-indigo-700 dark:text-indigo-400 text-right" dir="rtl">
-                      <span className="text-red-500">*</span>
-                      {t('incident_reports.form.report_date')}
-                      <Calendar className="h-4 w-4" />
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="report_date"
-                        type="date"
-                        value={data.report_date}
-                        onChange={(e) => setData('report_date', e.target.value)}
-                        required
-                        className="h-12 border-indigo-200 dark:border-indigo-700 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-indigo-500/20 dark:focus:ring-indigo-400/20 bg-gradient-to-l from-indigo-50 dark:from-indigo-900/30 to-white dark:to-gray-800 text-right"
-                      />
-                      <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-indigo-400 pointer-events-none" />
-                    </div>
-                    {errors.report_date && <p className="text-sm text-red-500 dark:text-red-400 font-medium bg-red-50 dark:bg-red-900/20 p-2 rounded-lg border border-red-200 dark:border-red-800 flex items-center gap-2 text-right">
-                      <AlertTriangle className="h-4 w-4" />
-                      {errors.report_date}
-                    </p>}
+                    <PersianDatePicker
+                      id="report_date"
+                      label={t('incident_reports.form.report_date')}
+                      value={data.report_date}
+                      onChange={(value) => setData('report_date', value)}
+                      placeholder={t('incident_reports.form.report_date_placeholder')}
+                      required
+                      error={errors.report_date}
+                      className="w-full"
+                    />
                   </div>
                 </div>
 

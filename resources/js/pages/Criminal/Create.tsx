@@ -13,6 +13,7 @@ import { ArrowRight, Camera, Calendar, UserRound, FileText, BookText, Shield, Us
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/i18n/translate';
 import { formatPersianDate } from '@/lib/utils/date';
+import PersianDatePicker from '@/components/ui/PersianDatePicker';
 import Header from '@/components/template/header';
 
 
@@ -52,7 +53,6 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
   // Content tabs state
   const [activeTab, setActiveTab] = useState<string>('other');
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  const [persianDateDisplay, setPersianDateDisplay] = useState<string>('');
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const [userSearchTerm, setUserSearchTerm] = useState<string>('');
 
@@ -118,18 +118,9 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
     }
   };
 
-  // Handle date change and show Persian format
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const gregorianDate = e.target.value;
-    setData('arrest_date', gregorianDate);
-
-    if (gregorianDate) {
-      // Convert to Persian date for display
-      const persianDate = formatPersianDate(gregorianDate);
-      setPersianDateDisplay(persianDate);
-    } else {
-      setPersianDateDisplay('');
-    }
+  // Handle date change
+  const handleDateChange = (value: string) => {
+    setData('arrest_date', value);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -493,27 +484,15 @@ export default function CriminalCreate({ departments = [], users = [], auth }: P
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="space-y-3">
-                        <Label htmlFor="arrest_date" className="font-medium flex items-center gap-2 text-blue-600 dark:text-blue-400 text-right" dir="rtl">
-                          <Calendar className="h-4 w-4" />
-                          {t('criminal.create.fields.arrest_date')}
-                        </Label>
-                        <div className="relative">
-                          <Input
-                            id="arrest_date"
-                            type="date"
-                            value={data.arrest_date}
-                            onChange={handleDateChange}
-                            className="h-11 border-blue-200 dark:border-blue-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-blue-400/20 dark:focus:ring-blue-500/20 bg-gradient-to-l from-blue-50/50 dark:from-blue-900/10 to-white dark:to-gray-800 text-right"
-                          />
-                          {persianDateDisplay && (
-                            <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-md text-right">
-                              <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">
-                                {t('criminal.create.persian_date_label')}: {persianDateDisplay}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                        {errors.arrest_date && <p className="text-sm text-red-500 dark:text-red-400 font-medium text-right">{errors.arrest_date}</p>}
+                        <PersianDatePicker
+                          id="arrest_date"
+                          label={t('criminal.create.fields.arrest_date')}
+                          value={data.arrest_date}
+                          onChange={handleDateChange}
+                          placeholder={t('criminal.create.placeholders.arrest_date')}
+                          error={errors.arrest_date}
+                          className="w-full"
+                        />
                       </div>
 
                       <div className="space-y-3">
