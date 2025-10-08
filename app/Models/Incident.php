@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Traits\HasVisitors;
+use App\Services\PersianDateService;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Contracts\Activity;
@@ -58,6 +59,23 @@ class Incident extends Model
         'is_confirmed' => 'boolean',
         'confirmed_at' => 'datetime',
     ];
+
+    /**
+     * Get the incident date in Persian format
+     */
+    public function getPersianIncidentDateAttribute()
+    {
+        if (!$this->incident_date) {
+            return null;
+        }
+        
+        // Ensure we have a Carbon instance
+        $date = $this->incident_date instanceof \Carbon\Carbon 
+            ? $this->incident_date 
+            : \Carbon\Carbon::parse($this->incident_date);
+            
+        return PersianDateService::fromCarbon($date);
+    }
 
     /**
      * Get the activity log options for the model.
