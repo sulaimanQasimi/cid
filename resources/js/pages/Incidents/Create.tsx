@@ -11,6 +11,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import PersianDatePicker from '@/components/ui/PersianDatePicker';
 import { PageHeader } from '@/components/page-header';
 import { ArrowRight, Save, Shield, FileText, AlertTriangle, MapPin, Calendar, Users, Building2, Clock, AlertCircle, Home, Gavel, FileCheck, BookText } from 'lucide-react';
 import { FormEventHandler } from 'react';
@@ -66,7 +67,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
   const { data, setData, post, processing, errors, reset } = useForm({
     title: '',
     description: '',
-    incident_date: new Date().toISOString().split('T')[0],
+    incident_date: '',
     incident_time: '',
     district_id: '',
     incident_category_id: '',
@@ -201,26 +202,16 @@ export default function Create({ districts, categories, reports }: CreateInciden
 
             <div className="grid gap-6 sm:grid-cols-2">
               <div className="space-y-3">
-                <Label htmlFor="incident_date" className="text-base font-medium flex items-center gap-2 text-gray-800 dark:text-gray-200 text-right" dir="rtl">
-                  <span className="text-red-500">*</span>
-                  {t('incidents.form.date')}
-                  <Calendar className="h-4 w-4" />
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="incident_date"
-                    type="date"
-                    value={data.incident_date}
-                    onChange={e => setData('incident_date', e.target.value)}
-                    required
-                    className="h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 bg-white dark:bg-gray-800 text-right"
-                  />
-                  <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-400 pointer-events-none" />
-                </div>
-                {errors.incident_date && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
-                  <AlertTriangle className="h-4 w-4" />
-                  {errors.incident_date}
-                </p>}
+                <PersianDatePicker
+                  id="incident_date"
+                  label={t('incidents.form.date')}
+                  value={data.incident_date}
+                  onChange={(value) => setData('incident_date', value)}
+                  placeholder={t('incidents.form.date_placeholder')}
+                  required
+                  error={errors.incident_date}
+                  className="w-full"
+                />
               </div>
 
               <div className="space-y-3">

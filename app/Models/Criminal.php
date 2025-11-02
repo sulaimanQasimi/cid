@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use App\Models\Traits\HasVisitors;
+use App\Services\PersianDateService;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Contracts\Activity;
@@ -84,6 +85,23 @@ class Criminal extends Model
         'this_week_visits_count',
         'this_month_visits_count',
     ];
+
+    /**
+     * Get the arrest date in Persian format
+     */
+    public function getPersianArrestDateAttribute()
+    {
+        if (!$this->arrest_date) {
+            return null;
+        }
+        
+        // Ensure we have a Carbon instance
+        $date = $this->arrest_date instanceof \Carbon\Carbon 
+            ? $this->arrest_date 
+            : \Carbon\Carbon::parse($this->arrest_date);
+            
+        return PersianDateService::fromCarbon($date);
+    }
 
     /**
      * Get the activity log options for the model.

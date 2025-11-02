@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Services\PersianDateService;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Contracts\Activity;
@@ -43,6 +44,23 @@ class IncidentReport extends Model
         'report_date' => 'date',
         'attachments' => 'array',
     ];
+
+    /**
+     * Get the report date in Persian format
+     */
+    public function getPersianReportDateAttribute()
+    {
+        if (!$this->report_date) {
+            return null;
+        }
+        
+        // Ensure we have a Carbon instance
+        $date = $this->report_date instanceof \Carbon\Carbon 
+            ? $this->report_date 
+            : \Carbon\Carbon::parse($this->report_date);
+            
+        return PersianDateService::fromCarbon($date);
+    }
 
     /**
      * Get the activity log options for the model.

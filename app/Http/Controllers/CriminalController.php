@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Criminal;
 use App\Models\Department;
 use App\Models\User;
+use App\Services\PersianDateService;
 use App\Services\VisitorTrackingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -142,7 +143,7 @@ class CriminalController extends Controller
             'crime_type' => 'nullable|string|max:255',
             'arrest_location' => 'nullable|string|max:255',
             'arrested_by' => 'nullable|string|max:255',
-            'arrest_date' => 'nullable|date',
+            'arrest_date' => 'nullable|string',
             'referred_to' => 'nullable|string|max:255',
             'final_verdict' => 'nullable|string',
             'notes' => 'nullable|string',
@@ -150,6 +151,14 @@ class CriminalController extends Controller
             'access_users' => 'nullable|array',
             'access_users.*' => 'integer|exists:users,id',
         ]);
+
+        // Convert Persian date to Carbon date for database storage
+        if (!empty($validated['arrest_date'])) {
+            $validated['arrest_date'] = PersianDateService::toDatabaseFormat($validated['arrest_date']);
+            if (!$validated['arrest_date']) {
+                return back()->withErrors(['arrest_date' => 'Invalid date format. Please use Persian date format (YYYY/MM/DD).']);
+            }
+        }
 
         // Handle 'none' value for department_id
         if (isset($validated['department_id']) && $validated['department_id'] === 'none') {
@@ -246,7 +255,7 @@ class CriminalController extends Controller
             'crime_type' => 'nullable|string|max:255',
             'arrest_location' => 'nullable|string|max:255',
             'arrested_by' => 'nullable|string|max:255',
-            'arrest_date' => 'nullable|date',
+            'arrest_date' => 'nullable|string',
             'referred_to' => 'nullable|string|max:255',
             'final_verdict' => 'nullable|string',
             'notes' => 'nullable|string',
@@ -256,6 +265,14 @@ class CriminalController extends Controller
             'deleted_users' => 'nullable|array',
             'deleted_users.*' => 'integer|exists:users,id',
         ]);
+
+        // Convert Persian date to Carbon date for database storage
+        if (!empty($validated['arrest_date'])) {
+            $validated['arrest_date'] = PersianDateService::toDatabaseFormat($validated['arrest_date']);
+            if (!$validated['arrest_date']) {
+                return back()->withErrors(['arrest_date' => 'Invalid date format. Please use Persian date format (YYYY/MM/DD).']);
+            }
+        }
 
         // Handle 'none' value for department_id
         if (isset($validated['department_id']) && $validated['department_id'] === 'none') {

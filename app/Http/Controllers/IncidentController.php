@@ -7,6 +7,7 @@ use App\Models\IncidentCategory;
 use App\Models\IncidentReport;
 use App\Models\District;
 use App\Models\Province;
+use App\Services\PersianDateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -118,7 +119,7 @@ class IncidentController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'incident_date' => 'required|date',
+            'incident_date' => 'required|string',
             'incident_time' => 'nullable|date_format:H:i',
             'district_id' => 'required|exists:districts,id',
             'incident_category_id' => 'required|exists:incident_categories,id',
@@ -130,6 +131,12 @@ class IncidentController extends Controller
             'incident_type' => 'required|string|max:255',
             'status' => 'required|string|in:reported,investigating,resolved,closed',
         ]);
+
+        // Convert Persian date to Carbon date for database storage
+        $validated['incident_date'] = PersianDateService::toDatabaseFormat($validated['incident_date']);
+        if (!$validated['incident_date']) {
+            return back()->withErrors(['incident_date' => 'Invalid date format. Please use Persian date format (YYYY/MM/DD).']);
+        }
 
         $validated['reported_by'] = Auth::id();
 
@@ -200,7 +207,7 @@ class IncidentController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'incident_date' => 'required|date',
+            'incident_date' => 'required|string',
             'incident_time' => 'nullable|date_format:H:i',
             'district_id' => 'required|exists:districts,id',
             'incident_category_id' => 'required|exists:incident_categories,id',
@@ -212,6 +219,12 @@ class IncidentController extends Controller
             'incident_type' => 'required|string|max:255',
             'status' => 'required|string|in:reported,investigating,resolved,closed',
         ]);
+
+        // Convert Persian date to Carbon date for database storage
+        $validated['incident_date'] = PersianDateService::toDatabaseFormat($validated['incident_date']);
+        if (!$validated['incident_date']) {
+            return back()->withErrors(['incident_date' => 'Invalid date format. Please use Persian date format (YYYY/MM/DD).']);
+        }
 
         $incident->update($validated);
 

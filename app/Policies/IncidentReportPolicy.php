@@ -16,9 +16,6 @@ class IncidentReportPolicy
     public function viewAny(User $user): bool
     {
         // Check if user has incident report access
-        if (!$user->canViewIncidentReports()) {
-            return false;
-        }
 
         return $user->hasPermissionTo('incident_report.view_any');
     }
@@ -49,7 +46,7 @@ class IncidentReportPolicy
      */
     public function update(User $user, IncidentReport $incidentReport): bool
     {
-        return $user->hasPermissionTo('incident_report.update');
+        return $user->hasPermissionTo('incident_report.update') && $user->id === $incidentReport->submitted_by;
     }
 
     /**
@@ -57,7 +54,7 @@ class IncidentReportPolicy
      */
     public function delete(User $user, IncidentReport $incidentReport): bool
     {
-        return $user->hasPermissionTo('incident_report.delete');
+        return $user->hasPermissionTo('incident_report.delete') && $user->id === $incidentReport->submitted_by;
     }
 
     /**
@@ -65,7 +62,7 @@ class IncidentReportPolicy
      */
     public function restore(User $user, IncidentReport $incidentReport): bool
     {
-        return $user->hasPermissionTo('incident_report.restore');
+        return $user->hasPermissionTo('incident_report.restore') && $user->id === $incidentReport->submitted_by;
     }
 
     /**
@@ -73,6 +70,6 @@ class IncidentReportPolicy
      */
     public function forceDelete(User $user, IncidentReport $incidentReport): bool
     {
-        return $user->hasPermissionTo('incident_report.force_delete');
+        return $user->hasPermissionTo('incident_report.force_delete') && $user->id === $incidentReport->submitted_by;
     }
 }

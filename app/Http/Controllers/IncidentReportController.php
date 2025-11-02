@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\IncidentReport;
 use App\Models\Incident;
+use App\Services\PersianDateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -161,7 +162,7 @@ class IncidentReportController extends Controller
             'action_taken' => 'nullable|string',
             'recommendation' => 'nullable|string',
             'security_level' => 'required|string|in:normal,restricted,classified',
-            'report_date' => 'required|date',
+            'report_date' => 'required|string',
             'report_status' => 'required|string|in:submitted,reviewed,approved',
             'source' => 'nullable|string',
             'attachments' => 'nullable|array',
@@ -170,6 +171,12 @@ class IncidentReportController extends Controller
             'stats.*.value' => 'required',
             'stats.*.notes' => 'nullable|string|max:1000',
         ]);
+
+        // Convert Persian date to Carbon date for database storage
+        $validated['report_date'] = PersianDateService::toDatabaseFormat($validated['report_date']);
+        if (!$validated['report_date']) {
+            return back()->withErrors(['report_date' => 'Invalid date format. Please use Persian date format (YYYY/MM/DD).']);
+        }
 
         $validated['submitted_by'] = Auth::id();
 
@@ -329,12 +336,18 @@ class IncidentReportController extends Controller
             'action_taken' => 'nullable|string',
             'recommendation' => 'nullable|string',
             'security_level' => 'required|string|in:normal,restricted,classified',
-            'report_date' => 'required|date',
+            'report_date' => 'required|string',
             'report_status' => 'required|string|in:submitted,reviewed,approved',
             'source' => 'nullable|string',
             'attachments' => 'nullable|array',
             'approved_by' => 'nullable|exists:users,id',
         ]);
+
+        // Convert Persian date to Carbon date for database storage
+        $validated['report_date'] = PersianDateService::toDatabaseFormat($validated['report_date']);
+        if (!$validated['report_date']) {
+            return back()->withErrors(['report_date' => 'Invalid date format. Please use Persian date format (YYYY/MM/DD).']);
+        }
 
         // Set approved_by if status is changed to approved
         if ($validated['report_status'] === 'approved' && $incidentReport->report_status !== 'approved') {
