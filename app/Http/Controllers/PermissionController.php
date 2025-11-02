@@ -11,18 +11,50 @@ use Inertia\Inertia;
 class PermissionController extends Controller
 {
     /**
-     * Display the user permission management page
+     * Display the permissions list page (readonly)
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::with('roles', 'permissions')->paginate(10);
-        $roles = Role::all();
-        $permissions = Permission::all();
+        // Validate query parameters
+        $validated = $request->validate([
+            'per_page' => 'nullable|integer|min:10|max:100',
+            'search' => 'nullable|string|max:255',
+            'sort' => 'nullable|string|in:id,name,guard_name',
+            'direction' => 'nullable|string|in:asc,desc',
+            'page' => 'nullable|integer|min:1',
+        ]);
+
+        $perPage = $validated['per_page'] ?? 10;
+        $search = $validated['search'] ?? '';
+        $sort = $validated['sort'] ?? 'name';
+        $direction = $validated['direction'] ?? 'asc';
+
+        // Build query
+        $query = Permission::query();
+
+        // Apply search filter
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('label', 'like', "%{$search}%")
+                  ->orWhere('guard_name', 'like', "%{$search}%");
+            });
+        }
+
+        // Apply sorting
+        $query->orderBy($sort, $direction);
+
+        // Get paginated results
+        $permissions = $query->paginate($perPage)->withQueryString();
 
         return Inertia::render('Permission/Index', [
-            'users' => $users,
-            'roles' => $roles,
-            'permissions' => $permissions
+            'permissions' => $permissions,
+            'filters' => [
+                'search' => $search,
+                'sort' => $sort,
+                'direction' => $direction,
+                'per_page' => $perPage,
+            ],
         ]);
     }
 
