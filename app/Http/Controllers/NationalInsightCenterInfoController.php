@@ -18,6 +18,7 @@ use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Carbon\Carbon;
 
 class NationalInsightCenterInfoController extends Controller
 {
@@ -170,6 +171,14 @@ class NationalInsightCenterInfoController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(5);
 
+        // Aggregate all item stats from all info items
+        $aggregatedStats = $nationalInsightCenterInfo->infoItems()
+            ->with('itemStats.statCategoryItem.category')
+            ->get()
+            ->pluck('itemStats')
+            ->flatten()
+            ->values();
+
         $statCategories = StatCategory::where('status', 'active')
             ->orderBy('label')
             ->get();
@@ -181,6 +190,7 @@ class NationalInsightCenterInfoController extends Controller
         return Inertia::render('NationalInsightCenterInfo/Show', [
             'nationalInsightCenterInfo' => $nationalInsightCenterInfo,
             'infos' => $infos,
+            'aggregatedStats' => $aggregatedStats,
             'statCategories' => $statCategories,
             'infoCategories' => $infoCategories,
             'departments' => $departments,
@@ -199,9 +209,26 @@ class NationalInsightCenterInfoController extends Controller
         // Load existing access users
         $nationalInsightCenterInfo->load(['accesses.user:id,name', 'confirmer:id,name']);
 
+        // Load stat categories and items for statistics management
+        $statItems = StatCategoryItem::with('category')
+            ->whereHas('category', function($query) {
+                $query->where('status', 'active');
+            })
+            ->orderBy('name')
+            ->get();
+
+        $statCategories = StatCategory::where('status', 'active')
+            ->orderBy('label')
+            ->get();
+
+        // Load existing stats
+        $nationalInsightCenterInfo->load(['infoStats.statCategoryItem.category']);
+
         return Inertia::render('NationalInsightCenterInfo/Edit', [
             'nationalInsightCenterInfo' => $nationalInsightCenterInfo,
             'users' => $users,
+            'statItems' => $statItems,
+            'statCategories' => $statCategories,
         ]);
     }
 
@@ -218,6 +245,10 @@ class NationalInsightCenterInfoController extends Controller
             'description' => 'nullable|string',
             'access_users' => 'nullable|array',
             'access_users.*' => 'integer|exists:users,id',
+            'stats' => 'nullable|array',
+            'stats.*.stat_category_item_id' => 'required|integer|exists:stat_category_items,id',
+            'stats.*.value' => 'required|string|max:255',
+            'stats.*.notes' => 'nullable|string|max:1000',
         ]);
 
         try {
@@ -229,10 +260,14 @@ class NationalInsightCenterInfoController extends Controller
                     'updated_by' => Auth::id(),
                 ]);
 
-
                 // Update access permissions
                 if (isset($validated['access_users'])) {
                     $this->updateAccessPermissions($nationalInsightCenterInfo, $validated['access_users']);
+                }
+
+                // Update statistics if provided
+                if (isset($validated['stats']) && is_array($validated['stats'])) {
+                    $this->updateInfoStats($nationalInsightCenterInfo, $validated['stats']);
                 }
             });
 
@@ -329,6 +364,33 @@ class NationalInsightCenterInfoController extends Controller
     }
 
     /**
+     * Create info stats for the national insight center info.
+     */
+    private function createInfoStats(NationalInsightCenterInfo $nationalInsightCenterInfo, array $stats): void
+    {
+        foreach ($stats as $stat) {
+            $nationalInsightCenterInfo->infoStats()->create([
+                'stat_category_item_id' => $stat['stat_category_item_id'],
+                'string_value' => $stat['value'],
+                'notes' => $stat['notes'] ?? null,
+                'created_by' => Auth::id(),
+            ]);
+        }
+    }
+
+    /**
+     * Update info stats for the national insight center info.
+     */
+    private function updateInfoStats(NationalInsightCenterInfo $nationalInsightCenterInfo, array $stats): void
+    {
+        // Delete existing stats
+        $nationalInsightCenterInfo->infoStats()->delete();
+
+        // Create new stats
+        $this->createInfoStats($nationalInsightCenterInfo, $stats);
+    }
+
+    /**
      * Print the national insight center info.
      */
     public function print(NationalInsightCenterInfo $nationalInsightCenterInfo): Response
@@ -358,5 +420,230 @@ class NationalInsightCenterInfoController extends Controller
             'nationalInsightCenterInfo' => $nationalInsightCenterInfo,
             'infos' => $infos,
         ]);
+    }
+
+    /**
+     * Generate weekly report for national insight center info.
+     */
+    public function weeklyReport(Request $request, NationalInsightCenterInfo $nationalInsightCenterInfo): Response
+    {
+        $this->authorize('view', $nationalInsightCenterInfo);
+
+        // Get date parameters (default to current week and previous week)
+        $currentWeekStart = $request->input('current_week_start');
+        $currentWeekEnd = $request->input('current_week_end');
+        
+        // If not provided, use current week (Monday to Sunday)
+        if (!$currentWeekStart || !$currentWeekEnd) {
+            $now = Carbon::now();
+            $currentWeekStart = $now->copy()->startOfWeek();
+            $currentWeekEnd = $now->copy()->endOfWeek();
+        } else {
+            $currentWeekStart = Carbon::parse($currentWeekStart);
+            $currentWeekEnd = Carbon::parse($currentWeekEnd);
+        }
+
+        $previousWeekStart = $currentWeekStart->copy()->subWeek();
+        $previousWeekEnd = $currentWeekEnd->copy()->subWeek();
+
+        // Load the national insight center info
+        $nationalInsightCenterInfo->load([
+            'creator:id,name,department_id',
+            'creator.department:id,name',
+            'confirmer:id,name'
+        ]);
+
+        // Get all items for current week
+        $currentWeekItems = $nationalInsightCenterInfo->infoItems()
+            ->whereBetween('date', [$currentWeekStart->format('Y-m-d'), $currentWeekEnd->format('Y-m-d')])
+            ->with([
+                'infoCategory:id,name,code',
+                'department:id,name,code',
+                'province:id,name',
+                'district:id,name',
+                'itemStats.statCategoryItem.category'
+            ])
+            ->get();
+
+        // Get all items for previous week
+        $previousWeekItems = $nationalInsightCenterInfo->infoItems()
+            ->whereBetween('date', [$previousWeekStart->format('Y-m-d'), $previousWeekEnd->format('Y-m-d')])
+            ->with([
+                'infoCategory:id,name,code',
+                'department:id,name,code',
+                'province:id,name',
+                'district:id,name',
+                'itemStats.statCategoryItem.category'
+            ])
+            ->get();
+
+        // Aggregate data by category
+        $currentWeekData = $this->aggregateWeeklyData($currentWeekItems);
+        $previousWeekData = $this->aggregateWeeklyData($previousWeekItems);
+
+        // Calculate comparisons
+        $comparisons = $this->calculateComparisons($currentWeekData, $previousWeekData);
+
+        // Get categories for grouping
+        $categories = InfoCategory::orderBy('name')->get();
+
+        // Get all stat categories and items
+        $statCategories = StatCategory::where('status', 'active')
+            ->with('items')
+            ->orderBy('label')
+            ->get();
+
+        return Inertia::render('NationalInsightCenterInfo/WeeklyReport', [
+            'nationalInsightCenterInfo' => $nationalInsightCenterInfo,
+            'currentWeekData' => $currentWeekData,
+            'previousWeekData' => $previousWeekData,
+            'comparisons' => $comparisons,
+            'currentWeekItems' => $currentWeekItems,
+            'previousWeekItems' => $previousWeekItems,
+            'dateRange' => [
+                'current_week_start' => $currentWeekStart->format('Y-m-d'),
+                'current_week_end' => $currentWeekEnd->format('Y-m-d'),
+                'previous_week_start' => $previousWeekStart->format('Y-m-d'),
+                'previous_week_end' => $previousWeekEnd->format('Y-m-d'),
+            ],
+            'categories' => $categories,
+            'statCategories' => $statCategories,
+        ]);
+    }
+
+    /**
+     * Aggregate weekly data by category and statistics.
+     */
+    private function aggregateWeeklyData($items): array
+    {
+        $data = [
+            'total_items' => $items->count(),
+            'by_category' => [],
+            'by_stat_category' => [],
+            'casualties' => [
+                'dead' => 0,
+                'injured' => 0,
+                'captured' => 0,
+                'surrendered' => 0,
+            ],
+            'incidents' => [
+                'total' => 0,
+                'terrorist' => 0,
+                'non_terrorist' => 0,
+            ],
+            'traffic' => [
+                'military' => 0,
+                'civilian' => 0,
+            ],
+            'security_activities' => 0,
+            'border_violations' => 0,
+            'air_violations' => 0,
+        ];
+
+        // Group by category
+        foreach ($items as $item) {
+            $categoryId = $item->info_category_id ?? 'uncategorized';
+            $categoryName = $item->infoCategory->name ?? 'Uncategorized';
+            
+            if (!isset($data['by_category'][$categoryId])) {
+                $data['by_category'][$categoryId] = [
+                    'id' => $categoryId,
+                    'name' => $categoryName,
+                    'code' => $item->infoCategory->code ?? null,
+                    'count' => 0,
+                    'items' => [],
+                ];
+            }
+            
+            $data['by_category'][$categoryId]['count']++;
+            $data['by_category'][$categoryId]['items'][] = $item;
+        }
+
+        // Aggregate statistics
+        foreach ($items as $item) {
+            foreach ($item->itemStats as $stat) {
+                $statCategoryId = $stat->statCategoryItem->category->id;
+                $statCategoryName = $stat->statCategoryItem->category->label;
+                $statItemName = $stat->statCategoryItem->label;
+                
+                if (!isset($data['by_stat_category'][$statCategoryId])) {
+                    $data['by_stat_category'][$statCategoryId] = [
+                        'id' => $statCategoryId,
+                        'name' => $statCategoryName,
+                        'items' => [],
+                    ];
+                }
+                
+                if (!isset($data['by_stat_category'][$statCategoryId]['items'][$statItemName])) {
+                    $data['by_stat_category'][$statCategoryId]['items'][$statItemName] = [
+                        'name' => $statItemName,
+                        'value' => 0,
+                        'count' => 0,
+                    ];
+                }
+                
+                // Try to parse numeric value, otherwise count occurrences
+                $value = $stat->string_value;
+                if (is_numeric($value)) {
+                    $data['by_stat_category'][$statCategoryId]['items'][$statItemName]['value'] += (float)$value;
+                } else {
+                    $data['by_stat_category'][$statCategoryId]['items'][$statItemName]['count']++;
+                }
+            }
+        }
+
+        // Convert stat category items to array for easier frontend consumption
+        foreach ($data['by_stat_category'] as &$category) {
+            $category['items'] = array_values($category['items']);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Calculate week-over-week comparisons.
+     */
+    private function calculateComparisons(array $currentWeekData, array $previousWeekData): array
+    {
+        $comparisons = [
+            'total_items' => [
+                'current' => $currentWeekData['total_items'],
+                'previous' => $previousWeekData['total_items'],
+                'change' => $currentWeekData['total_items'] - $previousWeekData['total_items'],
+                'percentage_change' => 0,
+            ],
+            'categories' => [],
+        ];
+
+        // Calculate percentage change
+        if ($previousWeekData['total_items'] > 0) {
+            $comparisons['total_items']['percentage_change'] = 
+                (($currentWeekData['total_items'] - $previousWeekData['total_items']) / $previousWeekData['total_items']) * 100;
+        } else if ($currentWeekData['total_items'] > 0) {
+            $comparisons['total_items']['percentage_change'] = 100;
+        }
+
+        // Compare categories
+        $allCategories = array_unique(array_merge(
+            array_keys($currentWeekData['by_category']),
+            array_keys($previousWeekData['by_category'])
+        ));
+
+        foreach ($allCategories as $categoryId) {
+            $currentCount = $currentWeekData['by_category'][$categoryId]['count'] ?? 0;
+            $previousCount = $previousWeekData['by_category'][$categoryId]['count'] ?? 0;
+            
+            $comparisons['categories'][$categoryId] = [
+                'name' => $currentWeekData['by_category'][$categoryId]['name'] ?? $previousWeekData['by_category'][$categoryId]['name'] ?? 'Unknown',
+                'current' => $currentCount,
+                'previous' => $previousCount,
+                'change' => $currentCount - $previousCount,
+                'percentage_change' => $previousCount > 0 
+                    ? (($currentCount - $previousCount) / $previousCount) * 100 
+                    : ($currentCount > 0 ? 100 : 0),
+            ];
+        }
+
+        return $comparisons;
     }
 }

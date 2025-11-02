@@ -69,4 +69,12 @@ class CriminalPolicy
     {
         return $user->hasPermissionTo('criminal.force_delete') && ($criminal->created_by === $user->id);
     }
+
+    /**
+     * Determine whether the user can view the comprehensive list of criminals.
+     */
+    public function viewComprehensiveList(User $user): bool
+    {
+        return $user->hasPermissionTo('criminal.view_comprehensive_list');
+    }
 }

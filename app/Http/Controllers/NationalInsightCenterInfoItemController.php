@@ -142,6 +142,9 @@ class NationalInsightCenterInfoItemController extends Controller
                 'description' => $validated['description'],
                 'date' => $validated['date'],
                 'created_by' => Auth::id(),
+                'confirmed' => false,
+                'confirmed_by' => null,
+                'confirmed_at' => null,
             ]);
 
             return redirect()
@@ -328,9 +331,12 @@ class NationalInsightCenterInfoItemController extends Controller
     /**
      * Show the form for managing statistics.
      */
-    public function manageStats(NationalInsightCenterInfoItem $item): Response
+public function manageStats(NationalInsightCenterInfoItem $item): Response
     {
-        $this->authorize('update', $item);
+        // Load the parent relationship for authorization
+        $item->load('nationalInsightCenterInfo');
+        
+        $this->authorize('updateStats', $item);
         
         $statItems = StatCategoryItem::with('category')
             ->whereHas('category', function($query) {
@@ -358,7 +364,10 @@ class NationalInsightCenterInfoItemController extends Controller
      */
     public function updateStats(Request $request, NationalInsightCenterInfoItem $item): RedirectResponse
     {
-        $this->authorize('update', $item);
+        // Load the parent relationship for authorization
+        $item->load('nationalInsightCenterInfo');
+        
+        $this->authorize('updateStats', $item);
         
         $validated = $request->validate([
             'stats' => 'required|array|min:1',

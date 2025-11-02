@@ -51,9 +51,39 @@ class NationalInsightCenterInfoItemPolicy
             return false;
         }
         
+        // Cannot update if item itself is confirmed
+        if ($nationalInsightCenterInfoItem->confirmed) {
+            return false;
+        }
+        
         return $user->hasPermissionTo('national_insight_center_info_item.update') && 
                ($nationalInsightCenterInfoItem->created_by === $user->id || 
                 $nationalInsightCenterInfoItem->nationalInsightCenterInfo->hasAccess($user));
+    }
+
+    /**
+     * Determine whether the user can update statistics for the model.
+     * This allows stats updates on unconfirmed items, as long as parent is not confirmed.
+     */
+    public function updateStats(User $user, NationalInsightCenterInfoItem $nationalInsightCenterInfoItem): bool
+    {
+        // Cannot update stats if parent is confirmed
+        if ($nationalInsightCenterInfoItem->nationalInsightCenterInfo->confirmed) {
+            return false;
+        }
+        
+        // IMPORTANT: We intentionally do NOT check if the item itself is confirmed.
+        // This allows stats to be added/updated on unconfirmed items.
+        // Stats can be managed even on unconfirmed items as long as the parent is not confirmed.
+        
+        // Check permission and access
+        if (!$user->hasPermissionTo('national_insight_center_info_item.update')) {
+            return false;
+        }
+        
+        // Check if user is creator or has access to parent
+        return $nationalInsightCenterInfoItem->created_by === $user->id || 
+               $nationalInsightCenterInfoItem->nationalInsightCenterInfo->hasAccess($user);
     }
 
     /**

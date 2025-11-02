@@ -108,6 +108,13 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
             icon: FileText
         });
     }
+    if (auth.permissions.includes('criminal.view_comprehensive_list')) {
+        criminalItems.push({
+            title: t('sidebar.criminals_comprehensive_list'),
+            href: '/criminals/comprehensive-list',
+            icon: FileText
+        });
+    }
     if (criminalItems.length > 0) {
         navigation.push({
             title: t('sidebar.criminal_database'),

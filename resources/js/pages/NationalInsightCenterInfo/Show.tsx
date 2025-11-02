@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Pencil, Trash, ExternalLink, FileText, BarChart3, TrendingUp, AlertTriangle, Plus, Database, Settings, Printer } from 'lucide-react';
+import { ArrowLeft, Pencil, Trash, ExternalLink, FileText, BarChart3, TrendingUp, AlertTriangle, Plus, Database, Settings, Printer, Calendar } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -74,17 +74,39 @@ interface Department {
   code: string;
 }
 
+interface AggregatedStat {
+  id: number;
+  string_value: string;
+  notes: string | null;
+  stat_category_item: {
+    id: number;
+    name: string;
+    label: string;
+    category: {
+      id: number;
+      name: string;
+      label: string;
+      color: string;
+    };
+  };
+  national_insight_center_info_item?: {
+    id: number;
+    title: string;
+  };
+}
+
 interface Props {
   nationalInsightCenterInfo: NationalInsightCenterInfo;
   infos: {
     data: Info[];
     links: any[];
   };
+  aggregatedStats?: AggregatedStat[];
   infoCategories?: InfoCategory[];
   departments?: Department[];
 }
 
-export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInfo, infos, infoCategories = [], departments = [] }: Props) {
+export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInfo, infos, aggregatedStats = [], infoCategories = [], departments = [] }: Props) {
   const { t } = useTranslation();
   const { canCreate, canView, canUpdate, canDelete } = usePermissions();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
@@ -176,6 +198,11 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
                   <Printer className="h-5 w-5" />
                 </Link>
               </Button>
+              <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-4 py-3 transition-all duration-300 hover:scale-105" title={t('weekly_report.page_title')}>
+                <Link href={route('national-insight-center-infos.weekly-report', nationalInsightCenterInfo.id)} className="flex items-center">
+                  <Calendar className="h-5 w-5" />
+                </Link>
+              </Button>
               <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-4 py-3 transition-all duration-300 hover:scale-105">
                 <Link href={route('national-insight-center-infos.index')} className="flex items-center">
                   <ArrowLeft className="h-5 w-5" />
@@ -232,6 +259,131 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
           </CardContent>
         </Card>
 
+        {/* Aggregated Statistics Section */}
+        {aggregatedStats && aggregatedStats.length > 0 && (
+          <Card className="shadow-2xl bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 overflow-hidden mb-8">
+            <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 text-white py-6">
+              <CardTitle className="flex items-center gap-4">
+                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
+                  <BarChart3 className="h-6 w-6" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">{t('national_insight_center_info.show.statistics_title')}</div>
+                  <div className="text-purple-100 text-sm font-medium">{t('national_insight_center_info.show.statistics_description')}</div>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-8">
+              <div className="overflow-x-auto">
+                <table className="w-full border border-purple-200 dark:border-purple-700 rounded-lg bg-white dark:bg-gray-800 text-sm" style={{ borderCollapse: 'collapse' }}>
+                  <tbody>
+                    {/* Group stats by category */}
+                    {(() => {
+                      const groupedStats = aggregatedStats.reduce((acc, stat) => {
+                        const categoryId = stat.stat_category_item.category.id;
+                        if (!acc[categoryId]) {
+                          acc[categoryId] = {
+                            category: stat.stat_category_item.category,
+                            items: []
+                          };
+                        }
+                        acc[categoryId].items.push(stat);
+                        return acc;
+                      }, {} as Record<number, { category: any; items: AggregatedStat[] }>);
+
+                      const categoryEntries = Object.entries(groupedStats);
+                      
+                      return (
+                        <>
+                          {/* First Row: All Categories */}
+                          <tr className="border-b border-purple-200 dark:border-purple-700 bg-purple-50 dark:bg-purple-900/20">
+                            {categoryEntries.map(([categoryId, categoryData]) => (
+                              <td 
+                                key={categoryId}
+                                colSpan={categoryData.items.length} 
+                                className="font-bold text-center py-2 border-r border-purple-200 dark:border-purple-700 text-purple-800 dark:text-purple-200 text-sm"
+                                style={{ backgroundColor: categoryData.category.color + '20' }}
+                              >
+                                {categoryData.category.label}
+                              </td>
+                            ))}
+                          </tr>
+                          
+                          {/* Second Row: Item Labels */}
+                          <tr className="border-b border-purple-200 dark:border-purple-700 bg-purple-25 dark:bg-purple-900/10">
+                            {categoryEntries.map(([categoryId, categoryData]) => (
+                              <React.Fragment key={categoryId}>
+                                {categoryData.items.map((stat) => (
+                                  <th 
+                                    key={stat.id}
+                                    className="text-center py-1 font-semibold border-r border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300 bg-white dark:bg-gray-800 text-xs"
+                                  >
+                                    {stat.stat_category_item.label}
+                                  </th>
+                                ))}
+                              </React.Fragment>
+                            ))}
+                          </tr>
+                          
+                          {/* Third Row: Values */}
+                          <tr className="border-b border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-800">
+                            {categoryEntries.map(([categoryId, categoryData]) => (
+                              <React.Fragment key={categoryId}>
+                                {categoryData.items.map((stat) => (
+                                  <td 
+                                    key={stat.id}
+                                    className="text-center py-1 border-r border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-800"
+                                  >
+                                    <Badge variant="outline" className="bg-gradient-to-l from-green-100 dark:from-green-800 to-green-200 dark:to-green-700 text-green-800 dark:text-green-200 border-green-300 dark:border-green-600 px-2 py-0.5 rounded text-xs font-semibold">
+                                      {stat.string_value}
+                                    </Badge>
+                                  </td>
+                                ))}
+                              </React.Fragment>
+                            ))}
+                          </tr>
+                          
+                          {/* Notes Row (if any) */}
+                          {aggregatedStats.some(stat => stat.notes) && (
+                            <tr className="border-b border-purple-200 dark:border-purple-700 bg-gray-50 dark:bg-gray-700/50">
+                              {categoryEntries.map(([categoryId, categoryData]) => (
+                                <React.Fragment key={categoryId}>
+                                  {categoryData.items.map((stat) => (
+                                    <td 
+                                      key={`notes-${stat.id}`}
+                                      className="text-center py-1 text-xs border-r border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-400 bg-gray-50 dark:bg-gray-700/50"
+                                    >
+                                      {stat.notes || ''}
+                                    </td>
+                                  ))}
+                                </React.Fragment>
+                              ))}
+                            </tr>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* No Statistics Message */}
+        {(!aggregatedStats || aggregatedStats.length === 0) && (
+          <Card className="shadow-2xl bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 overflow-hidden mb-8">
+            <CardContent className="text-center py-8">
+              <div className="flex flex-col items-center gap-4 text-purple-600 dark:text-purple-400">
+                <div className="p-4 bg-purple-100 dark:bg-purple-800/50 rounded-full flex items-center justify-center border border-purple-200 dark:border-purple-700">
+                  <BarChart3 className="h-12 w-12 text-purple-400 dark:text-purple-300" />
+                </div>
+                <p className="text-xl font-bold text-purple-800 dark:text-purple-200">{t('national_insight_center_info.show.no_statistics')}</p>
+                <p className="text-purple-500 dark:text-purple-400 max-w-md">{t('national_insight_center_info.show.no_statistics_description')}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Associated Info Records */}
         <div className="mt-8">
