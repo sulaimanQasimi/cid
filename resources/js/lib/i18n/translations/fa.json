@@ -347,6 +347,8 @@
     "departments.create.fields.code_error": "د معلومات کوډ ولیکئ",
     "departments.create.fields.name_error": "د معلومات نوم ولیکئ",
     "departments.create.fields.description_error": "د معلومات په اړه نور یادښتونه یا تبصرې اضافه کړئ",
+    "departments.no_records_description": "هیڅ څانګې ثبتونه ونه موندل شول",
+    "districts.no_records_description": "هیڅ ډیستریټ ثبتونه ونه موندل شول",
     "departments.create.fields.code_required": "د معلومات کوډ ولیکئ",
     "incident_reports.show.report_info": "د راپور معلومات",
     "incident_reports.show.report_number": "د راپور نېټه",
