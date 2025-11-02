@@ -209,18 +209,18 @@ export default function EditInfoType({ infoType, users }: Props) {
             
             <form onSubmit={handleSubmit}>
               <CardContent className="p-8">
-                <Tabs defaultValue="basic" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 mb-8 bg-gray-100 dark:bg-gray-700 rounded-xl p-1">
+                <Tabs defaultValue="basic" className="w-full" dir="rtl">
+                  <TabsList className="grid w-full grid-cols-2 mb-8 bg-gray-100 dark:bg-gray-700 rounded-xl p-1" dir="rtl">
                     <TabsTrigger 
                       value="basic" 
-                      className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:text-purple-600 dark:data-[state=active]:text-gray-400 data-[state=active]:shadow-lg rounded-lg font-medium transition-all duration-300"
+                      className="flex flex-row-reverse items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:text-purple-600 dark:data-[state=active]:text-gray-400 data-[state=active]:shadow-lg rounded-lg font-medium transition-all duration-300"
                     >
                       <FileText className="h-4 w-4" />
                       {t('info_types.create.basic_info')}
                     </TabsTrigger>
                     <TabsTrigger 
                       value="access" 
-                      className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:text-purple-600 dark:data-[state=active]:text-gray-400 data-[state=active]:shadow-lg rounded-lg font-medium transition-all duration-300"
+                      className="flex flex-row-reverse items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:text-purple-600 dark:data-[state=active]:text-gray-400 data-[state=active]:shadow-lg rounded-lg font-medium transition-all duration-300"
                     >
                       <Users className="h-4 w-4" />
                       {t('info_type.access.tab')}

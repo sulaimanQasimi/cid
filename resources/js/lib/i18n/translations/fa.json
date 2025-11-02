@@ -2161,6 +2161,12 @@
     "incidents.district": "ولسوالی",
     "incident_reports.print.print_button": "چاپ کول",
     "incident_reports.print.back_button": "بازگشت",
-    "info_types.print.no_description": "توضیحات ندارد"
-
+    "info_types.print.no_description": "توضیحات ندارد",
+    "info_types.delete_dialog.description": "آیا مطمئن هستید که می‌خواهید تحلیلی و تفصیلی را حذف کنید؟ این عمل قابل بازگشت نیست.",
+    "info_types.delete_dialog.cancel": "انصراف",
+    "info_types.delete_dialog.confirm": "تأیید حذف",
+    "info_types.delete_dialog.delete": "حذف تحلیلی و تفصیلی",
+    "info_types.delete_dialog.delete_button": "حذف تحلیلی و تفصیلی",
+    "info_types.delete_dialog.title": "حذف تحلیلی و تفصیلی",
+    "info_types.edit.code_label": "کد"
 }
