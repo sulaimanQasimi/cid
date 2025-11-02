@@ -2168,5 +2168,19 @@
     "info_types.delete_dialog.delete": "حذف تحلیلی و تفصیلی",
     "info_types.delete_dialog.delete_button": "حذف تحلیلی و تفصیلی",
     "info_types.delete_dialog.title": "حذف تحلیلی و تفصیلی",
-    "info_types.edit.code_label": "کد"
+    "info_types.edit.code_label": "کد",
+    "info_categories.show.delete_dialog.title": "حذف دسته",
+    "info_categories.show.delete_dialog.description": "آیا مطمئن هستید که می‌خواهید دسته را حذف کنید؟ این عمل قابل بازگشت نیست.",
+    "info_categories.show.delete_dialog.cancel": "انصراف",
+    "info_categories.show.delete_dialog.confirm": "تأیید حذف",
+    "info_categories.show.delete_dialog.delete": "حذف دسته",
+    "info_categories.show.delete_dialog.delete_button": "حذف دسته",
+    "info_categories.show.delete_dialog.cancel_button": "انصراف",
+    "info_categories.delete_dialog.title":"حذف دسته",
+    "info_categories.delete_dialog.description":"آیا مطمئن هستید که می‌خواهید دسته را حذف کنید؟ این عمل قابل بازگشت نیست.",
+    "info_categories.delete_dialog.cancel":"انصراف",
+    "info_categories.delete_dialog.confirm":"تأیید حذف",
+    "info_categories.delete_dialog.delete":"حذف دسته",
+    "info_categories.delete_dialog.delete_button":"حذف دسته",
+    "info_categories.delete_dialog.cancel_button":"انصراف"
 }
