@@ -347,7 +347,7 @@ export default function DepartmentIndex({
                               <AlertTriangle className="h-16 w-16 text-blue-400 dark:text-blue-300" />
                             </div>
                             <p className="text-xl font-bold">{t('departments.no_records')}</p>
-                            <p className="text-blue-500 dark:text-blue-400">No department records found</p>
+                            <p className="text-blue-500 dark:text-blue-400">{t('departments.no_records_description')}</p>
                           </div>
                         </TableCell>
                       </TableRow>
