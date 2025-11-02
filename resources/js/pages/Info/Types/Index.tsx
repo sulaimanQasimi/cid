@@ -311,19 +311,6 @@ export default function InfoTypesIndex({
                                   variant="ghost"
                                   size="icon"
                                   asChild
-                                  title={t('info_types.actions.manage_stats')}
-                                  className="h-10 w-10 rounded-xl hover:bg-orange-100 dark:hover:bg-orange-800 text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 transition-all duration-300 hover:scale-110"
-                                >
-                                  <Link href={route('info-types.stats', infoType.id)}>
-                                    <BarChart3 className="h-5 w-5" />
-                                  </Link>
-                                </Button>
-                              </CanUpdate>
-                              <CanUpdate model="info_type">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  asChild
                                   title={t('info_types.actions.edit')}
                                   className="h-10 w-10 rounded-xl hover:bg-green-100 dark:hover:bg-green-800 text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-all duration-300 hover:scale-110"
                                 >

@@ -83,12 +83,11 @@ class InfoTypeController extends Controller
     {
         $this->authorize('create', InfoType::class);
         
-        $statData = $this->getStatisticalData();
         $users = User::orderBy('name')->get(['id', 'name', 'email']);
 
-        return Inertia::render('Info/Types/Create', array_merge($statData, [
+        return Inertia::render('Info/Types/Create', [
             'users' => $users,
-        ]));
+        ]);
     }
 
     /**
@@ -163,21 +162,13 @@ class InfoTypeController extends Controller
         
         // Load the info type with all necessary relationships
         $infoType->load([
-            'creator:id,name',
-            'infoStats' => function($query) {
-                $query->with(['statCategoryItem.category'])
-                      ->orderBy('created_at', 'desc');
-            }
+            'creator:id,name'
         ]);
 
         $infos = $infoType->infos()
             ->with(['infoType:id,name', 'infoCategory:id,name'])
             ->orderBy('created_at', 'desc')
             ->paginate(5);
-
-        $statCategories = StatCategory::where('status', 'active')
-            ->orderBy('label')
-            ->get();
 
         // Get data for the create modal
         $infoCategories = InfoCategory::orderBy('name')->get();
@@ -186,7 +177,6 @@ class InfoTypeController extends Controller
         return Inertia::render('Info/Types/Show', [
             'infoType' => $infoType,
             'infos' => $infos,
-            'statCategories' => $statCategories,
             'infoCategories' => $infoCategories,
             'departments' => $departments,
         ]);
@@ -199,15 +189,13 @@ class InfoTypeController extends Controller
     {
         $this->authorize('update', $infoType);
         
-        $infoType->load(['infoStats.statCategoryItem.category', 'accesses.user:id,name,email']);
+        $infoType->load(['accesses.user:id,name,email']);
         $users = User::orderBy('name')->get(['id', 'name', 'email']);
-        
-        $statData = $this->getStatisticalData();
 
-        return Inertia::render('Info/Types/Edit', array_merge($statData, [
+        return Inertia::render('Info/Types/Edit', [
             'infoType' => $infoType,
             'users' => $users,
-        ]));
+        ]);
     }
 
     /**
@@ -221,10 +209,6 @@ class InfoTypeController extends Controller
             'name' => ['required', 'string', 'max:255', Rule::unique('info_types')->ignore($infoType->id)],
             'code' => ['nullable', 'string', 'max:50', Rule::unique('info_types')->ignore($infoType->id)],
             'description' => 'nullable|string',
-            'stats' => 'nullable|array',
-            'stats.*.stat_category_item_id' => 'required|exists:stat_category_items,id',
-            'stats.*.value' => 'required|string|max:255',
-            'stats.*.notes' => 'nullable|string|max:1000',
             'access_users' => 'nullable|array',
             'access_users.*' => 'integer|exists:users,id',
             'deleted_users' => 'nullable|array',
@@ -239,11 +223,6 @@ class InfoTypeController extends Controller
                     'description' => $validated['description'],
                     'updated_by' => Auth::id(),
                 ]);
-
-                // Update stats if provided
-                if (isset($validated['stats'])) {
-                    $this->updateInfoStats($infoType, $validated['stats']);
-                }
 
                 // Handle access permissions update
                 if (isset($validated['access_users'])) {
@@ -312,65 +291,6 @@ class InfoTypeController extends Controller
             return redirect()
                 ->back()
                 ->with('error', 'Failed to delete info type. Please try again.');
-        }
-    }
-
-    /**
-     * Show the stats management page for a specific info type.
-     */
-    public function manageStats(InfoType $infoType): Response
-    {
-        $this->authorize('update', $infoType);
-        
-        // Load the info type with current stats
-        $infoType->load([
-            'infoStats' => function($query) {
-                $query->with(['statCategoryItem.category'])
-                      ->orderBy('created_at', 'desc');
-            }
-        ]);
-        
-        $statData = $this->getStatisticalData();
-
-        return Inertia::render('Info/Types/ManageStats', array_merge($statData, [
-            'infoType' => $infoType,
-        ]));
-    }
-
-    /**
-     * Update statistics for a specific info type.
-     */
-    public function updateStats(Request $request, InfoType $infoType): RedirectResponse
-    {
-        $this->authorize('update', $infoType);
-        
-        $validated = $request->validate([
-            'stats' => 'required|array|min:1',
-            'stats.*.stat_category_item_id' => 'required|integer|exists:stat_category_items,id',
-            'stats.*.value' => 'required|string|max:255',
-            'stats.*.notes' => 'nullable|string|max:1000',
-        ]);
-
-        try {
-            DB::transaction(function () use ($infoType, $validated) {
-                $this->updateInfoStats($infoType, $validated['stats']);
-            });
-
-            return redirect()
-                ->route('info-types.show', $infoType)
-                ->with('success', 'Statistics updated successfully.');
-
-        } catch (\Exception $e) {
-            Log::error('Failed to update info type statistics', [
-                'error' => $e->getMessage(),
-                'info_type_id' => $infoType->id,
-                'stats_data' => $validated['stats'] ?? []
-            ]);
-
-            return redirect()
-                ->back()
-                ->with('error', 'Failed to update statistics. Please try again.')
-                ->withInput();
         }
     }
 
@@ -481,59 +401,4 @@ class InfoTypeController extends Controller
         }
     }
 
-    /**
-     * Update info statistics for a given info type.
-     */
-    private function updateInfoStats(InfoType $infoType, array $statsData): void
-    {
-        try {
-        // Get existing stats indexed by stat_category_item_id (including soft-deleted)
-        $existingStats = InfoStat::query()
-            ->where('info_type_id', $infoType->id)
-            ->get()
-            ->keyBy('stat_category_item_id');
-
-        $processedItemIds = [];
-
-        foreach ($statsData as $statData) {
-            $itemId = $statData['stat_category_item_id'];
-            $processedItemIds[] = $itemId;
-
-            if (isset($existingStats[$itemId])) {
-                // Update existing stat (restore if soft-deleted)
-                $existingStat = $existingStats[$itemId];
-                
-                $existingStat->update([
-                    'string_value' => $statData['value'],
-                    'integer_value' => null, // Clear integer value when updating with string
-                    'notes' => $statData['notes'] ?? null,
-                    'updated_by' => Auth::id(),
-                ]);
-            } else {
-                // Create new stat
-                InfoStat::create([
-                    'info_type_id' => $infoType->id,
-                    'stat_category_item_id' => $itemId,
-                    'string_value' => $statData['value'],
-                    'notes' => $statData['notes'] ?? null,
-                    'created_by' => Auth::id(),
-                    'updated_by' => Auth::id(),
-                ]);
-            }
-        }
-
-        // Soft delete stats that are no longer in the request
-        if (!empty($processedItemIds)) {
-            $infoType->infoStats()
-                ->whereNotIn('stat_category_item_id', $processedItemIds)
-                ->delete();
-        }
-        } catch (\Exception $e) {
-            Log::error('Failed to update info type statistics', [
-                'error' => $e->getMessage(),
-                'info_type_id' => $infoType->id,
-                'stats_data' => $statsData
-            ]);
-        }
-    }
 }
