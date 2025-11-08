@@ -112,11 +112,13 @@
             "@/*": ["./resources/js/*"],
             "ziggy-js": ["./vendor/tightenco/ziggy"]
         },
+        "typeRoots": ["./node_modules/@types", "./resources/js/types"],
         "jsx": "react-jsx"
     },
     "include": [
         "resources/js/**/*.ts",
         "resources/js/**/*.d.ts",
         "resources/js/**/*.tsx",
+        "resources/js/types/**/*.d.ts"
     ]
 }

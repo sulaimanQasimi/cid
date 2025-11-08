@@ -62,8 +62,10 @@ export default function InfoTypesCreate({ users }: CreateProps) {
     },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
     // Submit the form
     post(route('info-types.store'));
   };

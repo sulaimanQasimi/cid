@@ -181,8 +181,10 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
     }));
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
 
     // Prepare stats data for submission
     const stats = Object.entries(statsData)

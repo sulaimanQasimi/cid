@@ -85,7 +85,7 @@ interface Props {
     sort: string;
     direction: string;
     per_page: number;
-    department_id?: string;
+    department_id?: number | string;
   };
 }
 
@@ -410,7 +410,8 @@ export default function ComprehensiveList({
   // Handle department filter change
   const handleDepartmentChange = (value: string) => {
     setSelectedDepartment(value);
-    applyFilters({ department_id: value === '_all' || value === '' ? undefined : parseInt(value) });
+    const deptId = value === '_all' || value === '' ? undefined : parseInt(value);
+    applyFilters({ department_id: deptId as any });
   };
 
   // Apply filters to the URL
@@ -431,7 +432,7 @@ export default function ComprehensiveList({
       direction: 'desc',
       per_page: 25,
       page: 1,
-      department_id: undefined
+      department_id: undefined as any
     });
   };
 
@@ -507,9 +508,9 @@ export default function ComprehensiveList({
               <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
               <p className="text-sm font-medium text-blue-700 dark:text-blue-300">
                 {t('criminal.comprehensive_list.results_count', {
-                  total: criminals.meta.total,
-                  from: criminals.meta.from,
-                  to: criminals.meta.to
+                  total: criminals.meta.total.toString(),
+                  from: criminals.meta.from.toString(),
+                  to: criminals.meta.to.toString()
                 })}
               </p>
             </div>

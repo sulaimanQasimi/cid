@@ -2285,7 +2285,7 @@
     "weekly_report.footer.generated_on": "د راپور د تولید نیټه",
     "weekly_report.footer.page": "پاڼه {page}",
     "weekly_report.empty_state.title": "هیڅ معلومات نشته",
-    "weekly_report.empty_state.description": "د اونې لپاره هیڅ معلومات شتون نلري"
+    "weekly_report.empty_state.description": "د اونې لپاره هیڅ معلومات شتون نلري",
     "info_types.delete_dialog.description": "آیا مطمئن هستید که می‌خواهید تحلیلی و تفصیلی را حذف کنید؟ این عمل قابل بازگشت نیست.",
     "info_types.delete_dialog.cancel": "انصراف",
     "info_types.delete_dialog.confirm": "تأیید حذف",
