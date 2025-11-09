@@ -88,8 +88,22 @@ class NationalInsightCenterInfoController extends Controller
         
         $users = User::orderBy('name')->get();
 
+        // Load stat categories and items for statistics management
+        $statItems = StatCategoryItem::with('category')
+            ->whereHas('category', function($query) {
+                $query->where('status', 'active');
+            })
+            ->orderBy('name')
+            ->get();
+
+        $statCategories = StatCategory::where('status', 'active')
+            ->orderBy('label')
+            ->get();
+
         return Inertia::render('NationalInsightCenterInfo/Create', [
             'users' => $users,
+            'statItems' => $statItems,
+            'statCategories' => $statCategories,
         ]);
     }
 
