@@ -17,6 +17,8 @@ import { Badge } from '@/components/ui/badge';
 import Header from '@/components/template/header';
 import FooterButtons from '@/components/template/FooterButtons';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import PersianDatePicker from '@/components/ui/PersianDatePicker';
+import moment from 'moment-jalaali';
 
 
 interface User {
@@ -33,6 +35,7 @@ type NationalInsightCenterInfoFormData = {
   name: string;
   code?: string;
   description?: string;
+  date?: string;
   access_users?: number[];
 };
 
@@ -44,6 +47,7 @@ export default function NationalInsightCenterInfosCreate({ users }: CreateProps)
     name: '',
     code: '',
     description: '',
+    date: moment().format('jYYYY/jMM/jDD'), // Default to today's date
     access_users: [] as number[],
   });
 
@@ -146,6 +150,19 @@ export default function NationalInsightCenterInfosCreate({ users }: CreateProps)
 
                     {/* Basic Information Tab */}
                     <TabsContent value="basic" className="space-y-8">
+                      {/* Date Field */}
+                      <div className="space-y-4">
+                        <PersianDatePicker
+                          id="date"
+                          value={data.date}
+                          onChange={(value) => setData('date', value)}
+                          label={t('national_insight_center_info.date_label')}
+                          required
+                          error={errors.date}
+                          className="w-full"
+                        />
+                      </div>
+
                       {/* Name Field */}
                       <div className="space-y-4">
                         <Label htmlFor="name" dir="rtl" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2 text-right">

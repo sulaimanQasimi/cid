@@ -57,6 +57,7 @@ interface NationalInsightCenterInfo {
   created_at: string;
   updated_at: string;
   code: string;
+  date: string | null;
 }
 
 interface InfoCategory {
@@ -242,6 +243,12 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
                 </div>
               </div>
               <div className="space-y-6">
+                <div>
+                  <h3 className="text-md font-semibold text-purple-800 dark:text-purple-200 mb-2">{t('national_insight_center_info.show.date_label')}</h3>
+                  <p className="text-purple-800 dark:text-purple-200 bg-white dark:bg-gray-800 p-4 rounded-xl border border-purple-200 dark:border-purple-700">
+                    {nationalInsightCenterInfo.date ? formatPersianDateOnly(nationalInsightCenterInfo.date) : t('national_insight_center_info.na')}
+                  </p>
+                </div>
                 <div>
                   <h3 className="text-md font-semibold text-purple-800 dark:text-purple-200 mb-2">{t('national_insight_center_info.show.created_at_label')}</h3>
                   <p className="text-purple-800 dark:text-purple-200 bg-white dark:bg-gray-800 p-4 rounded-xl border border-purple-200 dark:border-purple-700">

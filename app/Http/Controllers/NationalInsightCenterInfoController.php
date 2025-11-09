@@ -19,6 +19,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Carbon\Carbon;
+use App\Services\PersianDateService;
 
 class NationalInsightCenterInfoController extends Controller
 {
@@ -32,7 +33,7 @@ class NationalInsightCenterInfoController extends Controller
         $validated = $request->validate([
             'search' => 'nullable|string|max:255',
             'sort_field' => ['nullable', 'string', Rule::in([
-                'name', 'code', 'description', 'created_at', 'updated_at', 'info_items_count', 'info_stats_count'
+                'name', 'code', 'description', 'date', 'created_at', 'updated_at', 'info_items_count', 'info_stats_count'
             ])],
             'sort_direction' => ['nullable', 'string', Rule::in(['asc', 'desc'])],
             'per_page' => 'nullable|integer|min:5|max:100',
@@ -53,7 +54,8 @@ class NationalInsightCenterInfoController extends Controller
             $query->where(function($q) use ($validated) {
                 $q->where('name', 'like', '%' . $validated['search'] . '%')
                   ->orWhere('code', 'like', '%' . $validated['search'] . '%')
-                  ->orWhere('description', 'like', '%' . $validated['search'] . '%');
+                  ->orWhere('description', 'like', '%' . $validated['search'] . '%')
+                  ->orWhere('date', 'like', '%' . $validated['search'] . '%');
             });
         }
 
@@ -102,9 +104,27 @@ class NationalInsightCenterInfoController extends Controller
             'name' => 'required|string|max:255|unique:national_insight_center_infos',
             'code' => 'nullable|string|max:50|unique:national_insight_center_infos',
             'description' => 'nullable|string',
+            'date' => 'required|string',
             'access_users' => 'nullable|array',
             'access_users.*' => 'integer|exists:users,id',
         ]);
+
+        // Convert Persian date to database format
+        $validated['date'] = PersianDateService::toDatabaseFormat($validated['date']);
+        if (!$validated['date']) {
+            return redirect()
+                ->back()
+                ->withErrors(['date' => 'Invalid date format. Please use Persian date format (YYYY/MM/DD).'])
+                ->withInput();
+        }
+
+        // Check uniqueness after conversion
+        if (NationalInsightCenterInfo::where('date', $validated['date'])->exists()) {
+            return redirect()
+                ->back()
+                ->withErrors(['date' => 'A record with this date already exists.'])
+                ->withInput();
+        }
 
         try {
             DB::transaction(function () use ($validated) {
@@ -112,6 +132,7 @@ class NationalInsightCenterInfoController extends Controller
                     'name' => $validated['name'],
                     'code' => $validated['code'],
                     'description' => $validated['description'],
+                    'date' => $validated['date'],
                     'created_by' => Auth::id(),
                 ]);
 
@@ -243,6 +264,7 @@ class NationalInsightCenterInfoController extends Controller
             'name' => ['required', 'string', 'max:255', Rule::unique('national_insight_center_infos')->ignore($nationalInsightCenterInfo->id)],
             'code' => ['nullable', 'string', 'max:50', Rule::unique('national_insight_center_infos')->ignore($nationalInsightCenterInfo->id)],
             'description' => 'nullable|string',
+            'date' => 'required|string',
             'access_users' => 'nullable|array',
             'access_users.*' => 'integer|exists:users,id',
             'stats' => 'nullable|array',
@@ -251,12 +273,30 @@ class NationalInsightCenterInfoController extends Controller
             'stats.*.notes' => 'nullable|string|max:1000',
         ]);
 
+        // Convert Persian date to database format
+        $validated['date'] = PersianDateService::toDatabaseFormat($validated['date']);
+        if (!$validated['date']) {
+            return redirect()
+                ->back()
+                ->withErrors(['date' => 'Invalid date format. Please use Persian date format (YYYY/MM/DD).'])
+                ->withInput();
+        }
+
+        // Check uniqueness after conversion (excluding current record)
+        if (NationalInsightCenterInfo::where('date', $validated['date'])->where('id', '!=', $nationalInsightCenterInfo->id)->exists()) {
+            return redirect()
+                ->back()
+                ->withErrors(['date' => 'A record with this date already exists.'])
+                ->withInput();
+        }
+
         try {
             DB::transaction(function () use ($nationalInsightCenterInfo, $validated) {
                 $nationalInsightCenterInfo->update([
                     'name' => $validated['name'],
                     'code' => $validated['code'],
                     'description' => $validated['description'],
+                    'date' => $validated['date'],
                     'updated_by' => Auth::id(),
                 ]);
 

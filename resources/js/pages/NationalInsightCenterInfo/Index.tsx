@@ -37,6 +37,7 @@ interface NationalInsightCenterInfo {
   id: number;
   name: string;
   description: string | null;
+  date: string | null;
   created_at: string;
   updated_at: string;
   confirmed: boolean;
@@ -88,6 +89,7 @@ interface Props {
 const sortOptions = [
   { value: 'name', label: 'Name' },
   { value: 'description', label: 'Description' },
+  { value: 'date', label: 'Date' },
   { value: 'created_at', label: 'Created Date' },
   { value: 'updated_at', label: 'Updated Date' },
   { value: 'info_items_count', label: 'Info Items Count' },
@@ -272,6 +274,7 @@ export default function NationalInsightCenterInfosIndex({
                       <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.id')}</TableHead>
                       <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.name')}</TableHead>
                       <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.description')}</TableHead>
+                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.date')}</TableHead>
                       <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.status')}</TableHead>
                       <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.info_items_count')}</TableHead>
                       <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.stats_count')}</TableHead>
@@ -290,6 +293,13 @@ export default function NationalInsightCenterInfosIndex({
                               <span className="text-purple-800 dark:text-purple-200 font-medium">{nationalInsightCenterInfo.description}</span>
                             ) : (
                               <span className="text-purple-600 dark:text-purple-400 font-medium">-</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6 font-medium">
+                            {nationalInsightCenterInfo.date ? (
+                              formatPersianDateOnly(nationalInsightCenterInfo.date)
+                            ) : (
+                              <span className="text-purple-600 dark:text-purple-400">{t('national_insight_center_info.na')}</span>
                             )}
                           </TableCell>
                           <TableCell className="py-6 px-6">
@@ -394,7 +404,7 @@ export default function NationalInsightCenterInfosIndex({
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={7} className="h-32 text-center">
+                        <TableCell colSpan={8} className="h-32 text-center">
                           <div className="flex flex-col items-center gap-4 text-purple-600 dark:text-purple-400">
                             <div className="p-4 bg-purple-100 dark:bg-purple-800 rounded-full">
                               <AlertTriangle className="h-16 w-16 text-purple-400 dark:text-purple-300" />

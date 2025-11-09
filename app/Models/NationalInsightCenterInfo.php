@@ -23,6 +23,7 @@ class NationalInsightCenterInfo extends Model
         'name',
         'code',
         'description',
+        'date',
         'created_by',
         'updated_by',
         'confirmed',
@@ -36,6 +37,7 @@ class NationalInsightCenterInfo extends Model
      * @var array<string, string>
      */
     protected $casts = [
+        'date' => 'date',
         'confirmed' => 'boolean',
         'confirmed_at' => 'datetime',
     ];

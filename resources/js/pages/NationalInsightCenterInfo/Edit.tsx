@@ -18,6 +18,8 @@ import Header from '@/components/template/header';
 import FooterButtons from '@/components/template/FooterButtons';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TreeViewStatSelector from '@/components/reports/TreeViewStatSelector';
+import PersianDatePicker from '@/components/ui/PersianDatePicker';
+import moment from 'moment-jalaali';
 
 
 interface User {
@@ -79,6 +81,7 @@ interface NationalInsightCenterInfo {
   name: string;
   code: string;
   description: string | null;
+  date: string | null;
   created_at: string;
   updated_at: string;
   accesses?: AccessUser[];
@@ -96,6 +99,7 @@ type NationalInsightCenterInfoFormData = {
   name: string;
   code?: string;
   description?: string;
+  date?: string;
   access_users?: number[];
   stats?: Array<{
     stat_category_item_id: number;
@@ -112,6 +116,11 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
     name: nationalInsightCenterInfo.name || '',
     code: nationalInsightCenterInfo.code || '',
     description: nationalInsightCenterInfo.description || '',
+    date: nationalInsightCenterInfo.date ? (() => {
+      // Convert database date (YYYY-MM-DD) to Persian format (jYYYY/jMM/jDD)
+      const dbDate = moment(nationalInsightCenterInfo.date);
+      return dbDate.isValid() ? dbDate.format('jYYYY/jMM/jDD') : '';
+    })() : '',
     access_users: [] as number[],
   });
 
@@ -358,6 +367,19 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
                             </div>
                           )}
                         </div>
+                      </div>
+
+                      {/* Date Field */}
+                      <div className="space-y-4">
+                        <PersianDatePicker
+                          id="date"
+                          value={data.date}
+                          onChange={(value) => setData('date', value)}
+                          label={t('national_insight_center_info.date_label')}
+                          required
+                          error={errors.date}
+                          className="w-full"
+                        />
                       </div>
                     </TabsContent>
 
