@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Head } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
+import LogoHeader from '@/components/ui/logoheader';
 import { ArrowLeft, FileText, User, Calendar, CheckCircle, Clock, Building2, Tag, FileCheck, BarChart3, Info } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/translate';
 import { formatPersianDateOnly, formatPersianDateTime } from '@/lib/utils/date';
@@ -181,7 +182,7 @@ export default function NationalInsightCenterInfoPrint({
             </div>
             <div className="print:page-break-inside-avoid relative">
                 <h1 className="text-2xl font-bold text-black text-center mb-2">{t('national_insight_center_info.print.header_title')}</h1>
-                <h2 className="text-xl font-semibold text-black text-center pt-2 mb-4">{nationalInsightCenterInfo.name}</h2>
+                <LogoHeader title={nationalInsightCenterInfo.name} />
                 
                 {qrCodeDataUrl && (
                     <div className="absolute top-0 right-0 print:top-0 print:right-0">
