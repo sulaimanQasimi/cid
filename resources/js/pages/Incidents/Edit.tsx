@@ -11,6 +11,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import PersianDatePicker from '@/components/ui/PersianDatePicker';
 import { PageHeader } from '@/components/page-header';
 import { ArrowRight, Save, Shield, FileText, AlertTriangle, MapPin, Calendar, Users, Building2, Clock, AlertCircle, Home, Gavel, FileCheck, BookText } from 'lucide-react';
 import { FormEventHandler } from 'react';
@@ -27,6 +28,7 @@ import { useTranslation } from '@/lib/i18n/translate';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import Header from '@/components/template/header';
+import moment from 'moment-jalaali';
 
 interface EditIncidentProps {
   incident: {
@@ -83,10 +85,24 @@ export default function Edit({ incident, districts, categories, reports }: EditI
       href: route('incidents.edit', incident.id),
     },
   ];
+  // Convert database date (Gregorian) to Persian format for PersianDatePicker
+  const getPersianDate = (dateString: string | null): string => {
+    if (!dateString) return '';
+    try {
+      const momentDate = moment(dateString);
+      if (momentDate.isValid()) {
+        return momentDate.format('jYYYY/jMM/jDD');
+      }
+    } catch (e) {
+      console.error('Error converting date:', e);
+    }
+    return '';
+  };
+
   const { data, setData, put, processing, errors } = useForm({
     title: incident.title || '',
     description: incident.description || '',
-    incident_date: incident.incident_date || new Date().toISOString().split('T')[0],
+    incident_date: getPersianDate(incident.incident_date),
     incident_time: incident.incident_time ? incident.incident_time.substring(0, 5) : '',
     district_id: incident.district_id?.toString() || '',
     incident_category_id: incident.incident_category_id?.toString() || '',
@@ -235,26 +251,16 @@ export default function Edit({ incident, districts, categories, reports }: EditI
 
             <div className="grid gap-6 sm:grid-cols-2">
               <div className="space-y-3">
-                <Label htmlFor="incident_date" className="text-base font-medium flex items-center gap-2 text-blue-700 text-right" dir="rtl">
-                  <span className="text-red-500">*</span>
-                  {t('incidents.form.date')}
-                  <Calendar className="h-4 w-4" />
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="incident_date"
-                    type="date"
-                    value={data.incident_date}
-                    onChange={e => setData('incident_date', e.target.value)}
-                    required
-                    className="h-12 border-blue-200 focus:border-blue-500 focus:ring-blue-500/20 bg-gradient-to-l from-blue-50 to-white text-right"
-                  />
-                  <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-400 pointer-events-none" />
-                </div>
-                {errors.incident_date && <p className="text-sm text-red-500 font-medium bg-red-50 p-2  border border-red-200 flex items-center gap-2 text-right">
-                  <AlertTriangle className="h-4 w-4" />
-                  {errors.incident_date}
-                </p>}
+                <PersianDatePicker
+                  id="incident_date"
+                  label={t('incidents.form.date')}
+                  value={data.incident_date}
+                  onChange={(value) => setData('incident_date', value)}
+                  placeholder={t('incidents.form.date_placeholder')}
+                  required
+                  error={errors.incident_date}
+                  className="w-full"
+                />
               </div>
 
               <div className="space-y-3">

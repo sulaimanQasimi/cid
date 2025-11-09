@@ -15,6 +15,8 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/i18n/translate';
 import Header from '@/components/template/header';
+import PersianDatePicker from '@/components/ui/PersianDatePicker';
+import moment from 'moment-jalaali';
 
 interface Criminal {
   id: number;
@@ -94,6 +96,20 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
   const [userToRemove, setUserToRemove] = useState<{ id: number; name: string } | null>(null);
   const [deletedUsers, setDeletedUsers] = useState<number[]>([]);
 
+  // Convert database date (Gregorian) to Persian format for PersianDatePicker
+  const getPersianDate = (dateString: string | null): string => {
+    if (!dateString) return '';
+    try {
+      const momentDate = moment(dateString);
+      if (momentDate.isValid()) {
+        return momentDate.format('jYYYY/jMM/jDD');
+      }
+    } catch (e) {
+      console.error('Error converting date:', e);
+    }
+    return '';
+  };
+
   const { data, setData, post, processing, errors } = useForm({
     _method: 'PUT', // For method spoofing in Laravel
     photo: null as File | null,
@@ -108,7 +124,7 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
     crime_type: criminal.crime_type || '',
     arrest_location: criminal.arrest_location || '',
     arrested_by: criminal.arrested_by || '',
-    arrest_date: criminal.arrest_date || '',
+    arrest_date: getPersianDate(criminal.arrest_date),
     refercyan_to: criminal.refercyan_to || '',
     final_verdict: criminal.final_verdict || '',
     notes: criminal.notes || '',
@@ -601,21 +617,15 @@ export default function CriminalEdit({ criminal, departments = [], users = [], a
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="space-y-3">
-                        <Label htmlFor="arrest_date" className="font-medium flex items-center gap-2 text-cyan-700 dark:text-cyan-300 text-right" dir="rtl">
-                          {t('criminal.create.fields.arrest_date')}
-                          <Calendar className="h-4 w-4" />
-                        </Label>
-                        <div className="relative">
-                          <Input
-                            id="arrest_date"
-                            type="date"
-                            value={data.arrest_date}
-                            onChange={(e) => setData('arrest_date', e.target.value)}
-                            className="h-11 text-right border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                          />
-                          <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400 dark:text-neutral-500 pointer-events-none" />
-                        </div>
-                        {errors.arrest_date && <p className="text-sm text-cyan-500 dark:text-cyan-400 font-medium text-right">{errors.arrest_date}</p>}
+                        <PersianDatePicker
+                          id="arrest_date"
+                          label={t('criminal.create.fields.arrest_date')}
+                          value={data.arrest_date}
+                          onChange={(value) => setData('arrest_date', value)}
+                          placeholder={t('criminal.create.placeholders.arrest_date')}
+                          error={errors.arrest_date}
+                          className="w-full"
+                        />
                       </div>
 
                       <div className="space-y-3">

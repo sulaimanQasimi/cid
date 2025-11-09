@@ -3,7 +3,7 @@ import { Save } from 'lucide-react';
 
 interface FooterButtonsProps {
   onCancel: () => void;
-  onSubmit: () => void;
+  onSubmit: (e?: React.FormEvent | React.MouseEvent) => void;
   processing?: boolean;
   cancelText: string;
   submitText: string;

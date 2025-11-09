@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth'])->group(function () {
     // Info Types routes
     Route::resource('info-types', InfoTypeController::class);
-    Route::get('info-types/{infoType}/stats', [InfoTypeController::class, 'manageStats'])->name('info-types.stats');
-    Route::put('info-types/{infoType}/stats', [InfoTypeController::class, 'updateStats'])->name('info-types.stats.update');
     Route::get('info-types/{infoType}/print', [InfoTypeController::class, 'print'])->name('info-types.print');
 
     // Info Categories routes
@@ -27,6 +25,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('national-insight-center-infos/{nationalInsightCenterInfo}/stats', [NationalInsightCenterInfoController::class, 'manageStats'])->name('national-insight-center-infos.stats');
     Route::put('national-insight-center-infos/{nationalInsightCenterInfo}/stats', [NationalInsightCenterInfoController::class, 'updateStats'])->name('national-insight-center-infos.stats.update');
     Route::get('national-insight-center-infos/{nationalInsightCenterInfo}/print', [NationalInsightCenterInfoController::class, 'print'])->name('national-insight-center-infos.print')->middleware('can:print,nationalInsightCenterInfo');
+    Route::get('national-insight-center-infos/{nationalInsightCenterInfo}/weekly-report', [NationalInsightCenterInfoController::class, 'weeklyReport'])->name('national-insight-center-infos.weekly-report');
 
     // National Insight Center Info Item routes
     Route::resource('national-insight-center-info-items', NationalInsightCenterInfoItemController::class)

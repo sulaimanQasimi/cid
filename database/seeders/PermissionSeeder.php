@@ -24,6 +24,7 @@ class PermissionSeeder extends Seeder
             ['name' => 'criminal.delete', 'label' => 'حذف مجرم'],
             ['name' => 'criminal.restore', 'label' => 'بازیابی مجرم'],
             ['name' => 'criminal.force_delete', 'label' => 'حذف دائمی مجرم'],
+            ['name' => 'criminal.view_comprehensive_list', 'label' => 'مشاهده فهرست مجرمین'],
 
             // Department permissions
             ['name' => 'department.view_any', 'label' => 'مشاهده همه بخش‌ها'],
@@ -249,14 +250,14 @@ class PermissionSeeder extends Seeder
 
         // Assign manager permissions
         $managerRole->givePermissionTo([
-            'criminal.view_any', 'criminal.view', 'criminal.create', 'criminal.update',
+            'criminal.view_any', 'criminal.view', 'criminal.create', 'criminal.update', 'criminal.view_comprehensive_list',
             'incident.view_any', 'incident.view', 'incident.create', 'incident.update', 'incident.confirm',
             'incident_report.view_any', 'incident_report.view', 'incident_report.create', 'incident_report.update',
             'info.view_any', 'info.view', 'info.create', 'info.update', 'info.confirm',
             'info_category.view_any', 'info_category.view', 'info_category.confirm',
             'info_type.view_any', 'info_type.view', 'info_type.confirm',
             'national_insight_center_info.view_any', 'national_insight_center_info.view', 'national_insight_center_info.confirm',
-            'national_insight_center_info_item.view_any', 'national_insight_center_info_item.view', 'national_insight_center_info_item.confirm',
+            'national_insight_center_info_item.view_any', 'national_insight_center_info_item.view', 'national_insight_center_info_item.create', 'national_insight_center_info_item.update', 'national_insight_center_info_item.confirm',
            
             'report.view_any', 'report.view', 'report.create', 'report.update',
             'report_stat.view_any', 'report_stat.view', 'report_stat.create', 'report_stat.update',

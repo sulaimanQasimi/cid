@@ -7,39 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, FileText, BarChart3, Save, X, AlertTriangle, Building2, Users, Search, ArrowRight, Trash, User } from 'lucide-react';
+import { ArrowLeft, FileText, BarChart3, X } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/translate';
 import { usePermissions } from '@/hooks/use-permissions';
 import { CanCreate } from '@/components/ui/permission-guard';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import TreeViewStatSelector from '@/components/reports/TreeViewStatSelector';
 import { useState } from 'react';
-import { Badge } from '@/components/ui/badge';
 import Header from '@/components/template/header';
 import FooterButtons from '@/components/template/FooterButtons';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
-interface StatCategory {
-  id: number;
-  name: string;
-  label: string;
-  color: string;
-  status: string;
-}
-
-interface StatCategoryItem {
-  id: number;
-  name: string;
-  label: string;
-  color: string | null;
-  parent_id: number | null;
-  category: {
-    id: number;
-    name: string;
-    label: string;
-    color: string;
-  };
-}
 
 interface User {
   id: number;
@@ -48,8 +22,6 @@ interface User {
 }
 
 interface CreateProps {
-  statItems: StatCategoryItem[];
-  statCategories: StatCategory[];
   users: User[];
 }
 
@@ -58,14 +30,9 @@ type InfoTypeFormData = {
   code?: string;
   description?: string;
   access_users?: number[];
-  stats?: Array<{
-    stat_category_item_id: number;
-    value: string;
-    notes?: string;
-  }>;
 };
 
-export default function InfoTypesCreate({ statItems, statCategories, users }: CreateProps) {
+export default function InfoTypesCreate({ users }: CreateProps) {
   const { t } = useTranslation();
   const { canCreate } = usePermissions();
 
@@ -75,14 +42,6 @@ export default function InfoTypesCreate({ statItems, statCategories, users }: Cr
     description: '',
     access_users: [] as number[],
   });
-
-  // State for managing statistical data
-  const [statsData, setStatsData] = useState<{
-    [key: number]: { value: string; notes: string | null };
-  }>({});
-
-  // Add state for category filter
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
   // Access control state
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
@@ -103,56 +62,13 @@ export default function InfoTypesCreate({ statItems, statCategories, users }: Cr
     },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Prepare stats data for submission
-    const stats = Object.entries(statsData)
-      .filter(([_, { value }]) => value.trim() !== '')
-      .map(([itemId, { value, notes }]) => ({
-        stat_category_item_id: parseInt(itemId),
-        value,
-        notes: notes || undefined,
-      }));
-
-    // Add stats to form data
-    if (stats.length > 0) {
-      setData('stats', stats);
+  const handleSubmit = (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
     }
-
     // Submit the form
     post(route('info-types.store'));
   };
-
-  // Group stat items by category for the dropdown filter
-  const categoriesForFilter = statCategories.map(category => ({
-    id: category.id,
-    label: category.label,
-    color: category.color
-  }));
-
-  // Filter stat items by category if one is selected
-  const filteredStatItems = selectedCategory
-    ? statItems.filter(item => item.category.id === selectedCategory)
-    : statItems;
-
-  // Handle stat input change
-  function handleStatChange(itemId: number, value: string) {
-    setStatsData(prev => ({
-      ...prev,
-      [itemId]: { ...prev[itemId] || { notes: null }, value }
-    }));
-  }
-
-  // Handle stat notes change
-  function handleNotesChange(itemId: number, notes: string) {
-    setStatsData(prev => ({
-      ...prev,
-      [itemId]: { ...prev[itemId] || { value: '' }, notes: notes || null }
-    }));
-  }
-
-  const statsCount = Object.keys(statsData).length;
 
   // Access control functions
   const handleUserSelect = (userId: number) => {
@@ -284,70 +200,10 @@ export default function InfoTypesCreate({ statItems, statCategories, users }: Cr
                 </CardContent>
               </Card>
 
-              <Header
-                title={t('info_types.stats.title')}
-                description={t('info_types.stats.description')}
-                icon={<AlertTriangle className="h-6 w-6" />}
-                model="info_type"
-                routeName={() => ''}
-                buttonText=""
-                theme="purple"
-                showButton={false}
-              />
-              <Card className="shadow-2xl bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 overflow-hidden">
-                <CardContent className="p-8 space-y-6">
-                  <div className="mb-6">
-                    <Label htmlFor="category-filter" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right" dir="rtl">
-                      {t('info_types.stats.filter_by_category')}
-                      <Building2 className="h-4 w-4" />
-                    </Label>
-                    <Select
-                      value={selectedCategory?.toString() || 'all'}
-                      onValueChange={(value) => setSelectedCategory(value !== 'all' ? parseInt(value) : null)}
-                    >
-                      <SelectTrigger id="category-filter" className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right">
-                        <SelectValue placeholder={t('incidents.filters.all_categories')} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">{t('incidents.filters.all_categories')}</SelectItem>
-                        {categoriesForFilter.map((category) => (
-                          <SelectItem key={category.id} value={category.id.toString()}>
-                            <div className="flex items-center">
-                              <div
-                                className="mr-2 h-3 w-3 rounded-full"
-                                style={{ backgroundColor: category.color }}
-                              ></div>
-                              {category.label}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {filteredStatItems.length > 0 ? (
-                    <TreeViewStatSelector
-                      items={filteredStatItems}
-                      statsData={statsData}
-                      onValueChange={handleStatChange}
-                      onNotesChange={handleNotesChange}
-                    />
-                  ) : (
-                    <div className="text-center py-8">
-                      <div className="p-4 bg-purple-100 dark:bg-purple-800/30 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                        <AlertTriangle className="h-8 w-8 text-purple-400 dark:text-purple-500" />
-                      </div>
-                      <p className="text-lg font-semibold text-purple-800 dark:text-purple-200 mb-2">{t('info_types.stats.no_items')}</p>
-                      <p className="text-purple-600 dark:text-purple-400">{t('info_types.stats.no_items_description')}</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
               {/* Form Actions */}
               <FooterButtons
                 onCancel={() => window.history.back()}
-                onSubmit={() => {}}
+                onSubmit={handleSubmit}
                 processing={processing}
                 cancelText={t('info_types.create.cancel_button')}
                 submitText={t('info_types.create.save_button')}
