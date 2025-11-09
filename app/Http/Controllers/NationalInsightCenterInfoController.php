@@ -711,4 +711,58 @@ class NationalInsightCenterInfoController extends Controller
 
         return $comparisons;
     }
+
+    /**
+     * Display report page for national insight center info with date range filter.
+     */
+    public function report(Request $request): Response
+    {
+        $this->authorize('viewAny', NationalInsightCenterInfo::class);
+
+        $validated = $request->validate([
+            'date_from' => 'nullable|string',
+            'date_to' => 'nullable|string',
+        ]);
+
+        // Convert Persian dates to database format if provided
+        $dateFrom = null;
+        $dateTo = null;
+
+        if (!empty($validated['date_from'])) {
+            $dateFrom = PersianDateService::toDatabaseFormat($validated['date_from']);
+        }
+
+        if (!empty($validated['date_to'])) {
+            $dateTo = PersianDateService::toDatabaseFormat($validated['date_to']);
+        }
+
+        // Get all national insight center infos accessible by the user
+        $query = NationalInsightCenterInfo::with(['creator:id,name', 'confirmer:id,name'])
+            ->withCount(['infoItems', 'infoStats'])
+            ->where(function($q) {
+                $q->where('created_by', Auth::id())
+                  ->orWhereHas('accesses', function($accessQuery) {
+                      $accessQuery->where('user_id', Auth::id());
+                  });
+            });
+
+        // Apply date filters if provided
+        if ($dateFrom) {
+            $query->where('date', '>=', $dateFrom);
+        }
+
+        if ($dateTo) {
+            $query->where('date', '<=', $dateTo);
+        }
+
+        $nationalInsightCenterInfos = $query->orderBy('date', 'desc')->get();
+
+        return Inertia::render('NationalInsightCenterInfo/Report', [
+            'nationalInsightCenterInfos' => $nationalInsightCenterInfos,
+            'filters' => [
+                'date_from' => $validated['date_from'] ?? '',
+                'date_to' => $validated['date_to'] ?? '',
+            ],
+        ]);
+    }
 }

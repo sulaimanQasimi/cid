@@ -80,6 +80,11 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
             href: '/national-insight-center-infos',
             icon: Target
         });
+        nationalInsightCenterItems.push({
+            title: t('sidebar.national_insight_center_report'),
+            href: '/national-insight-center-infos/report',
+            icon: FileBarChart
+        });
     }
     if (nationalInsightCenterItems.length > 0) {
         navigation.push({
