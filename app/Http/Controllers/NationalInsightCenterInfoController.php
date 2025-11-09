@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\NationalInsightCenterInfo;
+use App\Models\Department;
 use App\Models\Info;
-use App\Models\InfoStat;
+use App\Models\InfoCategory;
+use App\Models\NationalInsightCenterInfo;
 use App\Models\StatCategory;
 use App\Models\StatCategoryItem;
-use App\Models\InfoCategory;
-use App\Models\Department;
 use App\Models\User;
+use App\Services\PersianDateService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -18,8 +19,6 @@ use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Carbon\Carbon;
-use App\Services\PersianDateService;
 
 class NationalInsightCenterInfoController extends Controller
 {
@@ -29,33 +28,33 @@ class NationalInsightCenterInfoController extends Controller
     public function index(Request $request): Response
     {
         $this->authorize('viewAny', NationalInsightCenterInfo::class);
-        
+
         $validated = $request->validate([
             'search' => 'nullable|string|max:255',
             'sort_field' => ['nullable', 'string', Rule::in([
-                'name', 'code', 'description', 'date', 'created_at', 'updated_at', 'info_items_count', 'info_stats_count'
+                'name', 'code', 'description', 'date', 'created_at', 'updated_at', 'info_items_count', 'info_stats_count',
             ])],
             'sort_direction' => ['nullable', 'string', Rule::in(['asc', 'desc'])],
             'per_page' => 'nullable|integer|min:5|max:100',
-            'page' => 'nullable|integer|min:1'
+            'page' => 'nullable|integer|min:1',
         ]);
 
         $query = NationalInsightCenterInfo::with(['creator:id,name', 'confirmer:id,name'])
             ->withCount(['infoItems', 'infoStats'])
-            ->where(function($q) {
+            ->where(function ($q) {
                 $q->where('created_by', Auth::id())
-                  ->orWhereHas('accesses', function($accessQuery) {
-                      $accessQuery->where('user_id', Auth::id());
-                  });
+                    ->orWhereHas('accesses', function ($accessQuery) {
+                        $accessQuery->where('user_id', Auth::id());
+                    });
             });
 
         // Apply search filter
-        if (!empty($validated['search'])) {
-            $query->where(function($q) use ($validated) {
-                $q->where('name', 'like', '%' . $validated['search'] . '%')
-                  ->orWhere('code', 'like', '%' . $validated['search'] . '%')
-                  ->orWhere('description', 'like', '%' . $validated['search'] . '%')
-                  ->orWhere('date', 'like', '%' . $validated['search'] . '%');
+        if (! empty($validated['search'])) {
+            $query->where(function ($q) use ($validated) {
+                $q->where('name', 'like', '%'.$validated['search'].'%')
+                    ->orWhere('code', 'like', '%'.$validated['search'].'%')
+                    ->orWhere('description', 'like', '%'.$validated['search'].'%')
+                    ->orWhere('date', 'like', '%'.$validated['search'].'%');
             });
         }
 
@@ -85,12 +84,12 @@ class NationalInsightCenterInfoController extends Controller
     public function create(): Response
     {
         $this->authorize('create', NationalInsightCenterInfo::class);
-        
+
         $users = User::orderBy('name')->get();
 
         // Load stat categories and items for statistics management
         $statItems = StatCategoryItem::with('category')
-            ->whereHas('category', function($query) {
+            ->whereHas('category', function ($query) {
                 $query->where('status', 'active');
             })
             ->orderBy('name')
@@ -113,7 +112,7 @@ class NationalInsightCenterInfoController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $this->authorize('create', NationalInsightCenterInfo::class);
-        
+
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:national_insight_center_infos',
             'code' => 'nullable|string|max:50|unique:national_insight_center_infos',
@@ -129,7 +128,7 @@ class NationalInsightCenterInfoController extends Controller
 
         // Convert Persian date to database format
         $validated['date'] = PersianDateService::toDatabaseFormat($validated['date']);
-        if (!$validated['date']) {
+        if (! $validated['date']) {
             return redirect()
                 ->back()
                 ->withErrors(['date' => 'Invalid date format. Please use Persian date format (YYYY/MM/DD).'])
@@ -153,7 +152,6 @@ class NationalInsightCenterInfoController extends Controller
                     'date' => $validated['date'],
                     'created_by' => Auth::id(),
                 ]);
-
 
                 // Create access permissions
                 if (isset($validated['access_users']) && is_array($validated['access_users'])) {
@@ -180,7 +178,7 @@ class NationalInsightCenterInfoController extends Controller
         } catch (\Exception $e) {
             Log::error('Failed to create national insight center info', [
                 'error' => $e->getMessage(),
-                'data' => $validated
+                'data' => $validated,
             ]);
 
             return redirect()
@@ -196,22 +194,22 @@ class NationalInsightCenterInfoController extends Controller
     public function show(NationalInsightCenterInfo $nationalInsightCenterInfo): Response
     {
         $this->authorize('view', $nationalInsightCenterInfo);
-        
+
         // Load the national insight center info with all necessary relationships
         $nationalInsightCenterInfo->load([
             'creator:id,name',
             'confirmer:id,name',
-            'infoStats.statCategoryItem.category'
+            'infoStats.statCategoryItem.category',
         ]);
 
         $infos = $nationalInsightCenterInfo->infoItems()
             ->with([
-                'infoCategory:id,name,code', 
-                'department:id,name,code', 
-                'creator:id,name', 
-                'itemStats' => function($query) {
+                'infoCategory:id,name,code',
+                'department:id,name,code',
+                'creator:id,name',
+                'itemStats' => function ($query) {
                     $query->with(['statCategoryItem.category']);
-                }
+                },
             ])
             ->orderBy('created_at', 'desc')
             ->paginate(5);
@@ -248,7 +246,7 @@ class NationalInsightCenterInfoController extends Controller
     public function edit(NationalInsightCenterInfo $nationalInsightCenterInfo): Response
     {
         $this->authorize('update', $nationalInsightCenterInfo);
-        
+
         $users = User::orderBy('name')->get();
 
         // Load existing access users and infoStats
@@ -256,7 +254,7 @@ class NationalInsightCenterInfoController extends Controller
 
         // Load stat categories and items for statistics management
         $statItems = StatCategoryItem::with('category')
-            ->whereHas('category', function($query) {
+            ->whereHas('category', function ($query) {
                 $query->where('status', 'active');
             })
             ->orderBy('name')
@@ -265,7 +263,7 @@ class NationalInsightCenterInfoController extends Controller
         $statCategories = StatCategory::where('status', 'active')
             ->orderBy('label')
             ->get();
-        
+
         // Get infoStats as a separate variable
         $infoStats = $nationalInsightCenterInfo->infoStats;
 
@@ -300,7 +298,7 @@ class NationalInsightCenterInfoController extends Controller
 
         // Convert Persian date to database format
         $validated['date'] = PersianDateService::toDatabaseFormat($validated['date']);
-        if (!$validated['date']) {
+        if (! $validated['date']) {
             return redirect()
                 ->back()
                 ->withErrors(['date' => 'Invalid date format. Please use Persian date format (YYYY/MM/DD).'])
@@ -344,7 +342,7 @@ class NationalInsightCenterInfoController extends Controller
             Log::error('Failed to update national insight center info', [
                 'error' => $e->getMessage(),
                 'national_insight_center_info_id' => $nationalInsightCenterInfo->id,
-                'data' => $validated
+                'data' => $validated,
             ]);
 
             return redirect()
@@ -360,7 +358,7 @@ class NationalInsightCenterInfoController extends Controller
     public function destroy(NationalInsightCenterInfo $nationalInsightCenterInfo): RedirectResponse
     {
         $this->authorize('delete', $nationalInsightCenterInfo);
-        
+
         try {
             $nationalInsightCenterInfo->delete();
 
@@ -371,7 +369,7 @@ class NationalInsightCenterInfoController extends Controller
         } catch (\Exception $e) {
             Log::error('Failed to delete national insight center info', [
                 'error' => $e->getMessage(),
-                'national_insight_center_info_id' => $nationalInsightCenterInfo->id
+                'national_insight_center_info_id' => $nationalInsightCenterInfo->id,
             ]);
 
             return redirect()
@@ -401,7 +399,7 @@ class NationalInsightCenterInfoController extends Controller
         } catch (\Exception $e) {
             Log::error('Failed to confirm national insight center info', [
                 'error' => $e->getMessage(),
-                'national_insight_center_info_id' => $nationalInsightCenterInfo->id
+                'national_insight_center_info_id' => $nationalInsightCenterInfo->id,
             ]);
 
             return redirect()
@@ -409,7 +407,6 @@ class NationalInsightCenterInfoController extends Controller
                 ->with('error', 'Failed to confirm national insight center info. Please try again.');
         }
     }
-
 
     /**
      * Update access permissions for the national insight center info.
@@ -461,22 +458,22 @@ class NationalInsightCenterInfoController extends Controller
     public function print(NationalInsightCenterInfo $nationalInsightCenterInfo): Response
     {
         $this->authorize('view', $nationalInsightCenterInfo);
-        
+
         // Load the national insight center info with all necessary relationships
         $nationalInsightCenterInfo->load([
             'creator:id,name,department_id',
             'creator.department:id,name',
             'confirmer:id,name',
-            'infoStats.statCategoryItem.category'
+            'infoStats.statCategoryItem.category',
         ]);
         $infos = $nationalInsightCenterInfo->infoItems()
             ->with([
-                'infoCategory:id,name,code', 
-                'department:id,name,code', 
-                'creator:id,name', 
-                'itemStats' => function($query) {
+                'infoCategory:id,name,code',
+                'department:id,name,code',
+                'creator:id,name',
+                'itemStats' => function ($query) {
                     $query->with(['statCategoryItem.category']);
-                }
+                },
             ])
             ->orderBy('created_at', 'desc')
             ->get();
@@ -497,9 +494,9 @@ class NationalInsightCenterInfoController extends Controller
         // Get date parameters (default to current week and previous week)
         $currentWeekStart = $request->input('current_week_start');
         $currentWeekEnd = $request->input('current_week_end');
-        
+
         // If not provided, use current week (Monday to Sunday)
-        if (!$currentWeekStart || !$currentWeekEnd) {
+        if (! $currentWeekStart || ! $currentWeekEnd) {
             $now = Carbon::now();
             $currentWeekStart = $now->copy()->startOfWeek();
             $currentWeekEnd = $now->copy()->endOfWeek();
@@ -515,7 +512,7 @@ class NationalInsightCenterInfoController extends Controller
         $nationalInsightCenterInfo->load([
             'creator:id,name,department_id',
             'creator.department:id,name',
-            'confirmer:id,name'
+            'confirmer:id,name',
         ]);
 
         // Get all items for current week
@@ -526,7 +523,7 @@ class NationalInsightCenterInfoController extends Controller
                 'department:id,name,code',
                 'province:id,name',
                 'district:id,name',
-                'itemStats.statCategoryItem.category'
+                'itemStats.statCategoryItem.category',
             ])
             ->get();
 
@@ -538,7 +535,7 @@ class NationalInsightCenterInfoController extends Controller
                 'department:id,name,code',
                 'province:id,name',
                 'district:id,name',
-                'itemStats.statCategoryItem.category'
+                'itemStats.statCategoryItem.category',
             ])
             ->get();
 
@@ -609,8 +606,8 @@ class NationalInsightCenterInfoController extends Controller
         foreach ($items as $item) {
             $categoryId = $item->info_category_id ?? 'uncategorized';
             $categoryName = $item->infoCategory->name ?? 'Uncategorized';
-            
-            if (!isset($data['by_category'][$categoryId])) {
+
+            if (! isset($data['by_category'][$categoryId])) {
                 $data['by_category'][$categoryId] = [
                     'id' => $categoryId,
                     'name' => $categoryName,
@@ -619,7 +616,7 @@ class NationalInsightCenterInfoController extends Controller
                     'items' => [],
                 ];
             }
-            
+
             $data['by_category'][$categoryId]['count']++;
             $data['by_category'][$categoryId]['items'][] = $item;
         }
@@ -630,27 +627,27 @@ class NationalInsightCenterInfoController extends Controller
                 $statCategoryId = $stat->statCategoryItem->category->id;
                 $statCategoryName = $stat->statCategoryItem->category->label;
                 $statItemName = $stat->statCategoryItem->label;
-                
-                if (!isset($data['by_stat_category'][$statCategoryId])) {
+
+                if (! isset($data['by_stat_category'][$statCategoryId])) {
                     $data['by_stat_category'][$statCategoryId] = [
                         'id' => $statCategoryId,
                         'name' => $statCategoryName,
                         'items' => [],
                     ];
                 }
-                
-                if (!isset($data['by_stat_category'][$statCategoryId]['items'][$statItemName])) {
+
+                if (! isset($data['by_stat_category'][$statCategoryId]['items'][$statItemName])) {
                     $data['by_stat_category'][$statCategoryId]['items'][$statItemName] = [
                         'name' => $statItemName,
                         'value' => 0,
                         'count' => 0,
                     ];
                 }
-                
+
                 // Try to parse numeric value, otherwise count occurrences
                 $value = $stat->string_value;
                 if (is_numeric($value)) {
-                    $data['by_stat_category'][$statCategoryId]['items'][$statItemName]['value'] += (float)$value;
+                    $data['by_stat_category'][$statCategoryId]['items'][$statItemName]['value'] += (float) $value;
                 } else {
                     $data['by_stat_category'][$statCategoryId]['items'][$statItemName]['count']++;
                 }
@@ -682,9 +679,9 @@ class NationalInsightCenterInfoController extends Controller
 
         // Calculate percentage change
         if ($previousWeekData['total_items'] > 0) {
-            $comparisons['total_items']['percentage_change'] = 
+            $comparisons['total_items']['percentage_change'] =
                 (($currentWeekData['total_items'] - $previousWeekData['total_items']) / $previousWeekData['total_items']) * 100;
-        } else if ($currentWeekData['total_items'] > 0) {
+        } elseif ($currentWeekData['total_items'] > 0) {
             $comparisons['total_items']['percentage_change'] = 100;
         }
 
@@ -697,14 +694,14 @@ class NationalInsightCenterInfoController extends Controller
         foreach ($allCategories as $categoryId) {
             $currentCount = $currentWeekData['by_category'][$categoryId]['count'] ?? 0;
             $previousCount = $previousWeekData['by_category'][$categoryId]['count'] ?? 0;
-            
+
             $comparisons['categories'][$categoryId] = [
                 'name' => $currentWeekData['by_category'][$categoryId]['name'] ?? $previousWeekData['by_category'][$categoryId]['name'] ?? 'Unknown',
                 'current' => $currentCount,
                 'previous' => $previousCount,
                 'change' => $currentCount - $previousCount,
-                'percentage_change' => $previousCount > 0 
-                    ? (($currentCount - $previousCount) / $previousCount) * 100 
+                'percentage_change' => $previousCount > 0
+                    ? (($currentCount - $previousCount) / $previousCount) * 100
                     : ($currentCount > 0 ? 100 : 0),
             ];
         }
@@ -728,22 +725,22 @@ class NationalInsightCenterInfoController extends Controller
         $dateFrom = null;
         $dateTo = null;
 
-        if (!empty($validated['date_from'])) {
+        if (! empty($validated['date_from'])) {
             $dateFrom = PersianDateService::toDatabaseFormat($validated['date_from']);
         }
 
-        if (!empty($validated['date_to'])) {
+        if (! empty($validated['date_to'])) {
             $dateTo = PersianDateService::toDatabaseFormat($validated['date_to']);
         }
 
         // Get all national insight center infos accessible by the user
         $query = NationalInsightCenterInfo::with(['creator:id,name', 'confirmer:id,name'])
             ->withCount(['infoItems', 'infoStats'])
-            ->where(function($q) {
+            ->where(function ($q) {
                 $q->where('created_by', Auth::id())
-                  ->orWhereHas('accesses', function($accessQuery) {
-                      $accessQuery->where('user_id', Auth::id());
-                  });
+                    ->orWhereHas('accesses', function ($accessQuery) {
+                        $accessQuery->where('user_id', Auth::id());
+                    });
             });
 
         // Apply date filters if provided
@@ -763,6 +760,108 @@ class NationalInsightCenterInfoController extends Controller
                 'date_from' => $validated['date_from'] ?? '',
                 'date_to' => $validated['date_to'] ?? '',
             ],
+        ]);
+    }
+
+    /**
+     * Get dates data for national insight center info report.
+     */
+    public function dates(Request $request)
+    {
+        $this->authorize('viewAny', NationalInsightCenterInfo::class);
+
+        $validated = $request->validate([
+            'date_from' => 'nullable|string',
+            'date_to' => 'nullable|string',
+        ]);
+
+        // Convert Persian dates to database format if provided
+        $dateFrom = null;
+        $dateTo = null;
+
+        if (! empty($validated['date_from'])) {
+            $dateFrom = PersianDateService::toDatabaseFormat($validated['date_from']);
+        }
+
+        if (! empty($validated['date_to'])) {
+            $dateTo = PersianDateService::toDatabaseFormat($validated['date_to']);
+        }
+
+        // Get all national insight center infos accessible by the user
+        $query = NationalInsightCenterInfo::with(['creator:id,name', 'confirmer:id,name'])
+            ->withCount(['infoItems', 'infoStats'])
+            ->where(function ($q) {
+                $q->where('created_by', Auth::id())
+                    ->orWhereHas('accesses', function ($accessQuery) {
+                        $accessQuery->where('user_id', Auth::id());
+                    });
+            });
+
+        // Apply date filters if provided
+        if ($dateFrom) {
+            $query->where('date', '>=', $dateFrom);
+        }
+
+        if ($dateTo) {
+            $query->where('date', '<=', $dateTo);
+        }
+
+        $nationalInsightCenterInfos = $query->orderBy('date', 'desc')->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $nationalInsightCenterInfos,
+            'filters' => [
+                'date_from' => $validated['date_from'] ?? '',
+                'date_to' => $validated['date_to'] ?? '',
+            ],
+        ]);
+    }
+
+    /**
+     * Print dates report for national insight center info.
+     */
+    public function printDates(Request $request)
+    {
+        $this->authorize('viewAny', NationalInsightCenterInfo::class);
+
+        $validated = $request->validate([
+            'date_from' => 'nullable|string',
+            'date_to' => 'nullable|string',
+        ]);
+
+        // Convert Persian dates to database format if provided
+        $dateFrom = null;
+        $dateTo = null;
+
+        if (! empty($validated['date_from'])) {
+            $dateFrom = PersianDateService::toDatabaseFormat($validated['date_from']);
+        }
+
+        if (! empty($validated['date_to'])) {
+            $dateTo = PersianDateService::toDatabaseFormat($validated['date_to']);
+        }
+        // Call the stored procedure to get IDs by date filter
+        $idsResult = DB::select(
+            'CALL sp_get_ids_by_date(?, ?)',
+            [$dateFrom, $dateTo]
+        );
+        $ids = collect($idsResult)->pluck('id')->toArray();
+        // Use the IDs from the stored procedure to call the SUM integer value SP and get per-category totals
+        $statSums = [];
+        if (! empty($ids)) {
+            // Convert array to comma-separated string for the SP input
+            $idsString = implode(',', $ids);
+            // The procedure will return stat_category_item_id and total_integer_value
+            $statSums = DB::select('CALL sp_sum_integer_values_by_category(?)', [$idsString]);
+        }
+        // Get all national insight center infos accessible by the user with their info items
+        $sub_items = DB::select('CALL sp_get_sub_items_by_ids(?)', [$idsString]);
+        
+        // Aggregate all stats from national insight center infos only (not from info items)
+        return view('national-insight-center-info.print-dates', [
+            'sub_items' => $sub_items,
+            'statSums' => $statSums,
         ]);
     }
 }

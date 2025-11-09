@@ -22,6 +22,8 @@ Route::middleware(['auth'])->group(function () {
     // National Insight Center Info routes
     // IMPORTANT: Specific routes must come BEFORE resource routes to avoid conflicts
     Route::get('national-insight-center-infos/report', [NationalInsightCenterInfoController::class, 'report'])->name('national-insight-center-infos.report');
+    Route::get('national-insight-center-infos/dates', [NationalInsightCenterInfoController::class, 'dates'])->name('national-insight-center-infos.dates');
+    Route::get('national-insight-center-infos/print-dates', [NationalInsightCenterInfoController::class, 'printDates'])->name('national-insight-center-infos.print-dates');
     Route::resource('national-insight-center-infos', NationalInsightCenterInfoController::class);
     Route::patch('national-insight-center-infos/{nationalInsightCenterInfo}/confirm', [NationalInsightCenterInfoController::class, 'confirm'])->name('national-insight-center-infos.confirm');
     Route::get('national-insight-center-infos/{nationalInsightCenterInfo}/stats', [NationalInsightCenterInfoController::class, 'manageStats'])->name('national-insight-center-infos.stats');

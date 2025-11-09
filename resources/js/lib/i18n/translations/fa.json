@@ -2073,6 +2073,7 @@
     "national_insight_center_info.report.date_to_placeholder": "تاریخ پایان را انتخاب کنید",
     "national_insight_center_info.report.filter_button": "فیلتر",
     "national_insight_center_info.report.reset_button": "بازنشانی",
+    "national_insight_center_info.report.print_button": "چاپ",
     "national_insight_center_info.report.results_title": "نتایج گزارش",
     "national_insight_center_info.report.results_description": "تعداد {count} رکورد یافت شد",
     "national_insight_center_info.report.no_results": "هیچ نتیجه‌ای یافت نشد",

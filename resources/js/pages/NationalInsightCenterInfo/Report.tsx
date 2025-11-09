@@ -5,10 +5,11 @@ import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Calendar, FileText, Search, Filter } from 'lucide-react';
+import { Calendar, FileText, Search, Filter, Printer } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/translate';
 import Header from '@/components/template/header';
 import PersianDatePicker from '@/components/ui/PersianDatePicker';
+import axios from 'axios';
 
 interface Props {
   filters?: {
@@ -42,6 +43,8 @@ export default function NationalInsightCenterInfoReport({
 
   const handleFilter = (e: React.FormEvent) => {
     e.preventDefault();
+    // Call the dates endpoint
+    fetchDates();
     router.get(route('national-insight-center-infos.report'), {
       date_from: dateFrom,
       date_to: dateTo,
@@ -49,6 +52,21 @@ export default function NationalInsightCenterInfoReport({
       preserveState: true,
       preserveScroll: true,
     });
+  };
+
+  const fetchDates = async () => {
+    try {
+      const response = await axios.get(route('national-insight-center-infos.dates'), {
+        params: {
+          date_from: dateFrom,
+          date_to: dateTo,
+        },
+      });
+      console.log('Dates data:', response.data);
+      // Handle the response data here if needed
+    } catch (error) {
+      console.error('Error fetching dates:', error);
+    }
   };
 
   const handleReset = () => {
@@ -137,6 +155,20 @@ export default function NationalInsightCenterInfoReport({
                   className="px-6 py-3"
                 >
                   {t('national_insight_center_info.report.reset_button')}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    const params = new URLSearchParams();
+                    if (dateFrom) params.append('date_from', dateFrom);
+                    if (dateTo) params.append('date_to', dateTo);
+                    window.open(route('national-insight-center-infos.print-dates') + '?' + params.toString(), '_blank');
+                  }}
+                  className="px-6 py-3 flex items-center gap-2"
+                >
+                  <Printer className="h-4 w-4" />
+                  {t('national_insight_center_info.report.print_button')}
                 </Button>
                 <Button
                   type="submit"
