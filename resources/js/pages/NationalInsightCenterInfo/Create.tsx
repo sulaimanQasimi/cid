@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, FileText, Save, X, Users, Search, ArrowRight, Trash, User, Shield, BarChart3 } from 'lucide-react';
+import { ArrowLeft, FileText, Save, X, Users, Search, ArrowRight, Trash, User, Shield, BarChart3, Calendar } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/translate';
 import { usePermissions } from '@/hooks/use-permissions';
 import { CanCreate } from '@/components/ui/permission-guard';
@@ -19,6 +19,8 @@ import FooterButtons from '@/components/template/FooterButtons';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PersianDatePicker from '@/components/ui/PersianDatePicker';
 import moment from 'moment-jalaali';
+import TreeViewStatSelector from '@/components/reports/TreeViewStatSelector';
+import { Building2, AlertTriangle } from 'lucide-react';
 
 
 interface User {
@@ -27,8 +29,32 @@ interface User {
   email: string;
 }
 
+interface StatCategory {
+  id: number;
+  name: string;
+  label: string;
+  color: string;
+  status: string;
+}
+
+interface StatCategoryItem {
+  id: number;
+  name: string;
+  label: string;
+  color: string | null;
+  parent_id: number | null;
+  category: {
+    id: number;
+    name: string;
+    label: string;
+    color: string;
+  };
+}
+
 interface CreateProps {
   users: User[];
+  statItems?: StatCategoryItem[];
+  statCategories?: StatCategory[];
 }
 
 type NationalInsightCenterInfoFormData = {
@@ -37,9 +63,14 @@ type NationalInsightCenterInfoFormData = {
   description?: string;
   date?: string;
   access_users?: number[];
+  stats?: Array<{
+    stat_category_item_id: number;
+    value: string;
+    notes?: string;
+  }>;
 };
 
-export default function NationalInsightCenterInfosCreate({ users }: CreateProps) {
+export default function NationalInsightCenterInfosCreate({ users, statItems = [], statCategories = [] }: CreateProps) {
   const { t } = useTranslation();
   const { canCreate } = usePermissions();
 
@@ -56,6 +87,14 @@ export default function NationalInsightCenterInfosCreate({ users }: CreateProps)
   // Access control state
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const [userSearchTerm, setUserSearchTerm] = useState<string>('');
+
+  // Statistics state
+  const [statsData, setStatsData] = useState<{
+    [key: number]: { value: string; notes: string | null };
+  }>({});
+
+  // Category filter for stats
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -75,9 +114,49 @@ export default function NationalInsightCenterInfosCreate({ users }: CreateProps)
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Prepare stats data for submission
+    const stats = Object.entries(statsData)
+      .filter(([_, { value }]) => value.trim() !== '')
+      .map(([itemId, { value, notes }]) => ({
+        stat_category_item_id: parseInt(itemId),
+        value,
+        notes: notes || undefined,
+      }));
+
+    // Include stats in the form data
+    setData('stats', stats);
+
     // Submit the form
     post(route('national-insight-center-infos.store'));
   };
+
+  // Handle stat input change
+  function handleStatChange(itemId: number, value: string) {
+    setStatsData(prev => ({
+      ...prev,
+      [itemId]: { ...prev[itemId] || { notes: null }, value }
+    }));
+  }
+
+  // Handle stat notes change
+  function handleNotesChange(itemId: number, notes: string) {
+    setStatsData(prev => ({
+      ...prev,
+      [itemId]: { ...prev[itemId] || { value: '' }, notes: notes || null }
+    }));
+  }
+
+  // Filter stat items by category if one is selected
+  const filteredStatItems = selectedCategory
+    ? statItems.filter(item => item.category.id === selectedCategory)
+    : statItems;
+
+  // Group stat items by category for the dropdown filter
+  const categoriesForFilter = statCategories.map(category => ({
+    id: category.id,
+    label: category.label,
+    color: category.color
+  }));
 
 
   // Access control functions
@@ -146,21 +225,62 @@ export default function NationalInsightCenterInfosCreate({ users }: CreateProps)
                         <Shield className="h-4 w-4" />
                         {t('national_insight_center_info.access_control')}
                       </TabsTrigger>
+                      <TabsTrigger value="statistics" className="flex items-center gap-2 data-[state=active]:bg-purple-600 data-[state=active]:text-white dark:data-[state=active]:bg-purple-700 dark:data-[state=active]:text-white hover:bg-purple-100 dark:hover:bg-gray-700 transition-colors">
+                        <BarChart3 className="h-4 w-4" />
+                        {t('national_insight_center_info.statistics')}
+                      </TabsTrigger>
                     </TabsList>
 
                     {/* Basic Information Tab */}
                     <TabsContent value="basic" className="space-y-8">
-                      {/* Date Field */}
-                      <div className="space-y-4">
-                        <PersianDatePicker
-                          id="date"
-                          value={data.date}
-                          onChange={(value) => setData('date', value)}
-                          label={t('national_insight_center_info.date_label')}
-                          required
-                          error={errors.date}
-                          className="w-full"
-                        />
+                      {/* Date and Code Fields in One Row */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Date Field */}
+                        <div className="space-y-4">
+                          <Label htmlFor="date" dir="rtl" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2 text-right">
+                            <Calendar className="h-4 w-4" />
+                            {t('national_insight_center_info.date_label')} *
+                          </Label>
+                          <div className="relative">
+                            <PersianDatePicker
+                              id="date"
+                              value={data.date}
+                              onChange={(value) => setData('date', value)}
+                              required
+                              error={errors.date}
+                              className="w-full h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg"
+                            />
+                            {errors.date && (
+                              <div className="mt-2 flex items-center gap-2 text-red-600">
+                                <X className="h-4 w-4" />
+                                <p className="text-sm font-medium">{errors.date}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Code Field */}
+                        <div className="space-y-4">
+                          <Label htmlFor="code" dir="rtl" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2 text-right">
+                            <BarChart3 className="h-4 w-4" />
+                            {t('national_insight_center_info.code_label')}
+                          </Label>
+                          <div className="relative">
+                            <Input
+                              id="code"
+                              value={data.code}
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('code', e.target.value)}
+                              className="h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg text-right"
+                              placeholder={t('national_insight_center_info.code_placeholder')}
+                            />
+                            {errors.code && (
+                              <div className="mt-2 flex items-center gap-2 text-red-600">
+                                <X className="h-4 w-4" />
+                                <p className="text-sm font-medium">{errors.code}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
 
                       {/* Name Field */}
@@ -182,29 +302,6 @@ export default function NationalInsightCenterInfosCreate({ users }: CreateProps)
                             <div className="mt-2 flex items-center gap-2 text-red-600">
                               <X className="h-4 w-4" />
                               <p className="text-sm font-medium">{errors.name}</p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Code Field */}
-                      <div className="space-y-4">
-                        <Label htmlFor="code" dir="rtl" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2 text-right">
-                          <BarChart3 className="h-4 w-4" />
-                          {t('national_insight_center_info.code_label')}
-                        </Label>
-                        <div className="relative">
-                          <Input
-                            id="code"
-                            value={data.code}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('code', e.target.value)}
-                            className="h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg text-right"
-                            placeholder={t('national_insight_center_info.code_placeholder')}
-                          />
-                          {errors.code && (
-                            <div className="mt-2 flex items-center gap-2 text-red-600">
-                              <X className="h-4 w-4" />
-                              <p className="text-sm font-medium">{errors.code}</p>
                             </div>
                           )}
                         </div>
@@ -350,6 +447,69 @@ export default function NationalInsightCenterInfosCreate({ users }: CreateProps)
                             </div>
                             <p className="text-lg font-semibold text-purple-800 dark:text-purple-200 mb-2">{t('national_insight_center_info.access.no_users_found')}</p>
                             <p className="text-purple-600 dark:text-purple-400">{t('national_insight_center_info.access.try_different_search')}</p>
+                          </div>
+                        )}
+                      </div>
+                    </TabsContent>
+
+                    {/* Statistics Tab */}
+                    <TabsContent value="statistics" className="space-y-6">
+                      <div className="bg-gradient-to-l from-purple-50/50 dark:from-purple-900/10 to-white dark:to-gray-800 rounded-lg p-6 border border-purple-200 dark:border-purple-700">
+                        <div className="flex items-center gap-2 mb-4">
+                          <BarChart3 className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                          <h3 className="text-lg font-semibold text-purple-800 dark:text-purple-200">
+                            {t('national_insight_center_info.statistics_title')}
+                          </h3>
+                        </div>
+                        <p className="text-sm text-purple-600 dark:text-purple-400 mb-6">
+                          {t('national_insight_center_info.statistics_description')}
+                        </p>
+
+                        {/* Category Filter */}
+                        <div className="mb-6">
+                          <Label htmlFor="category-filter" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right" dir="rtl">
+                            {t('national_insight_center_info_item.stats.filter_by_category')}
+                            <Building2 className="h-4 w-4" />
+                          </Label>
+                          <Select
+                            value={selectedCategory?.toString() || 'all'}
+                            onValueChange={(value) => setSelectedCategory(value !== 'all' ? parseInt(value) : null)}
+                          >
+                            <SelectTrigger id="category-filter" className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right mt-2">
+                              <SelectValue placeholder={t('incidents.filters.all_categories')} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">{t('incidents.filters.all_categories')}</SelectItem>
+                              {categoriesForFilter.map((category) => (
+                                <SelectItem key={category.id} value={category.id.toString()}>
+                                  <div className="flex items-center">
+                                    <div
+                                      className="mr-2 h-3 w-3 rounded-full"
+                                      style={{ backgroundColor: category.color }}
+                                    ></div>
+                                    {category.label}
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Stats Selector */}
+                        {filteredStatItems.length > 0 ? (
+                          <TreeViewStatSelector
+                            items={filteredStatItems}
+                            statsData={statsData}
+                            onValueChange={handleStatChange}
+                            onNotesChange={handleNotesChange}
+                          />
+                        ) : (
+                          <div className="text-center py-8">
+                            <div className="p-4 bg-purple-100 dark:bg-purple-800/30 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                              <AlertTriangle className="h-8 w-8 text-purple-400 dark:text-purple-500" />
+                            </div>
+                            <p className="text-lg font-semibold text-purple-800 dark:text-purple-200 mb-2">{t('national_insight_center_info_item.stats.no_items')}</p>
+                            <p className="text-purple-600 dark:text-purple-400">{t('national_insight_center_info_item.stats.no_items_description')}</p>
                           </div>
                         )}
                       </div>

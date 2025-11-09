@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, FileText, Save, X, Users, Search, ArrowRight, Trash, User, Shield, BarChart3, Building2, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, FileText, Save, X, Users, Search, ArrowRight, Trash, User, Shield, BarChart3, Building2, AlertTriangle, Calendar } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/translate';
 import { usePermissions } from '@/hooks/use-permissions';
 import { CanUpdate } from '@/components/ui/permission-guard';
@@ -322,26 +322,53 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
                         </div>
                       </div>
 
-                      {/* Code Field */}
-                      <div className="space-y-4">
-                        <Label htmlFor="code" dir="rtl" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2 text-right">
-                          <FileText className="h-4 w-4" />
-                          {t('national_insight_center_info.code_label')}
-                        </Label>
-                        <div className="relative">
-                          <Input
-                            id="code"
-                            value={data.code}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('code', e.target.value)}
-                            className="h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg text-right"
-                            placeholder={t('national_insight_center_info.code_placeholder')}
-                          />
-                          {errors.code && (
-                            <div className="mt-2 flex items-center gap-2 text-red-600">
-                              <X className="h-4 w-4" />
-                              <p className="text-sm font-medium">{errors.code}</p>
-                            </div>
-                          )}
+                      {/* Date and Code Fields in One Row */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Date Field */}
+                        <div className="space-y-4">
+                          <Label htmlFor="date" dir="rtl" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2 text-right">
+                            <Calendar className="h-4 w-4" />
+                            {t('national_insight_center_info.date_label')} *
+                          </Label>
+                          <div className="relative">
+                            <PersianDatePicker
+                              id="date"
+                              value={data.date}
+                              onChange={(value) => setData('date', value)}
+                              required
+                              error={errors.date}
+                              className="w-full h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg"
+                            />
+                            {errors.date && (
+                              <div className="mt-2 flex items-center gap-2 text-red-600">
+                                <X className="h-4 w-4" />
+                                <p className="text-sm font-medium">{errors.date}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Code Field */}
+                        <div className="space-y-4">
+                          <Label htmlFor="code" dir="rtl" className="text-lg font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2 text-right">
+                            <FileText className="h-4 w-4" />
+                            {t('national_insight_center_info.code_label')}
+                          </Label>
+                          <div className="relative">
+                            <Input
+                              id="code"
+                              value={data.code}
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('code', e.target.value)}
+                              className="h-12 text-lg border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 rounded-xl shadow-lg text-right"
+                              placeholder={t('national_insight_center_info.code_placeholder')}
+                            />
+                            {errors.code && (
+                              <div className="mt-2 flex items-center gap-2 text-red-600">
+                                <X className="h-4 w-4" />
+                                <p className="text-sm font-medium">{errors.code}</p>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
 
@@ -367,19 +394,6 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
                             </div>
                           )}
                         </div>
-                      </div>
-
-                      {/* Date Field */}
-                      <div className="space-y-4">
-                        <PersianDatePicker
-                          id="date"
-                          value={data.date}
-                          onChange={(value) => setData('date', value)}
-                          label={t('national_insight_center_info.date_label')}
-                          required
-                          error={errors.date}
-                          className="w-full"
-                        />
                       </div>
                     </TabsContent>
 

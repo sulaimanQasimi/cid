@@ -121,6 +121,10 @@ class NationalInsightCenterInfoController extends Controller
             'date' => 'required|string',
             'access_users' => 'nullable|array',
             'access_users.*' => 'integer|exists:users,id',
+            'stats' => 'nullable|array',
+            'stats.*.stat_category_item_id' => 'required|integer|exists:stat_category_items,id',
+            'stats.*.value' => 'required|string|max:255',
+            'stats.*.notes' => 'nullable|string|max:1000',
         ]);
 
         // Convert Persian date to database format
@@ -161,6 +165,11 @@ class NationalInsightCenterInfoController extends Controller
                     }
                 }
 
+                // Create statistics if provided
+                if (isset($validated['stats']) && is_array($validated['stats'])) {
+                    $this->createInfoStats($nationalInsightCenterInfo, $validated['stats']);
+                }
+
                 return $nationalInsightCenterInfo;
             });
 
@@ -191,7 +200,8 @@ class NationalInsightCenterInfoController extends Controller
         // Load the national insight center info with all necessary relationships
         $nationalInsightCenterInfo->load([
             'creator:id,name',
-            'confirmer:id,name'
+            'confirmer:id,name',
+            'infoStats.statCategoryItem.category'
         ]);
 
         $infos = $nationalInsightCenterInfo->infoItems()

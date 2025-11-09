@@ -50,6 +50,24 @@ interface Info {
 }
 
 
+interface InfoStat {
+  id: number;
+  stat_category_item_id: number;
+  string_value: string;
+  notes: string | null;
+  statCategoryItem: {
+    id: number;
+    name: string;
+    label: string;
+    category: {
+      id: number;
+      name: string;
+      label: string;
+      color: string;
+    };
+  };
+}
+
 interface NationalInsightCenterInfo {
   id: number;
   name: string;
@@ -58,6 +76,7 @@ interface NationalInsightCenterInfo {
   updated_at: string;
   code: string;
   date: string | null;
+  infoStats?: InfoStat[];
 }
 
 interface InfoCategory {
@@ -265,6 +284,117 @@ export default function ShowNationalInsightCenterInfo({ nationalInsightCenterInf
             </div>
           </CardContent>
         </Card>
+
+        {/* National Insight Center Info Statistics Section */}
+        {nationalInsightCenterInfo.infoStats && nationalInsightCenterInfo.infoStats.length > 0 && (
+          <Card className="shadow-2xl bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 overflow-hidden mb-8">
+            <CardHeader className="bg-gradient-to-l from-purple-500 to-purple-600 text-white py-6">
+              <CardTitle className="flex items-center gap-4">
+                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
+                  <BarChart3 className="h-6 w-6" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">{t('national_insight_center_info.show.info_stats_title')}</div>
+                  <div className="text-purple-100 text-sm font-medium">{t('national_insight_center_info.show.info_stats_description')}</div>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-8">
+              <div className="overflow-x-auto">
+                <table className="w-full border border-purple-200 dark:border-purple-700 rounded-lg bg-white dark:bg-gray-800 text-sm" style={{ borderCollapse: 'collapse' }}>
+                  <tbody>
+                    {/* Group stats by category */}
+                    {(() => {
+                      const groupedStats = nationalInsightCenterInfo.infoStats.reduce((acc, stat) => {
+                        const categoryId = stat.statCategoryItem.category.id;
+                        if (!acc[categoryId]) {
+                          acc[categoryId] = {
+                            category: stat.statCategoryItem.category,
+                            items: []
+                          };
+                        }
+                        acc[categoryId].items.push(stat);
+                        return acc;
+                      }, {} as Record<number, { category: any; items: InfoStat[] }>);
+
+                      const categoryEntries = Object.entries(groupedStats);
+                      
+                      return (
+                        <>
+                          {/* First Row: All Categories */}
+                          <tr className="border-b border-purple-200 dark:border-purple-700 bg-purple-50 dark:bg-purple-900/20">
+                            {categoryEntries.map(([categoryId, categoryData]) => (
+                              <td 
+                                key={categoryId}
+                                colSpan={categoryData.items.length} 
+                                className="font-bold text-center py-2 border-r border-purple-200 dark:border-purple-700 text-purple-800 dark:text-purple-200 text-sm"
+                                style={{ backgroundColor: categoryData.category.color + '20' }}
+                              >
+                                {categoryData.category.label}
+                              </td>
+                            ))}
+                          </tr>
+                          
+                          {/* Second Row: Item Labels */}
+                          <tr className="border-b border-purple-200 dark:border-purple-700 bg-purple-25 dark:bg-purple-900/10">
+                            {categoryEntries.map(([categoryId, categoryData]) => (
+                              <React.Fragment key={categoryId}>
+                                {categoryData.items.map((stat) => (
+                                  <th 
+                                    key={stat.id}
+                                    className="text-center py-1 font-semibold border-r border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300 bg-white dark:bg-gray-800 text-xs"
+                                  >
+                                    {stat.statCategoryItem.label}
+                                  </th>
+                                ))}
+                              </React.Fragment>
+                            ))}
+                          </tr>
+                          
+                          {/* Third Row: Values */}
+                          <tr className="border-b border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-800">
+                            {categoryEntries.map(([categoryId, categoryData]) => (
+                              <React.Fragment key={categoryId}>
+                                {categoryData.items.map((stat) => (
+                                  <td 
+                                    key={stat.id}
+                                    className="text-center py-1 border-r border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-800"
+                                  >
+                                    <Badge variant="outline" className="bg-gradient-to-l from-green-100 dark:from-green-800 to-green-200 dark:to-green-700 text-green-800 dark:text-green-200 border-green-300 dark:border-green-600 px-2 py-0.5 rounded text-xs font-semibold">
+                                      {stat.string_value}
+                                    </Badge>
+                                  </td>
+                                ))}
+                              </React.Fragment>
+                            ))}
+                          </tr>
+                          
+                          {/* Notes Row (if any) */}
+                          {nationalInsightCenterInfo.infoStats.some(stat => stat.notes) && (
+                            <tr className="border-b border-purple-200 dark:border-purple-700 bg-gray-50 dark:bg-gray-700/50">
+                              {categoryEntries.map(([categoryId, categoryData]) => (
+                                <React.Fragment key={categoryId}>
+                                  {categoryData.items.map((stat) => (
+                                    <td 
+                                      key={`notes-${stat.id}`}
+                                      className="text-center py-1 text-xs border-r border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-400 bg-gray-50 dark:bg-gray-700/50"
+                                    >
+                                      {stat.notes || ''}
+                                    </td>
+                                  ))}
+                                </React.Fragment>
+                              ))}
+                            </tr>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Aggregated Statistics Section */}
         {aggregatedStats && aggregatedStats.length > 0 && (
