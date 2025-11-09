@@ -251,8 +251,8 @@ class NationalInsightCenterInfoController extends Controller
         
         $users = User::orderBy('name')->get();
 
-        // Load existing access users
-        $nationalInsightCenterInfo->load(['accesses.user:id,name', 'confirmer:id,name']);
+        // Load existing access users and infoStats
+        $nationalInsightCenterInfo->load(['accesses.user:id,name', 'confirmer:id,name', 'infoStats']);
 
         // Load stat categories and items for statistics management
         $statItems = StatCategoryItem::with('category')
@@ -265,12 +265,13 @@ class NationalInsightCenterInfoController extends Controller
         $statCategories = StatCategory::where('status', 'active')
             ->orderBy('label')
             ->get();
-
-        // Load existing stats
-        $nationalInsightCenterInfo->load(['infoStats.statCategoryItem.category']);
+        
+        // Get infoStats as a separate variable
+        $infoStats = $nationalInsightCenterInfo->infoStats;
 
         return Inertia::render('NationalInsightCenterInfo/Edit', [
             'nationalInsightCenterInfo' => $nationalInsightCenterInfo,
+            'infoStats' => $infoStats,
             'users' => $users,
             'statItems' => $statItems,
             'statCategories' => $statCategories,
@@ -283,7 +284,7 @@ class NationalInsightCenterInfoController extends Controller
     public function update(Request $request, NationalInsightCenterInfo $nationalInsightCenterInfo): RedirectResponse
     {
         $this->authorize('update', $nationalInsightCenterInfo);
-        
+        Log::info($request->all());
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique('national_insight_center_infos')->ignore($nationalInsightCenterInfo->id)],
             'code' => ['nullable', 'string', 'max:50', Rule::unique('national_insight_center_infos')->ignore($nationalInsightCenterInfo->id)],

@@ -60,21 +60,18 @@ interface StatCategoryItem {
 
 interface InfoStat {
   id: number;
+  info_type_id: number | null;
+  national_insight_center_info_id: number;
+  national_insight_center_info_item_id: number | null;
   stat_category_item_id: number;
-  string_value: string;
+  integer_value: number | null;
+  string_value: string | null;
   notes: string | null;
-  statCategoryItem: {
-    id: number;
-    name: string;
-    label: string;
-    category: {
-      id: number;
-      name: string;
-      label: string;
-      color: string;
-    };
-  };
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
 }
+
 
 interface NationalInsightCenterInfo {
   id: number;
@@ -91,6 +88,7 @@ interface NationalInsightCenterInfo {
 interface EditProps {
   nationalInsightCenterInfo: NationalInsightCenterInfo;
   users: User[];
+  infoStats: InfoStat[];
   statItems?: StatCategoryItem[];
   statCategories?: StatCategory[];
 }
@@ -108,11 +106,11 @@ type NationalInsightCenterInfoFormData = {
   }>;
 };
 
-export default function NationalInsightCenterInfosEdit({ nationalInsightCenterInfo, users, statItems = [], statCategories = [] }: EditProps) {
+export default function NationalInsightCenterInfosEdit({ nationalInsightCenterInfo,infoStats, users, statItems = [], statCategories = [] }: EditProps) {
   const { t } = useTranslation();
   const { canUpdate } = usePermissions();
 
-  const { data, setData, put, processing, errors } = useForm<NationalInsightCenterInfoFormData>({
+  const { data, setData, put, processing, errors, transform } = useForm<NationalInsightCenterInfoFormData>({
     name: nationalInsightCenterInfo.name || '',
     code: nationalInsightCenterInfo.code || '',
     description: nationalInsightCenterInfo.description || '',
@@ -122,25 +120,54 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
       return dbDate.isValid() ? dbDate.format('jYYYY/jMM/jDD') : '';
     })() : '',
     access_users: [] as number[],
+    stats: [] as Array<{
+      stat_category_item_id: number;
+      value: string;
+      notes?: string;
+    }>,
   });
 
   // Access control state
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const [userSearchTerm, setUserSearchTerm] = useState<string>('');
-
-  // Statistics state
+// console.log(infoStats);
+  // Statistics state - initialize from existing stats
   const [statsData, setStatsData] = useState<{
     [key: number]: { value: string; notes: string | null };
   }>(() => {
     const initialStatsData: { [key: number]: { value: string; notes: string | null } } = {};
-    nationalInsightCenterInfo.infoStats?.forEach(stat => {
-      initialStatsData[stat.statCategoryItem.id] = {
-        value: stat.string_value || '',
-        notes: stat.notes
-      };
-    });
+    if (infoStats && Array.isArray(infoStats)) {
+      infoStats.forEach(stat => {
+        // Use stat_category_item_id directly (Laravel keeps snake_case in JSON)
+        const itemId = stat.stat_category_item_id;
+        if (itemId) {
+          initialStatsData[itemId] = {
+            value: stat.string_value || '',
+            notes: stat.notes || null
+          };
+        }
+      });
+    }
     return initialStatsData;
   });
+
+  // Update statsData when nationalInsightCenterInfo changes
+  useEffect(() => {
+    if (infoStats && Array.isArray(infoStats)) {
+      const updatedStatsData: { [key: number]: { value: string; notes: string | null } } = {};
+      infoStats.forEach(stat => {
+        // Use stat_category_item_id from the attributes
+        const itemId = stat.stat_category_item_id;
+        if (itemId) {
+          updatedStatsData[itemId] = {
+            value: stat.string_value || '',
+            notes: stat.notes || null
+          };
+        }
+      });
+      setStatsData(updatedStatsData);
+    }
+  }, [infoStats]);
 
   // Category filter for stats
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
@@ -204,11 +231,17 @@ export default function NationalInsightCenterInfosEdit({ nationalInsightCenterIn
         notes: notes || undefined,
       }));
 
-    // Include stats in the form data
-    setData('stats', stats);
+    // Use transform to ensure stats and access_users are included
+    transform((formData) => {
+      formData.stats = stats;
+      formData.access_users = selectedUsers;
+      return formData;
+    });
 
     // Submit the form
-    put(route('national-insight-center-infos.update', nationalInsightCenterInfo.id));
+    put(route('national-insight-center-infos.update', nationalInsightCenterInfo.id), {
+      preserveScroll: true,
+    });
   };
 
   // Filter stat items by category if one is selected
