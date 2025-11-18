@@ -144,7 +144,7 @@ class NationalInsightCenterInfoItemController extends Controller
                 'created_by' => Auth::id(),
                 'confirmed' => false,
                 'confirmed_by' => null,
-                'confirmed_at' => null,
+                // 'confirmed_at' => null,
             ]);
 
             return redirect()

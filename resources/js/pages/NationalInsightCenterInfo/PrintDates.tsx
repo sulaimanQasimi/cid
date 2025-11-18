@@ -39,6 +39,7 @@ interface SubItem {
     updated_at: string;
     province_name: string | null;
     district_name: string | null;
+    department_name: string | null;
 }
 
 interface Props {
@@ -191,6 +192,7 @@ export default function PrintDates({ sub_items = [], statSums = [], dateFrom, da
                     <table className="min-w-full border-collapse border-2 border-gray-900 bg-white print:border-gray-800">
                         <thead>
                             <tr className="bg-gray-900 text-white">
+                                <th className="border-2 border-gray-900 px-6 py-3 text-center">اداره</th>
                                 <th className="border-2 border-gray-900 px-6 py-3 text-center">ولایت</th>
                                 <th className="border-2 border-gray-900 px-6 py-3 text-center">ولسوالی</th>
                                 <th className="w-1/3 border-2 border-gray-900 px-6 py-3 text-center">توضیحات</th>
@@ -201,6 +203,9 @@ export default function PrintDates({ sub_items = [], statSums = [], dateFrom, da
                             {sub_items.length > 0 ? (
                                 sub_items.map((item) => (
                                     <tr key={item.id} className="transition hover:bg-gray-100">
+                                        <td className="border-2 border-gray-900 px-4 py-2 text-center">
+                                            {item.department_name || '-'}
+                                        </td>
                                         <td className="border-2 border-gray-900 px-4 py-2 text-center">
                                             {item.province_name || '-'}
                                         </td>

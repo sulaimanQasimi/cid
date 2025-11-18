@@ -63,7 +63,8 @@ return new class extends Migration
                     sci.created_at,
                     sci.updated_at,
                     p.name AS province_name,
-                    d.name AS district_name
+                    d.name AS district_name,
+                    dept.name AS department_name
                 FROM national_insight_center_info_items AS sci
                 LEFT JOIN national_insight_center_infos AS ni
                     ON sci.national_insight_center_info_id = ni.id
@@ -71,6 +72,8 @@ return new class extends Migration
                     ON sci.province_id = p.id
                 LEFT JOIN districts AS d
                     ON sci.district_id = d.id
+                LEFT JOIN departments AS dept
+                    ON sci.department_id = dept.id
                 WHERE FIND_IN_SET(CAST(sci.national_insight_center_info_id AS CHAR) COLLATE utf8mb4_unicode_ci, @ids);
             END;
         ");
