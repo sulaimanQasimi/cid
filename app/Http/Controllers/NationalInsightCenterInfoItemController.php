@@ -8,6 +8,7 @@ use App\Models\InfoCategory;
 use App\Models\Province;
 use App\Models\District;
 use App\Models\User;
+use App\Services\PersianDateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -124,8 +125,16 @@ class NationalInsightCenterInfoItemController extends Controller
             'province_id' => 'nullable|exists:provinces,id',
             'district_id' => 'nullable|exists:districts,id',
             'description' => 'nullable|string',
-            'date' => 'nullable|date',
+            'date' => 'nullable|string',
         ]);
+
+        // Convert Persian date to Gregorian format for database storage
+        if (!empty($validated['date'])) {
+            $validated['date'] = PersianDateService::toDatabaseFormat($validated['date']);
+            if (!$validated['date']) {
+                return back()->withErrors(['date' => 'Invalid date format. Please use Persian date format (YYYY/MM/DD).'])->withInput();
+            }
+        }
 
         try {
             $item = NationalInsightCenterInfoItem::create([
@@ -235,8 +244,16 @@ class NationalInsightCenterInfoItemController extends Controller
             'province_id' => 'nullable|exists:provinces,id',
             'district_id' => 'nullable|exists:districts,id',
             'description' => 'nullable|string',
-            'date' => 'nullable|date',
+            'date' => 'nullable|string',
         ]);
+
+        // Convert Persian date to Gregorian format for database storage
+        if (!empty($validated['date'])) {
+            $validated['date'] = PersianDateService::toDatabaseFormat($validated['date']);
+            if (!$validated['date']) {
+                return back()->withErrors(['date' => 'Invalid date format. Please use Persian date format (YYYY/MM/DD).'])->withInput();
+            }
+        }
 
         try {
             $item->update([

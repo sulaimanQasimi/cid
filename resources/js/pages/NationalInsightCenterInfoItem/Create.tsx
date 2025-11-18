@@ -14,6 +14,7 @@ import { usePermissions } from '@/hooks/use-permissions';
 import { CanCreate } from '@/components/ui/permission-guard';
 import Header from '@/components/template/header';
 import FooterButtons from '@/components/template/FooterButtons';
+import PersianDatePicker from '@/components/ui/PersianDatePicker';
 
 interface NationalInsightCenterInfo {
   id: number;
@@ -297,16 +298,13 @@ export default function Create({ nationalInsightCenterInfos, infoCategories, pro
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="date" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right" dir="rtl">
-                        {t('national_insight_center_info_item.create.date')}
-                      </Label>
-                      <Input
+                      <PersianDatePicker
                         id="date"
-                        type="date"
+                        label={t('national_insight_center_info_item.create.date')}
                         value={data.date}
-                        onChange={(e) => setData('date', e.target.value)}
-                        className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right"
-                        dir="rtl"
+                        onChange={(value) => setData('date', value)}
+                        error={errors.date}
+                        className="w-full h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right"
                       />
                       {errors.date && (
                         <p className="text-red-500 text-sm">{errors.date}</p>
