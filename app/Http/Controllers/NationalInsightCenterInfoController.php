@@ -821,7 +821,7 @@ class NationalInsightCenterInfoController extends Controller
     /**
      * Print dates report for national insight center info.
      */
-    public function printDates(Request $request)
+    public function printDates(Request $request): Response
     {
         $this->authorize('viewAny', NationalInsightCenterInfo::class);
 
@@ -862,9 +862,12 @@ class NationalInsightCenterInfoController extends Controller
         // Get all national insight center infos accessible by the user with their info items
         
         // Aggregate all stats from national insight center infos only (not from info items)
-        return view('national-insight-center-info.print-dates', [
+        // dd($sub_items);
+        return Inertia::render('NationalInsightCenterInfo/PrintDates', [
             'sub_items' => $sub_items,
             'statSums' => $statSums,
+            'dateFrom' => $validated['date_from'] ?? null,
+            'dateTo' => $validated['date_to'] ?? null,
         ]);
     }
 }
