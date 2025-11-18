@@ -848,15 +848,18 @@ class NationalInsightCenterInfoController extends Controller
         );
         $ids = collect($idsResult)->pluck('id')->toArray();
         // Use the IDs from the stored procedure to call the SUM integer value SP and get per-category totals
+        // dd($ids);
+
         $statSums = [];
+        $sub_items = [];
         if (! empty($ids)) {
             // Convert array to comma-separated string for the SP input
             $idsString = implode(',', $ids);
             // The procedure will return stat_category_item_id and total_integer_value
             $statSums = DB::select('CALL sp_sum_integer_values_by_category(?)', [$idsString]);
+            $sub_items = DB::select('CALL sp_get_sub_items_by_ids(?)', [$idsString]);
         }
         // Get all national insight center infos accessible by the user with their info items
-        $sub_items = DB::select('CALL sp_get_sub_items_by_ids(?)', [$idsString]);
         
         // Aggregate all stats from national insight center infos only (not from info items)
         return view('national-insight-center-info.print-dates', [

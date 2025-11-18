@@ -43,8 +43,8 @@ return new class extends Migration
                 IN p_info_ids TEXT
             )
             BEGIN
-                -- Clean up the input CSV (remove spaces)
-                SET @ids := REPLACE(p_info_ids, ' ', '');
+                -- Clean up the input CSV (remove spaces) and set collation
+                SET @ids := REPLACE(p_info_ids, ' ', '') COLLATE utf8mb4_unicode_ci;
 
                 SELECT
                     sci.id,
@@ -61,11 +61,17 @@ return new class extends Migration
                     sci.confirmed,
                     sci.confirmed_by,
                     sci.created_at,
-                    sci.updated_at
+                    sci.updated_at,
+                    p.name AS province_name,
+                    d.name AS district_name
                 FROM national_insight_center_info_items AS sci
                 LEFT JOIN national_insight_center_infos AS ni
                     ON sci.national_insight_center_info_id = ni.id
-                WHERE FIND_IN_SET(CAST(sci.national_insight_center_info_id AS CHAR), @ids);
+                LEFT JOIN provinces AS p
+                    ON sci.province_id = p.id
+                LEFT JOIN districts AS d
+                    ON sci.district_id = d.id
+                WHERE FIND_IN_SET(CAST(sci.national_insight_center_info_id AS CHAR) COLLATE utf8mb4_unicode_ci, @ids);
             END;
         ");
 
@@ -75,8 +81,8 @@ return new class extends Migration
                 IN p_info_ids TEXT
             )
             BEGIN
-                -- Clean up the input CSV (remove spaces)
-                SET @ids := REPLACE(p_info_ids, ' ', '');
+                -- Clean up the input CSV (remove spaces) and set collation
+                SET @ids := REPLACE(p_info_ids, ' ', '') COLLATE utf8mb4_unicode_ci;
 
                 SELECT
                     sci.stat_category_item_id,
@@ -98,14 +104,14 @@ return new class extends Migration
                     MAX(sc.status) AS category_status,
 
                     -- Aggregated Metric
-                    SUM(sci.integer_value) AS total_integer_value
+                    SUM(sci.string_value) AS total_integer_value
 
                 FROM info_stats AS sci
                 INNER JOIN stat_category_items AS sci2
                     ON sci.stat_category_item_id = sci2.id
                 LEFT JOIN stat_categories AS sc
                     ON sci2.stat_category_id = sc.id
-                WHERE FIND_IN_SET(CAST(sci.national_insight_center_info_id AS CHAR), @ids)
+                WHERE FIND_IN_SET(CAST(sci.national_insight_center_info_id AS CHAR) COLLATE utf8mb4_unicode_ci, @ids)
                 GROUP BY sci.stat_category_item_id;
             END;
         ");

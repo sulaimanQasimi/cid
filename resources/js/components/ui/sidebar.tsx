@@ -213,7 +213,7 @@ function Sidebar({
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          className="bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden dark:bg-slate-900 dark:text-slate-100"
+          className="bg-white/90 dark:bg-slate-900/95 backdrop-blur-xl text-gray-800 dark:text-gray-100 w-(--sidebar-width) p-0 [&>button]:hidden border-2 border-purple-200 dark:border-purple-800 shadow-2xl shadow-purple-500/20 dark:shadow-purple-500/10 relative overflow-hidden"
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -221,7 +221,9 @@ function Sidebar({
           }
           side={actualSide}
         >
-          <div className="flex h-full w-full flex-col">{children}</div>
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 dark:from-pink-600 dark:via-purple-600 dark:to-blue-600"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 via-purple-500/5 to-blue-500/5 dark:from-pink-500/10 dark:via-purple-500/10 dark:to-blue-500/10 opacity-50"></div>
+          <div className="flex h-full w-full flex-col relative z-10">{children}</div>
         </SheetContent>
       </Sheet>
     )
@@ -256,16 +258,19 @@ function Sidebar({
           // Adjust the padding for floating and inset variants.
           variant === "floating" || variant === "inset"
             ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]"
-            : "group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=right]:border-l",
+            : "group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r-2 group-data-[side=right]:border-l-2 group-data-[side=left]:border-purple-200 dark:group-data-[side=left]:border-purple-800 group-data-[side=right]:border-purple-200 dark:group-data-[side=right]:border-purple-800",
           className
         )}
         {...props}
       >
         <div
           data-sidebar="sidebar"
-          className="bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm dark:bg-slate-900 dark:border-slate-800"
+          className="bg-white/80 dark:bg-slate-900/90 backdrop-blur-xl group-data-[variant=floating]:border-2 group-data-[variant=floating]:border-purple-200 dark:group-data-[variant=floating]:border-purple-800 flex h-full w-full flex-col group-data-[variant=floating]:rounded-2xl group-data-[variant=floating]:border group-data-[variant=floating]:shadow-2xl group-data-[variant=floating]:shadow-purple-500/20 dark:group-data-[variant=floating]:shadow-purple-500/10 relative overflow-hidden"
         >
-          {children}
+          {/* Colorful Border Gradient */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 dark:from-pink-600 dark:via-purple-600 dark:to-blue-600 group-data-[variant=floating]:hidden"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 via-purple-500/5 to-blue-500/5 dark:from-pink-500/10 dark:via-purple-500/10 dark:to-blue-500/10 opacity-50 group-data-[variant=floating]:hidden"></div>
+          <div className="relative z-10 h-full flex flex-col">{children}</div>
         </div>
       </div>
     </div>
@@ -285,7 +290,7 @@ function SidebarTrigger({
       data-slot="sidebar-trigger"
       variant="ghost"
       size="icon"
-      className={cn("h-7 w-7", className)}
+      className={cn("h-8 w-8 rounded-lg hover:bg-gradient-to-r hover:from-pink-50 hover:via-purple-50 hover:to-blue-50 dark:hover:from-pink-900/30 dark:hover:via-purple-900/30 dark:hover:to-blue-900/30 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-200", className)}
       onClick={(event) => {
         onClick?.(event)
         toggleSidebar()
@@ -369,7 +374,7 @@ function SidebarInput({
     <Input
       data-slot="sidebar-input"
       data-sidebar="input"
-      className={cn("bg-background h-8 w-full shadow-none", className)}
+      className={cn("bg-white/90 dark:bg-slate-800/90 border-2 border-purple-200 dark:border-purple-800 h-10 w-full shadow-sm focus:border-purple-500 dark:focus:border-purple-600 focus:ring-4 focus:ring-purple-500/20 dark:focus:ring-purple-500/30 transition-all duration-200 text-gray-900 dark:text-gray-100", className)}
       {...props}
     />
   )
@@ -380,7 +385,7 @@ function SidebarHeader({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sidebar-header"
       data-sidebar="header"
-      className={cn("flex flex-col gap-2 p-2 dark:bg-slate-800 dark:border-slate-700", className)}
+      className={cn("flex flex-col gap-2 p-4 bg-gradient-to-r from-pink-50/50 via-purple-50/50 to-blue-50/50 dark:from-pink-950/30 dark:via-purple-950/30 dark:to-blue-950/30 border-b-2 border-purple-200/50 dark:border-purple-800/50", className)}
       {...props}
     />
   )
@@ -391,7 +396,7 @@ function SidebarFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sidebar-footer"
       data-sidebar="footer"
-      className={cn("flex flex-col gap-2 p-2 dark:bg-slate-800 dark:border-slate-700", className)}
+      className={cn("flex flex-col gap-2 p-4 bg-gradient-to-r from-pink-50/50 via-purple-50/50 to-blue-50/50 dark:from-pink-950/30 dark:via-purple-950/30 dark:to-blue-950/30 border-t-2 border-purple-200/50 dark:border-purple-800/50", className)}
       {...props}
     />
   )
@@ -405,7 +410,7 @@ function SidebarSeparator({
     <Separator
       data-slot="sidebar-separator"
       data-sidebar="separator"
-      className={cn("bg-sidebar-border mx-2 w-auto dark:bg-slate-700", className)}
+      className={cn("bg-gradient-to-r from-transparent via-purple-200 dark:via-purple-800 to-transparent mx-2 w-auto h-px", className)}
       {...props}
     />
   )
@@ -417,7 +422,7 @@ function SidebarContent({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="sidebar-content"
       data-sidebar="content"
       className={cn(
-        "flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden dark:bg-slate-900",
+        "flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden bg-white/50 dark:bg-slate-900/50",
         className
       )}
       {...props}
@@ -430,7 +435,7 @@ function SidebarGroup({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sidebar-group"
       data-sidebar="group"
-      className={cn("relative flex w-full min-w-0 flex-col p-2 dark:bg-slate-900", className)}
+      className={cn("relative flex w-full min-w-0 flex-col p-2", className)}
       {...props}
     />
   )
@@ -448,7 +453,7 @@ function SidebarGroupLabel({
       data-slot="sidebar-group-label"
       data-sidebar="group-label"
       className={cn(
-        "text-sidebar-foreground/70 ring-sidebar-ring flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium outline-hidden transition-[margin,opacity] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0 dark:text-slate-400",
+        "text-gray-600 dark:text-gray-300 ring-purple-500/20 dark:ring-purple-400/20 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-bold outline-hidden transition-[margin,opacity] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
         "group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0",
         className
       )}
@@ -487,7 +492,7 @@ function SidebarGroupAction({
       data-sidebar="group-action"
       data-dir={documentDir}
       className={cn(
-        "text-sidebar-foreground ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground absolute top-3.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 outline-hidden transition-transform focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100",
+        "text-purple-600 dark:text-purple-400 ring-purple-500/20 dark:ring-purple-400/20 hover:bg-gradient-to-r hover:from-pink-100 hover:via-purple-100 hover:to-blue-100 dark:hover:from-pink-900/50 dark:hover:via-purple-900/50 dark:hover:to-blue-900/50 hover:text-purple-700 dark:hover:text-purple-300 absolute top-3.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 outline-hidden transition-all duration-200 focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
         // Position based on text direction
         documentDir === "rtl" ? "left-3" : "right-3",
         // Increases the hit area of the button on mobile.
@@ -508,7 +513,7 @@ function SidebarGroupContent({
     <div
       data-slot="sidebar-group-content"
       data-sidebar="group-content"
-      className={cn("w-full text-sm dark:text-slate-300", className)}
+      className={cn("w-full text-sm text-gray-700 dark:text-gray-200", className)}
       {...props}
     />
   )
@@ -519,7 +524,7 @@ function SidebarMenu({ className, ...props }: React.ComponentProps<"ul">) {
     <ul
       data-slot="sidebar-menu"
       data-sidebar="menu"
-      className={cn("flex w-full min-w-0 flex-col gap-1 dark:bg-slate-900", className)}
+      className={cn("flex w-full min-w-0 flex-col gap-1", className)}
       {...props}
     />
   )
@@ -530,20 +535,20 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<"li">) {
     <li
       data-slot="sidebar-menu-item"
       data-sidebar="menu-item"
-      className={cn("group/menu-item relative dark:bg-slate-900", className)}
+      className={cn("group/menu-item relative", className)}
       {...props}
     />
   )
 }
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden ring-sidebar-ring transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100 dark:data-[active=true]:bg-slate-700 dark:data-[active=true]:text-slate-100",
+  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-xl p-2.5 text-left text-sm outline-hidden ring-purple-500/20 dark:ring-purple-400/20 transition-all duration-200 hover:bg-gradient-to-r hover:from-pink-50 hover:via-purple-50 hover:to-blue-50 dark:hover:from-pink-900/30 dark:hover:via-purple-900/30 dark:hover:to-blue-900/30 hover:text-purple-700 dark:hover:text-purple-300 focus-visible:ring-2 focus-visible:ring-purple-500/30 dark:focus-visible:ring-purple-400/30 active:bg-gradient-to-r active:from-pink-100 active:via-purple-100 active:to-blue-100 dark:active:from-pink-800/40 dark:active:via-purple-800/40 dark:active:to-blue-800/40 active:text-purple-800 dark:active:text-purple-200 disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-gradient-to-r data-[active=true]:from-pink-500 data-[active=true]:via-purple-500 data-[active=true]:to-blue-500 dark:data-[active=true]:from-pink-600 dark:data-[active=true]:via-purple-600 dark:data-[active=true]:to-blue-600 data-[active=true]:text-white data-[active=true]:font-bold data-[active=true]:shadow-lg data-[active=true]:shadow-purple-500/30 dark:data-[active=true]:shadow-purple-500/20 data-[state=open]:hover:bg-gradient-to-r data-[state=open]:hover:from-pink-50 data-[state=open]:hover:via-purple-50 data-[state=open]:hover:to-blue-50 dark:data-[state=open]:hover:from-pink-900/30 dark:data-[state=open]:hover:via-purple-900/30 dark:data-[state=open]:hover:to-blue-900/30 group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 text-gray-700 dark:text-gray-200",
   {
     variants: {
       variant: {
-        default: "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground dark:hover:bg-slate-700 dark:hover:text-slate-100",
+        default: "hover:bg-gradient-to-r hover:from-pink-50 hover:via-purple-50 hover:to-blue-50 dark:hover:from-pink-900/30 dark:hover:via-purple-900/30 dark:hover:to-blue-900/30 hover:text-purple-700 dark:hover:text-purple-300",
         outline:
-          "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))] dark:bg-slate-800 dark:shadow-[0_0_0_1px_hsl(var(--slate-700))] dark:hover:bg-slate-700 dark:hover:text-slate-100",
+          "bg-white/90 dark:bg-slate-800/90 shadow-[0_0_0_2px_rgba(139,92,246,0.2)] dark:shadow-[0_0_0_2px_rgba(139,92,246,0.3)] hover:bg-gradient-to-r hover:from-pink-50 hover:via-purple-50 hover:to-blue-50 dark:hover:from-pink-900/30 dark:hover:via-purple-900/30 dark:hover:to-blue-900/30 hover:text-purple-700 dark:hover:text-purple-300 hover:shadow-[0_0_0_2px_rgba(139,92,246,0.4)] dark:hover:shadow-[0_0_0_2px_rgba(139,92,246,0.5)] border-2 border-purple-200 dark:border-purple-800",
       },
       size: {
         default: "h-8 text-sm",
@@ -642,7 +647,7 @@ function SidebarMenuAction({
       data-sidebar="menu-action"
       data-dir={documentDir}
       className={cn(
-        "text-sidebar-foreground ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground peer-hover/menu-button:text-sidebar-accent-foreground absolute top-1.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 outline-hidden transition-transform focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100",
+        "text-purple-600 dark:text-purple-400 ring-purple-500/20 dark:ring-purple-400/20 hover:bg-gradient-to-r hover:from-pink-100 hover:via-purple-100 hover:to-blue-100 dark:hover:from-pink-900/50 dark:hover:via-purple-900/50 dark:hover:to-blue-900/50 hover:text-purple-700 dark:hover:text-purple-300 peer-hover/menu-button:text-purple-700 dark:peer-hover/menu-button:text-purple-300 absolute top-1.5 flex aspect-square w-5 items-center justify-center rounded-lg p-0 outline-hidden transition-all duration-200 focus-visible:ring-2 focus-visible:ring-purple-500/30 dark:focus-visible:ring-purple-400/30 [&>svg]:size-4 [&>svg]:shrink-0",
         // Position based on text direction
         documentDir === "rtl" ? "left-1" : "right-1",
         // Increases the hit area of the button on mobile.
@@ -669,7 +674,7 @@ function SidebarMenuBadge({
       data-slot="sidebar-menu-badge"
       data-sidebar="menu-badge"
       className={cn(
-        "text-sidebar-foreground pointer-events-none absolute right-1 flex h-5 min-w-5 items-center justify-center rounded-md px-1 text-xs font-medium tabular-nums select-none dark:text-slate-300",
+        "text-purple-600 dark:text-purple-400 pointer-events-none absolute right-1 flex h-5 min-w-5 items-center justify-center rounded-lg px-1.5 text-xs font-bold tabular-nums select-none bg-gradient-to-r from-pink-100 to-purple-100 dark:from-pink-900/50 dark:to-purple-900/50",
         "peer-hover/menu-button:text-sidebar-accent-foreground peer-data-[active=true]/menu-button:text-sidebar-accent-foreground",
         "peer-data-[size=sm]/menu-button:top-1",
         "peer-data-[size=default]/menu-button:top-1.5",
@@ -698,17 +703,17 @@ function SidebarMenuSkeleton({
     <div
       data-slot="sidebar-menu-skeleton"
       data-sidebar="menu-skeleton"
-      className={cn("flex h-8 items-center gap-2 rounded-md px-2 dark:bg-slate-800", className)}
+      className={cn("flex h-8 items-center gap-2 rounded-xl px-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-purple-200 dark:border-purple-800", className)}
       {...props}
     >
       {showIcon && (
         <Skeleton
-          className="size-4 rounded-md dark:bg-slate-700"
+          className="size-4 rounded-md bg-gradient-to-br from-pink-200 to-purple-200 dark:from-pink-800 dark:to-purple-800"
           data-sidebar="menu-skeleton-icon"
         />
       )}
       <Skeleton
-        className="h-4 max-w-(--skeleton-width) flex-1 dark:bg-slate-700"
+        className="h-4 max-w-(--skeleton-width) flex-1 bg-gradient-to-r from-pink-200 via-purple-200 to-blue-200 dark:from-pink-800 dark:via-purple-800 dark:to-blue-800 rounded"
         data-sidebar="menu-skeleton-text"
         style={
           {
@@ -726,7 +731,7 @@ function SidebarMenuSub({ className, ...props }: React.ComponentProps<"ul">) {
       data-slot="sidebar-menu-sub"
       data-sidebar="menu-sub"
       className={cn(
-        "border-sidebar-border mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l px-2.5 py-0.5 dark:border-slate-700",
+        "border-purple-300 dark:border-purple-700 mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l-2 px-2.5 py-0.5",
         "group-data-[collapsible=icon]:hidden",
         className
       )}
@@ -743,7 +748,7 @@ function SidebarMenuSubItem({
     <li
       data-slot="sidebar-menu-sub-item"
       data-sidebar="menu-sub-item"
-      className={cn("group/menu-sub-item relative dark:bg-slate-900", className)}
+      className={cn("group/menu-sub-item relative", className)}
       {...props}
     />
   )
@@ -769,8 +774,8 @@ function SidebarMenuSubButton({
       data-size={size}
       data-active={isActive}
       className={cn(
-        "text-sidebar-foreground ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground active:bg-sidebar-accent active:text-sidebar-accent-foreground [&>svg]:text-sidebar-accent-foreground flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 outline-hidden focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100 dark:active:bg-slate-700 dark:active:text-slate-100",
-        "data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground dark:data-[active=true]:bg-slate-700 dark:data-[active=true]:text-slate-100",
+        "text-gray-700 dark:text-gray-200 ring-purple-500/20 dark:ring-purple-400/20 hover:bg-gradient-to-r hover:from-pink-50 hover:via-purple-50 hover:to-blue-50 dark:hover:from-pink-900/30 dark:hover:via-purple-900/30 dark:hover:to-blue-900/30 hover:text-purple-700 dark:hover:text-purple-300 active:bg-gradient-to-r active:from-pink-100 active:via-purple-100 active:to-blue-100 dark:active:from-pink-800/40 dark:active:via-purple-800/40 dark:active:to-blue-800/40 active:text-purple-800 dark:active:text-purple-200 [&>svg]:text-purple-600 dark:[&>svg]:text-purple-400 flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-lg px-2 outline-hidden focus-visible:ring-2 focus-visible:ring-purple-500/30 dark:focus-visible:ring-purple-400/30 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 transition-all duration-200",
+        "data-[active=true]:bg-gradient-to-r data-[active=true]:from-pink-500 data-[active=true]:via-purple-500 data-[active=true]:to-blue-500 dark:data-[active=true]:from-pink-600 dark:data-[active=true]:via-purple-600 dark:data-[active=true]:to-blue-600 data-[active=true]:text-white data-[active=true]:font-semibold data-[active=true]:shadow-md data-[active=true]:shadow-purple-500/20 dark:data-[active=true]:shadow-purple-500/10",
         size === "sm" && "text-xs",
         size === "md" && "text-sm",
         "group-data-[collapsible=icon]:hidden",
