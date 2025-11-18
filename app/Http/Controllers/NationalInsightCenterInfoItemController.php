@@ -182,7 +182,6 @@ class NationalInsightCenterInfoItemController extends Controller
             'district',
             'creator',
             'confirmer',
-            'itemStats.statCategoryItem.category'
         ]);
 
         return Inertia::render('NationalInsightCenterInfoItem/Show', [
@@ -328,101 +327,4 @@ class NationalInsightCenterInfoItemController extends Controller
         }
     }
 
-    /**
-     * Show the form for managing statistics.
-     */
-public function manageStats(NationalInsightCenterInfoItem $item): Response
-    {
-        // Load the parent relationship for authorization
-        $item->load('nationalInsightCenterInfo');
-        
-        $this->authorize('updateStats', $item);
-        
-        $statItems = StatCategoryItem::with('category')
-            ->whereHas('category', function($query) {
-                $query->where('status', 'active');
-            })
-            ->orderBy('name')
-            ->get();
-
-        $statCategories = StatCategory::where('status', 'active')
-            ->orderBy('label')
-            ->get();
-
-        // Load existing stats
-        $item->load(['itemStats.statCategoryItem.category']);
-
-        return Inertia::render('NationalInsightCenterInfoItem/ManageStats', [
-            'item' => $item,
-            'statItems' => $statItems,
-            'statCategories' => $statCategories,
-        ]);
-    }
-
-    /**
-     * Update statistics for a specific national insight center info item.
-     */
-    public function updateStats(Request $request, NationalInsightCenterInfoItem $item): RedirectResponse
-    {
-        // Load the parent relationship for authorization
-        $item->load('nationalInsightCenterInfo');
-        
-        $this->authorize('updateStats', $item);
-        
-        $validated = $request->validate([
-            'stats' => 'required|array|min:1',
-            'stats.*.stat_category_item_id' => 'required|integer|exists:stat_category_items,id',
-            'stats.*.value' => 'required|string|max:255',
-            'stats.*.notes' => 'nullable|string|max:1000',
-        ]);
-
-        try {
-            DB::transaction(function () use ($item, $validated) {
-                $this->updateInfoStats($item, $validated['stats']);
-            });
-
-            return redirect()
-                ->route('national-insight-center-info-items.show', $item)
-                ->with('success', 'Statistics updated successfully.');
-
-        } catch (\Exception $e) {
-            Log::error('Failed to update national insight center info item statistics', [
-                'error' => $e->getMessage(),
-                'item_id' => $item->id,
-                'stats_data' => $validated['stats'] ?? []
-            ]);
-
-            return redirect()
-                ->back()
-                ->with('error', 'Failed to update statistics. Please try again.')
-                ->withInput();
-        }
-    }
-
-    /**
-     * Create info stats for the national insight center info item.
-     */
-    private function createInfoStats(NationalInsightCenterInfoItem $item, array $stats): void
-    {
-        foreach ($stats as $stat) {
-            $item->itemStats()->create([
-                'stat_category_item_id' => $stat['stat_category_item_id'],
-                'string_value' => $stat['value'],
-                'notes' => $stat['notes'] ?? null,
-                'created_by' => Auth::id(),
-            ]);
-        }
-    }
-
-    /**
-     * Update info stats for the national insight center info item.
-     */
-    private function updateInfoStats(NationalInsightCenterInfoItem $item, array $stats): void
-    {
-        // Delete existing stats
-        $item->itemStats()->delete();
-
-        // Create new stats
-        $this->createInfoStats($item, $stats);
-    }
 }

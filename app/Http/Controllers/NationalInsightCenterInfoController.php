@@ -207,20 +207,10 @@ class NationalInsightCenterInfoController extends Controller
                 'infoCategory:id,name,code',
                 'department:id,name,code',
                 'creator:id,name',
-                'itemStats' => function ($query) {
-                    $query->with(['statCategoryItem.category']);
-                },
             ])
             ->orderBy('created_at', 'desc')
             ->paginate(5);
 
-        // Aggregate all item stats from all info items
-        $aggregatedStats = $nationalInsightCenterInfo->infoItems()
-            ->with('itemStats.statCategoryItem.category')
-            ->get()
-            ->pluck('itemStats')
-            ->flatten()
-            ->values();
 
         $statCategories = StatCategory::where('status', 'active')
             ->orderBy('label')
@@ -233,7 +223,6 @@ class NationalInsightCenterInfoController extends Controller
         return Inertia::render('NationalInsightCenterInfo/Show', [
             'nationalInsightCenterInfo' => $nationalInsightCenterInfo,
             'infos' => $infos,
-            'aggregatedStats' => $aggregatedStats,
             'statCategories' => $statCategories,
             'infoCategories' => $infoCategories,
             'departments' => $departments,
@@ -471,9 +460,6 @@ class NationalInsightCenterInfoController extends Controller
                 'infoCategory:id,name,code',
                 'department:id,name,code',
                 'creator:id,name',
-                'itemStats' => function ($query) {
-                    $query->with(['statCategoryItem.category']);
-                },
             ])
             ->orderBy('created_at', 'desc')
             ->get();
@@ -523,7 +509,6 @@ class NationalInsightCenterInfoController extends Controller
                 'department:id,name,code',
                 'province:id,name',
                 'district:id,name',
-                'itemStats.statCategoryItem.category',
             ])
             ->get();
 
@@ -535,7 +520,6 @@ class NationalInsightCenterInfoController extends Controller
                 'department:id,name,code',
                 'province:id,name',
                 'district:id,name',
-                'itemStats.statCategoryItem.category',
             ])
             ->get();
 
@@ -621,43 +605,7 @@ class NationalInsightCenterInfoController extends Controller
             $data['by_category'][$categoryId]['items'][] = $item;
         }
 
-        // Aggregate statistics
-        foreach ($items as $item) {
-            foreach ($item->itemStats as $stat) {
-                $statCategoryId = $stat->statCategoryItem->category->id;
-                $statCategoryName = $stat->statCategoryItem->category->label;
-                $statItemName = $stat->statCategoryItem->label;
-
-                if (! isset($data['by_stat_category'][$statCategoryId])) {
-                    $data['by_stat_category'][$statCategoryId] = [
-                        'id' => $statCategoryId,
-                        'name' => $statCategoryName,
-                        'items' => [],
-                    ];
-                }
-
-                if (! isset($data['by_stat_category'][$statCategoryId]['items'][$statItemName])) {
-                    $data['by_stat_category'][$statCategoryId]['items'][$statItemName] = [
-                        'name' => $statItemName,
-                        'value' => 0,
-                        'count' => 0,
-                    ];
-                }
-
-                // Try to parse numeric value, otherwise count occurrences
-                $value = $stat->string_value;
-                if (is_numeric($value)) {
-                    $data['by_stat_category'][$statCategoryId]['items'][$statItemName]['value'] += (float) $value;
-                } else {
-                    $data['by_stat_category'][$statCategoryId]['items'][$statItemName]['count']++;
-                }
-            }
-        }
-
-        // Convert stat category items to array for easier frontend consumption
-        foreach ($data['by_stat_category'] as &$category) {
-            $category['items'] = array_values($category['items']);
-        }
+        // Aggregate statistics removed - stats no longer associated with items
 
         return $data;
     }

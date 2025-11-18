@@ -16,7 +16,6 @@ import {
   Calendar,
   Building2,
   Folder,
-  BarChart3,
   Eye,
   FileText
 } from 'lucide-react';
@@ -94,7 +93,6 @@ interface NationalInsightCenterInfoItem {
   district: District | null;
   creator: User | null;
   confirmer: User | null;
-  itemStats: InfoStat[];
 }
 
 interface ShowProps {
@@ -195,14 +193,6 @@ export default function Show({ item }: ShowProps) {
                   </Button>
                 </CanConfirm>
               )}
-
-              <CanUpdate model="national_insight_center_info_item">
-                <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-4 py-3 transition-all duration-300 hover:scale-105">
-                  <Link href={route('national-insight-center-info-items.stats', item.id)} className="flex items-center">
-                    <BarChart3 className="h-5 w-5" />
-                  </Link>
-                </Button>
-              </CanUpdate>
 
               <CanUpdate model="national_insight_center_info_item">
                 <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-4 py-3 transition-all duration-300 hover:scale-105">
@@ -334,41 +324,6 @@ export default function Show({ item }: ShowProps) {
               </div>
             </CardContent>
           </Card>
-
-          {/* Statistics */}
-          {item.itemStats && item.itemStats.length > 0 && (
-            <Card className="shadow-2xl bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 overflow-hidden">
-              <CardHeader className="bg-gradient-to-r from-purple-600 to-purple-700 text-white p-6">
-                <CardTitle className="text-xl font-bold flex items-center gap-3">
-                  <BarChart3 className="h-6 w-6" />
-                  {t('national_insight_center_info_item.show.statistics')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  {item.itemStats.map((stat) => (
-                    <div key={stat.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-800/50">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <div 
-                            className="w-3 h-3 rounded-full"
-                            style={{ backgroundColor: stat.statCategoryItem.category.color }}
-                          ></div>
-                          <span className="font-semibold text-gray-900 dark:text-white">
-                            {stat.statCategoryItem.category.label} - {stat.statCategoryItem.label}
-                          </span>
-                        </div>
-                      </div>
-                      <p className="text-gray-700 dark:text-gray-300 mb-2">{stat.string_value}</p>
-                      {stat.notes && (
-                        <p className="text-sm text-gray-600 dark:text-gray-400 italic">{stat.notes}</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
           {/* Audit Information */}
           <Card className="shadow-2xl bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 overflow-hidden">

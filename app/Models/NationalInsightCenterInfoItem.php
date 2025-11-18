@@ -141,11 +141,4 @@ class NationalInsightCenterInfoItem extends Model
         return $this->belongsTo(User::class, 'confirmed_by');
     }
 
-    /**
-     * Get the stats associated with this item.
-     */
-    public function infoStats(): HasMany
-    {
-        return $this->hasMany(InfoStat::class, 'national_insight_center_info_item_id');
-    }
 }
