@@ -14,7 +14,6 @@ import {
   Clock, 
   User, 
   Calendar,
-  Building2,
   Folder,
   Eye,
   FileText
@@ -25,11 +24,16 @@ import { CanUpdate, CanDelete, CanConfirm } from '@/components/ui/permission-gua
 import Header from '@/components/template/header';
 import { Label } from '@/components/ui/label';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { formatPersianDateOnly } from '@/lib/utils/date';
 
 interface User {
   id: number;
   name: string;
   email: string;
+  department?: {
+    id: number;
+    name: string;
+  };
 }
 
 interface InfoCategory {
@@ -58,24 +62,6 @@ interface NationalInsightCenterInfo {
   name: string;
   code: string;
   description: string | null;
-}
-
-interface InfoStat {
-  id: number;
-  stat_category_item_id: number;
-  string_value: string;
-  notes: string | null;
-  statCategoryItem: {
-    id: number;
-    name: string;
-    label: string;
-    category: {
-      id: number;
-      name: string;
-      label: string;
-      color: string;
-    };
-  };
 }
 
 interface NationalInsightCenterInfoItem {
@@ -126,15 +112,6 @@ export default function Show({ item }: ShowProps) {
     router.patch(route('national-insight-center-info-items.confirm', item.id));
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fa-IR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
 
 
   return (
@@ -246,6 +223,20 @@ export default function Show({ item }: ShowProps) {
                     {item.date ? new Date(item.date).toLocaleDateString('fa-IR') : '-'}
                   </p>
                 </div>
+
+                {item.province && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.province')}</Label>
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white">{item.province.name || item.province.label || '-'}</p>
+                  </div>
+                )}
+
+                {item.district && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.district')}</Label>
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white">{item.district.name || item.district.label || '-'}</p>
+                  </div>
+                )}
               </div>
 
               {item.description && (
@@ -254,74 +245,6 @@ export default function Show({ item }: ShowProps) {
                   <p className="text-gray-900 dark:text-white leading-relaxed">{item.description}</p>
                 </div>
               )}
-            </CardContent>
-          </Card>
-
-          {/* Related Information */}
-          <Card className="shadow-2xl bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-purple-600 to-purple-700 text-white p-6">
-              <CardTitle className="text-xl font-bold flex items-center gap-3">
-                <Building2 className="h-6 w-6" />
-                {t('national_insight_center_info_item.show.related_info')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.national_insight_center_info')}</Label>
-                  {item.nationalInsightCenterInfo ? (
-                    <Link 
-                      href={route('national-insight-center-infos.show', { national_insight_center_info: item.nationalInsightCenterInfo.id })}
-                      className="text-lg font-semibold text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 transition-colors"
-                    >
-                      {item.nationalInsightCenterInfo.name}
-                    </Link>
-                  ) : (
-                    <span className="text-lg font-semibold text-gray-500 dark:text-gray-400">
-                      {t('national_insight_center_info_item.unknown')}
-                    </span>
-                  )}
-                </div>
-
-                {item.infoCategory && (
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.info_category')}</Label>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: item.infoCategory?.color || '#6b7280' }}
-                      ></div>
-                      <span className="text-lg font-semibold text-gray-900 dark:text-white">{item.infoCategory?.label || t('national_insight_center_info_item.unknown')}</span>
-                    </div>
-                  </div>
-                )}
-
-                {item.province && (
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.province')}</Label>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: item.province?.color || '#6b7280' }}
-                      ></div>
-                      <span className="text-lg font-semibold text-gray-900 dark:text-white">{item.province?.label || t('national_insight_center_info_item.unknown')}</span>
-                    </div>
-                  </div>
-                )}
-
-                {item.district && (
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.district')}</Label>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: item.district?.color || '#6b7280' }}
-                      ></div>
-                      <span className="text-lg font-semibold text-gray-900 dark:text-white">{item.district?.label || t('national_insight_center_info_item.unknown')}</span>
-                    </div>
-                  </div>
-                )}
-              </div>
             </CardContent>
           </Card>
 
@@ -337,26 +260,54 @@ export default function Show({ item }: ShowProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.created_at')}</Label>
-                  <p className="text-lg font-semibold text-gray-900 dark:text-white">{formatDate(item.created_at)}</p>
+                  <p className="text-lg font-semibold text-gray-900 dark:text-white">{formatPersianDateOnly(item.created_at)}</p>
                 </div>
 
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.updated_at')}</Label>
-                  <p className="text-lg font-semibold text-gray-900 dark:text-white">{formatDate(item.updated_at)}</p>
+                  <p className="text-lg font-semibold text-gray-900 dark:text-white">{formatPersianDateOnly(item.updated_at)}</p>
                 </div>
 
                 {item.creator && (
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.created_by')}</Label>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-white">{item.creator?.name || t('national_insight_center_info_item.unknown')}</p>
-                  </div>
+                  <>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.created_by')}</Label>
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white">{item.creator?.name || t('national_insight_center_info_item.unknown')}</p>
+                    </div>
+                    {item.creator?.email && (
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.creator_email') || 'ایمیل ایجادکننده'}</Label>
+                        <p className="text-lg font-semibold text-gray-900 dark:text-white">{item.creator.email}</p>
+                      </div>
+                    )}
+                    {item.creator?.department && (
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.creator_department') || 'دپارتمان ایجادکننده'}</Label>
+                        <p className="text-lg font-semibold text-gray-900 dark:text-white">{item.creator.department.name}</p>
+                      </div>
+                    )}
+                  </>
                 )}
 
                 {item.confirmer && (
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.confirmed_by')}</Label>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-white">{item.confirmer?.name || t('national_insight_center_info_item.unknown')}</p>
-                  </div>
+                  <>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.confirmed_by')}</Label>
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white">{item.confirmer?.name || t('national_insight_center_info_item.unknown')}</p>
+                    </div>
+                    {item.confirmer?.email && (
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.confirmer_email') || 'ایمیل تأییدکننده'}</Label>
+                        <p className="text-lg font-semibold text-gray-900 dark:text-white">{item.confirmer.email}</p>
+                      </div>
+                    )}
+                    {item.confirmer?.department && (
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.confirmer_department') || 'دپارتمان تأییدکننده'}</Label>
+                        <p className="text-lg font-semibold text-gray-900 dark:text-white">{item.confirmer.department.name}</p>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </CardContent>

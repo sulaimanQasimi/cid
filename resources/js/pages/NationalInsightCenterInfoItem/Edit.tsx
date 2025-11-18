@@ -71,10 +71,9 @@ interface EditProps {
   nationalInsightCenterInfos: NationalInsightCenterInfo[];
   infoCategories: InfoCategory[];
   provinces: Province[];
-  districts: District[];
 }
 
-export default function Edit({ item, nationalInsightCenterInfos, infoCategories, provinces, districts }: EditProps) {
+export default function Edit({ item, nationalInsightCenterInfos, infoCategories, provinces }: EditProps) {
   const { t } = useTranslation();
   const { canUpdate } = usePermissions();
 
@@ -103,13 +102,15 @@ export default function Edit({ item, nationalInsightCenterInfos, infoCategories,
       href: item.nationalInsightCenterInfo?.id ? route('national-insight-center-infos.show', { national_insight_center_info: item.nationalInsightCenterInfo.id }) : route('national-insight-center-infos.index'),
     },
     {
-      title: t('national_insight_center_info_item.edit.title', { name: item.title }),
+      title: t('national_insight_center_info_item.create.title'),
       href: '#',
     },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e?: React.FormEvent | React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
     put(route('national-insight-center-info-items.update', item.id));
   };
 
@@ -125,27 +126,27 @@ export default function Edit({ item, nationalInsightCenterInfos, infoCategories,
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title={t('national_insight_center_info_item.edit.title', { name: item.title })} />
+      <Head title={t('national_insight_center_info_item.create.title')} />
 
       <div className="container px-0 py-6">
         <Header
-          title={t('national_insight_center_info_item.edit.title', { name: item.title })}
-          description={t('national_insight_center_info_item.edit.description')}
+          title={t('national_insight_center_info_item.create.title')}
+          description={t('national_insight_center_info_item.create.description')}
           icon={<AlertTriangle className="h-6 w-6 text-white" />}
           model="national_insight_center_info_item"
           routeName="national-insight-center-info-items.edit"
-          buttonText={t('national_insight_center_info_item.edit.save_button')}
+          buttonText={t('national_insight_center_info_item.create.save_button')}
           theme="purple"
           buttonSize="lg"
           showBackButton={true}
           backRouteName="national-insight-center-info-items.show"
-          backButtonText={t('national_insight_center_info_item.edit.back_button')}
+          backButtonText={t('national_insight_center_info_item.create.back_button')}
           showButton={false}
           actionButtons={
             <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
               <Link href={route('national-insight-center-info-items.show', item.id)} className="flex items-center gap-3">
                 <ArrowLeft className="h-5 w-5" />
-                {t('national_insight_center_info_item.edit.back_button')}
+                {t('national_insight_center_info_item.create.back_button')}
               </Link>
             </Button>
           }
@@ -158,21 +159,21 @@ export default function Edit({ item, nationalInsightCenterInfos, infoCategories,
                 <CardHeader className="bg-gradient-to-r from-purple-600 to-purple-700 text-white p-6">
                   <CardTitle className="text-xl font-bold flex items-center gap-3">
                     <AlertTriangle className="h-6 w-6" />
-                    {t('national_insight_center_info_item.edit.basic_info')}
+                    {t('national_insight_center_info_item.create.basic_info')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-6 space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="national_insight_center_info_id" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right" dir="rtl">
-                        {t('national_insight_center_info_item.edit.national_insight_center_info')} *
+                        {t('national_insight_center_info_item.create.national_insight_center_info')} *
                       </Label>
                       <Select
                         value={data.national_insight_center_info_id?.toString() || ''}
                         onValueChange={(value) => setData('national_insight_center_info_id', value ? parseInt(value) : null)}
                       >
                         <SelectTrigger id="national_insight_center_info_id" className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right">
-                          <SelectValue placeholder={t('national_insight_center_info_item.edit.select_national_insight_center_info')} />
+                          <SelectValue placeholder={t('national_insight_center_info_item.create.select_national_insight_center_info')} />
                         </SelectTrigger>
                         <SelectContent>
                           {nationalInsightCenterInfos.map((info) => (
@@ -189,7 +190,7 @@ export default function Edit({ item, nationalInsightCenterInfos, infoCategories,
 
                     <div className="space-y-2">
                       <Label htmlFor="title" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right" dir="rtl">
-                        {t('national_insight_center_info_item.edit.title')} *
+                        {t('national_insight_center_info_item.create.title')} *
                       </Label>
                       <Input
                         id="title"
@@ -197,7 +198,7 @@ export default function Edit({ item, nationalInsightCenterInfos, infoCategories,
                         value={data.title}
                         onChange={(e) => setData('title', e.target.value)}
                         className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right"
-                        placeholder={t('national_insight_center_info_item.edit.title_placeholder')}
+                        placeholder={t('national_insight_center_info_item.create.title_placeholder')}
                         dir="rtl"
                       />
                       {errors.title && (
@@ -207,7 +208,7 @@ export default function Edit({ item, nationalInsightCenterInfos, infoCategories,
 
                     <div className="space-y-2">
                       <Label htmlFor="registration_number" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right" dir="rtl">
-                        {t('national_insight_center_info_item.edit.registration_number')} *
+                        {t('national_insight_center_info_item.create.registration_number')} *
                       </Label>
                       <Input
                         id="registration_number"
@@ -215,7 +216,7 @@ export default function Edit({ item, nationalInsightCenterInfos, infoCategories,
                         value={data.registration_number}
                         onChange={(e) => setData('registration_number', e.target.value)}
                         className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right"
-                        placeholder={t('national_insight_center_info_item.edit.registration_number_placeholder')}
+                        placeholder={t('national_insight_center_info_item.create.registration_number_placeholder')}
                         dir="rtl"
                       />
                       {errors.registration_number && (
@@ -225,14 +226,14 @@ export default function Edit({ item, nationalInsightCenterInfos, infoCategories,
 
                     <div className="space-y-2">
                       <Label htmlFor="info_category_id" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right" dir="rtl">
-                        {t('national_insight_center_info_item.edit.info_category')}
+                        {t('national_insight_center_info_item.create.info_category')}
                       </Label>
                       <Select
                         value={data.info_category_id?.toString() || ''}
                         onValueChange={(value) => setData('info_category_id', value ? parseInt(value) : null)}
                       >
                         <SelectTrigger id="info_category_id" className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right">
-                          <SelectValue placeholder={t('national_insight_center_info_item.edit.select_info_category')} />
+                          <SelectValue placeholder={t('national_insight_center_info_item.create.select_info_category')} />
                         </SelectTrigger>
                         <SelectContent>
                           {infoCategories.map((category) => (
@@ -255,14 +256,14 @@ export default function Edit({ item, nationalInsightCenterInfos, infoCategories,
 
                     <div className="space-y-2">
                       <Label htmlFor="province_id" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right" dir="rtl">
-                        {t('national_insight_center_info_item.edit.province')}
+                        {t('national_insight_center_info_item.create.province')}
                       </Label>
                       <Select
                         value={data.province_id?.toString() || ''}
                         onValueChange={handleProvinceChange}
                       >
                         <SelectTrigger id="province_id" className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right">
-                          <SelectValue placeholder={t('national_insight_center_info_item.edit.select_province')} />
+                          <SelectValue placeholder={t('national_insight_center_info_item.create.select_province')} />
                         </SelectTrigger>
                         <SelectContent>
                           {provinces.map((province) => (
@@ -285,7 +286,7 @@ export default function Edit({ item, nationalInsightCenterInfos, infoCategories,
 
                     <div className="space-y-2">
                       <Label htmlFor="district_id" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right" dir="rtl">
-                        {t('national_insight_center_info_item.edit.district')}
+                        {t('national_insight_center_info_item.create.district')}
                       </Label>
                       <Select
                         value={data.district_id?.toString() || ''}
@@ -296,7 +297,7 @@ export default function Edit({ item, nationalInsightCenterInfos, infoCategories,
                           <SelectValue placeholder={
                             !data.province_id 
                               ? t('national_insight_center_info_item.create.select_province_first')
-                              : t('national_insight_center_info_item.edit.select_district')
+                              : t('national_insight_center_info_item.create.select_district')
                           } />
                         </SelectTrigger>
                         <SelectContent>
@@ -320,7 +321,7 @@ export default function Edit({ item, nationalInsightCenterInfos, infoCategories,
 
                     <div className="space-y-2">
                       <Label htmlFor="date" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right" dir="rtl">
-                        {t('national_insight_center_info_item.edit.date')}
+                        {t('national_insight_center_info_item.create.date')}
                       </Label>
                       <Input
                         id="date"
@@ -338,14 +339,14 @@ export default function Edit({ item, nationalInsightCenterInfos, infoCategories,
 
                   <div className="space-y-2">
                     <Label htmlFor="description" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right" dir="rtl">
-                      {t('national_insight_center_info_item.edit.description')}
+                      {t('national_insight_center_info_item.create.description')}
                     </Label>
                     <Textarea
                       id="description"
                       value={data.description}
                       onChange={(e) => setData('description', e.target.value)}
                       className="min-h-[120px] border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right resize-none"
-                      placeholder={t('national_insight_center_info_item.edit.description_placeholder')}
+                      placeholder={t('national_insight_center_info_item.create.description_placeholder')}
                       dir="rtl"
                     />
                     {errors.description && (
@@ -358,11 +359,11 @@ export default function Edit({ item, nationalInsightCenterInfos, infoCategories,
               {/* Form Actions */}
               <FooterButtons
                 onCancel={handleCancel}
-                onSubmit={() => {}}
+                onSubmit={handleSubmit}
                 processing={processing}
-                cancelText={t('national_insight_center_info_item.edit.cancel_button')}
-                submitText={t('national_insight_center_info_item.edit.save_button')}
-                savingText={t('national_insight_center_info_item.edit.saving_button')}
+                cancelText={t('national_insight_center_info_item.create.cancel_button')}
+                submitText={t('national_insight_center_info_item.create.save_button')}
+                savingText={t('national_insight_center_info_item.create.saving_button')}
               />
             </div>
           </form>

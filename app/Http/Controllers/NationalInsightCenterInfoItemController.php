@@ -8,9 +8,6 @@ use App\Models\InfoCategory;
 use App\Models\Province;
 use App\Models\District;
 use App\Models\User;
-use App\Models\StatCategory;
-use App\Models\StatCategoryItem;
-use App\Models\NationalInsightCenterInfoItemStat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -180,8 +177,8 @@ class NationalInsightCenterInfoItemController extends Controller
             'infoCategory',
             'province',
             'district',
-            'creator',
-            'confirmer',
+            'creator.department',
+            'confirmer.department',
         ]);
 
         return Inertia::render('NationalInsightCenterInfoItem/Show', [
