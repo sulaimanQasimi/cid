@@ -149,8 +149,9 @@ export default function Create({ nationalInsightCenterInfos, infoCategories, pro
                       <Select
                         value={data.national_insight_center_info_id.toString()}
                         onValueChange={(value) => setData('national_insight_center_info_id', parseInt(value))}
+                        disabled={!!nationalInsightCenterInfoId}
                       >
-                        <SelectTrigger id="national_insight_center_info_id" className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right">
+                        <SelectTrigger id="national_insight_center_info_id" className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right disabled:opacity-50 disabled:cursor-not-allowed">
                           <SelectValue placeholder={t('national_insight_center_info_item.create.select_national_insight_center_info')} />
                         </SelectTrigger>
                         <SelectContent>
@@ -163,6 +164,20 @@ export default function Create({ nationalInsightCenterInfos, infoCategories, pro
                       </Select>
                       {errors.national_insight_center_info_id && (
                         <p className="text-red-500 text-sm">{errors.national_insight_center_info_id}</p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <PersianDatePicker
+                        id="date"
+                        label={t('national_insight_center_info_item.create.date')}
+                        value={data.date}
+                        onChange={(value) => setData('date', value)}
+                        error={errors.date}
+                        className="w-full h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right"
+                      />
+                      {errors.date && (
+                        <p className="text-red-500 text-sm">{errors.date}</p>
                       )}
                     </div>
 
@@ -294,20 +309,6 @@ export default function Create({ nationalInsightCenterInfos, infoCategories, pro
                       </Select>
                       {errors.district_id && (
                         <p className="text-red-500 text-sm">{errors.district_id}</p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <PersianDatePicker
-                        id="date"
-                        label={t('national_insight_center_info_item.create.date')}
-                        value={data.date}
-                        onChange={(value) => setData('date', value)}
-                        error={errors.date}
-                        className="w-full h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right"
-                      />
-                      {errors.date && (
-                        <p className="text-red-500 text-sm">{errors.date}</p>
                       )}
                     </div>
                   </div>

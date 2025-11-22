@@ -2330,5 +2330,7 @@
     "info_categories.delete_dialog.delete":"حذف دسته",
     "info_categories.delete_dialog.delete_button":"حذف دسته",
     "info_categories.delete_dialog.cancel_button":"انصراف",
-    "national_insight_center_info.na":"ندارد"
+    "national_insight_center_info.na":"ندارد",
+    "national_insight_center_info.show.no_description": "توضیحات ندارد"
+
 }

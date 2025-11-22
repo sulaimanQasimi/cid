@@ -94,7 +94,6 @@ export default function Edit({ item, nationalInsightCenterInfos, infoCategories,
   };
 
   const { data, setData, put, processing, errors } = useForm({
-    national_insight_center_info_id: item.nationalInsightCenterInfo?.id || null as number | null,
     title: item.title,
     registration_number: item.registration_number,
     info_category_id: item.infoCategory?.id || null as number | null,
@@ -181,30 +180,6 @@ export default function Edit({ item, nationalInsightCenterInfos, infoCategories,
                 <CardContent className="p-6 space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label htmlFor="national_insight_center_info_id" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right" dir="rtl">
-                        {t('national_insight_center_info_item.create.national_insight_center_info')} *
-                      </Label>
-                      <Select
-                        value={data.national_insight_center_info_id?.toString() || ''}
-                        onValueChange={(value) => setData('national_insight_center_info_id', value ? parseInt(value) : null)}
-                      >
-                        <SelectTrigger id="national_insight_center_info_id" className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right">
-                          <SelectValue placeholder={t('national_insight_center_info_item.create.select_national_insight_center_info')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {nationalInsightCenterInfos.map((info) => (
-                            <SelectItem key={info.id} value={info.id.toString()}>
-                              {info.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {errors.national_insight_center_info_id && (
-                        <p className="text-red-500 text-sm">{errors.national_insight_center_info_id}</p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
                       <Label htmlFor="title" className="text-base font-medium flex items-center gap-2 text-purple-700 dark:text-purple-300 text-right" dir="rtl">
                         {t('national_insight_center_info_item.create.title')} *
                       </Label>
@@ -219,6 +194,20 @@ export default function Edit({ item, nationalInsightCenterInfos, infoCategories,
                       />
                       {errors.title && (
                         <p className="text-red-500 text-sm">{errors.title}</p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <PersianDatePicker
+                        id="date"
+                        label={t('national_insight_center_info_item.create.date')}
+                        value={data.date}
+                        onChange={(value) => setData('date', value)}
+                        error={errors.date}
+                        className="w-full h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right"
+                      />
+                      {errors.date && (
+                        <p className="text-red-500 text-sm">{errors.date}</p>
                       )}
                     </div>
 
@@ -332,20 +321,6 @@ export default function Edit({ item, nationalInsightCenterInfos, infoCategories,
                       </Select>
                       {errors.district_id && (
                         <p className="text-red-500 text-sm">{errors.district_id}</p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <PersianDatePicker
-                        id="date"
-                        label={t('national_insight_center_info_item.create.date')}
-                        value={data.date}
-                        onChange={(value) => setData('date', value)}
-                        error={errors.date}
-                        className="w-full h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right"
-                      />
-                      {errors.date && (
-                        <p className="text-red-500 text-sm">{errors.date}</p>
                       )}
                     </div>
                   </div>

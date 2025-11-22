@@ -1,436 +1,482 @@
-import React, { useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash, Eye, BarChart3, FileText, AlertTriangle, TrendingUp, CheckCircle } from 'lucide-react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { useTranslation } from '@/lib/i18n/translate';
-import { usePermissions } from '@/hooks/use-permissions';
-import { CanCreate, CanView, CanUpdate, CanDelete, CanConfirm } from '@/components/ui/permission-guard';
-import { cn } from '@/lib/utils';
 import { Pagination } from '@/components/pagination';
 import Header from '@/components/template/header';
 import SearchFilters from '@/components/template/SearchFilters';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { CanConfirm, CanDelete, CanUpdate, CanView } from '@/components/ui/permission-guard';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { usePermissions } from '@/hooks/use-permissions';
+import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from '@/lib/i18n/translate';
 import { formatPersianDateOnly } from '@/lib/utils/date';
+import { type BreadcrumbItem } from '@/types';
+import { Head, Link, router } from '@inertiajs/react';
+import { AlertTriangle, CheckCircle, Eye, FileText, Pencil, Trash } from 'lucide-react';
+import React, { useState } from 'react';
 
 interface NationalInsightCenterInfo {
-  id: number;
-  name: string;
-  description: string | null;
-  date: string | null;
-  created_at: string;
-  updated_at: string;
-  confirmed: boolean;
-  confirmed_at: string | null;
-  confirmed_by: number | null;
-  confirmer?: {
     id: number;
     name: string;
-  };
-  info_items_count?: number;
-  info_stats_count?: number;
+    description: string | null;
+    date: string | null;
+    created_at: string;
+    updated_at: string;
+    confirmed: boolean;
+    confirmed_at: string | null;
+    confirmed_by: number | null;
+    confirmer?: {
+        id: number;
+        name: string;
+    };
+    info_items_count?: number;
+    info_stats_count?: number;
 }
 
 interface PaginationLinks {
-  url: string | null;
-  label: string;
-  active: boolean;
-}
-
-interface PaginationMeta {
-  current_page: number;
-  from: number;
-  last_page: number;
-  links: Array<{
     url: string | null;
     label: string;
     active: boolean;
-  }>;
-  path: string;
-  per_page: number;
-  to: number;
-  total: number;
+}
+
+interface PaginationMeta {
+    current_page: number;
+    from: number;
+    last_page: number;
+    links: Array<{
+        url: string | null;
+        label: string;
+        active: boolean;
+    }>;
+    path: string;
+    per_page: number;
+    to: number;
+    total: number;
 }
 
 interface Props {
-  nationalInsightCenterInfos?: {
-    data?: NationalInsightCenterInfo[];
-    links?: PaginationLinks[];
-    meta?: PaginationMeta;
-  };
-  filters?: {
-    search: string;
-    sort: string;
-    direction: string;
-    per_page: number;
-  };
+    nationalInsightCenterInfos?: {
+        data?: NationalInsightCenterInfo[];
+        links?: PaginationLinks[];
+        meta?: PaginationMeta;
+    };
+    filters?: {
+        search: string;
+        sort: string;
+        direction: string;
+        per_page: number;
+    };
 }
 
 const sortOptions = [
-  { value: 'name', label: 'Name' },
-  { value: 'description', label: 'Description' },
-  { value: 'date', label: 'Date' },
-  { value: 'created_at', label: 'Created Date' },
-  { value: 'updated_at', label: 'Updated Date' },
-  { value: 'info_items_count', label: 'Info Items Count' },
-  { value: 'info_stats_count', label: 'Stats Count' },
+    { value: 'name', label: 'Name' },
+    { value: 'description', label: 'Description' },
+    { value: 'date', label: 'Date' },
+    { value: 'created_at', label: 'Created Date' },
+    { value: 'updated_at', label: 'Updated Date' },
+    { value: 'info_items_count', label: 'Info Items Count' },
+    { value: 'info_stats_count', label: 'Stats Count' },
 ];
 
 const perPageOptions = [
-  { value: 10, label: '10 per page' },
-  { value: 25, label: '25 per page' },
-  { value: 50, label: '50 per page' },
-  { value: 100, label: '100 per page' },
+    { value: 10, label: '10 per page' },
+    { value: 25, label: '25 per page' },
+    { value: 50, label: '50 per page' },
+    { value: 100, label: '100 per page' },
 ];
 
 export default function NationalInsightCenterInfosIndex({
-  nationalInsightCenterInfos = { data: [], links: [], meta: undefined },
-  filters = { search: '', sort: 'name', direction: 'asc', per_page: 10 }
+    nationalInsightCenterInfos = { data: [], links: [], meta: undefined },
+    filters = { search: '', sort: 'name', direction: 'asc', per_page: 10 },
 }: Props) {
-  const { canCreate, canView, canUpdate, canDelete, canConfirm } = usePermissions();
-  const { t } = useTranslation();
-  
-  const breadcrumbs: BreadcrumbItem[] = [
-    {
-      title: t('info.page_title'),
-      href: route('national-insight-center-infos.index'),
-    },
-    {
-      title: t('national_insight_center_info.page_title'),
-      href: '#',
-    },
-  ];
-  const [searchQuery, setSearchQuery] = useState(filters.search);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [nationalInsightCenterInfoToDelete, setNationalInsightCenterInfoToDelete] = useState<NationalInsightCenterInfo | null>(null);
+    const { canCreate, canView, canUpdate, canDelete, canConfirm } = usePermissions();
+    const { t } = useTranslation();
 
-  // Handle search form submission
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    applyFilters({ search: searchQuery });
-  };
-
-  // Handle sort change
-  const handleSortChange = (value: string) => {
-    applyFilters({ sort: value });
-  };
-
-  // Handle direction change
-  const handleDirectionChange = () => {
-    const newDirection = filters.direction === 'asc' ? 'desc' : 'asc';
-    applyFilters({ direction: newDirection });
-  };
-
-  // Handle per page change
-  const handlePerPageChange = (value: string) => {
-    applyFilters({ per_page: parseInt(value) });
-  };
-
-  // Navigate to page
-  const goToPage = (page: number) => {
-    router.get(route('national-insight-center-infos.index'),
-      { ...filters, page },
-      { preserveState: true, preserveScroll: true, replace: true }
-    );
-  };
-
-  // Apply filters to the URL
-  const applyFilters = (newFilters: Partial<Props['filters']>) => {
-    router.get(route('national-insight-center-infos.index'),
-      { ...filters, ...newFilters, page: 1 },
-      { preserveState: true, preserveScroll: true, replace: true }
-    );
-  };
-
-  // Reset all filters
-  const resetFilters = () => {
-    setSearchQuery('');
-    router.get(route('national-insight-center-infos.index'), {
-      search: '',
-      sort: 'name',
-      direction: 'asc',
-      per_page: 10,
-      page: 1,
-    }, { replace: true });
-  };
-
-  // Open delete confirmation dialog
-  const openDeleteDialog = (nationalInsightCenterInfo: NationalInsightCenterInfo) => {
-    setNationalInsightCenterInfoToDelete(nationalInsightCenterInfo);
-    setIsDeleteDialogOpen(true);
-  };
-
-  // Handle delete confirmation
-  const confirmDelete = () => {
-    if (nationalInsightCenterInfoToDelete) {
-      router.delete(route('national-insight-center-infos.destroy', nationalInsightCenterInfoToDelete.id), {
-        onSuccess: () => {
-          setNationalInsightCenterInfoToDelete(null);
-          setIsDeleteDialogOpen(false);
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: t('info.page_title'),
+            href: route('national-insight-center-infos.index'),
         },
-      });
-    }
-  };
+        {
+            title: t('national_insight_center_info.page_title'),
+            href: '#',
+        },
+    ];
+    const [searchQuery, setSearchQuery] = useState(filters.search);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [nationalInsightCenterInfoToDelete, setNationalInsightCenterInfoToDelete] = useState<NationalInsightCenterInfo | null>(null);
 
-  // Handle confirm
-  const handleConfirm = (id: number) => {
-    router.patch(route('national-insight-center-infos.confirm', id), {}, {
-      onSuccess: () => {
-        // Refresh the page to show updated status
-        router.reload();
-      },
-    });
-  };
+    // Handle search form submission
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        applyFilters({ search: searchQuery });
+    };
 
-  return (
-    <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title={t('national_insight_center_info.page_title')} />
+    // Handle sort change
+    const handleSortChange = (value: string) => {
+        applyFilters({ sort: value });
+    };
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t('national_insight_center_info.delete_dialog.title')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('national_insight_center_info.delete_dialog.description', { name: nationalInsightCenterInfoToDelete?.name || '' })}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>{t('national_insight_center_info.delete_dialog.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
-              {t('national_insight_center_info.delete_dialog.confirm')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+    // Handle direction change
+    const handleDirectionChange = () => {
+        const newDirection = filters.direction === 'asc' ? 'desc' : 'asc';
+        applyFilters({ direction: newDirection });
+    };
 
-      <div className="container px-0 py-6">
-        <Header
-          title={t('national_insight_center_info.page_title')}
-          description={t('national_insight_center_info.page_description')}
-          icon={<FileText className="h-6 w-6 text-white" />}
-          model="national_insight_center_info"
-          routeName="national-insight-center-infos.create"
-          buttonText={t('national_insight_center_info.add_button')}
-          theme="purple"
-          buttonSize="lg"
-        />
-        <SearchFilters
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          onSearchSubmit={handleSearch}
-          searchPlaceholder={t('national_insight_center_info.search_placeholder')}
-          filters={{
-            sort: filters.sort,
-            direction: filters.direction as 'asc' | 'desc',
-            per_page: filters.per_page,
-          }}
-          onTypeChange={() => {}} // Not used for national insight center infos
-          onCategoryChange={() => {}} // Not used for national insight center infos
-          onDepartmentChange={() => {}} // Not used for national insight center infos
-          onSortChange={handleSortChange}
-          onDirectionChange={handleDirectionChange}
-          onPerPageChange={handlePerPageChange}
-          onResetFilters={resetFilters}
-          types={[]} // No types for national insight center infos
-          categories={[]} // No categories for national insight center infos
-          departments={[]} // No departments for national insight center infos
-          sortOptions={sortOptions}
-          perPageOptions={perPageOptions}
-          title={t('national_insight_center_info.search_filters')}
-          description={t('national_insight_center_info.find_and_filter')}
-          className="shadow-2xl bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 overflow-hidden"
-        />
+    // Handle per page change
+    const handlePerPageChange = (value: string) => {
+        applyFilters({ per_page: parseInt(value) });
+    };
+
+    // Navigate to page
+    const goToPage = (page: number) => {
+        router.get(route('national-insight-center-infos.index'), { ...filters, page }, { preserveState: true, preserveScroll: true, replace: true });
+    };
+
+    // Apply filters to the URL
+    const applyFilters = (newFilters: Partial<Props['filters']>) => {
+        router.get(
+            route('national-insight-center-infos.index'),
+            { ...filters, ...newFilters, page: 1 },
+            { preserveState: true, preserveScroll: true, replace: true },
+        );
+    };
+
+    // Reset all filters
+    const resetFilters = () => {
+        setSearchQuery('');
+        router.get(
+            route('national-insight-center-infos.index'),
+            {
+                search: '',
+                sort: 'name',
+                direction: 'asc',
+                per_page: 10,
+                page: 1,
+            },
+            { replace: true },
+        );
+    };
+
+    // Open delete confirmation dialog
+    const openDeleteDialog = (nationalInsightCenterInfo: NationalInsightCenterInfo) => {
+        setNationalInsightCenterInfoToDelete(nationalInsightCenterInfo);
+        setIsDeleteDialogOpen(true);
+    };
+
+    // Handle delete confirmation
+    const confirmDelete = () => {
+        if (nationalInsightCenterInfoToDelete) {
+            router.delete(route('national-insight-center-infos.destroy', nationalInsightCenterInfoToDelete.id), {
+                onSuccess: () => {
+                    setNationalInsightCenterInfoToDelete(null);
+                    setIsDeleteDialogOpen(false);
+                },
+            });
+        }
+    };
+
+    // Handle confirm
+    const handleConfirm = (id: number) => {
+        router.patch(
+            route('national-insight-center-infos.confirm', id),
+            {},
+            {
+                onSuccess: () => {
+                    // Refresh the page to show updated status
+                    router.reload();
+                },
+            },
+        );
+    };
+
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title={t('national_insight_center_info.page_title')} />
+
+            {/* Delete Confirmation Dialog */}
+            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{t('national_insight_center_info.delete_dialog.title')}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {t('national_insight_center_info.delete_dialog.description', { name: nationalInsightCenterInfoToDelete?.name || '' })}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>
+                            {t('national_insight_center_info.delete_dialog.cancel')}
+                        </AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
+                            {t('national_insight_center_info.delete_dialog.confirm')}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            <div className="container px-0 py-6">
+                <Header
+                    title={t('national_insight_center_info.page_title')}
+                    description={t('national_insight_center_info.page_description')}
+                    icon={<FileText className="h-6 w-6 text-white" />}
+                    model="national_insight_center_info"
+                    routeName="national-insight-center-infos.create"
+                    buttonText={t('national_insight_center_info.add_button')}
+                    theme="purple"
+                    buttonSize="lg"
+                />
+                <SearchFilters
+                    searchQuery={searchQuery}
+                    onSearchChange={setSearchQuery}
+                    onSearchSubmit={handleSearch}
+                    searchPlaceholder={t('national_insight_center_info.search_placeholder')}
+                    filters={{
+                        sort: filters.sort,
+                        direction: filters.direction as 'asc' | 'desc',
+                        per_page: filters.per_page,
+                    }}
+                    onTypeChange={() => {}} // Not used for national insight center infos
+                    onCategoryChange={() => {}} // Not used for national insight center infos
+                    onDepartmentChange={() => {}} // Not used for national insight center infos
+                    onSortChange={handleSortChange}
+                    onDirectionChange={handleDirectionChange}
+                    onPerPageChange={handlePerPageChange}
+                    onResetFilters={resetFilters}
+                    types={[]} // No types for national insight center infos
+                    categories={[]} // No categories for national insight center infos
+                    departments={[]} // No departments for national insight center infos
+                    sortOptions={sortOptions}
+                    perPageOptions={perPageOptions}
+                    title={t('national_insight_center_info.search_filters')}
+                    description={t('national_insight_center_info.find_and_filter')}
+                    className="overflow-hidden border-0 bg-gradient-to-bl from-white to-purple-50/30 shadow-2xl dark:from-gray-800 dark:to-purple-900/20"
+                />
 
                 {/* Results Table */}
-        <div className="mt-8">
-        
-          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 rounded-3xl">
-            <CardContent className="p-0">
-              <div className="overflow-hidden rounded-b-3xl">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-gradient-to-l from-purple-100 dark:from-purple-900 to-purple-200 dark:to-purple-800 border-0">
-                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.id')}</TableHead>
-                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.name')}</TableHead>
-                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.description')}</TableHead>
-                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.date')}</TableHead>
-                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.status')}</TableHead>
-                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.info_items_count')}</TableHead>
-                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.stats_count')}</TableHead>
-                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.created_at')}</TableHead>
-                      <TableHead className="text-purple-800 dark:text-purple-200 font-bold text-lg py-6 px-6">{t('national_insight_center_info.table.actions')}</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {nationalInsightCenterInfos?.data && nationalInsightCenterInfos.data.length > 0 ? (
-                      nationalInsightCenterInfos.data.map((nationalInsightCenterInfo: NationalInsightCenterInfo) => (
-                        <TableRow key={nationalInsightCenterInfo.id} className="hover:bg-purple-50/50 dark:hover:bg-purple-900/20 transition-colors duration-300 border-b border-purple-100 dark:border-purple-800">
-                          <TableCell className="font-bold text-purple-900 dark:text-purple-100 py-6 px-6 text-lg">{nationalInsightCenterInfo.id}</TableCell>
-                          <TableCell className="font-bold text-purple-900 dark:text-purple-100 py-6 px-6 text-lg">{nationalInsightCenterInfo.name}</TableCell>
-                          <TableCell className="py-6 px-6">
-                            {nationalInsightCenterInfo.description ? (
-                              <span className="text-purple-800 dark:text-purple-200 font-medium">{nationalInsightCenterInfo.description}</span>
-                            ) : (
-                              <span className="text-purple-600 dark:text-purple-400 font-medium">-</span>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6 font-medium">
-                            {nationalInsightCenterInfo.date ? (
-                              formatPersianDateOnly(nationalInsightCenterInfo.date)
-                            ) : (
-                              <span className="text-purple-600 dark:text-purple-400">{t('national_insight_center_info.na')}</span>
-                            )}
-                          </TableCell>
-                          <TableCell className="py-6 px-6">
-                            {nationalInsightCenterInfo.confirmed ? (
-                              <Badge variant="outline" className="bg-gradient-to-l from-green-100 dark:from-green-800 to-green-200 dark:to-green-700 text-green-800 dark:text-green-200 border-green-300 dark:border-green-600 px-4 py-2 rounded-xl font-semibold flex items-center gap-2">
-                                <CheckCircle className="h-4 w-4" />
-                                {t('national_insight_center_info.confirmed')}
-                              </Badge>
-                            ) : (
-                              <Badge variant="outline" className="bg-gradient-to-l from-yellow-100 dark:from-yellow-800 to-yellow-200 dark:to-yellow-700 text-yellow-800 dark:text-yellow-200 border-yellow-300 dark:border-yellow-600 px-4 py-2 rounded-xl font-semibold">
-                                {t('national_insight_center_info.pending')}
-                              </Badge>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6">
-                            <Badge variant="outline" className="bg-gradient-to-l from-purple-100 dark:from-purple-800 to-purple-200 dark:to-purple-700 text-purple-800 dark:text-purple-200 border-purple-300 dark:border-purple-600 px-4 py-2 rounded-xl font-semibold">
-                              {nationalInsightCenterInfo.info_items_count || 0} {t('national_insight_center_info.info_items')}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6">
-                            <Badge variant="outline" className="bg-gradient-to-l from-purple-100 dark:from-purple-800 to-purple-200 dark:to-purple-700 text-purple-800 dark:text-purple-200 border-purple-300 dark:border-purple-600 px-4 py-2 rounded-xl font-semibold">
-                              {nationalInsightCenterInfo.info_stats_count || 0} {t('national_insight_center_info.stats_records')}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6 font-medium">
-                            {nationalInsightCenterInfo.created_at ? (
-                              formatPersianDateOnly(nationalInsightCenterInfo.created_at)
-                            ) : (
-                              <span className="text-purple-600 dark:text-purple-400">{t('national_insight_center_info.na')}</span>
-                            )}
-                          </TableCell>
-                          <TableCell className="py-6 px-6">
-                            <div className="flex items-center gap-2">
-                              <CanView model="national_insight_center_info">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  asChild
-                                  title={t('national_insight_center_info.actions.view')}
-                                  className="h-10 w-10 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-800 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-300 hover:scale-110"
-                                >
-                                  <Link href={route('national-insight-center-infos.show', { national_insight_center_info: nationalInsightCenterInfo.id })}>
-                                    <Eye className="h-5 w-5" />
-                                  </Link>
-                                </Button>
-                              </CanView>
-                              <CanUpdate model="national_insight_center_info">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  asChild
-                                  title={t('national_insight_center_info.actions.manage_stats')}
-                                  className="h-10 w-10 rounded-xl hover:bg-orange-100 dark:hover:bg-orange-800 text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 transition-all duration-300 hover:scale-110"
-                                >
-                                  <Link href={route('national-insight-center-infos.stats', nationalInsightCenterInfo.id)}>
-                                    <BarChart3 className="h-5 w-5" />
-                                  </Link>
-                                </Button>
-                              </CanUpdate>
-                              <CanUpdate model="national_insight_center_info">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  asChild
-                                  title={t('national_insight_center_info.actions.edit')}
-                                  className="h-10 w-10 rounded-xl hover:bg-green-100 dark:hover:bg-green-800 text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-all duration-300 hover:scale-110"
-                                  disabled={nationalInsightCenterInfo.confirmed}
-                                >
-                                  <Link href={route('national-insight-center-infos.edit', nationalInsightCenterInfo.id)}>
-                                    <Pencil className="h-5 w-5" />
-                                  </Link>
-                                </Button>
-                              </CanUpdate>
-                              <CanConfirm model="national_insight_center_info">
-                                {!nationalInsightCenterInfo.confirmed && (
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => handleConfirm(nationalInsightCenterInfo.id)}
-                                    title={t('national_insight_center_info.actions.confirm')}
-                                    className="h-10 w-10 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-800 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-300 hover:scale-110"
-                                  >
-                                    <CheckCircle className="h-5 w-5" />
-                                  </Button>
-                                )}
-                              </CanConfirm>
-                              <CanDelete model="national_insight_center_info">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => openDeleteDialog(nationalInsightCenterInfo)}
-                                  title={t('national_insight_center_info.actions.delete')}
-                                  className="h-10 w-10 rounded-xl text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-100 dark:hover:bg-red-800 transition-all duration-300 hover:scale-110"
-                                  disabled={nationalInsightCenterInfo.confirmed}
-                                >
-                                  <Trash className="h-5 w-5" />
-                                </Button>
-                              </CanDelete>
+                <div className="mt-8">
+                    <Card className="overflow-hidden rounded-3xl border-0 bg-gradient-to-bl from-white to-purple-50/30 shadow-2xl dark:from-gray-800 dark:to-purple-900/20">
+                        <CardContent className="p-0">
+                            <div className="overflow-hidden rounded-b-3xl">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow className="border-0 bg-gradient-to-l from-purple-100 to-purple-200 dark:from-purple-900 dark:to-purple-800">
+                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800 dark:text-purple-200">
+                                                {t('national_insight_center_info.table.id')}
+                                            </TableHead>
+                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800 dark:text-purple-200">
+                                                {t('national_insight_center_info.table.name')}
+                                            </TableHead>
+                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800 dark:text-purple-200">
+                                                {t('national_insight_center_info.table.description')}
+                                            </TableHead>
+                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800 dark:text-purple-200">
+                                                {t('national_insight_center_info.table.date')}
+                                            </TableHead>
+                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800 dark:text-purple-200">
+                                                {t('national_insight_center_info.table.status')}
+                                            </TableHead>
+                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800 dark:text-purple-200">
+                                                {t('national_insight_center_info.table.info_items_count')}
+                                            </TableHead>
+                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800 dark:text-purple-200">
+                                                {t('national_insight_center_info.table.stats_count')}
+                                            </TableHead>
+                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800 dark:text-purple-200">
+                                                {t('national_insight_center_info.table.created_at')}
+                                            </TableHead>
+                                            <TableHead className="px-6 py-6 text-lg font-bold text-purple-800 dark:text-purple-200">
+                                                {t('national_insight_center_info.table.actions')}
+                                            </TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {nationalInsightCenterInfos?.data && nationalInsightCenterInfos.data.length > 0 ? (
+                                            nationalInsightCenterInfos.data.map((nationalInsightCenterInfo: NationalInsightCenterInfo) => (
+                                                <TableRow
+                                                    key={nationalInsightCenterInfo.id}
+                                                    className="border-b border-purple-100 transition-colors duration-300 hover:bg-purple-50/50 dark:border-purple-800 dark:hover:bg-purple-900/20"
+                                                >
+                                                    <TableCell className="px-6 py-6 text-lg font-bold text-purple-900 dark:text-purple-100">
+                                                        {nationalInsightCenterInfo.id}
+                                                    </TableCell>
+                                                    <TableCell className="px-6 py-6 text-lg font-bold text-purple-900 dark:text-purple-100">
+                                                        {nationalInsightCenterInfo.name}
+                                                    </TableCell>
+                                                    <TableCell className="px-6 py-6">
+                                                        {nationalInsightCenterInfo.description ? (
+                                                            <span className="font-medium text-purple-800 dark:text-purple-200">
+                                                                {nationalInsightCenterInfo.description}
+                                                            </span>
+                                                        ) : (
+                                                            <span className="font-medium text-purple-600 dark:text-purple-400">-</span>
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell className="px-6 py-6 font-medium text-purple-800 dark:text-purple-200">
+                                                        {nationalInsightCenterInfo.date ? (
+                                                            formatPersianDateOnly(nationalInsightCenterInfo.date)
+                                                        ) : (
+                                                            <span className="text-purple-600 dark:text-purple-400">
+                                                                {t('national_insight_center_info.na')}
+                                                            </span>
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell className="px-6 py-6">
+                                                        {nationalInsightCenterInfo.confirmed ? (
+                                                            <Badge
+                                                                variant="outline"
+                                                                className="flex items-center gap-2 rounded-xl border-green-300 bg-gradient-to-l from-green-100 to-green-200 px-4 py-2 font-semibold text-green-800 dark:border-green-600 dark:from-green-800 dark:to-green-700 dark:text-green-200"
+                                                            >
+                                                                <CheckCircle className="h-4 w-4" />
+                                                                {t('national_insight_center_info.confirmed')}
+                                                            </Badge>
+                                                        ) : (
+                                                            <Badge
+                                                                variant="outline"
+                                                                className="rounded-xl border-yellow-300 bg-gradient-to-l from-yellow-100 to-yellow-200 px-4 py-2 font-semibold text-yellow-800 dark:border-yellow-600 dark:from-yellow-800 dark:to-yellow-700 dark:text-yellow-200"
+                                                            >
+                                                                {t('national_insight_center_info.pending')}
+                                                            </Badge>
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell className="px-6 py-6 text-purple-800 dark:text-purple-200">
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="rounded-xl border-purple-300 bg-gradient-to-l from-purple-100 to-purple-200 px-4 py-2 font-semibold text-purple-800 dark:border-purple-600 dark:from-purple-800 dark:to-purple-700 dark:text-purple-200"
+                                                        >
+                                                            {nationalInsightCenterInfo.info_items_count || 0}{' '}
+                                                            {t('national_insight_center_info.info_items')}
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell className="px-6 py-6 text-purple-800 dark:text-purple-200">
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="rounded-xl border-purple-300 bg-gradient-to-l from-purple-100 to-purple-200 px-4 py-2 font-semibold text-purple-800 dark:border-purple-600 dark:from-purple-800 dark:to-purple-700 dark:text-purple-200"
+                                                        >
+                                                            {nationalInsightCenterInfo.info_stats_count || 0}{' '}
+                                                            {t('national_insight_center_info.stats_records')}
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell className="px-6 py-6 font-medium text-purple-800 dark:text-purple-200">
+                                                        {nationalInsightCenterInfo.created_at ? (
+                                                            formatPersianDateOnly(nationalInsightCenterInfo.created_at)
+                                                        ) : (
+                                                            <span className="text-purple-600 dark:text-purple-400">
+                                                                {t('national_insight_center_info.na')}
+                                                            </span>
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell className="px-6 py-6">
+                                                        <div className="flex items-center gap-2">
+                                                            <CanView model="national_insight_center_info">
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    asChild
+                                                                    title={t('national_insight_center_info.actions.view')}
+                                                                    className="h-10 w-10 rounded-xl text-purple-600 transition-all duration-300 hover:scale-110 hover:bg-purple-100 hover:text-purple-700 dark:text-purple-400 dark:hover:bg-purple-800 dark:hover:text-purple-300"
+                                                                >
+                                                                    <Link
+                                                                        href={route('national-insight-center-infos.show', {
+                                                                            national_insight_center_info: nationalInsightCenterInfo.id,
+                                                                        })}
+                                                                    >
+                                                                        <Eye className="h-5 w-5" />
+                                                                    </Link>
+                                                                </Button>
+                                                            </CanView>
+                                                            {!nationalInsightCenterInfo.confirmed && (
+                                                                <CanUpdate model="national_insight_center_info">
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        asChild
+                                                                        title={t('national_insight_center_info.actions.edit')}
+                                                                        className="h-10 w-10 rounded-xl text-green-600 transition-all duration-300 hover:scale-110 hover:bg-green-100 hover:text-green-700 dark:text-green-400 dark:hover:bg-green-800 dark:hover:text-green-300"
+                                                                        disabled={nationalInsightCenterInfo.confirmed}
+                                                                    >
+                                                                        <Link
+                                                                            href={route(
+                                                                                'national-insight-center-infos.edit',
+                                                                                nationalInsightCenterInfo.id,
+                                                                            )}
+                                                                        >
+                                                                            <Pencil className="h-5 w-5" />
+                                                                        </Link>
+                                                                    </Button>
+                                                                </CanUpdate>
+                                                            )}
+                                                            <CanConfirm model="national_insight_center_info">
+                                                                {!nationalInsightCenterInfo.confirmed && (
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        onClick={() => handleConfirm(nationalInsightCenterInfo.id)}
+                                                                        title={t('national_insight_center_info.actions.confirm')}
+                                                                        className="h-10 w-10 rounded-xl text-blue-600 transition-all duration-300 hover:scale-110 hover:bg-blue-100 hover:text-blue-700 dark:text-blue-400 dark:hover:bg-blue-800 dark:hover:text-blue-300"
+                                                                    >
+                                                                        <CheckCircle className="h-5 w-5" />
+                                                                    </Button>
+                                                                )}
+                                                            </CanConfirm>
+                                                            {!nationalInsightCenterInfo.confirmed && (
+                                                            <CanDelete model="national_insight_center_info">
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    onClick={() => openDeleteDialog(nationalInsightCenterInfo)}
+                                                                    title={t('national_insight_center_info.actions.delete')}
+                                                                    className="h-10 w-10 rounded-xl text-red-600 transition-all duration-300 hover:scale-110 hover:bg-red-100 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-800 dark:hover:text-red-300"
+                                                                    disabled={nationalInsightCenterInfo.confirmed}
+                                                                >
+                                                                    <Trash className="h-5 w-5" />
+                                                                </Button>
+                                                            </CanDelete>
+                                                            )}
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))
+                                        ) : (
+                                            <TableRow>
+                                                <TableCell colSpan={8} className="h-32 text-center">
+                                                    <div className="flex flex-col items-center gap-4 text-purple-600 dark:text-purple-400">
+                                                        <div className="rounded-full bg-purple-100 p-4 dark:bg-purple-800">
+                                                            <AlertTriangle className="h-16 w-16 text-purple-400 dark:text-purple-300" />
+                                                        </div>
+                                                        <p className="text-xl font-bold">{t('national_insight_center_info.no_records')}</p>
+                                                        <p className="text-purple-500 dark:text-purple-400">
+                                                            No national insight center info records found
+                                                        </p>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
                             </div>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={8} className="h-32 text-center">
-                          <div className="flex flex-col items-center gap-4 text-purple-600 dark:text-purple-400">
-                            <div className="p-4 bg-purple-100 dark:bg-purple-800 rounded-full">
-                              <AlertTriangle className="h-16 w-16 text-purple-400 dark:text-purple-300" />
-                            </div>
-                            <p className="text-xl font-bold">{t('national_insight_center_info.no_records')}</p>
-                            <p className="text-purple-500 dark:text-purple-400">No national insight center info records found</p>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+                        </CardContent>
+                    </Card>
+                </div>
 
-        {/* Pagination */}
-        {nationalInsightCenterInfos?.links && nationalInsightCenterInfos.links.length > 0 && (
-          <div className="mt-8 flex justify-center">
-            <div className="bg-gradient-to-l from-purple-50 dark:from-purple-900/20 to-white dark:to-gray-800 p-4 rounded-3xl shadow-2xl border border-purple-200 dark:border-purple-700">
-              <Pagination links={nationalInsightCenterInfos.links} />
+                {/* Pagination */}
+                {nationalInsightCenterInfos?.links && nationalInsightCenterInfos.links.length > 0 && (
+                    <div className="mt-8 flex justify-center">
+                        <div className="rounded-3xl border border-purple-200 bg-gradient-to-l from-purple-50 to-white p-4 shadow-2xl dark:border-purple-700 dark:from-purple-900/20 dark:to-gray-800">
+                            <Pagination links={nationalInsightCenterInfos.links} />
+                        </div>
+                    </div>
+                )}
             </div>
-          </div>
-        )}
-      </div>
-    </AppLayout>
-  );
+        </AppLayout>
+    );
 }

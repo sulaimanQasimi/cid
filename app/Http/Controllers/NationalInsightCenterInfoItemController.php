@@ -87,23 +87,17 @@ class NationalInsightCenterInfoItemController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request): Response
+    public function create(Request $request,NationalInsightCenterInfo $nationalInsightCenterInfo): Response
     {
-        $this->authorize('create', NationalInsightCenterInfoItem::class);
+        $this->authorize('create', [NationalInsightCenterInfoItem::class, $nationalInsightCenterInfo]);
         
         $nationalInsightCenterInfoId = $request->get('national_insight_center_info_id');
-        
-        $nationalInsightCenterInfos = NationalInsightCenterInfo::where(function($q) {
-            $q->where('created_by', Auth::id())
-              ->orWhereHas('accesses', function($accessQuery) {
-                  $accessQuery->where('user_id', Auth::id());
-              });
-        })->orderBy('name')->get();
+ 
         $infoCategories = InfoCategory::orderBy('name')->get();
         $provinces = Province::orderBy('name')->with('districts')->get();
 
         return Inertia::render('NationalInsightCenterInfoItem/Create', [
-            'nationalInsightCenterInfos' => $nationalInsightCenterInfos,
+            'nationalInsightCenterInfo' => $nationalInsightCenterInfo,
             'infoCategories' => $infoCategories,
             'provinces' => $provinces,
             'nationalInsightCenterInfoId' => $nationalInsightCenterInfoId,
@@ -237,7 +231,6 @@ class NationalInsightCenterInfoItemController extends Controller
         $this->authorize('update', $item);
         
         $validated = $request->validate([
-            'national_insight_center_info_id' => 'required|exists:national_insight_center_infos,id',
             'title' => 'required|string|max:255',
             'registration_number' => 'required|string|max:255|unique:national_insight_center_info_items,registration_number,' . $item->id,
             'info_category_id' => 'nullable|exists:info_categories,id',
@@ -257,7 +250,6 @@ class NationalInsightCenterInfoItemController extends Controller
 
         try {
             $item->update([
-                'national_insight_center_info_id' => $validated['national_insight_center_info_id'],
                 'title' => $validated['title'],
                 'registration_number' => $validated['registration_number'],
                 'info_category_id' => $validated['info_category_id'],

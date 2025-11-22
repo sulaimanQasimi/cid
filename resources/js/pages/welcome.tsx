@@ -1,6 +1,6 @@
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { Shield, Database, Users, AlertTriangle, Building, Lock, Eye, ArrowRight } from 'lucide-react';
+import { Shield, Database, Users, AlertTriangle, Building, Lock, Eye, ArrowRight, ArrowLeft, ArrowRightLeft } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/translate';
 
 export default function Welcome() {
@@ -173,7 +173,7 @@ export default function Welcome() {
                                 >
                                     <Eye className="mr-3 h-6 w-6" />
                                     {t('welcome.cta.access_dashboard')}
-                                    <ArrowRight className="ml-3 h-6 w-6" />
+                                    <ArrowRightLeft className="ml-3 h-6 w-6" />
                                 </Link>
                             ) : (
                                 <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
@@ -183,7 +183,7 @@ export default function Welcome() {
                                     >
                                         <Lock className="mr-3 h-6 w-6" />
                                         {t('welcome.cta.sign_in')}
-                                        <ArrowRight className="ml-3 h-6 w-6" />
+                                        <ArrowLeft className="ml-3 h-6 w-6" />
                                     </Link>
                                 </div>
                             )}
