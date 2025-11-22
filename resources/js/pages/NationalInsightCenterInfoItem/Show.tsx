@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/translate';
 import { usePermissions } from '@/hooks/use-permissions';
-import { CanUpdate, CanDelete, CanConfirm } from '@/components/ui/permission-guard';
+import { CanUpdate, CanDelete } from '@/components/ui/permission-guard';
 import Header from '@/components/template/header';
 import { Label } from '@/components/ui/label';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
@@ -89,7 +89,7 @@ interface ShowProps {
 
 export default function Show({ item }: ShowProps) {
   const { t } = useTranslation();
-  const { canUpdate, canDelete, canConfirm } = usePermissions();
+  const { canUpdate, canDelete } = usePermissions();
 
   // Normalize the data to handle both snake_case and camelCase from backend
   const nationalInsightCenterInfo = item.nationalInsightCenterInfo || item.national_insight_center_info;
@@ -112,10 +112,6 @@ export default function Show({ item }: ShowProps) {
 
   const handleDelete = () => {
     router.delete(route('national-insight-center-info-items.destroy', item.id));
-  };
-
-  const handleConfirm = () => {
-    router.patch(route('national-insight-center-info-items.confirm', item.id));
   };
 
 
@@ -163,19 +159,6 @@ export default function Show({ item }: ShowProps) {
                   </AlertDialogContent>
                 </AlertDialog>
               </CanDelete>
-
-              {!nationalInsightCenterInfo?.confirmed && (
-                <CanConfirm model="national_insight_center_info_item">
-                  <Button
-                    onClick={handleConfirm}
-                    variant="outline"
-                    size="lg"
-                    className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-4 py-3 transition-all duration-300 hover:scale-105"
-                  >
-                    <CheckCircle className="h-5 w-5" />
-                  </Button>
-                </CanConfirm>
-              )}
 
               <CanUpdate model="national_insight_center_info_item">
                 <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-4 py-3 transition-all duration-300 hover:scale-105">
