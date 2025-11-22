@@ -177,48 +177,56 @@ export default function PrintDates({ sub_items = [], statSums = [], dateFrom, da
                 {/* Statistics Table */}
                 {Object.keys(categories).length > 0 && (
                     <div className="mb-8 flex justify-start">
-                        <table className="border-collapse border-2 border-gray-900 print:border-gray-800">
-                            <thead>
-                                <tr>
-                                    {Object.entries(categories).map(([key, category]) => (
-                                        <th
-                                            key={key}
-                                            colSpan={category.length}
-                                            className="border-2 border-gray-900 bg-gray-900 px-4 py-3 text-center font-bold text-white"
-                                        >
-                                            {key}
-                                        </th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    {Object.values(categories)
-                                        .flat()
-                                        .map((item, index) => (
-                                            <td key={index} className="h-22 rotate-90 border-2 border-gray-900 py-3 text-center text-gray-900">
-                                                {item.item_name}
-                                            </td>
+                        <div className="overflow-hidden rounded-lg border border-gray-300 print:border-gray-800">
+                            <table className="w-fit border-collapse bg-white">
+                                <thead>
+                                    <tr className="bg-gradient-to-b from-gray-700 to-gray-800 text-white print:bg-gray-900">
+                                        {Object.entries(categories).map(([key, category]) => (
+                                            <th
+                                                key={key}
+                                                colSpan={category.length}
+                                                className="border border-gray-400 px-4 py-3 text-center text-sm font-bold print:border-gray-800"
+                                            >
+                                                {key}
+                                            </th>
                                         ))}
-                                </tr>
-                                <tr>
-                                    {Object.values(categories)
-                                        .flat()
-                                        .map((item, index) => (
-                                            <td key={index} className="border-2 border-gray-900 py-3 text-center text-gray-900">
-                                                {item.total_integer_value ?? 0}
-                                            </td>
-                                        ))}
-                                </tr>
-                            </tbody>
-                        </table>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr className="bg-white print:bg-white">
+                                        {Object.values(categories)
+                                            .flat()
+                                            .map((item, index) => (
+                                                <td
+                                                    key={index}
+                                                    className="h-22 rotate-90 border border-gray-300 px-4 py-2 text-center text-sm text-gray-900 print:border-gray-800"
+                                                >
+                                                    {item.item_name}
+                                                </td>
+                                            ))}
+                                    </tr>
+                                    <tr className="bg-gray-50 print:bg-gray-100">
+                                        {Object.values(categories)
+                                            .flat()
+                                            .map((item, index) => (
+                                                <td
+                                                    key={index}
+                                                    className="border border-gray-300 px-4 py-2 text-center text-sm font-medium text-gray-900 print:border-gray-800"
+                                                >
+                                                    {item.total_integer_value ?? 0}
+                                                </td>
+                                            ))}
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
 
                 {/* Sub Items Table */}
                 <div className="mb-8">
                     <h2 className="mb-4 text-xl font-bold text-gray-900 print:text-lg">جزئیات موارد</h2>
-                    <div className="overflow-hidden rounded-lg border border-gray-300 shadow-md print:border-gray-800 print:shadow-none">
+                    <div className="overflow-hidden rounded-lg border border-gray-300 print:border-gray-800">
                         <table className="min-w-full border-collapse bg-white">
                             <thead>
                                 <tr className="bg-gradient-to-b from-gray-700 to-gray-800 text-white print:bg-gray-900">
