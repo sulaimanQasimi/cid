@@ -46,19 +46,19 @@ interface District {
 }
 
 interface CreateProps {
+  nationalInsightCenterInfo: NationalInsightCenterInfo;
   nationalInsightCenterInfos: NationalInsightCenterInfo[];
   infoCategories: InfoCategory[];
   provinces: Province[];
   districts: District[];
-  nationalInsightCenterInfoId?: number;
 }
 
-export default function Create({ nationalInsightCenterInfos, infoCategories, provinces, nationalInsightCenterInfoId }: CreateProps) {
+export default function Create({ nationalInsightCenterInfo, nationalInsightCenterInfos, infoCategories, provinces }: CreateProps) {
   const { t } = useTranslation();
   const { canCreate } = usePermissions();
 
   const { data, setData, post, processing, errors, reset } = useForm({
-    national_insight_center_info_id: nationalInsightCenterInfoId || '',
+    national_insight_center_info_id: nationalInsightCenterInfo.id,
     title: '',
     registration_number: '',
     info_category_id: null as number | null,
@@ -89,11 +89,7 @@ export default function Create({ nationalInsightCenterInfos, infoCategories, pro
   };
 
   const handleCancel = () => {
-    if (nationalInsightCenterInfoId) {
-      window.history.back();
-    } else {
-      window.location.href = route('national-insight-center-infos.index');
-    }
+    window.location.href = route('national-insight-center-infos.show', { national_insight_center_info: nationalInsightCenterInfo.id });
   };
 
   const handleProvinceChange = (value: string) => {
@@ -117,12 +113,12 @@ export default function Create({ nationalInsightCenterInfos, infoCategories, pro
           theme="purple"
           buttonSize="lg"
           showBackButton={true}
-          backRouteName={nationalInsightCenterInfoId ? () => route('national-insight-center-infos.show', { national_insight_center_info: nationalInsightCenterInfoId }) : 'national-insight-center-infos.index'}
-               backButtonText={t('national_insight_center_info_item.create.back_button')}
+          backRouteName={() => route('national-insight-center-infos.show', { national_insight_center_info: nationalInsightCenterInfo.id })}
+          backButtonText={t('national_insight_center_info_item.create.back_button')}
           showButton={false}
           actionButtons={
             <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
-              <Link href={nationalInsightCenterInfoId ? route('national-insight-center-infos.show', { national_insight_center_info: nationalInsightCenterInfoId }) : route('national-insight-center-infos.index')} className="flex items-center gap-3">
+              <Link href={route('national-insight-center-infos.show', { national_insight_center_info: nationalInsightCenterInfo.id })} className="flex items-center gap-3">
                 <ArrowLeft className="h-5 w-5" />
                 {t('national_insight_center_info_item.create.back_button')}
               </Link>
@@ -149,7 +145,7 @@ export default function Create({ nationalInsightCenterInfos, infoCategories, pro
                       <Select
                         value={data.national_insight_center_info_id.toString()}
                         onValueChange={(value) => setData('national_insight_center_info_id', parseInt(value))}
-                        disabled={!!nationalInsightCenterInfoId}
+                        disabled={true}
                       >
                         <SelectTrigger id="national_insight_center_info_id" className="h-12 border-purple-200 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20 bg-gradient-to-l from-purple-50 dark:from-purple-900/30 to-white dark:to-gray-800 text-right disabled:opacity-50 disabled:cursor-not-allowed">
                           <SelectValue placeholder={t('national_insight_center_info_item.create.select_national_insight_center_info')} />

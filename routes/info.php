@@ -32,7 +32,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('national-insight-center-infos/{nationalInsightCenterInfo}/weekly-report', [NationalInsightCenterInfoController::class, 'weeklyReport'])->name('national-insight-center-infos.weekly-report');
 
     // National Insight Center Info Item routes
+    // Nested route for creating items within a parent info
+    Route::get('national-insight-center-infos/{nationalInsightCenterInfo}/national-insight-center-info-items/create', [NationalInsightCenterInfoItemController::class, 'create'])->name('national-insight-center-info-items.create');
     Route::resource('national-insight-center-info-items', NationalInsightCenterInfoItemController::class)
-    ->parameters(['national-insight-center-info-items' => 'item']);
+        ->parameters(['national-insight-center-info-items' => 'item'])
+        ->except(['create']);
     Route::patch('national-insight-center-info-items/{item}/confirm', [NationalInsightCenterInfoItemController::class, 'confirm'])->name('national-insight-center-info-items.confirm');
 });

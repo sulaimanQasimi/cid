@@ -87,20 +87,26 @@ class NationalInsightCenterInfoItemController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request,NationalInsightCenterInfo $nationalInsightCenterInfo): Response
+    public function create(NationalInsightCenterInfo $nationalInsightCenterInfo): Response
     {
         $this->authorize('create', [NationalInsightCenterInfoItem::class, $nationalInsightCenterInfo]);
-        
-        $nationalInsightCenterInfoId = $request->get('national_insight_center_info_id');
  
         $infoCategories = InfoCategory::orderBy('name')->get();
         $provinces = Province::orderBy('name')->with('districts')->get();
+        
+        // Get available national insight center infos for dropdown (if needed)
+        $nationalInsightCenterInfos = NationalInsightCenterInfo::where(function($q) {
+            $q->where('created_by', Auth::id())
+              ->orWhereHas('accesses', function($accessQuery) {
+                  $accessQuery->where('user_id', Auth::id());
+              });
+        })->orderBy('name')->get();
 
         return Inertia::render('NationalInsightCenterInfoItem/Create', [
             'nationalInsightCenterInfo' => $nationalInsightCenterInfo,
+            'nationalInsightCenterInfos' => $nationalInsightCenterInfos,
             'infoCategories' => $infoCategories,
             'provinces' => $provinces,
-            'nationalInsightCenterInfoId' => $nationalInsightCenterInfoId,
         ]);
     }
 
@@ -181,11 +187,10 @@ class NationalInsightCenterInfoItemController extends Controller
             'province',
             'district',
             'creator.department',
-            'confirmer.department',
         ]);
-
         return Inertia::render('NationalInsightCenterInfoItem/Show', [
             'item' => $item,
+
         ]);
     }
 

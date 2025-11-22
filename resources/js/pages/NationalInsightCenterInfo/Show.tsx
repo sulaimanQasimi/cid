@@ -622,7 +622,7 @@ export default function ShowNationalInsightCenterInfo({
                                     <Button asChild>
                                         <Link
                                             href={route('national-insight-center-info-items.create', {
-                                                national_insight_center_info_id: nationalInsightCenterInfo.id,
+                                                nationalInsightCenterInfo: nationalInsightCenterInfo.id,
                                             })}
                                         >
                                             <Plus className="mr-2 h-5 w-5" />
@@ -733,7 +733,7 @@ export default function ShowNationalInsightCenterInfo({
                                                                 >
                                                                     <Link
                                                                         href={route('national-insight-center-info-items.create', {
-                                                                            national_insight_center_info_id: nationalInsightCenterInfo.id,
+                                                                            nationalInsightCenterInfo: nationalInsightCenterInfo.id,
                                                                         })}
                                                                     >
                                                                         <Plus className="h-5 w-5" />

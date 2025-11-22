@@ -61,6 +61,7 @@ interface NationalInsightCenterInfo {
   id: number;
   name: string;
   code: string;
+  confirmed: boolean;
   description: string | null;
 }
 
@@ -70,11 +71,12 @@ interface NationalInsightCenterInfoItem {
   registration_number: string;
   description: string | null;
   date: string | null;
-  confirmed: boolean;
   created_at: string;
   updated_at: string;
-  nationalInsightCenterInfo: NationalInsightCenterInfo;
-  infoCategory: InfoCategory | null;
+  nationalInsightCenterInfo?: NationalInsightCenterInfo;
+  national_insight_center_info?: NationalInsightCenterInfo;
+  infoCategory?: InfoCategory | null;
+  info_category?: InfoCategory | null;
   province: Province | null;
   district: District | null;
   creator: User | null;
@@ -89,14 +91,18 @@ export default function Show({ item }: ShowProps) {
   const { t } = useTranslation();
   const { canUpdate, canDelete, canConfirm } = usePermissions();
 
+  // Normalize the data to handle both snake_case and camelCase from backend
+  const nationalInsightCenterInfo = item.nationalInsightCenterInfo || item.national_insight_center_info;
+  const infoCategory = item.infoCategory || item.info_category;
+
   const breadcrumbs: BreadcrumbItem[] = [
     {
       title: t('national_insight_center_info.page_title'),
       href: route('national-insight-center-infos.index'),
     },
     {
-      title: item.nationalInsightCenterInfo?.name || t('national_insight_center_info_item.unknown'),
-      href: item.nationalInsightCenterInfo?.id ? route('national-insight-center-infos.show', { national_insight_center_info: item.nationalInsightCenterInfo.id }) : route('national-insight-center-infos.index'),
+      title: nationalInsightCenterInfo?.name || t('national_insight_center_info_item.unknown'),
+      href: nationalInsightCenterInfo?.id ? route('national-insight-center-infos.show', { national_insight_center_info: nationalInsightCenterInfo.id }) : route('national-insight-center-infos.index'),
     },
     {
       title: item.title,
@@ -129,7 +135,7 @@ export default function Show({ item }: ShowProps) {
           theme="purple"
           buttonSize="lg"
           showBackButton={true}
-          backRouteName={() => item.nationalInsightCenterInfo?.id ? route('national-insight-center-infos.show', { national_insight_center_info: item.nationalInsightCenterInfo.id }) : route('national-insight-center-infos.index')}
+          backRouteName={() => nationalInsightCenterInfo?.id ? route('national-insight-center-infos.show', { national_insight_center_info: nationalInsightCenterInfo.id }) : route('national-insight-center-infos.index')}
           backButtonText={t('national_insight_center_info_item.show.back_button')}
           showButton={canUpdate('national_insight_center_info_item')}
           actionButtons={
@@ -158,7 +164,7 @@ export default function Show({ item }: ShowProps) {
                 </AlertDialog>
               </CanDelete>
 
-              {!item.confirmed && (
+              {!nationalInsightCenterInfo?.confirmed && (
                 <CanConfirm model="national_insight_center_info_item">
                   <Button
                     onClick={handleConfirm}
@@ -206,10 +212,10 @@ export default function Show({ item }: ShowProps) {
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('national_insight_center_info_item.show.status')}</Label>
                   <Badge 
-                    variant={item.confirmed ? "default" : "secondary"}
-                    className={item.confirmed ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"}
+                    variant={nationalInsightCenterInfo?.confirmed ? "default" : "secondary"}
+                    className={nationalInsightCenterInfo?.confirmed ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"}
                   >
-                    {item.confirmed ? (
+                    {nationalInsightCenterInfo?.confirmed ? (
                       <><CheckCircle className="h-4 w-4 mr-1" /> {t('national_insight_center_info_item.show.confirmed')}</>
                     ) : (
                       <><Clock className="h-4 w-4 mr-1" /> {t('national_insight_center_info_item.show.pending')}</>
