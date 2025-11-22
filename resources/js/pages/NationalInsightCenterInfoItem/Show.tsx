@@ -8,7 +8,6 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-    AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,7 +20,8 @@ import { useTranslation } from '@/lib/i18n/translate';
 import { formatPersianDateOnly } from '@/lib/utils/date';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { Calendar, CheckCircle, Clock, Edit, FileText, Trash2 } from 'lucide-react';
+import React from 'react';
+import { ArrowLeft, CheckCircle, Clock, FileText, Pencil, Trash2 } from 'lucide-react';
 
 interface User {
     id: number;
@@ -87,6 +87,7 @@ interface ShowProps {
 export default function Show({ item }: ShowProps) {
     const { t } = useTranslation();
     const { canUpdate, canDelete } = usePermissions();
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
 
     // Normalize the data to handle both snake_case and camelCase from backend
     const nationalInsightCenterInfo = item.nationalInsightCenterInfo || item.national_insight_center_info;
@@ -110,12 +111,34 @@ export default function Show({ item }: ShowProps) {
     ];
 
     const handleDelete = () => {
-        router.delete(route('national-insight-center-info-items.destroy', item.id));
+        router.delete(route('national-insight-center-info-items.destroy', item.id), {
+            onSuccess: () => {
+                setIsDeleteDialogOpen(false);
+            },
+        });
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('national_insight_center_info_item.show.page_title', { name: item.title })} />
+
+            {/* Delete Confirmation Dialog */}
+            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{t('national_insight_center_info_item.show.delete_confirm_title')}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {t('national_insight_center_info_item.show.delete_confirm_description', { name: item.title })}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+                            {t('common.delete')}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
 
             <div className="container px-0 py-6">
                 <Header
@@ -126,7 +149,6 @@ export default function Show({ item }: ShowProps) {
                     routeName={() => route('national-insight-center-info-items.show', item.id)}
                     buttonText={t('national_insight_center_info_item.show.edit_button')}
                     theme="purple"
-                    buttonSize="lg"
                     showBackButton={true}
                     backRouteName={() =>
                         nationalInsightCenterInfo?.id
@@ -134,49 +156,51 @@ export default function Show({ item }: ShowProps) {
                             : route('national-insight-center-infos.index')
                     }
                     backButtonText={t('national_insight_center_info_item.show.back_button')}
-                    showButton={canUpdate('national_insight_center_info_item')}
+                    showButton={false}
                     actionButtons={
                         <>
-                            <CanDelete model="national_insight_center_info_item">
-                                <AlertDialog>
-                                    <AlertDialogTrigger asChild>
+                            {!nationalInsightCenterInfo?.confirmed && (
+                                <>
+                                    <CanDelete model="national_insight_center_info_item">
                                         <Button
-                                            variant="outline"
                                             size="lg"
-                                            className="rounded-2xl border-red-400/30 bg-red-500/20 px-4 py-3 text-white shadow-2xl backdrop-blur-md transition-all duration-300 hover:scale-105 hover:bg-red-500/30"
+                                            variant="destructive"
+                                            onClick={() => setIsDeleteDialogOpen(true)}
+                                            className="rounded-2xl border-red-300/30 bg-red-500/20 px-4 py-3 text-white shadow-2xl backdrop-blur-md transition-all duration-300 hover:scale-105 hover:bg-red-500/30"
                                         >
                                             <Trash2 className="h-5 w-5" />
                                         </Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                        <AlertDialogHeader>
-                                            <AlertDialogTitle>{t('national_insight_center_info_item.show.delete_confirm_title')}</AlertDialogTitle>
-                                            <AlertDialogDescription>
-                                                {t('national_insight_center_info_item.show.delete_confirm_description', { name: item.title })}
-                                            </AlertDialogDescription>
-                                        </AlertDialogHeader>
-                                        <AlertDialogFooter>
-                                            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-                                            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
-                                                {t('common.delete')}
-                                            </AlertDialogAction>
-                                        </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-                            </CanDelete>
-
-                            <CanUpdate model="national_insight_center_info_item">
-                                <Button
-                                    asChild
-                                    variant="outline"
-                                    size="lg"
-                                    className="rounded-2xl border-white/30 bg-white/20 px-4 py-3 text-white shadow-2xl backdrop-blur-md transition-all duration-300 hover:scale-105 hover:bg-white/30"
+                                    </CanDelete>
+                                    <CanUpdate model="national_insight_center_info_item">
+                                        <Button
+                                            asChild
+                                            size="lg"
+                                            className="rounded-2xl border-white/30 bg-white/20 px-4 py-3 text-white shadow-2xl backdrop-blur-md transition-all duration-300 hover:scale-105 hover:bg-white/30"
+                                        >
+                                            <Link href={route('national-insight-center-info-items.edit', item.id)} className="flex items-center">
+                                                <Pencil className="h-5 w-5" />
+                                            </Link>
+                                        </Button>
+                                    </CanUpdate>
+                                </>
+                            )}
+                            <Button
+                                asChild
+                                variant="outline"
+                                size="lg"
+                                className="rounded-2xl border-white/30 bg-white/20 px-4 py-3 text-white shadow-2xl backdrop-blur-md transition-all duration-300 hover:scale-105 hover:bg-white/30"
+                            >
+                                <Link
+                                    href={
+                                        nationalInsightCenterInfo?.id
+                                            ? route('national-insight-center-infos.show', { national_insight_center_info: nationalInsightCenterInfo.id })
+                                            : route('national-insight-center-infos.index')
+                                    }
+                                    className="flex items-center"
                                 >
-                                    <Link href={route('national-insight-center-info-items.edit', item.id)} className="flex items-center">
-                                        <Edit className="h-5 w-5" />
-                                    </Link>
-                                </Button>
-                            </CanUpdate>
+                                    <ArrowLeft className="h-5 w-5" />
+                                </Link>
+                            </Button>
                         </>
                     }
                 />
@@ -271,29 +295,7 @@ export default function Show({ item }: ShowProps) {
                                         </p>
                                     </div>
                                 )}
-                            </div>
 
-                            {item.description && (
-                                <div className="space-y-2">
-                                    <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                                        {t('national_insight_center_info_item.show.description_label')}
-                                    </Label>
-                                    <p className="leading-relaxed text-gray-900 dark:text-white">{item.description}</p>
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-
-                    {/* Audit Information */}
-                    <Card className="overflow-hidden border-0 bg-gradient-to-bl from-white to-purple-50/30 shadow-2xl dark:from-gray-800 dark:to-purple-900/20">
-                        <CardHeader className="bg-gradient-to-r from-purple-600 to-purple-700 p-6 text-white">
-                            <CardTitle className="flex items-center gap-3 text-xl font-bold">
-                                <Calendar className="h-6 w-6" />
-                                {t('national_insight_center_info_item.show.audit_info')}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-6 p-6">
-                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                 <div className="space-y-2">
                                     <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">
                                         {t('national_insight_center_info_item.show.created_at')}
@@ -337,6 +339,15 @@ export default function Show({ item }: ShowProps) {
                                     </>
                                 )}
                             </div>
+
+                            {item.description && (
+                                <div className="space-y-2">
+                                    <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                                        {t('national_insight_center_info_item.show.description_label')}
+                                    </Label>
+                                    <p className="leading-relaxed text-gray-900 dark:text-white">{item.description}</p>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </div>

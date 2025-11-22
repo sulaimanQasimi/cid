@@ -2331,6 +2331,8 @@
     "info_categories.delete_dialog.delete_button":"حذف دسته",
     "info_categories.delete_dialog.cancel_button":"انصراف",
     "national_insight_center_info.na":"ندارد",
-    "national_insight_center_info.show.no_description": "توضیحات ندارد"
+    "national_insight_center_info.show.no_description": "توضیحات ندارد",
+    "national_insight_center_info_item.show.creator_email":"ایمیل ایجادکننده",
+    "national_insight_center_info_item.show.creator_department":"بخش ایجادکننده"
 
 }
