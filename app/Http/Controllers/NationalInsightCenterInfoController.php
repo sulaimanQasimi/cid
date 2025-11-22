@@ -31,10 +31,6 @@ class NationalInsightCenterInfoController extends Controller
 
         $validated = $request->validate([
             'search' => 'nullable|string|max:255',
-            'sort_field' => ['nullable', 'string', Rule::in([
-                'name', 'code', 'description', 'date', 'created_at', 'updated_at', 'info_items_count', 'info_stats_count',
-            ])],
-            'sort_direction' => ['nullable', 'string', Rule::in(['asc', 'desc'])],
             'per_page' => 'nullable|integer|min:5|max:100',
             'page' => 'nullable|integer|min:1',
         ]);
@@ -58,10 +54,8 @@ class NationalInsightCenterInfoController extends Controller
             });
         }
 
-        // Apply sorting
-        $sortField = $validated['sort_field'] ?? 'name';
-        $sortDirection = $validated['sort_direction'] ?? 'asc';
-        $query->orderBy($sortField, $sortDirection);
+        // Sort by newest first
+        $query->orderBy('created_at', 'desc');
 
         // Get paginated results
         $perPage = $validated['per_page'] ?? 10;
@@ -71,8 +65,6 @@ class NationalInsightCenterInfoController extends Controller
             'nationalInsightCenterInfos' => $nationalInsightCenterInfos,
             'filters' => [
                 'search' => $validated['search'] ?? '',
-                'sort' => $sortField,
-                'direction' => $sortDirection,
                 'per_page' => $perPage,
             ],
         ]);
@@ -210,7 +202,6 @@ class NationalInsightCenterInfoController extends Controller
             ])
             ->orderBy('created_at', 'desc')
             ->paginate(5);
-
 
         $statCategories = StatCategory::where('status', 'active')
             ->orderBy('label')
@@ -376,6 +367,11 @@ class NationalInsightCenterInfoController extends Controller
 
         try {
             $nationalInsightCenterInfo->update([
+                'confirmed' => true,
+                'confirmed_by' => Auth::id(),
+                'confirmed_at' => now(),
+            ]);
+            $nationalInsightCenterInfo->infoItems()->update([
                 'confirmed' => true,
                 'confirmed_by' => Auth::id(),
                 'confirmed_at' => now(),
@@ -808,7 +804,7 @@ class NationalInsightCenterInfoController extends Controller
             $sub_items = DB::select('CALL sp_get_sub_items_by_ids(?)', [$idsString]);
         }
         // Get all national insight center infos accessible by the user with their info items
-        
+
         // Aggregate all stats from national insight center infos only (not from info items)
         // dd($sub_items);
         return Inertia::render('NationalInsightCenterInfo/PrintDates', [

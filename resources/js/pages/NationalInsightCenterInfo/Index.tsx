@@ -72,21 +72,9 @@ interface Props {
     };
     filters?: {
         search: string;
-        sort: string;
-        direction: string;
         per_page: number;
     };
 }
-
-const sortOptions = [
-    { value: 'name', label: 'Name' },
-    { value: 'description', label: 'Description' },
-    { value: 'date', label: 'Date' },
-    { value: 'created_at', label: 'Created Date' },
-    { value: 'updated_at', label: 'Updated Date' },
-    { value: 'info_items_count', label: 'Info Items Count' },
-    { value: 'info_stats_count', label: 'Stats Count' },
-];
 
 const perPageOptions = [
     { value: 10, label: '10 per page' },
@@ -97,7 +85,7 @@ const perPageOptions = [
 
 export default function NationalInsightCenterInfosIndex({
     nationalInsightCenterInfos = { data: [], links: [], meta: undefined },
-    filters = { search: '', sort: 'name', direction: 'asc', per_page: 10 },
+    filters = { search: '', per_page: 10 },
 }: Props) {
     const { canCreate, canView, canUpdate, canDelete, canConfirm } = usePermissions();
     const { t } = useTranslation();
@@ -120,17 +108,6 @@ export default function NationalInsightCenterInfosIndex({
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         applyFilters({ search: searchQuery });
-    };
-
-    // Handle sort change
-    const handleSortChange = (value: string) => {
-        applyFilters({ sort: value });
-    };
-
-    // Handle direction change
-    const handleDirectionChange = () => {
-        const newDirection = filters.direction === 'asc' ? 'desc' : 'asc';
-        applyFilters({ direction: newDirection });
     };
 
     // Handle per page change
@@ -159,8 +136,6 @@ export default function NationalInsightCenterInfosIndex({
             route('national-insight-center-infos.index'),
             {
                 search: '',
-                sort: 'name',
-                direction: 'asc',
                 per_page: 10,
                 page: 1,
             },
@@ -241,21 +216,19 @@ export default function NationalInsightCenterInfosIndex({
                     onSearchSubmit={handleSearch}
                     searchPlaceholder={t('national_insight_center_info.search_placeholder')}
                     filters={{
-                        sort: filters.sort,
-                        direction: filters.direction as 'asc' | 'desc',
                         per_page: filters.per_page,
                     }}
                     onTypeChange={() => {}} // Not used for national insight center infos
                     onCategoryChange={() => {}} // Not used for national insight center infos
                     onDepartmentChange={() => {}} // Not used for national insight center infos
-                    onSortChange={handleSortChange}
-                    onDirectionChange={handleDirectionChange}
+                    onSortChange={() => {}} // Sorting removed - always newest first
+                    onDirectionChange={() => {}} // Sorting removed - always newest first
                     onPerPageChange={handlePerPageChange}
                     onResetFilters={resetFilters}
                     types={[]} // No types for national insight center infos
                     categories={[]} // No categories for national insight center infos
                     departments={[]} // No departments for national insight center infos
-                    sortOptions={sortOptions}
+                    sortOptions={[]} // Sorting removed - always newest first
                     perPageOptions={perPageOptions}
                     title={t('national_insight_center_info.search_filters')}
                     description={t('national_insight_center_info.find_and_filter')}
