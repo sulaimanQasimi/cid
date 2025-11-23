@@ -19,10 +19,17 @@ class StatCategoryController extends Controller
         
         $categories = StatCategory::with('creator')
             ->latest()
-            ->paginate(10);
+            ->get();
 
-        return Inertia::render('Admin/StatCategory/Index', [
+        // Get all items with their relationships
+        $items = \App\Models\StatCategoryItem::with(['category', 'creator', 'parent', 'children'])
+            ->orderBy('stat_category_id')
+            ->orderBy('order')
+            ->get();
+
+        return Inertia::render('Admin/StatCategory/Combined', [
             'categories' => $categories,
+            'items' => $items,
         ]);
     }
 
@@ -100,7 +107,7 @@ class StatCategoryController extends Controller
 
         $statCategory->update($validated);
 
-        return redirect()->route('stat-categories.show', $statCategory)
+        return redirect()->route('stat-categories.index')
             ->with('success', 'Category updated successfully.');
     }
 

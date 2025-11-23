@@ -55,6 +55,8 @@
         "clsx": "^2.1.1",
         "concurrently": "^9.0.1",
         "date-fns": "^2.30.0",
+        "devextreme": "^25.1.6",
+        "devextreme-react": "^25.1.6",
         "globals": "^15.14.0",
         "laravel-vite-plugin": "^1.0",
         "lucide-react": "^0.475.0",

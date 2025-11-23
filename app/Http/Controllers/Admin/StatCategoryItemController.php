@@ -18,24 +18,8 @@ class StatCategoryItemController extends Controller
     {
         $this->authorize('viewAny', StatCategoryItem::class);
         
-        $categoryId = $request->query('category_id');
-
-        $query = StatCategoryItem::with(['category', 'creator', 'parent', 'children']);
-
-        if ($categoryId) {
-            $query->where('stat_category_id', $categoryId);
-        }
-
-        $items = $query->orderBy('order')->paginate(10);
-        $categories = StatCategory::where('status', 'active')->get(['id', 'name', 'label']);
-
-        return Inertia::render('Admin/StatCategoryItem/Index', [
-            'items' => $items,
-            'categories' => $categories,
-            'filter' => [
-                'category_id' => $categoryId,
-            ],
-        ]);
+        // Redirect to the combined page
+        return redirect()->route('stat-categories.index');
     }
 
     /**
@@ -124,15 +108,7 @@ class StatCategoryItemController extends Controller
 
         $item = StatCategoryItem::create($validated);
 
-        // Check redirect preference from query parameters
-        $redirectToCategory = $request->query('redirect_to_category') === 'true';
-
-        if ($redirectToCategory) {
-            return redirect()->route('stat-categories.show', $item->stat_category_id)
-                ->with('success', 'Item created successfully.');
-        }
-
-        return redirect()->route('stat-category-items.index', ['category_id' => $item->stat_category_id])
+        return redirect()->route('stat-categories.index')
             ->with('success', 'Item created successfully.');
     }
 
@@ -247,15 +223,7 @@ class StatCategoryItemController extends Controller
 
         $statCategoryItem->update($validated);
 
-        // Check redirect preference from query parameters
-        $redirectToCategory = $request->query('redirect_to_category') === 'true';
-
-        if ($redirectToCategory) {
-            return redirect()->route('stat-categories.show', $statCategoryItem->stat_category_id)
-                ->with('success', 'Item updated successfully.');
-        }
-
-        return redirect()->route('stat-category-items.show', $statCategoryItem)
+        return redirect()->route('stat-categories.index')
             ->with('success', 'Item updated successfully.');
     }
 
@@ -271,10 +239,9 @@ class StatCategoryItemController extends Controller
             return back()->with('error', 'Cannot delete an item that has children.');
         }
 
-        $categoryId = $statCategoryItem->stat_category_id;
         $statCategoryItem->delete();
 
-        return redirect()->route('stat-category-items.index', ['category_id' => $categoryId])
+        return redirect()->route('stat-categories.index')
             ->with('success', 'Item deleted successfully.');
     }
 
