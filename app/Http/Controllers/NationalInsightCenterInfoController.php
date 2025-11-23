@@ -442,7 +442,7 @@ class NationalInsightCenterInfoController extends Controller
      */
     public function print(NationalInsightCenterInfo $nationalInsightCenterInfo): Response
     {
-        $this->authorize('view', $nationalInsightCenterInfo);
+        $this->authorize('print', $nationalInsightCenterInfo);
 
         // Load the national insight center info with all necessary relationships
         $nationalInsightCenterInfo->load([
@@ -471,7 +471,7 @@ class NationalInsightCenterInfoController extends Controller
      */
     public function weeklyReport(Request $request, NationalInsightCenterInfo $nationalInsightCenterInfo): Response
     {
-        $this->authorize('view', $nationalInsightCenterInfo);
+        $this->authorize('printDates', $nationalInsightCenterInfo);
 
         // Get date parameters (default to current week and previous week)
         $currentWeekStart = $request->input('current_week_start');
@@ -658,7 +658,7 @@ class NationalInsightCenterInfoController extends Controller
      */
     public function report(Request $request): Response
     {
-        $this->authorize('viewAny', NationalInsightCenterInfo::class);
+        $this->authorize('printDates', NationalInsightCenterInfo::class);
 
         $validated = $request->validate([
             'date_from' => 'nullable|string',

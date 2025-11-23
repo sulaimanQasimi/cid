@@ -19,6 +19,15 @@ class VisitorAnalyticsController extends Controller
     public function __construct(VisitorTrackingService $trackingService)
     {
         $this->trackingService = $trackingService;
+        
+        // Only super admin can access analytics
+        $this->middleware(function ($request, $next) {
+            if (!auth()->user()->hasRole('admin')) {
+                abort(403, 'Access denied. Super admin privileges required.');
+            }
+            
+            return $next($request);
+        });
     }
 
     /**

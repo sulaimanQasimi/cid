@@ -143,7 +143,7 @@ export default function ShowNationalInsightCenterInfo({
     departments = [],
 }: Props) {
     const { t } = useTranslation();
-    const { canCreate, canView, canUpdate, canDelete } = usePermissions();
+    const { canCreate, canView, canUpdate, canDelete, can } = usePermissions();
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
     const [selectedItem, setSelectedItem] = React.useState<Info | null>(null);
     const [isItemModalOpen, setIsItemModalOpen] = React.useState(false);
@@ -248,19 +248,21 @@ export default function ShowNationalInsightCenterInfo({
                                     <Printer className="h-5 w-5" />
                                 </Link>
                             </Button>
-                            <Button
-                                asChild
-                                size="lg"
-                                className="rounded-2xl border-white/30 bg-white/20 px-4 py-3 text-white shadow-2xl backdrop-blur-md transition-all duration-300 hover:scale-105 hover:bg-white/30"
-                                title={t('weekly_report.page_title')}
-                            >
-                                <Link
-                                    href={route('national-insight-center-infos.weekly-report', nationalInsightCenterInfo.id)}
-                                    className="flex items-center"
+                            {can('national_insight_center_info.print_dates') && (
+                                <Button
+                                    asChild
+                                    size="lg"
+                                    className="rounded-2xl border-white/30 bg-white/20 px-4 py-3 text-white shadow-2xl backdrop-blur-md transition-all duration-300 hover:scale-105 hover:bg-white/30"
+                                    title={t('weekly_report.page_title')}
                                 >
-                                    <Calendar className="h-5 w-5" />
-                                </Link>
-                            </Button>
+                                    <Link
+                                        href={route('national-insight-center-infos.weekly-report', nationalInsightCenterInfo.id)}
+                                        className="flex items-center"
+                                    >
+                                        <Calendar className="h-5 w-5" />
+                                    </Link>
+                                </Button>
+                            )}
                             <Button
                                 asChild
                                 variant="outline"

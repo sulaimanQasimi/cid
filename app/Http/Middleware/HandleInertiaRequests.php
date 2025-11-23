@@ -50,6 +50,8 @@ class HandleInertiaRequests extends Middleware
                 'user' => $user,
                 'permissions' => $user?->getAllPermissions()->pluck('name'),
                 'is_admin' => $user?->hasAnyRole(['superadmin', 'admin']),
+                'is_superadmin' => $user?->hasRole('superadmin'),
+                'has_admin_role' => $user?->hasRole('admin'),
             ],
             'ziggy' => fn (): array => [
                 ...(new Ziggy)->toArray(),

@@ -86,10 +86,22 @@ class NationalInsightCenterInfoPolicy
 
     /**
      * Determine whether the user can print dates report.
+     * If a specific record is provided, also checks access to that record.
      */
     public function printDates(User $user, NationalInsightCenterInfo $nationalInsightCenterInfo = null): bool
     {
-        return $user->hasPermissionTo('national_insight_center_info.print_dates');
+        // Check permission first
+        if (!$user->hasPermissionTo('national_insight_center_info.print')) {
+            return false;
+        }
+        
+        // If a specific record is provided, also check access
+        if ($nationalInsightCenterInfo !== null) {
+            return $nationalInsightCenterInfo->created_by === $user->id || $nationalInsightCenterInfo->hasAccess($user);
+        }
+        
+        // If no record provided, just check permission (for print-dates route)
+        return true;
     }
 
     /**

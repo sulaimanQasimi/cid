@@ -80,6 +80,8 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
             href: '/national-insight-center-infos',
             icon: Target
         });
+    }
+    if (auth.permissions.includes('national_insight_center_info.print')) {
         nationalInsightCenterItems.push({
             title: t('sidebar.national_insight_center_report'),
             href: '/national-insight-center-infos/report',
@@ -232,12 +234,14 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
         });
     }
 
-    // Analytics - accessible to all authenticated users
-    adminItems.push({
-        title: t('sidebar.visitor_analytics'),
-        href: '/analytics',
-        icon: BarChart3
-    });
+    // Analytics - only for admin
+    if (auth.has_admin_role) {
+        adminItems.push({
+            title: t('sidebar.visitor_analytics'),
+            href: '/analytics',
+            icon: BarChart3
+        });
+    }
 
     // Backup Management - admin only
     if (auth.permissions.includes('manage backups')) {

@@ -29,7 +29,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('national-insight-center-infos/{nationalInsightCenterInfo}/stats', [NationalInsightCenterInfoController::class, 'manageStats'])->name('national-insight-center-infos.stats');
     Route::put('national-insight-center-infos/{nationalInsightCenterInfo}/stats', [NationalInsightCenterInfoController::class, 'updateStats'])->name('national-insight-center-infos.stats.update');
     Route::get('national-insight-center-infos/{nationalInsightCenterInfo}/print', [NationalInsightCenterInfoController::class, 'print'])->name('national-insight-center-infos.print')->middleware('can:print,nationalInsightCenterInfo');
-    Route::get('national-insight-center-infos/{nationalInsightCenterInfo}/weekly-report', [NationalInsightCenterInfoController::class, 'weeklyReport'])->name('national-insight-center-infos.weekly-report');
+    Route::get('national-insight-center-infos/{nationalInsightCenterInfo}/weekly-report', [NationalInsightCenterInfoController::class, 'weeklyReport'])->name('national-insight-center-infos.weekly-report')->middleware('can:printDates,nationalInsightCenterInfo');
 
     // National Insight Center Info Item routes
     // Nested route for creating items within a parent info
