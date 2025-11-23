@@ -283,18 +283,11 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
 
     // Data Configuration
     const dataItems: NavItem[] = [];
-    if (auth.permissions.includes('stat_category.view_any')) {
+    if (auth.permissions.includes('stat_category.view_any') || auth.permissions.includes('stat_category_item.view_any')) {
         dataItems.push({
             title: t('sidebar.stat_categories'),
             href: route('stat-categories.index'),
             icon: Database
-        });
-    }
-    if (auth.permissions.includes('stat_category_item.view_any')) {
-        dataItems.push({
-            title: t('sidebar.stat_items'),
-            href: route('stat-category-items.index'),
-            icon: Tag
         });
     }
 

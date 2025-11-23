@@ -1499,6 +1499,7 @@
     "stat_category_items.page_title": "د احصائیه کټه ګوري آیټمونه",
     "stat_category_items.page_description": "د احصائیه کټه ګوري آیټمونو مدیریت",
     "stat_category_items.add_button": "آیټم اضافه کړئ",
+    "stat_category_items.add_item": "آیټم اضافه کړئ",
     "stat_category_items.search_filters": "لټون او فلټرونه",
     "stat_category_items.search_description": "د کټه ګوري آیټمونو لټون او فلټر",
     "stat_category_items.filter_by_category": "د کټه ګوري له مخې فلټر کړئ",

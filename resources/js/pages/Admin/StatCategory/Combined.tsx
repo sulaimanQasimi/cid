@@ -646,39 +646,24 @@ export default function Combined({ categories, items }: CombinedProps) {
         </div>
 
         {/* DevExtreme TreeList */}
-        <Card className="shadow-2xl bg-gradient-to-bl from-white to-blue-50/30 border-0 rounded-3xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 text-white py-6">
-            <CardTitle className="flex items-center gap-4 text-2xl">
-              <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
-                <Layers className="h-6 w-6" />
-              </div>
-              <div>
-                <div className="font-bold">{t('stat_categories.page_title')}</div>
-                <CardDescription className="text-blue-100 text-sm font-medium mt-1">
-                  {t('stat_categories.categories_description')}
-                </CardDescription>
-              </div>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
-              <TreeList
-                dataSource={treeListData}
-                keyExpr="id"
-                parentIdExpr="parent_id"
-                showBorders={true}
-                showRowLines={true}
-                columnAutoWidth={true}
-                wordWrapEnabled={true}
-                onInitialized={onTreeListInitialized}
-                onRowClick={onRowClick}
-                onRowDblClick={onRowDblClick}
-                rootValue={null}
-                autoExpandAll={false}
-                allowColumnReordering={true}
-                allowColumnResizing={true}
-                expandNodesOnFiltering={true}
-              >
+        <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+          <TreeList
+            dataSource={treeListData}
+            keyExpr="id"
+            parentIdExpr="parent_id"
+            showBorders={true}
+            showRowLines={true}
+            columnAutoWidth={true}
+            wordWrapEnabled={true}
+            onInitialized={onTreeListInitialized}
+            onRowClick={onRowClick}
+            onRowDblClick={onRowDblClick}
+            rootValue={null}
+            autoExpandAll={false}
+            allowColumnReordering={true}
+            allowColumnResizing={true}
+            expandNodesOnFiltering={true}
+          >
                 <Selection mode="single" />
                 <FilterRow visible={true} />
                 <HeaderFilter visible={true} />
@@ -748,9 +733,7 @@ export default function Combined({ categories, items }: CombinedProps) {
                   allowFiltering={false}
                 />
               </TreeList>
-            </div>
-          </CardContent>
-        </Card>
+        </div>
 
         {/* Category Create/Edit Dialog */}
         <Dialog open={isCategoryCreateOpen || isCategoryEditOpen} onOpenChange={(open) => {
