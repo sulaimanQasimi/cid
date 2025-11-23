@@ -767,7 +767,7 @@ class NationalInsightCenterInfoController extends Controller
      */
     public function printDates(Request $request): Response
     {
-        $this->authorize('viewAny', NationalInsightCenterInfo::class);
+        $this->authorize('printDates', NationalInsightCenterInfo::class);
 
         $validated = $request->validate([
             'date_from' => 'nullable|string',

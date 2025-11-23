@@ -85,6 +85,14 @@ class NationalInsightCenterInfoPolicy
     }
 
     /**
+     * Determine whether the user can print dates report.
+     */
+    public function printDates(User $user, NationalInsightCenterInfo $nationalInsightCenterInfo = null): bool
+    {
+        return $user->hasPermissionTo('national_insight_center_info.print_dates');
+    }
+
+    /**
      * Determine whether the user can restore the model.
      */
     public function restore(User $user, NationalInsightCenterInfo $nationalInsightCenterInfo): bool
