@@ -452,7 +452,7 @@ export default function Print({ report, incidents, barcodeData, isAdmin }: Print
                         onChange={(e) => handleSettingsChange('fontFamily', e.target.value)}
                         className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                       >
-                        <option value="Amiri, Traditional Arabic, Arial, sans-serif">Amiri (پیش‌فرض)</option>
+                        <option value="Amiri, Traditional Arabic, Arial, sans-serif">Amiri ({t('incident_reports.print.settings.typography.font_default')})</option>
                         <option value="Traditional Arabic, Arial, sans-serif">Traditional Arabic</option>
                         <option value="Arial, sans-serif">Arial</option>
                         <option value="Calibri, sans-serif">Calibri</option>
@@ -512,8 +512,8 @@ export default function Print({ report, incidents, barcodeData, isAdmin }: Print
                         onChange={(e) => handleSettingsChange('orientation', e.target.value)}
                         className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                       >
-                        <option value="portrait">عمودی</option>
-                        <option value="landscape">افقی</option>
+                        <option value="portrait">{t('incident_reports.print.settings.layout.orientation.portrait')}</option>
+                        <option value="landscape">{t('incident_reports.print.settings.layout.orientation.landscape')}</option>
                       </select>
                     </div>
                     <div>
@@ -525,9 +525,9 @@ export default function Print({ report, incidents, barcodeData, isAdmin }: Print
                         onChange={(e) => handleSettingsChange('margins', e.target.value)}
                         className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                       >
-                        <option value="normal">عادی</option>
-                        <option value="narrow">باریک</option>
-                        <option value="wide">پهن</option>
+                        <option value="normal">{t('incident_reports.print.settings.layout.margins.normal')}</option>
+                        <option value="narrow">{t('incident_reports.print.settings.layout.margins.narrow')}</option>
+                        <option value="wide">{t('incident_reports.print.settings.layout.margins.wide')}</option>
                       </select>
                     </div>
                   </div>
@@ -612,7 +612,7 @@ export default function Print({ report, incidents, barcodeData, isAdmin }: Print
                       </div>
                     </div>
                     <div className="border rounded-lg p-4 bg-gray-50">
-                      <h4 className="font-medium text-gray-700 mb-2">نمونه تاریخ:</h4>
+                      <h4 className="font-medium text-gray-700 mb-2">{t('incident_reports.print.settings.date_format.preview')}</h4>
                       <div className="text-sm text-gray-600">
                         {formatDate(new Date().toISOString())}
                       </div>
