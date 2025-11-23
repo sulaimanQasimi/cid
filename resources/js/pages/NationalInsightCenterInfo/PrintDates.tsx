@@ -2,8 +2,10 @@ import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/lib/i18n/translate';
 import { formatPersianDateOnly } from '@/lib/utils/date';
 import { Head } from '@inertiajs/react';
-import { ArrowLeft, FileText } from 'lucide-react';
-import React from 'react';
+import { ArrowLeft, FileText, Settings, X, Tag, TabletSmartphone } from 'lucide-react';
+import React, { useState } from 'react';
+import { format } from 'date-fns';
+import moment from 'moment-jalaali';
 
 interface StatSum {
     stat_category_item_id: number;
@@ -43,6 +45,13 @@ interface SubItem {
     department_name: string | null;
 }
 
+interface PrintSettings {
+    governmentName: string;
+    ministryName: string;
+    reportTitle: string;
+    dateFormat: 'gregorian' | 'hijri' | 'persian';
+}
+
 interface Props {
     sub_items?: SubItem[];
     statSums?: StatSum[];
@@ -52,6 +61,14 @@ interface Props {
 
 export default function PrintDates({ sub_items = [], statSums = [], dateFrom, dateTo }: Props) {
     const { t } = useTranslation();
+    const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false);
+    const [activeTab, setActiveTab] = useState<'labels' | 'date_format'>('labels');
+    const [printSettings, setPrintSettings] = useState<PrintSettings>({
+        governmentName: 'امارت اسلامی افغانستان',
+        ministryName: 'وزارت دفاع',
+        reportTitle: 'گزارش مرکز ملی بصیرت',
+        dateFormat: 'persian',
+    });
 
     // Group statSums by category_name
     const categories = React.useMemo(() => {
@@ -74,6 +91,101 @@ export default function PrintDates({ sub_items = [], statSums = [], dateFrom, da
 
     const handleBack = () => {
         window.history.back();
+    };
+
+    const handleSettingsChange = (key: keyof PrintSettings, value: string) => {
+        setPrintSettings((prev) => ({
+            ...prev,
+            [key]: value,
+        }));
+    };
+
+    // Date conversion utility functions
+    const gregorianToHijri = (date: Date): string => {
+        try {
+            // Use Intl API with Islamic calendar for accurate Hijri conversion
+            const formatter = new Intl.DateTimeFormat('en-US-u-ca-islamic', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+            });
+            
+            const parts = formatter.formatToParts(date);
+            const year = parts.find((part) => part.type === 'year')?.value || '';
+            const month = parts.find((part) => part.type === 'month')?.value || '';
+            const day = parts.find((part) => part.type === 'day')?.value || '';
+            
+            return `${year}/${month.padStart(2, '0')}/${day.padStart(2, '0')}`;
+        } catch (error) {
+            console.error('Error converting to Hijri:', error);
+            // Fallback to simple approximation if Intl API fails
+            const hijriYear = Math.floor((date.getFullYear() - 622) * 0.970224);
+            const hijriMonth = Math.floor((date.getMonth() + 1) * 0.970224);
+            const hijriDay = Math.floor(date.getDate() * 0.970224);
+            return `${hijriYear}/${hijriMonth.toString().padStart(2, '0')}/${hijriDay.toString().padStart(2, '0')}`;
+        }
+    };
+
+    const gregorianToPersian = (date: Date): string => {
+        // Use the existing formatPersianDateOnly function for accurate Persian conversion
+        return formatPersianDateOnly(date.toISOString());
+    };
+
+    // Parse Persian date string and convert to Date object
+    const parsePersianDate = (dateString: string): Date | null => {
+        if (!dateString) return null;
+        
+        try {
+            // Check if it's a Persian date format (YYYY/MM/DD or YYYY/M/D)
+            if (dateString.includes('/')) {
+                // Try to parse as Persian date using moment-jalaali
+                const persianMoment = moment(dateString, 'jYYYY/jMM/jDD');
+                if (persianMoment.isValid()) {
+                    // Convert Persian date to Gregorian Date object
+                    return persianMoment.toDate();
+                }
+            }
+            
+            // Try to parse as ISO date or standard date
+            const date = new Date(dateString);
+            if (!isNaN(date.getTime())) {
+                return date;
+            }
+            
+            return null;
+        } catch (e) {
+            console.error('Error parsing date:', e);
+            return null;
+        }
+    };
+
+    // Format the date based on selected calendar system
+    const formatDate = (dateString: string | null): string => {
+        if (!dateString) return '-';
+        
+        try {
+            // First, parse the date (handles Persian date strings)
+            const date = parsePersianDate(dateString);
+            
+            if (!date) {
+                // If parsing fails, return the original string
+                return dateString;
+            }
+            
+            // Now format according to selected calendar
+            switch (printSettings.dateFormat) {
+                case 'hijri':
+                    return gregorianToHijri(date);
+                case 'persian':
+                    return gregorianToPersian(date);
+                case 'gregorian':
+                default:
+                    return format(date, 'yyyy/MM/dd');
+            }
+        } catch (e) {
+            console.error('Error formatting date:', e);
+            return dateString;
+        }
     };
 
     return (
@@ -128,10 +240,21 @@ export default function PrintDates({ sub_items = [], statSums = [], dateFrom, da
                         <ArrowLeft className="h-4 w-4" />
                         {t('national_insight_center_info.print.back_button') || 'بازگشت'}
                     </Button>
-                    <Button onClick={handlePrint} size="lg" className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700">
-                        <FileText className="h-4 w-4" />
-                        {t('national_insight_center_info.print.print_button') || 'چاپ'}
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            onClick={() => setShowSettingsModal(true)}
+                            variant="outline"
+                            size="lg"
+                            className="flex items-center gap-2"
+                        >
+                            <Settings className="h-4 w-4" />
+                            {t('national_insight_center_info.print_dates.settings_button') || 'تنظیمات چاپ'}
+                        </Button>
+                        <Button onClick={handlePrint} size="lg" className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700">
+                            <FileText className="h-4 w-4" />
+                            {t('national_insight_center_info.print.print_button') || 'چاپ'}
+                        </Button>
+                    </div>
                 </div>
             </div>
 
@@ -148,10 +271,10 @@ export default function PrintDates({ sub_items = [], statSums = [], dateFrom, da
                         </div>
                         <div className="flex-1">
                             <h1 className="mb-1 text-3xl font-bold text-gray-900 print:text-2xl">
-                                امارت اسلامی افغانستان
+                                {printSettings.governmentName}
                             </h1>
-                            <h2 className="mb-1 text-2xl font-semibold text-gray-800 print:text-xl">وزارت دفاع</h2>
-                            <h3 className="text-xl font-medium text-gray-700 print:text-lg">گزارش مرکز ملی بصیرت</h3>
+                            <h2 className="mb-1 text-2xl font-semibold text-gray-800 print:text-xl">{printSettings.ministryName}</h2>
+                            <h3 className="text-xl font-medium text-gray-700 print:text-lg">{printSettings.reportTitle}</h3>
                         </div>
                         <div className="flex-shrink-0">
                             <img
@@ -163,11 +286,11 @@ export default function PrintDates({ sub_items = [], statSums = [], dateFrom, da
                     </div>
                     <div className="mt-4 rounded-lg bg-gray-100 px-4 py-2 text-base font-medium text-gray-800 print:bg-gray-200 print:text-sm">
                         {dateFrom && dateTo ? (
-                            <>گزارش بر اساس از تاریخ {dateFrom} تا {dateTo}</>
+                            <>گزارش بر اساس از تاریخ {formatDate(dateFrom)} تا {formatDate(dateTo)}</>
                         ) : dateFrom ? (
-                            <>گزارش بر اساس از تاریخ {dateFrom}</>
+                            <>گزارش بر اساس از تاریخ {formatDate(dateFrom)}</>
                         ) : dateTo ? (
-                            <>گزارش بر اساس تا تاریخ {dateTo}</>
+                            <>گزارش بر اساس تا تاریخ {formatDate(dateTo)}</>
                         ) : (
                             <>گزارش کامل</>
                         )}
@@ -271,7 +394,7 @@ export default function PrintDates({ sub_items = [], statSums = [], dateFrom, da
                                                 {item.description || '-'}
                                             </td>
                                             <td className="border border-gray-300 px-4 py-2 text-center text-sm font-medium text-gray-900 print:border-gray-800">
-                                                {item.date ? formatPersianDateOnly(item.date) : '-'}
+                                                {formatDate(item.date)}
                                             </td>
                                         </tr>
                                     ))
@@ -290,6 +413,224 @@ export default function PrintDates({ sub_items = [], statSums = [], dateFrom, da
                     </div>
                 </div>
             </div>
+
+            {/* Print Settings Modal */}
+            {showSettingsModal && (
+                <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+                    <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <div className="flex items-center justify-between p-4 border-b">
+                            <h2 className="text-lg font-semibold flex items-center">
+                                <FileText className="mr-2 h-5 w-5" />
+                                {t('national_insight_center_info.print_dates.settings_title') || 'تنظیمات چاپ'}
+                            </h2>
+                            <button
+                                onClick={() => setShowSettingsModal(false)}
+                                className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+
+                        <div className="p-6 space-y-6">
+                            {/* Tabs for settings categories */}
+                            <div className="flex border-b">
+                                <button
+                                    onClick={() => setActiveTab('labels')}
+                                    className={`px-4 py-2 border-b-2 font-medium text-sm ${
+                                        activeTab === 'labels'
+                                            ? 'border-primary text-primary'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    }`}
+                                >
+                                    <div className="flex items-center">
+                                        <Tag className="mr-2 h-4 w-4" />
+                                        {t('national_insight_center_info.print_dates.settings.tabs.labels') || 'عنوان‌ها'}
+                                    </div>
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('date_format')}
+                                    className={`px-4 py-2 border-b-2 font-medium text-sm ${
+                                        activeTab === 'date_format'
+                                            ? 'border-primary text-primary'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    }`}
+                                >
+                                    <div className="flex items-center">
+                                        <TabletSmartphone className="mr-2 h-4 w-4" />
+                                        {t('national_insight_center_info.print_dates.settings.tabs.date_format') || 'فرمت تاریخ'}
+                                    </div>
+                                </button>
+                            </div>
+
+                            {/* Labels Tab */}
+                            {activeTab === 'labels' && (
+                                <div className="space-y-4">
+                                    <div className="flex items-center">
+                                        <Tag className="mr-2 h-5 w-5 text-primary" />
+                                        <h3 className="text-md font-medium">
+                                            {t('national_insight_center_info.print_dates.settings_labels_title') || 'عنوان‌ها'}
+                                        </h3>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                {t('national_insight_center_info.print_dates.settings_government_name') || 'نام دولت:'}
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={printSettings.governmentName}
+                                                onChange={(e) => handleSettingsChange('governmentName', e.target.value)}
+                                                className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                                                placeholder="امارت اسلامی افغانستان"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                {t('national_insight_center_info.print_dates.settings_ministry_name') || 'نام وزارت:'}
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={printSettings.ministryName}
+                                                onChange={(e) => handleSettingsChange('ministryName', e.target.value)}
+                                                className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                                                placeholder="وزارت دفاع"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                {t('national_insight_center_info.print_dates.settings_report_title') || 'عنوان گزارش:'}
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={printSettings.reportTitle}
+                                                onChange={(e) => handleSettingsChange('reportTitle', e.target.value)}
+                                                className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                                                placeholder="گزارش مرکز ملی بصیرت"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Date Format Tab */}
+                            {activeTab === 'date_format' && (
+                                <div className="space-y-4">
+                                    <div className="flex items-center">
+                                        <TabletSmartphone className="mr-2 h-5 w-5 text-primary" />
+                                        <h3 className="text-md font-medium">
+                                            {t('national_insight_center_info.print_dates.settings.date_format.title') || 'فرمت تاریخ'}
+                                        </h3>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                {t('national_insight_center_info.print_dates.settings.date_format.title') || 'فرمت تاریخ'}
+                                            </label>
+                                            <div className="space-y-2">
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="radio"
+                                                        name="dateFormat"
+                                                        value="gregorian"
+                                                        checked={printSettings.dateFormat === 'gregorian'}
+                                                        onChange={(e) => handleSettingsChange('dateFormat', e.target.value)}
+                                                        className="mr-2"
+                                                    />
+                                                    <span className="text-sm">
+                                                        {t('national_insight_center_info.print_dates.settings.date_format.gregorian') || 'میلادی (Gregorian)'}
+                                                    </span>
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="radio"
+                                                        name="dateFormat"
+                                                        value="hijri"
+                                                        checked={printSettings.dateFormat === 'hijri'}
+                                                        onChange={(e) => handleSettingsChange('dateFormat', e.target.value)}
+                                                        className="mr-2"
+                                                    />
+                                                    <span className="text-sm">
+                                                        {t('national_insight_center_info.print_dates.settings.date_format.hijri') || 'هجری (Hijri)'}
+                                                    </span>
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="radio"
+                                                        name="dateFormat"
+                                                        value="persian"
+                                                        checked={printSettings.dateFormat === 'persian'}
+                                                        onChange={(e) => handleSettingsChange('dateFormat', e.target.value)}
+                                                        className="mr-2"
+                                                    />
+                                                    <span className="text-sm">
+                                                        {t('national_insight_center_info.print_dates.settings.date_format.persian') || 'شمسی (Persian)'}
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        {/* Preview of current date format */}
+                                        <div className="border rounded-lg p-4 bg-gray-50">
+                                            <h4 className="font-medium text-gray-700 mb-2">
+                                                {t('national_insight_center_info.print_dates.settings.date_format.preview') || 'نمونه تاریخ:'}
+                                            </h4>
+                                            <div className="text-sm text-gray-600">
+                                                {formatDate(new Date().toISOString())}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Preview */}
+                            <div className="border rounded-lg p-4 bg-gray-50">
+                                <h3 className="text-md font-medium mb-3">
+                                    {t('national_insight_center_info.print_dates.settings_preview') || 'پیش‌نمایش'}
+                                </h3>
+                                <div className="border rounded overflow-hidden bg-white p-4">
+                                    <div className="text-center">
+                                        <h1 className="mb-1 text-2xl font-bold text-gray-900">
+                                            {printSettings.governmentName}
+                                        </h1>
+                                        <h2 className="mb-1 text-xl font-semibold text-gray-800">{printSettings.ministryName}</h2>
+                                        <h3 className="text-lg font-medium text-gray-700">{printSettings.reportTitle}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="border-t px-4 py-3 flex justify-end space-x-3">
+                            <button
+                                onClick={() => setShowSettingsModal(false)}
+                                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                            >
+                                {t('common.cancel') || 'لغو'}
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setShowSettingsModal(false);
+                                }}
+                                className="px-4 py-2 bg-primary border border-transparent rounded-md text-sm font-medium text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                            >
+                                {t('common.save') || 'ذخیره'}
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setShowSettingsModal(false);
+                                    setTimeout(() => window.print(), 300);
+                                }}
+                                className="px-4 py-2 bg-purple-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                            >
+                                {t('national_insight_center_info.print_dates.apply_and_print') || 'ذخیره و چاپ'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
