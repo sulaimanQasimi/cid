@@ -1,1 +1,0 @@
-import{j as t,L as r}from"./app-GSRKIW_T.js";import{u as s}from"./translate-DpzX0cI9.js";function a(){const{t:e}=s();return t.jsx(t.Fragment,{children:t.jsx(r,{title:e("reports.view.page_title",{code:""})})})}export{a as default};

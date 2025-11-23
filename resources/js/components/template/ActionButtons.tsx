@@ -7,7 +7,7 @@ import { CanCreate } from '../ui/permission-guard';
 interface ActionButtonsProps {
     model: string;
     routeName: string | (() => string);
-    buttonText: string;
+    buttonText?: string;
     buttonSize?: 'default' | 'sm' | 'lg' | 'icon';
     showBackButton?: boolean;
     backRouteName?: string | (() => string);
@@ -50,18 +50,20 @@ export default function ActionButtons({
                     </Link>
                 </Button>
             )}
-            <CanCreate model={model}>
-                <Button
-                    asChild
-                    size={buttonSize}
-                    className="bg-white text-gray-900 hover:bg-white/90"
-                >
-                    <Link href={resolveRoute(routeName)} className="flex items-center gap-2">
-                        <Plus className="h-4 w-4" />
-                        {buttonText}
-                    </Link>
-                </Button>
-            </CanCreate>
+            {buttonText && (
+                <CanCreate model={model}>
+                    <Button
+                        asChild
+                        size={buttonSize}
+                        className="bg-white text-gray-900 hover:bg-white/90"
+                    >
+                        <Link href={resolveRoute(routeName)} className="flex items-center gap-2">
+                            <Plus className="h-4 w-4" />
+                            {buttonText}
+                        </Link>
+                    </Button>
+                </CanCreate>
+            )}
         </div>
     );
 }

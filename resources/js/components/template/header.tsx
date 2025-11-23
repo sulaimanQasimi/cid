@@ -93,7 +93,7 @@ interface HeaderProps {
     icon: React.ReactNode;
     model: string;
     routeName: string | (() => string);
-    buttonText: string;
+    buttonText?: string;
     theme?: ThemeKey;
     buttonSize?: 'default' | 'sm' | 'lg' | 'icon';
     showBackButton?: boolean;
