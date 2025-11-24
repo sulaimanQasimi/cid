@@ -16,7 +16,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('info-categories', InfoCategoryController::class);
 
     // Info routes (without index and create)
-    Route::resource('infos', InfoController::class)->except(['index', 'create']);
+    // Nested route for creating infos within an info type
+    Route::post('info-types/{infoType}/infos', [InfoController::class, 'store'])->name('infos.store');
+    Route::resource('infos', InfoController::class)->except(['index', 'create', 'store']);
     Route::patch('infos/{info}/confirm', [InfoController::class, 'confirm'])->name('infos.confirm');
 
     // National Insight Center Info routes

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -23,9 +23,11 @@ interface Info {
   confirmed: boolean;
   created_at: string;
   updated_at: string;
+  created_by?: number;
   info_type: {
     id: number;
     name: string;
+    created_by?: number;
   };
   info_category: {
     id: number;
@@ -92,6 +94,17 @@ export default function ShowInfoType({ infoType, infos, infoCategories = [], dep
   const { canCreate, canView, canUpdate, canDelete } = usePermissions();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
+  
+  // Get current user from Inertia shared data
+  const pageProps = usePage().props as any;
+  const currentUserId = pageProps?.auth?.user?.id;
+
+  // Check if user can view an info based on policy
+  const canViewInfo = (info: Info): boolean => {
+    if (!currentUserId) return false;
+    // Policy: user can view if they created the info OR they created the infoType
+    return info.created_by === currentUserId || info.info_type?.created_by === currentUserId;
+  };
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -272,7 +285,7 @@ export default function ShowInfoType({ infoType, infos, infoCategories = [], dep
                           </TableCell>
                           <TableCell className="py-6 px-6">
                             <div className="flex items-center gap-2 justify-end">
-                              <CanView model="info">
+                              {canViewInfo(info) && (
                                 <Button
                                   variant="ghost"
                                   size="icon"
@@ -284,7 +297,7 @@ export default function ShowInfoType({ infoType, infos, infoCategories = [], dep
                                     <ExternalLink className="h-5 w-5" />
                                   </Link>
                                 </Button>
-                              </CanView>
+                              )}
                             </div>
                           </TableCell>
                         </TableRow>

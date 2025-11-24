@@ -23,12 +23,15 @@ class InfoController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, InfoType $infoType)
     {
-        $this->authorize('create', Info::class);
+        // Authorize using policy with InfoType parameter
+        $policy = app(\App\Policies\InfoPolicy::class);
+        if (!$policy->create(Auth::user(), $infoType)) {
+            abort(403, 'You do not have access to create Info for this Info Type.');
+        }
 
         $validated = $request->validate([
-            'info_type_id' => 'required|integer|exists:info_types,id',
             'info_category_id' => 'required|integer|exists:info_categories,id',
             'name' => 'nullable|string|min:2|max:255',
             'code' => [
@@ -48,7 +51,6 @@ class InfoController extends Controller
             'user_id' => 'nullable|integer|exists:users,id',
             'confirmed' => 'boolean',
         ], [
-            'info_type_id.required' => 'The info type field is required.',
             'info_category_id.required' => 'The info category field is required.',
             'name.min' => 'The name must be at least 2 characters.',
             'code.regex' => 'The code may only contain letters, numbers, dashes, underscores, and periods.',
@@ -58,9 +60,13 @@ class InfoController extends Controller
             'value.location.province.max' => 'The province name cannot exceed 255 characters.',
         ]);
 
-        // Handle 'none' value for department_id
-        if (isset($validated['department_id']) && $validated['department_id'] === 'none') {
-            $validated['department_id'] = null;
+        // Set info_type_id from route parameter
+        $validated['info_type_id'] = $infoType->id;
+
+        // Get department from authenticated user
+        $user = Auth::user();
+        if ($user && $user->department_id) {
+            $validated['department_id'] = $user->department_id;
         }
 
         // Sanitize inputs
@@ -97,12 +103,12 @@ class InfoController extends Controller
         // Create the record within a transaction
         try {
             DB::beginTransaction();
-            $info = Info::create($validated);
+            $info = $infoType->infos()->create($validated);
             DB::commit();
 
             // Redirect to the info type show page if type_id is provided, otherwise to info-types index
-            if ($validated['info_type_id']) {
-                return Redirect::route('info-types.show', $validated['info_type_id'])->with('success', 'Info created successfully.');
+            if ($infoType->id) {
+                return Redirect::route('info-types.show', $infoType->id)->with('success', 'Info created successfully.');
             }
             return Redirect::route('info-types.index')->with('success', 'Info created successfully.');
         } catch (\Exception $e) {
@@ -188,6 +194,14 @@ class InfoController extends Controller
             'value.location.lng.numeric' => 'The longitude must be a valid number.',
             'value.location.province.max' => 'The province name cannot exceed 255 characters.',
         ]);
+
+        // Check if user has access to the InfoType (if changed or for new InfoType)
+        $infoType = InfoType::findOrFail($validated['info_type_id']);
+        if (!Auth::user()->hasAnyRole(['admin', 'superadmin', 'manager'])) {
+            if (!$infoType->hasAccess(Auth::user())) {
+                abort(403, 'You do not have access to this Info Type.');
+            }
+        }
 
         // Get department from authenticated user
         $user = Auth::user();

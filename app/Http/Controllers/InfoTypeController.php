@@ -166,7 +166,8 @@ class InfoTypeController extends Controller
         ]);
 
         $infos = $infoType->infos()
-            ->with(['infoType:id,name', 'infoCategory:id,name'])
+            ->with(['infoType:id,name,created_by', 'infoCategory:id,name'])
+            ->select('infos.*')
             ->orderBy('created_at', 'desc')
             ->paginate(5);
 

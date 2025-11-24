@@ -43,7 +43,6 @@ export default function InfoCreateModal({
         name: '',
         code: '',
         description: '',
-        info_type_id: typeId ? typeId.toString() : '',
         info_category_id: '',
         value: {
             content: '',
@@ -58,11 +57,8 @@ export default function InfoCreateModal({
             setActiveTab('basic');
             setIsMapTabMounted(false);
             setLocation(null);
-            if (typeId) {
-                setData('info_type_id', typeId.toString());
-            }
         }
-    }, [isOpen, typeId, reset]);
+    }, [isOpen, reset]);
 
     // Handle tab change
     const handleTabChange = (value: string) => {
@@ -83,7 +79,10 @@ export default function InfoCreateModal({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('infos.store'), {
+        if (!typeId) {
+            return;
+        }
+        post(route('infos.store', typeId), {
             onSuccess: () => {
                 onClose();
             },
@@ -91,7 +90,10 @@ export default function InfoCreateModal({
     };
 
     const handleFormSubmit = () => {
-        post(route('infos.store'), {
+        if (!typeId) {
+            return;
+        }
+        post(route('infos.store', typeId), {
             onSuccess: () => {
                 onClose();
             },
@@ -148,34 +150,7 @@ export default function InfoCreateModal({
                                 </Badge>
                             </div>
 
-                            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
-                                <div className="space-y-3">
-                                    <Label htmlFor="info_type_id" className="flex items-center gap-2 text-sm font-semibold text-gray-800 dark:text-gray-200">
-                                        <FileTextIcon className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                                        {t('info.create.fields.type')}
-                                        <span className="text-red-500 text-xs">{t('common.required_field')}</span>
-                                    </Label>
-                                    <Select value={data.info_type_id} onValueChange={(value) => setData('info_type_id', value)} required>
-                                        <SelectTrigger id="info_type_id" className="h-12 border-gray-200 dark:border-gray-600 focus:border-purple-500 dark:focus:border-purple-400 bg-white dark:bg-gray-800">
-                                            <SelectValue placeholder={t('info.create.placeholders.select_type')} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {infoTypes.length > 0 ? (
-                                                infoTypes.map((type) => (
-                                                    <SelectItem key={type.id} value={type.id.toString()}>
-                                                        {type.name}
-                                                    </SelectItem>
-                                                ))
-                                            ) : (
-                                                <div className="p-4 text-center text-gray-500 dark:text-gray-400">
-                                                    {t('info.create.no_types_available')}
-                                                </div>
-                                            )}
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.info_type_id && <p className="text-sm text-red-500 flex items-center gap-2"><X className="h-4 w-4" />{errors.info_type_id}</p>}
-                                </div>
-
+                            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                                 <div className="space-y-3">
                                     <Label htmlFor="info_category_id" className="flex items-center gap-2 text-sm font-semibold text-gray-800 dark:text-gray-200">
                                         <Tag className="h-4 w-4 text-purple-600 dark:text-purple-400" />

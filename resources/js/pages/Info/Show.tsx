@@ -11,7 +11,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CanDelete, CanUpdate } from '@/components/ui/permission-guard';
+import { CanConfirm, CanDelete, CanUpdate } from '@/components/ui/permission-guard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { usePermissions } from '@/hooks/use-permissions';
 import AppLayout from '@/layouts/app-layout';
@@ -72,6 +72,7 @@ export default function ShowInfo({ info }: Props) {
     const { t } = useTranslation();
     const { canUpdate, canDelete } = usePermissions();
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -90,6 +91,18 @@ export default function ShowInfo({ info }: Props) {
                 setIsDeleteDialogOpen(false);
             },
         });
+    };
+
+    const handleConfirm = () => {
+        router.patch(
+            route('infos.confirm', info.id),
+            {},
+            {
+                onSuccess: () => {
+                    setIsConfirmDialogOpen(false);
+                },
+            },
+        );
     };
 
     // Function to format the value object for display
@@ -139,6 +152,22 @@ export default function ShowInfo({ info }: Props) {
                 </AlertDialogContent>
             </AlertDialog>
 
+            {/* Confirm Dialog */}
+            <AlertDialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{t('info.show.confirm_dialog.title')}</AlertDialogTitle>
+                        <AlertDialogDescription>{t('info.show.confirm_dialog.description')}</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>{t('info.show.confirm_dialog.cancel')}</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleConfirm} className="bg-green-600 hover:bg-green-700">
+                            {t('info.show.confirm_dialog.confirm')}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
             <div className="container px-0 py-8">
                 {/* Professional Header */}
                 <div className="relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-8 text-white shadow-xl lg:p-10">
@@ -160,6 +189,16 @@ export default function ShowInfo({ info }: Props) {
                         </div>
 
                         <div className="flex items-center gap-3">
+                            {!info.confirmed && (
+                                <CanConfirm model="info">
+                                    <Button
+                                        onClick={() => setIsConfirmDialogOpen(true)}
+                                        className="rounded-lg bg-green-600 px-4 py-2 font-medium text-white shadow-lg transition-all duration-200 hover:bg-green-700"
+                                    >
+                                        <Check className="h-4 w-4" />
+                                    </Button>
+                                </CanConfirm>
+                            )}
                             <CanDelete model="info">
                                 <Button
                                     variant="destructive"
