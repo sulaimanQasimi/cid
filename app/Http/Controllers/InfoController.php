@@ -140,7 +140,6 @@ class InfoController extends Controller
         // Load data for dropdowns
         $infoTypes = InfoType::orderBy('name')->get();
         $infoCategories = InfoCategory::orderBy('name')->get();
-        $departments = Department::orderBy('name')->get();
 
         // Load the info with its relationships
         $info->load(['infoType', 'infoCategory', 'department']);
@@ -149,7 +148,6 @@ class InfoController extends Controller
             'info' => $info,
             'infoTypes' => $infoTypes,
             'infoCategories' => $infoCategories,
-            'departments' => $departments,
         ]);
     }
 
