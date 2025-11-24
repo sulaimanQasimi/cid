@@ -60,6 +60,7 @@ interface InfoType {
   description: string | null;
   created_at: string;
   updated_at: string;
+  created_by?: number;
   infoStats: InfoStat[];
   code: string;
 }
@@ -104,6 +105,12 @@ export default function ShowInfoType({ infoType, infos, infoCategories = [], dep
     if (!currentUserId) return false;
     // Policy: user can view if they created the info OR they created the infoType
     return info.created_by === currentUserId || info.info_type?.created_by === currentUserId;
+  };
+
+  // Check if user can print based on policy (must be creator of InfoType)
+  const canPrint = (): boolean => {
+    if (!currentUserId || !infoType.created_by) return false;
+    return infoType.created_by === currentUserId;
   };
 
   const breadcrumbs: BreadcrumbItem[] = [
@@ -164,11 +171,13 @@ export default function ShowInfoType({ infoType, infos, infoCategories = [], dep
           showButton={false}
           actionButtons={
             <>
-              <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
-                <Link href={route('info-types.print', infoType.id)} className="flex items-center gap-3">
-                  <Printer className="h-5 w-5" />
-                </Link>
-              </Button>
+              {canPrint() && (
+                <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
+                  <Link href={route('info-types.print', infoType.id)} className="flex items-center gap-3">
+                    <Printer className="h-5 w-5" />
+                  </Link>
+                </Button>
+              )}
               <CanUpdate model="info_type">
                 <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
                   <Link href={route('info-types.edit', infoType.id)} className="flex items-center gap-3">

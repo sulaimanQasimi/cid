@@ -318,7 +318,7 @@ class InfoTypeController extends Controller
      */
     public function print(InfoType $infoType): Response
     {
-        $this->authorize('view', $infoType);
+        $this->authorize('print', $infoType);
         
         // Load the info type with all necessary relationships
         $infoType->load([

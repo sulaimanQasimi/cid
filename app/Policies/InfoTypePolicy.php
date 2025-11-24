@@ -26,6 +26,10 @@ class InfoTypePolicy
         return $user->hasPermissionTo('info_type.view') && 
                ($infoType->created_by === $user->id || $infoType->hasAccess($user));
     }
+    public function print(User $user, InfoType $infoType): bool
+    {
+        return $infoType->created_by === $user->id;
+    }
 
     /**
      * Determine whether the user can create models.
