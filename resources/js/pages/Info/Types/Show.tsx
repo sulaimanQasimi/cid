@@ -151,23 +151,15 @@ export default function ShowInfoType({ infoType, infos, infoCategories = [], dep
           showButton={false}
           actionButtons={
             <>
-              <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
-                <Link href={route('info-types.index')} className="flex items-center gap-3">
-                  <ArrowLeft className="h-5 w-5" />
-                  {t('info_types.show.back_button')}
-                </Link>
-              </Button>
               <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
                 <Link href={route('info-types.print', infoType.id)} className="flex items-center gap-3">
                   <Printer className="h-5 w-5" />
-                  {t('info_types.show.print_button')}
                 </Link>
               </Button>
               <CanUpdate model="info_type">
                 <Button asChild size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
                   <Link href={route('info-types.edit', infoType.id)} className="flex items-center gap-3">
                     <Pencil className="h-5 w-5" />
-                    {t('info_types.show.edit_button')}
                   </Link>
                 </Button>
               </CanUpdate>
@@ -178,10 +170,15 @@ export default function ShowInfoType({ infoType, infos, infoCategories = [], dep
                   onClick={() => setIsDeleteDialogOpen(true)}
                   className="bg-red-500/20 backdrop-blur-md border-red-300/30 text-white hover:bg-red-500/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105"
                 >
-                  <Trash className="h-5 w-5 mr-2" />
-                  {t('info_types.show.delete_button')}
+                  <Trash className="h-5 w-5" />
                 </Button>
               </CanDelete>
+              
+              <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
+                <Link href={route('info-types.index')} className="flex items-center gap-3">
+                  <ArrowLeft className="h-5 w-5" />
+                </Link>
+              </Button>
             </>
           }
         />

@@ -184,8 +184,9 @@ export default function EditInfoType({ infoType, users }: Props) {
             <>
               <Button asChild variant="outline" size="lg" className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 shadow-2xl rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105">
                 <Link href={route('info-types.index')} className="flex items-center gap-3">
-                  <ArrowLeft className="h-5 w-5" />
                   {t('info_types.edit.back_button')}
+            
+                  <ArrowLeft className="h-5 w-5" />
                 </Link>
               </Button>
             </>
@@ -228,6 +229,29 @@ export default function EditInfoType({ infoType, users }: Props) {
                   </TabsList>
 
                   <TabsContent value="basic" className="space-y-8">
+                    {/* Code Field */}
+                    <div className="space-y-4">
+                      <Label htmlFor="code" className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                        <FileText className="h-4 w-4" />
+                        {t('info_types.edit.code_label')}
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          id="code"
+                          value={data.code}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('code', e.target.value)}
+                          className="h-12 text-lg border-gray-200 dark:border-gray-700 focus:border-purple-500 focus:ring-purple-500/20 bg-white dark:bg-gray-800 rounded-xl shadow-lg"
+                          placeholder={t('info_types.edit.code_placeholder')}
+                        />
+                        {errors.code && (
+                          <div className="mt-2 flex items-center gap-2 text-red-600">
+                            <X className="h-4 w-4" />
+                            <p className="text-sm font-medium">{errors.code}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
                     {/* Name Field */}
                     <div className="space-y-4">
                       <Label htmlFor="name" className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
@@ -247,29 +271,6 @@ export default function EditInfoType({ infoType, users }: Props) {
                           <div className="mt-2 flex items-center gap-2 text-red-600">
                             <X className="h-4 w-4" />
                             <p className="text-sm font-medium">{errors.name}</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Code Field */}
-                    <div className="space-y-4">
-                      <Label htmlFor="code" className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                        <FileText className="h-4 w-4" />
-                        {t('info_types.edit.code_label')}
-                      </Label>
-                      <div className="relative">
-                        <Input
-                          id="code"
-                          value={data.code}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('code', e.target.value)}
-                          className="h-12 text-lg border-gray-200 dark:border-gray-700 focus:border-purple-500 focus:ring-purple-500/20 bg-white dark:bg-gray-800 rounded-xl shadow-lg"
-                          placeholder={t('info_types.edit.code_placeholder')}
-                        />
-                        {errors.code && (
-                          <div className="mt-2 flex items-center gap-2 text-red-600">
-                            <X className="h-4 w-4" />
-                            <p className="text-sm font-medium">{errors.code}</p>
                           </div>
                         )}
                       </div>

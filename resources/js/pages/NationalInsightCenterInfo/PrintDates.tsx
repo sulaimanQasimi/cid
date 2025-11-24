@@ -264,7 +264,7 @@ export default function PrintDates({ sub_items = [], statSums = [], dateFrom, da
                     <div className="relative mb-4 flex items-center justify-between">
                         <div className="flex-shrink-0">
                             <img
-                                src="/images/logos/logo 2.png"
+                                src="/images/logos/logo 1.png"
                                 alt="logo"
                                 className="h-20 w-20 object-contain print:h-16 print:w-16"
                             />
@@ -278,7 +278,7 @@ export default function PrintDates({ sub_items = [], statSums = [], dateFrom, da
                         </div>
                         <div className="flex-shrink-0">
                             <img
-                                src="/images/logos/logo 1.png"
+                                src="/images/logos/logo 2.png"
                                 alt="logo"
                                 className="h-20 w-20 object-contain print:h-16 print:w-16"
                             />

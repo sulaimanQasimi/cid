@@ -18,6 +18,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { format } from 'date-fns';
+import moment from 'moment-jalaali';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/i18n/translate';
 import Header from '@/components/template/header';
@@ -250,7 +251,7 @@ export default function CriminalShow({ criminal, auth }: Props) {
                           {t('criminal.show.phone')}:
                           <Phone className="h-4 w-4" />
                         </span>
-                        <span className="text-sm text-teal-900 dark:text-teal-100">{criminal.phone_number}</span>
+                        <span className="text-sm text-teal-900 dark:text-teal-100" dir="ltr">{criminal.phone_number}</span>
                       </div>
                     )}
 
@@ -439,14 +440,14 @@ export default function CriminalShow({ criminal, auth }: Props) {
                   )}
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-emerald-700 dark:text-emerald-300 font-medium" dir="rtl">{t('criminal.show.system_info.created_date')}:</span>
-                    <span className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">
-                      {format(new Date(criminal.created_at), 'PPP')}
+                    <span className="text-sm font-semibold text-emerald-900 dark:text-emerald-100" dir="rtl">
+                      {moment(criminal.created_at).format('jYYYY/jMM/jDD')}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-emerald-700 dark:text-emerald-300 font-medium" dir="rtl">{t('criminal.show.system_info.updated_date')}:</span>
-                    <span className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">
-                      {format(new Date(criminal.updated_at), 'PPP')}
+                    <span className="text-sm font-semibold text-emerald-900 dark:text-emerald-100" dir="rtl">
+                      {moment(criminal.updated_at).format('jYYYY/jMM/jDD')}
                     </span>
                   </div>
                 </div>
