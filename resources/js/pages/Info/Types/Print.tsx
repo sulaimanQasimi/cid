@@ -425,18 +425,6 @@ export default function PrintInfoType({ infoType, infos, statCategories }: Props
           </th>
           <td className="pr-4">{formatPersianDateOnly(infoType.created_at)}</td>
         </tr>
-        <tr className="text-sm border-b border-gray-900 print:border-gray-800">
-          <th className="text-left pr-2 font-semibold flex items-center gap-1">
-            <User className="h-3 w-3" />
-            {t('info_types.print.created_by_label')}:
-          </th>
-          <td className="pr-4">{infoType.creator?.name || '-'}</td>
-          <th className="text-left pr-2 font-semibold flex items-center gap-1">
-            <Calendar className="h-3 w-3" />
-            {t('info_types.print.updated_at_label')}:
-          </th>
-          <td className="pr-4">{formatPersianDateOnly(infoType.updated_at)}</td>
-        </tr>
         <tr className="text-sm pt-2 py-2">
           <th className="text-left pr-2 font-semibold flex items-center gap-1">
             <Info className="h-3 w-3" />
@@ -466,12 +454,7 @@ export default function PrintInfoType({ infoType, infos, statCategories }: Props
                 <Building2 className="h-3 w-3" />
                 {t('info_types.print.category_label')}:
               </th>
-              <td className="pr-4 py-1">{info.info_category?.name || '-'}</td>
-              <th className="text-left pr-2 font-semibold py-1 flex items-center gap-1">
-                <User className="h-3 w-3" />
-                {t('info_types.print.creator_label')}:
-              </th>
-              <td className="pr-4 py-1">{info.creator?.name || '-'}</td>
+              <td className="pr-4 py-1" colSpan={2}>{info.info_category?.name || '-'}</td>
             </tr>
             <tr className="border-b border-gray-300 print:border-gray-600">
               <th className="text-left pr-2 font-semibold py-1 flex items-center gap-1">
