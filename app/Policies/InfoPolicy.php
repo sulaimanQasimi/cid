@@ -41,16 +41,16 @@ class InfoPolicy
      */
     public function create(User $user, ?InfoType $infoType = null): bool
     {
-            return $this->hasInfoTypeAccess($user, $infoType);
-       
+        return $this->hasInfoTypeAccess($user, $infoType);
+
     }
 
     /**
      * Determine whether the user can update the model.
      */
     public function update(User $user, Info $info): bool
-    { 
-        return $info->created_by === $user->id;
+    {
+        return ! $info->confirmed && ($info->created_by === $user->id);
     }
 
     /**
@@ -62,27 +62,6 @@ class InfoPolicy
         if ($info->confirmed) {
             return false;
         }
-
-        // Check permission first
-        if (!$user->hasPermissionTo('info.delete')) {
-            return false;
-        }
-
-        // Admin and managers can delete all non-confirmed infos
-        if ($user->hasAnyRole(['admin', 'superadmin', 'manager'])) {
-            return true;
-        }
-
-        // Load InfoType if not already loaded
-        if (!$info->relationLoaded('infoType')) {
-            $info->load('infoType');
-        }
-
-        // Check if user has access to the InfoType
-        if ($info->infoType && !$this->hasInfoTypeAccess($user, $info->infoType)) {
-            return false;
-        }
-
         // Regular users can only delete their own non-confirmed infos
         return $info->user_id === $user->id || $info->created_by === $user->id;
     }

@@ -128,11 +128,23 @@ class InfoController extends Controller
         // Record the visit
         $info->recordVisit();
 
-        // Load related data without caching
-        $info->load(['infoType', 'infoCategory', 'department', 'user', 'creator', 'confirmer']);
+        // Load related data without caching, ensuring created_by is included for InfoType
+        $info->load([
+            'infoType:id,name,code,description,created_by,created_at,updated_at',
+            'infoCategory',
+            'department',
+            'user',
+            'creator',
+            'confirmer'
+        ]);
 
         return Inertia::render('Info/Show', [
             'info' => $info,
+            'permissions'=>[
+                "canEdit"=>Auth::user()->can('update', $info),
+                "canDelete"=>Auth::user()->can('delete', $info),
+                "canConfirm"=>Auth::user()->can('confirm', $info),
+            ],
         ]);
     }
 
@@ -266,6 +278,11 @@ class InfoController extends Controller
      */
     public function confirm(Info $info)
     {
+        // Load InfoType with created_by for policy check
+        if (!$info->relationLoaded('infoType')) {
+            $info->load('infoType:id,name,created_by');
+        }
+        
         $this->authorize('confirm', $info);
 
         try {

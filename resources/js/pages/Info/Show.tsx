@@ -11,9 +11,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CanConfirm, CanDelete, CanUpdate } from '@/components/ui/permission-guard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { usePermissions } from '@/hooks/use-permissions';
 import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/lib/i18n/translate';
 import { type BreadcrumbItem } from '@/types';
@@ -51,7 +49,9 @@ interface Department {
 
 interface Props {
     info: Info & {
-        infoType?: InfoType;
+        infoType?: InfoType & {
+            created_by?: number;
+        };
         infoCategory?: InfoCategory;
         department?: Department | null;
         user?: User;
@@ -66,11 +66,15 @@ interface Props {
         bounce_rate?: number;
         average_time_spent?: number;
     };
+    permissions: {
+        canEdit: boolean;
+        canDelete: boolean;
+        canConfirm: boolean;
+    };
 }
 
-export default function ShowInfo({ info }: Props) {
+export default function ShowInfo({ info, permissions }: Props) {
     const { t } = useTranslation();
-    const { canUpdate, canDelete } = usePermissions();
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
 
@@ -189,17 +193,15 @@ export default function ShowInfo({ info }: Props) {
                         </div>
 
                         <div className="flex items-center gap-3">
-                            {!info.confirmed && (
-                                <CanConfirm model="info">
-                                    <Button
-                                        onClick={() => setIsConfirmDialogOpen(true)}
-                                        className="rounded-lg bg-green-600 px-4 py-2 font-medium text-white shadow-lg transition-all duration-200 hover:bg-green-700"
-                                    >
-                                        <Check className="h-4 w-4" />
-                                    </Button>
-                                </CanConfirm>
+                            {!info.confirmed && permissions.canConfirm && (
+                                <Button
+                                    onClick={() => setIsConfirmDialogOpen(true)}
+                                    className="rounded-lg bg-green-600 px-4 py-2 font-medium text-white shadow-lg transition-all duration-200 hover:bg-green-700"
+                                >
+                                    <Check className="h-4 w-4" />
+                                </Button>
                             )}
-                            <CanDelete model="info">
+                            {permissions.canDelete && (
                                 <Button
                                     variant="destructive"
                                     onClick={() => setIsDeleteDialogOpen(true)}
@@ -207,8 +209,8 @@ export default function ShowInfo({ info }: Props) {
                                 >
                                     <Trash className="h-4 w-4" />
                                 </Button>
-                            </CanDelete>
-                            <CanUpdate model="info">
+                            )}
+                            {permissions.canEdit && (
                                 <Button
                                     asChild
                                     className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white shadow-lg transition-all duration-200 hover:bg-blue-700"
@@ -217,7 +219,7 @@ export default function ShowInfo({ info }: Props) {
                                         <Pencil className="h-4 w-4" />
                                     </Link>
                                 </Button>
-                            </CanUpdate>
+                            )}
 
                             <Button
                                 variant="outline"
