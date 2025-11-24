@@ -1852,6 +1852,8 @@
     "info_types.show.table.id": "آی ډی",
     "info_types.show.table.title": "عنوان",
     "info_types.show.table.status": "وضعیت",
+    "info_types.show.table.status.confirmed": "تایید شوی",
+    "info_types.show.table.status.pending": "په تمه",
     "info_types.show.table.created_at": "تاریخ ثبت",
     "info_types.show.table.actions": "عملیات",
     "info.create.sections.selection": "انتخاب",

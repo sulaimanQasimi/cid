@@ -277,7 +277,7 @@ export default function ShowInfoType({ infoType, infos, infoCategories = [], dep
                                   : 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 border-yellow-300 dark:border-yellow-600'
                                 }`}
                             >
-                              {info.confirmed ? 'Confirmed' : 'Pending'}
+                              {info.confirmed ? t('info_types.show.table.status.confirmed') : t('info_types.show.table.status.pending')}
                             </Badge>
                           </TableCell>
                           <TableCell className="text-purple-800 dark:text-purple-200 py-6 px-6 font-medium">
