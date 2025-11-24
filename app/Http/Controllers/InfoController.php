@@ -30,7 +30,6 @@ class InfoController extends Controller
         $validated = $request->validate([
             'info_type_id' => 'required|integer|exists:info_types,id',
             'info_category_id' => 'required|integer|exists:info_categories,id',
-            'department_id' => 'nullable|string|exists:departments,id|not_in:none',
             'name' => 'nullable|string|min:2|max:255',
             'code' => [
                 'nullable',
@@ -51,8 +50,6 @@ class InfoController extends Controller
         ], [
             'info_type_id.required' => 'The info type field is required.',
             'info_category_id.required' => 'The info category field is required.',
-            'department_id.exists' => 'The selected department does not exist.',
-            'department_id.not_in' => 'Please select a valid department.',
             'name.min' => 'The name must be at least 2 characters.',
             'code.regex' => 'The code may only contain letters, numbers, dashes, underscores, and periods.',
             'code.unique' => 'This code is already in use.',
@@ -166,7 +163,6 @@ class InfoController extends Controller
         $validated = $request->validate([
             'info_type_id' => 'required|integer|exists:info_types,id',
             'info_category_id' => 'required|integer|exists:info_categories,id',
-            'department_id' => 'nullable|string|exists:departments,id|not_in:none',
             'name' => 'nullable|string|min:2|max:255',
             'code' => [
                 'nullable',
@@ -187,8 +183,6 @@ class InfoController extends Controller
         ], [
             'info_type_id.required' => 'The info type field is required.',
             'info_category_id.required' => 'The info category field is required.',
-            'department_id.exists' => 'The selected department does not exist.',
-            'department_id.not_in' => 'Please select a valid department.',
             'name.min' => 'The name must be at least 2 characters.',
             'code.regex' => 'The code may only contain letters, numbers, dashes, underscores, and periods.',
             'code.unique' => 'This code is already in use.',
@@ -197,9 +191,10 @@ class InfoController extends Controller
             'value.location.province.max' => 'The province name cannot exceed 255 characters.',
         ]);
 
-        // Handle 'none' value for department_id
-        if (isset($validated['department_id']) && $validated['department_id'] === 'none') {
-            $validated['department_id'] = null;
+        // Get department from authenticated user
+        $user = Auth::user();
+        if ($user && $user->department_id) {
+            $validated['department_id'] = $user->department_id;
         }
 
         // Sanitize inputs

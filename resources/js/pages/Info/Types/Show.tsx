@@ -326,7 +326,6 @@ export default function ShowInfoType({ infoType, infos, infoCategories = [], dep
           onClose={() => setIsCreateModalOpen(false)}
           infoTypes={[infoType]}
           infoCategories={infoCategories}
-          departments={departments}
           typeId={infoType.id}
         />
       </div>

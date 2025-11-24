@@ -172,13 +172,11 @@ class InfoTypeController extends Controller
 
         // Get data for the create modal
         $infoCategories = InfoCategory::orderBy('name')->get();
-        $departments = Department::orderBy('name')->get();
 
         return Inertia::render('Info/Types/Show', [
             'infoType' => $infoType,
             'infos' => $infos,
             'infoCategories' => $infoCategories,
-            'departments' => $departments,
         ]);
     }
 

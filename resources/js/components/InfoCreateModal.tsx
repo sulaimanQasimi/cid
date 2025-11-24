@@ -10,23 +10,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { FileText, MapPin, Save, X, Plus, Building2, Tag, Hash, Type, FileText as FileTextIcon, Sparkles } from 'lucide-react';
+import { FileText, MapPin, Save, X, Plus, Tag, Hash, Type, FileText as FileTextIcon, Sparkles } from 'lucide-react';
 import LocationSelector from '@/components/LocationSelector';
 import { type InfoCategory, type InfoType } from '@/types/info';
 import FooterButtons from '@/components/template/FooterButtons';
-
-interface Department {
-    id: number;
-    name: string;
-    code: string;
-}
 
 interface Props {
     isOpen: boolean;
     onClose: () => void;
     infoTypes: InfoType[];
     infoCategories: InfoCategory[];
-    departments: Department[];
     typeId?: string | number;
 }
 
@@ -35,7 +28,6 @@ export default function InfoCreateModal({
     onClose, 
     infoTypes, 
     infoCategories, 
-    departments,
     typeId 
 }: Props) {
     const { t } = useTranslation();
@@ -53,7 +45,6 @@ export default function InfoCreateModal({
         description: '',
         info_type_id: typeId ? typeId.toString() : '',
         info_category_id: '',
-        department_id: 'none',
         value: {
             content: '',
             location: null as { lat: number; lng: number; province?: string } | null,
@@ -212,32 +203,6 @@ export default function InfoCreateModal({
                                     {errors.info_category_id && <p className="text-sm text-red-500 flex items-center gap-2"><X className="h-4 w-4" />{errors.info_category_id}</p>}
                                 </div>
 
-                                <div className="space-y-3">
-                                    <Label htmlFor="department_id" className="flex items-center gap-2 text-sm font-semibold text-gray-800 dark:text-gray-200">
-                                        <Building2 className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                                        {t('info.create.fields.department')}
-                                    </Label>
-                                    <Select value={data.department_id} onValueChange={(value) => setData('department_id', value)}>
-                                        <SelectTrigger id="department_id" className="h-12 border-gray-200 dark:border-gray-600 focus:border-purple-500 dark:focus:border-purple-400 bg-white dark:bg-gray-800">
-                                            <SelectValue placeholder={t('info.create.placeholders.select_department')} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="none">{t('common.none')}</SelectItem>
-                                            {departments.length > 0 ? (
-                                                departments.map((department) => (
-                                                    <SelectItem key={department.id} value={department.id.toString()}>
-                                                        {department.name}
-                                                    </SelectItem>
-                                                ))
-                                            ) : (
-                                                <div className="p-4 text-center text-gray-500 dark:text-gray-400">
-                                                    {t('info.create.no_departments_available')}
-                                                </div>
-                                            )}
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.department_id && <p className="text-sm text-red-500 flex items-center gap-2"><X className="h-4 w-4" />{errors.department_id}</p>}
-                                </div>
                             </div>
                         </div>
 
