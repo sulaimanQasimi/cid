@@ -337,8 +337,7 @@ class InfoTypeController extends Controller
                 'department:id,name,code',
                 'creator:id,name',
                 'confirmer:id,name',
-                'province:id,name',
-                'district:id,name'
+                'user:id,name'
             ])
             ->orderBy('created_at', 'desc')
             ->get();
