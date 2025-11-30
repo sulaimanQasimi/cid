@@ -7,43 +7,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import PersianDatePicker from '@/components/ui/PersianDatePicker';
 
-import { Shield, FileText, BookText, AlertTriangle, Calendar, Clock, Users, Building2, MapPin, Phone, IdCard, Home, Gavel, FileCheck, ArrowLeft } from 'lucide-react';
+import { Shield, FileText, AlertTriangle, Calendar, Clock, Users, MapPin, Phone, IdCard, Home, Gavel, FileCheck, ArrowLeft } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import InputError from '@/components/input-error';
-import { useState } from 'react';
-import TreeViewStatSelector from '@/components/reports/TreeViewStatSelector';
 import { useTranslation } from '@/lib/i18n/translate';
 import Header from '@/components/template/header';
 import FooterButtons from '@/components/template/FooterButtons';
 
-interface StatCategory {
-  id: number;
-  name: string;
-  label: string;
-  color: string;
-  status: string;
-}
-
-interface StatCategoryItem {
-  id: number;
-  name: string;
-  label: string;
-  color: string | null;
-  parent_id: number | null;
-  category: {
-    id: number;
-    name: string;
-    label: string;
-    color: string;
-  };
-}
-
 interface CreateProps {
   securityLevels: string[];
-  statItems: StatCategoryItem[];
-  statCategories: StatCategory[];
 }
 
 type ReportFormData = {
@@ -55,11 +29,6 @@ type ReportFormData = {
   recommendation?: string;
   report_status: string;
   source?: string;
-  stats?: Array<{
-    stat_category_item_id: number;
-    value: string;
-    notes?: string;
-  }>;
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -77,7 +46,7 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ];
 
-export default function Create({ securityLevels, statItems, statCategories }: CreateProps) {
+export default function Create({ securityLevels }: CreateProps) {
   const { t } = useTranslation();
   const { data, setData, post, processing, errors } = useForm<ReportFormData>({
     report_date: '',
@@ -90,84 +59,13 @@ export default function Create({ securityLevels, statItems, statCategories }: Cr
     source: '',
   });
 
-  // State for managing statistical data
-  const [statsData, setStatsData] = useState<{
-    [key: number]: { value: string; notes: string | null };
-  }>({});
-
-  // Add state for category filter
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-
-    // Prepare stats data for submission
-    const stats = Object.entries(statsData)
-      .filter(([_, { value }]) => value.trim() !== '')
-      .map(([itemId, { value, notes }]) => ({
-        stat_category_item_id: parseInt(itemId),
-        value,
-        notes: notes || undefined,
-      }));
-
-    // Add stats to form data
-    if (stats.length > 0) {
-      setData('stats', stats);
-    }
-
-    // Submit the form
-    post(route('incident-reports.store'));
-  }
-
   function handleCancel() {
     window.location.href = route('incident-reports.index');
   }
 
   function handleFormSubmit() {
-    // Prepare stats data for submission
-    const stats = Object.entries(statsData)
-      .filter(([_, { value }]) => value.trim() !== '')
-      .map(([itemId, { value, notes }]) => ({
-        stat_category_item_id: parseInt(itemId),
-        value,
-        notes: notes || undefined,
-      }));
-
-    // Add stats to form data
-    if (stats.length > 0) {
-      setData('stats', stats);
-    }
-
     // Submit the form
     post(route('incident-reports.store'));
-  }
-
-  // Group stat items by category for the dropdown filter
-  const categoriesForFilter = statCategories.map(category => ({
-    id: category.id,
-    label: category.label,
-    color: category.color
-  }));
-
-  // Filter stat items by category if one is selected
-  const filteredStatItems = selectedCategory
-    ? statItems.filter(item => item.category.id === selectedCategory)
-    : statItems;
-
-  // Handle stat input change
-  function handleStatChange(itemId: number, value: string) {
-    setStatsData(prev => ({
-      ...prev,
-      [itemId]: { ...prev[itemId] || { notes: null }, value }
-    }));
-  }
-
-  // Handle stat notes change
-  function handleNotesChange(itemId: number, notes: string) {
-    setStatsData(prev => ({
-      ...prev,
-      [itemId]: { ...prev[itemId] || { value: '' }, notes: notes || null }
-    }));
   }
 
   return (
@@ -279,22 +177,7 @@ export default function Create({ securityLevels, statItems, statCategories }: Cr
                     </p>}
                   </div>
                 </div>
-              </CardContent>
-            </Card>
 
-            <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-indigo-50/30 dark:to-indigo-900/20">
-              <CardHeader className="bg-gradient-to-l from-indigo-500 dark:from-indigo-600 to-indigo-600 dark:to-indigo-700 text-white border-b pb-4">
-                <CardTitle className="flex items-center gap-3 text-lg">
-                  <div className="p-2 bg-white/20 rounded-lg">
-                    <BookText className="h-5 w-5" />
-                  </div>
-                  {t('incident_reports.details.title')}
-                </CardTitle>
-                <CardDescription className="text-indigo-100">
-                  {t('incident_reports.details.description')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-6 space-y-6">
                 <div className="space-y-3">
                   <Label htmlFor="details" className="text-base font-medium flex items-center gap-2 text-indigo-700 dark:text-indigo-400 text-right" dir="rtl">
                     <span className="text-red-500">*</span>
@@ -355,57 +238,6 @@ export default function Create({ securityLevels, statItems, statCategories }: Cr
                 </div>
 
                 <input type="hidden" name="report_status" value="submitted" />
-              </CardContent>
-            </Card>
-
-            <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-indigo-50/30 dark:to-indigo-900/20">
-              <CardHeader className="bg-gradient-to-l from-indigo-500 dark:from-indigo-600 to-indigo-600 dark:to-indigo-700 text-white border-b pb-4">
-                <CardTitle className="flex items-center gap-3 text-lg">
-                  <div className="p-2 bg-white/20 rounded-lg">
-                    <AlertTriangle className="h-5 w-5" />
-                  </div>
-                  {t('incident_reports.stats.title')}
-                </CardTitle>
-                <CardDescription className="text-indigo-100">
-                  {t('incident_reports.stats.description')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-6 space-y-6">
-                <div className="mb-6">
-                  <Label htmlFor="category-filter" className="text-base font-medium flex items-center gap-2 text-indigo-700 dark:text-indigo-400 text-right" dir="rtl">
-                    {t('incident_reports.stats.filter_by_category')}
-                    <Building2 className="h-4 w-4" />
-                  </Label>
-                  <Select
-                    value={selectedCategory?.toString() || 'all'}
-                    onValueChange={(value) => setSelectedCategory(value !== 'all' ? parseInt(value) : null)}
-                  >
-                    <SelectTrigger id="category-filter" className="h-12 border-indigo-200 dark:border-indigo-700 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-indigo-500/20 dark:focus:ring-indigo-400/20 bg-gradient-to-l from-indigo-50 dark:from-indigo-900/30 to-white dark:to-gray-800 text-right">
-                      <SelectValue placeholder={t('incidents.filters.all_categories')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">{t('incidents.filters.all_categories')}</SelectItem>
-                      {categoriesForFilter.map((category) => (
-                        <SelectItem key={category.id} value={category.id.toString()}>
-                          <div className="flex items-center">
-                            <div
-                              className="mr-2 h-3 w-3 rounded-full"
-                              style={{ backgroundColor: category.color }}
-                            ></div>
-                            {category.label}
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <TreeViewStatSelector
-                  items={filteredStatItems}
-                  statsData={statsData}
-                  onValueChange={handleStatChange}
-                  onNotesChange={handleNotesChange}
-                />
               </CardContent>
             </Card>
 

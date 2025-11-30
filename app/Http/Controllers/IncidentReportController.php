@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\IncidentReport;
 use App\Models\Incident;
+use App\Models\District;
+use App\Models\IncidentCategory;
 use App\Services\PersianDateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -218,14 +220,17 @@ class IncidentReportController extends Controller
             ->orderBy('incident_date', 'desc')
             ->paginate(5);
 
-        // Get all active stat categories
-        $statCategories = StatCategory::where('status', 'active')
-            ->orderBy('label')
+        // Get data for creating incidents in modal
+        $districts = District::with('province:id,name')
+            ->orderBy('name')
             ->get();
 
-        // Load report stats with their related items and categories
-        $reportStats = $incidentReport->reportStats()
-            ->with(['statCategoryItem.category'])
+        $categories = IncidentCategory::where('status', 'active')
+            ->orderBy('name')
+            ->get();
+
+        $reports = IncidentReport::select('id', 'report_number', 'report_date')
+            ->orderBy('report_date', 'desc')
             ->get();
 
         // Get incident report access information for the current user and specific report
@@ -265,8 +270,9 @@ class IncidentReportController extends Controller
         return Inertia::render('Incidents/Reports/Show', [
             'report' => $incidentReport,
             'incidents' => $incidents,
-            'reportStats' => $reportStats,
-            'statCategories' => $statCategories,
+            'districts' => $districts,
+            'categories' => $categories,
+            'reports' => $reports,
             'incidentReportAccess' => $incidentReportAccess,
         ]);
     }
@@ -371,23 +377,6 @@ class IncidentReportController extends Controller
 
         return redirect()->route('incident-reports.index')
             ->with('success', 'Incident report deleted successfully.');
-    }
-
-    /**
-     * Display incidents for a specific report.
-     */
-    public function showIncidents(IncidentReport $incidentReport)
-    {
-        $incidentReport->load(['submitter:id,name']);
-        $incidents = $incidentReport->incidents()
-            ->with(['district:id,name', 'category:id,name,color'])
-            ->orderBy('incident_date', 'desc')
-            ->get();
-
-        return Inertia::render('Incidents/Reports/Incidents', [
-            'report' => $incidentReport,
-            'incidents' => $incidents,
-        ]);
     }
 
     /**

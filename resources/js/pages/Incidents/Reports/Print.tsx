@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, FileText, AlertTriangle, Calendar, Shield, User, MapPin, Clock, Users, Gavel, FileCheck, BookText, Building2, Lock, Tag, Info, Settings, X, Palette, Type, Layout, TabletSmartphone, Printer } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/translate';
 import { formatPersianDateOnly, formatPersianDateTime } from '@/lib/utils/date';
-import QRCode from 'qrcode';
 import { format } from 'date-fns';
 
 
@@ -28,6 +27,9 @@ interface PrintSettings {
   orientation: 'portrait' | 'landscape';
   margins: 'normal' | 'narrow' | 'wide';
   dateFormat: 'gregorian' | 'hijri' | 'persian';
+  governmentName: string;
+  ministryName: string;
+  reportTitle: string;
 }
 
 interface PrintProps {
@@ -82,9 +84,8 @@ interface PrintProps {
 
 export default function Print({ report, incidents, barcodeData, isAdmin }: PrintProps) {
   const { t } = useTranslation();
-  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
   const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'colors' | 'typography' | 'layout' | 'date_format'>('colors');
+  const [activeTab, setActiveTab] = useState<'colors' | 'typography' | 'layout' | 'labels' | 'date_format'>('colors');
   const [printSettings, setPrintSettings] = useState<PrintSettings>({
     headerColor: '#1f2937',
     textColor: '#374151',
@@ -98,6 +99,9 @@ export default function Print({ report, incidents, barcodeData, isAdmin }: Print
     orientation: 'portrait',
     margins: 'normal',
     dateFormat: 'persian',
+    governmentName: 'امارت اسلامی افغانستان',
+    ministryName: 'وزارت دفاع',
+    reportTitle: 'د پېښو راپور',
   });
 
   // Update dynamic styles function
@@ -148,25 +152,6 @@ export default function Print({ report, incidents, barcodeData, isAdmin }: Print
   };
 
   useEffect(() => {
-    const generateQRCode = async () => {
-      try {
-        const qrData = report.report_number || report.id.toString();
-        const dataUrl = await QRCode.toDataURL(qrData, {
-          width: 120,
-          margin: 1,
-          color: {
-            dark: '#000000',
-            light: '#FFFFFF'
-          }
-        });
-        setQrCodeDataUrl(dataUrl);
-      } catch (error) {
-        console.error('Error generating QR code:', error);
-      }
-    };
-
-    generateQRCode();
-
     // Create dynamic style element
     let styleElement = document.getElementById('dynamic-print-styles');
     if (!styleElement) {
@@ -176,13 +161,13 @@ export default function Print({ report, incidents, barcodeData, isAdmin }: Print
     }
     updateDynamicStyles(styleElement, printSettings);
 
-    return () => {
-      const styleEl = document.getElementById('dynamic-print-styles');
-      if (styleEl) {
-        styleEl.remove();
-      }
-    };
-  }, [report.report_number, report.id, printSettings]);
+      return () => {
+        const styleEl = document.getElementById('dynamic-print-styles');
+        if (styleEl) {
+          styleEl.remove();
+        }
+      };
+    }, [printSettings]);
 
   // Date conversion utility functions
   const gregorianToHijri = (date: Date): string => {
@@ -327,6 +312,17 @@ export default function Print({ report, incidents, barcodeData, isAdmin }: Print
                   <div className="flex items-center">
                     <Layout className="mr-2 h-4 w-4" />
                     {t('incident_reports.print.settings.tabs.layout') || 'چیدمان'}
+                  </div>
+                </button>
+                <button
+                  onClick={() => setActiveTab('labels')}
+                  className={`px-4 py-2 border-b-2 font-medium text-sm ${activeTab === 'labels'
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+                >
+                  <div className="flex items-center">
+                    <Tag className="mr-2 h-4 w-4" />
+                    {t('incident_reports.print.settings.tabs.labels') || 'برچسب‌ها'}
                   </div>
                 </button>
                 <button
@@ -563,6 +559,75 @@ export default function Print({ report, incidents, barcodeData, isAdmin }: Print
                 </div>
               )}
 
+              {/* Labels Tab */}
+              {activeTab === 'labels' && (
+                <div className="space-y-4">
+                  <div className="flex items-center">
+                    <Tag className="mr-2 h-5 w-5 text-blue-600" />
+                    <h3 className="text-md font-medium">
+                      {t('incident_reports.print.settings.tabs.labels') || 'برچسب‌ها'}
+                    </h3>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t('national_insight_center_info.print_dates.settings_government_name') || 'نام دولت:'}
+                      </label>
+                      <input
+                        type="text"
+                        value={printSettings.governmentName}
+                        onChange={(e) => handleSettingsChange('governmentName', e.target.value)}
+                        className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                        placeholder="امارت اسلامی افغانستان"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t('national_insight_center_info.print_dates.settings_ministry_name') || 'نام وزارت:'}
+                      </label>
+                      <input
+                        type="text"
+                        value={printSettings.ministryName}
+                        onChange={(e) => handleSettingsChange('ministryName', e.target.value)}
+                        className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                        placeholder="وزارت دفاع"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t('national_insight_center_info.print_dates.settings_report_title') || 'عنوان گزارش:'}
+                      </label>
+                      <input
+                        type="text"
+                        value={printSettings.reportTitle}
+                        onChange={(e) => handleSettingsChange('reportTitle', e.target.value)}
+                        className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                        placeholder="گزارش تحلیلی و تفصيلي"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Preview */}
+                  <div className="border rounded-lg p-4 bg-gray-50">
+                    <h3 className="text-md font-medium mb-3">
+                      {t('national_insight_center_info.print_dates.settings_preview') || 'پیش‌نمایش'}
+                    </h3>
+                    <div className="border rounded overflow-hidden bg-white p-4">
+                      <div className="text-center">
+                        <h1 className="mb-1 text-2xl font-bold text-gray-900">
+                          {printSettings.governmentName}
+                        </h1>
+                        <h2 className="mb-1 text-xl font-semibold text-gray-800">{printSettings.ministryName}</h2>
+                        <h3 className="text-lg font-medium text-gray-700">{printSettings.reportTitle}</h3>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Date Format Tab */}
               {activeTab === 'date_format' && (
                 <div className="space-y-4">
@@ -705,24 +770,35 @@ export default function Print({ report, incidents, barcodeData, isAdmin }: Print
         </div>
       </div>
 
-      <div className="print:page-break-inside-avoid relative">
-        <h1 className="text-2xl font-bold text-black text-center mb-2">{t('incident_reports.print.title')}</h1>
-        <h2 className="text-xl font-semibold text-black text-center pt-2 mb-4">{t('incident_reports.print.subtitle')}</h2>
-        
-        {qrCodeDataUrl && (
-          <div className="absolute top-0 right-0 print:top-0 print:right-0">
-            <div className="text-center">
-              <img 
-                src={qrCodeDataUrl} 
-                alt="QR Code" 
-                className="w-24 h-24 print:w-20 print:h-20 border border-gray-300 print:border-gray-600"
+      {/* Header */}
+      <div className="print:page-break-inside-avoid relative mb-10 border-b-2 border-gray-300 pb-6 text-center print:border-gray-800">
+        <div className="relative mb-4 flex items-center justify-between">
+          <div className="flex-shrink-0">
+            {printSettings.showLogo && (
+              <img
+                src="/images/logos/logo 1.png"
+                alt="logo"
+                className="h-20 w-20 object-contain print:h-16 print:w-16"
               />
-              <p className="text-xs text-gray-600 print:text-gray-800 mt-1">
-                {report.report_number}
-              </p>
-            </div>
+            )}
           </div>
-        )}
+          <div className="flex-1">
+            <h1 className="mb-1 text-3xl font-bold text-gray-900 print:text-2xl">
+              {printSettings.governmentName}
+            </h1>
+            <h2 className="mb-1 text-2xl font-semibold text-gray-800 print:text-xl">{printSettings.ministryName}</h2>
+            <h3 className="text-xl font-medium text-gray-700 print:text-lg">{printSettings.reportTitle}</h3>
+          </div>
+          <div className="flex-shrink-0">
+            {printSettings.showLogo && (
+              <img
+                src="/images/logos/logo 2.png"
+                alt="logo"
+                className="h-20 w-20 object-contain print:h-16 print:w-16"
+              />
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Report Information Table */}
@@ -741,27 +817,15 @@ export default function Print({ report, incidents, barcodeData, isAdmin }: Print
         </tr>
         <tr className="text-sm border-b border-gray-900 print:border-gray-800">
           <th className="text-left pr-2 font-semibold flex items-center gap-1">
-            <Clock className="h-3 w-3" />
-            {t('incident_reports.show.status')}:
-          </th>
-          <td className="pr-4">{t(`incident_reports.status.${report.report_status}`)}</td>
-          <th className="text-left pr-2 font-semibold flex items-center gap-1">
             <Shield className="h-3 w-3" />
             {t('incident_reports.show.security_level')}:
           </th>
           <td className="pr-4">{t(`incident_reports.level.${report.security_level}`)}</td>
-        </tr>
-        <tr className="text-sm border-b border-gray-900 print:border-gray-800">
           <th className="text-left pr-2 font-semibold flex items-center gap-1">
             <User className="h-3 w-3" />
             {t('incident_reports.show.submitted_by')}:
           </th>
           <td className="pr-4">{report.submitter?.name || t('incidents.unknown')}</td>
-          <th className="text-left pr-2 font-semibold flex items-center gap-1">
-            <User className="h-3 w-3" />
-            {t('incident_reports.show.approved_by')}:
-          </th>
-          <td className="pr-4">{report.approver?.name || t('incident_reports.print.pending_approval')}</td>
         </tr>
         {report.source && (
           <tr className="text-sm pt-2 py-2">

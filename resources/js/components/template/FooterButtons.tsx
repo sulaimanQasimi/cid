@@ -26,7 +26,7 @@ export default function FooterButtons({
         type="button"
         variant="outline"
         onClick={onCancel}
-        className="h-9 px-4 text-sm border-gray-300 bg-gray-600 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+        className="h-9 px-4 text-sm border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/40 hover:border-red-400 dark:hover:border-red-500"
       >
         {cancelText}
       </Button>

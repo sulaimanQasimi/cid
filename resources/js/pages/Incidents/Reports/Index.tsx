@@ -222,7 +222,7 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
           model="incident_report"
           routeName={() => route('incident-reports.create')}
           buttonText={t('incident_reports.new_report')}
-          theme="stone"
+          theme="purple"
           buttonSize="lg"
           showBackButton={false}
           showButton={true}
@@ -248,62 +248,51 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
           perPageOptions={perPageOptions}
           title={t('incident_reports.search_filters')}
           description={t('incident_reports.search_filters_description')}
-          className="shadow-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl"
+          className="shadow-2xl bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 overflow-hidden"
         />
 
         {/* Results Table */}
         <div className="mt-8">
-          <Header
-            title={t('incident_reports.table.title')}
-            description={t('incident_reports.table.overview')}
-            icon={<TrendingUp className="h-6 w-6 text-white" />}
-            model="incident_report"
-            theme="stone"
-            showBackButton={false}
-            showButton={false}
-            routeName=""
-            buttonText=""
-          />
-          <Card className="shadow-2xl overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl mt-6">
+          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-purple-50/30 dark:to-purple-900/20 border-0 rounded-3xl mt-6">
             <CardContent className="p-0">
               <div className="overflow-hidden rounded-b-3xl">
                 <table className="w-full caption-bottom text-sm">
                   <thead className="[&_tr]:border-b">
-                    <tr className="bg-gray-100 dark:bg-gray-700 border-0">
+                    <tr className="bg-gradient-to-l from-purple-100 dark:from-purple-900 to-purple-200 dark:to-purple-800 border-0">
                       <th
-                        className="h-12 px-6 text-left align-middle font-bold text-gray-800 dark:text-gray-200 text-lg cursor-pointer"
+                        className="h-12 px-6 text-left align-middle font-bold text-purple-800 dark:text-purple-200 text-lg cursor-pointer py-6"
                         onClick={() => handleSort('report_number')}
                       >
                         {t('incident_reports.table.report_number')} {getSortIcon('report_number')}
                       </th>
                       <th
-                        className="h-12 px-6 text-left align-middle font-bold text-gray-800 dark:text-gray-200 text-lg cursor-pointer"
+                        className="h-12 px-6 text-left align-middle font-bold text-purple-800 dark:text-purple-200 text-lg cursor-pointer py-6"
                         onClick={() => handleSort('report_date')}
                       >
                         {t('incident_reports.table.date')} {getSortIcon('report_date')}
                       </th>
                       <th
-                        className="h-12 px-6 text-left align-middle font-bold text-gray-800 dark:text-gray-200 text-lg cursor-pointer"
+                        className="h-12 px-6 text-left align-middle font-bold text-purple-800 dark:text-purple-200 text-lg cursor-pointer py-6"
                         onClick={() => handleSort('incidents_count')}
                       >
                         {t('incident_reports.table.incidents')} {getSortIcon('incidents_count')}
                       </th>
                       <th
-                        className="h-12 px-6 text-left align-middle font-bold text-gray-800 dark:text-gray-200 text-lg cursor-pointer"
+                        className="h-12 px-6 text-left align-middle font-bold text-purple-800 dark:text-purple-200 text-lg cursor-pointer py-6"
                         onClick={() => handleSort('security_level')}
                       >
                         {t('incident_reports.table.security_level')} {getSortIcon('security_level')}
                       </th>
-                      <th className="h-12 px-6 text-left align-middle font-bold text-gray-800 dark:text-gray-200 text-lg">
+                      <th className="h-12 px-6 text-left align-middle font-bold text-purple-800 dark:text-purple-200 text-lg py-6">
                         {t('incident_reports.table.submitted_by')}
                       </th>
                       <th
-                        className="h-12 px-6 text-left align-middle font-bold text-gray-800 dark:text-gray-200 text-lg cursor-pointer"
+                        className="h-12 px-6 text-left align-middle font-bold text-purple-800 dark:text-purple-200 text-lg cursor-pointer py-6"
                         onClick={() => handleSort('report_status')}
                       >
                         {t('incident_reports.table.status')} {getSortIcon('report_status')}
                       </th>
-                      <th className="h-12 px-6 text-left align-middle font-bold text-gray-800 dark:text-gray-200 text-lg">
+                      <th className="h-12 px-6 text-left align-middle font-bold text-purple-800 dark:text-purple-200 text-lg py-6">
                         {t('common.actions')}
                       </th>
                     </tr>
@@ -312,24 +301,21 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
                     {isLoading ? (
                       <tr>
                         <td colSpan={7} className="h-32 text-center align-middle">
-                          <div className="flex flex-col items-center gap-4 text-gray-600 dark:text-gray-400">
-                            <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-full">
-                              <TrendingUp className="h-16 w-16 text-gray-400 animate-spin" />
-                            </div>
+                          <div className="flex flex-col items-center gap-4 text-purple-600 dark:text-purple-400">
                             <p className="text-xl font-bold">{t('incident_reports.loading_reports')}</p>
-                            <p className="text-gray-500 dark:text-gray-400">{t('incident_reports.loading_description')}</p>
+                            <p className="text-purple-500 dark:text-purple-400">{t('incident_reports.loading_description')}</p>
                           </div>
                         </td>
                       </tr>
                     ) : reports.data.length === 0 ? (
                       <tr>
                         <td colSpan={7} className="h-32 text-center align-middle">
-                          <div className="flex flex-col items-center gap-4 text-gray-600 dark:text-gray-400">
-                            <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-full">
-                              <AlertTriangle className="h-16 w-16 text-gray-400" />
+                          <div className="flex flex-col items-center gap-4 text-purple-600 dark:text-purple-400">
+                            <div className="p-4 bg-purple-100 dark:bg-purple-800 rounded-full">
+                              <AlertTriangle className="h-16 w-16 text-purple-400 dark:text-purple-300" />
                             </div>
                             <p className="text-xl font-bold">{t('incident_reports.no_reports')}</p>
-                            <p className="text-gray-500 dark:text-gray-400">{t('incident_reports.no_reports_found')}</p>
+                            <p className="text-purple-500 dark:text-purple-400">{t('incident_reports.no_reports_found')}</p>
                           </div>
                         </td>
                       </tr>
@@ -337,35 +323,35 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
                       reports.data.map((report) => (
                         <tr
                           key={report.id}
-                          className="border-b border-gray-200 dark:border-gray-700 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700 data-[state=selected]:bg-muted"
+                          className="border-b border-purple-100 dark:border-purple-800 transition-colors hover:bg-purple-50/50 dark:hover:bg-purple-900/20 data-[state=selected]:bg-muted"
                         >
                           <td className="p-6 align-middle">
                             <Link
                               href={route('incident-reports.show', report.id)}
-                              className="font-bold text-gray-900 dark:text-gray-100 text-lg hover:underline"
+                              className="font-bold text-purple-900 dark:text-purple-100 text-lg hover:underline"
                             >
                               {report.report_number}
                             </Link>
                           </td>
-                          <td className="p-6 align-middle text-gray-800 dark:text-gray-200 font-medium">
+                          <td className="p-6 align-middle text-purple-800 dark:text-purple-200 font-medium">
                             {format(new Date(report.report_date), 'PPP')}
                           </td>
                           <td className="p-6 align-middle">
-                            <Badge variant="outline" className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600 px-4 py-2 rounded-xl font-semibold">
+                            <Badge variant="outline" className="bg-gradient-to-l from-purple-100 dark:from-purple-800 to-purple-200 dark:to-purple-700 text-purple-800 dark:text-purple-200 border-purple-300 dark:border-purple-600 px-4 py-2 rounded-xl font-semibold">
                               {t('incident_reports.incidents_count', { count: String(report.incidents_count) })}
                             </Badge>
                           </td>
                           <td className="p-6 align-middle">
-                            <Badge variant="outline" className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600 px-4 py-2 rounded-xl font-semibold">
+                            <Badge variant="outline" className="bg-gradient-to-l from-purple-100 dark:from-purple-800 to-purple-200 dark:to-purple-700 text-purple-800 dark:text-purple-200 border-purple-300 dark:border-purple-600 px-4 py-2 rounded-xl font-semibold">
                               <Shield className="mr-1 h-3 w-3" />
                               {report.security_level}
                             </Badge>
                           </td>
-                          <td className="p-6 align-middle text-gray-800 dark:text-gray-200 font-medium">
+                          <td className="p-6 align-middle text-purple-800 dark:text-purple-200 font-medium">
                             {report.submitter?.name || t('incidents.unknown')}
                           </td>
                           <td className="p-6 align-middle">
-                            <Badge variant="outline" className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600 px-4 py-2 rounded-xl font-semibold">
+                            <Badge variant="outline" className="bg-gradient-to-l from-purple-100 dark:from-purple-800 to-purple-200 dark:to-purple-700 text-purple-800 dark:text-purple-200 border-purple-300 dark:border-purple-600 px-4 py-2 rounded-xl font-semibold">
                               {report.report_status}
                             </Badge>
                           </td>
@@ -376,7 +362,7 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
                                 size="icon"
                                 asChild
                                 title={t('incident_reports.view')}
-                                className="h-10 w-10 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-300 hover:scale-110"
+                                className="h-10 w-10 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-800 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-300 hover:scale-110"
                               >
                                 <Link href={route('incident-reports.show', report.id)}>
                                   <FileText className="h-5 w-5" />
@@ -387,7 +373,7 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
                                 size="icon"
                                 asChild
                                 title={t('incidents.page_title')}
-                                className="h-10 w-10 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-300 hover:scale-110"
+                                className="h-10 w-10 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-800 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-300 hover:scale-110"
                               >
                                 <Link href={route('incident-reports.incidents', report.id)}>
                                   <AlertCircle className="h-5 w-5" />
@@ -398,7 +384,7 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
                                 size="icon"
                                 asChild
                                 title={t('incident_reports.print.title')}
-                                className="h-10 w-10 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-300 hover:scale-110"
+                                className="h-10 w-10 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-800 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-300 hover:scale-110"
                               >
                                 <Link href={route('incident-reports.print', report.id)}>
                                   <Printer className="h-5 w-5" />
@@ -419,7 +405,7 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
         {/* Pagination */}
         {reports.links && reports.links.length > 0 && (
           <div className="mt-8 flex justify-center">
-            <div className="bg-white dark:bg-gray-800 p-4 rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700">
+            <div className="bg-gradient-to-l from-purple-50 dark:from-purple-900/20 to-white dark:to-gray-800 p-4 rounded-3xl shadow-2xl border border-purple-200 dark:border-purple-700">
               <Pagination links={reports.links} />
             </div>
           </div>

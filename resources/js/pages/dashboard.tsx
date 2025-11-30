@@ -2,11 +2,13 @@ import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import { ShieldCheck, Activity, Target, AlertTriangle, BarChart3, Users, Map, FileText, Eye, Clock, TrendingUp, MapPin, Zap, Database, Server, Globe, Shield, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
+import { ShieldCheck, Activity, Target, AlertTriangle, BarChart3, Users, Map as MapIcon, FileText, Eye, Clock, TrendingUp, MapPin, Zap, Database, Server, Globe, Shield, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/translate';
 import { useEffect, useRef, useState } from 'react';
 import * as am5 from '@amcharts/amcharts5';
 import * as am5map from '@amcharts/amcharts5/map';
+import am5geodata_afghanistanLow from '@amcharts/amcharts5-geodata/afghanistanLow';
+import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
 
 interface DashboardProps {
     stats: {
@@ -85,12 +87,135 @@ export default function Dashboard({
 }: DashboardProps) {
     const { t } = useTranslation();
     const [isLoading, setIsLoading] = useState(true);
+    const [isMapReady, setIsMapReady] = useState(false);
+    const mapChartRef = useRef<HTMLDivElement>(null);
+    const rootRef = useRef<am5.Root | null>(null);
     
     useEffect(() => {
         // Simulate loading for better UX
         const timer = setTimeout(() => setIsLoading(false), 1000);
         return () => clearTimeout(timer);
     }, []);
+
+    // AmCharts Map Implementation
+    useEffect(() => {
+        if (!mapChartRef.current || rootRef.current) return;
+
+        const timer = setTimeout(() => {
+            try {
+                // Create root element
+                const root = am5.Root.new(mapChartRef.current!);
+                rootRef.current = root;
+
+                // Set themes
+                root.setThemes([am5themes_Animated.new(root)]);
+
+                // Create chart
+                const chart = root.container.children.push(
+                    am5map.MapChart.new(root, {
+                        panX: "translateX",
+                        panY: "translateY",
+                        projection: am5map.geoMercator(),
+                        paddingBottom: 20,
+                        paddingTop: 20,
+                        paddingLeft: 20,
+                        paddingRight: 20,
+                    })
+                );
+
+                // Add background
+                chart.set("background", am5.Rectangle.new(root, {
+                    fill: am5.color(0xF5F5F5),
+                    fillOpacity: 1
+                }));
+
+                // Create province data map for quick lookup
+                const provinceDataMap = new Map(
+                    locationStats.provinces.map(province => [province.code, province])
+                );
+
+                // Create polygon series with Afghanistan geodata
+                const polygonSeries = chart.series.push(
+                    am5map.MapPolygonSeries.new(root, {
+                        geoJSON: am5geodata_afghanistanLow,
+                        valueField: "value",
+                        calculateAggregates: true
+                    })
+                );
+
+                // Configure polygon appearance with color coding based on incidents
+                polygonSeries.mapPolygons.template.setAll({
+                    tooltipText: "[bold]{name}[/]\n" + t('dashboard.incidents') + ": {value}\n" + t('dashboard.districts') + ": {districts}",
+                    interactive: true,
+                    stroke: am5.color(0xFFFFFF),
+                    strokeWidth: 1.5,
+                    cursorOverStyle: "pointer"
+                });
+
+                // Color function based on incidents count
+                polygonSeries.mapPolygons.template.adapters.add("fill", (fill, target) => {
+                    const dataItem = target.dataItem;
+                    if (!dataItem) return fill;
+                    
+                    const provinceCode = dataItem.get("id");
+                    const province = provinceDataMap.get(provinceCode);
+                    
+                    if (!province || province.incidents_count === 0) {
+                        return am5.color(0xE0E0E0); // Light gray for no incidents
+                    } else if (province.incidents_count <= 5) {
+                        return am5.color(0x81C784); // Green for low incidents
+                    } else if (province.incidents_count <= 15) {
+                        return am5.color(0xFFB74D); // Orange for medium incidents
+                    } else {
+                        return am5.color(0xE57373); // Red for high incidents
+                    }
+                });
+
+                // Create hover state
+                polygonSeries.mapPolygons.template.states.create("hover", {
+                    fill: am5.color(0x64B5F6),
+                    strokeWidth: 2.5,
+                    scale: 1.02
+                });
+
+                // Create active state
+                polygonSeries.mapPolygons.template.states.create("active", {
+                    fill: am5.color(0x42A5F5),
+                    strokeWidth: 3
+                });
+
+                // Set data with province information
+                const mapData = locationStats.provinces.map(province => ({
+                    id: province.code,
+                    name: province.name, // This will use the name from geodata (English)
+                    value: province.incidents_count,
+                    districts: province.districts_count
+                }));
+
+                polygonSeries.data.setAll(mapData);
+
+                // Add zoom control
+                chart.set("zoomControl", am5map.ZoomControl.new(root, {}));
+
+                // Animate map appearance
+                chart.appear(1000, 100);
+                
+                setIsMapReady(true);
+            } catch (error) {
+                console.error("Error initializing map:", error);
+                setIsMapReady(false);
+            }
+        }, 500);
+
+        // Cleanup function
+        return () => {
+            if (rootRef.current) {
+                rootRef.current.dispose();
+                rootRef.current = null;
+            }
+            clearTimeout(timer);
+        };
+    }, [locationStats, t]);
     
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -270,7 +395,7 @@ export default function Dashboard({
                                         <div className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-green-50 to-green-100/50 dark:from-green-950/30 dark:to-green-900/30">
                                             <div className="flex items-center gap-3">
                                                 <div className="rounded-lg bg-green-500 p-2">
-                                                    <Map className="h-4 w-4 text-white" />
+                                                    <MapIcon className="h-4 w-4 text-white" />
                                                 </div>
                                                 <span className="font-medium text-gray-700 dark:text-slate-300">{t('dashboard.total_districts')}</span>
                                             </div>
@@ -385,7 +510,7 @@ export default function Dashboard({
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <div className="rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 p-3">
-                                            <Map className="h-6 w-6 text-white" />
+                                            <MapIcon className="h-6 w-6 text-white" />
                                         </div>
                                         <div>
                                             <h3 className="text-xl font-bold text-gray-900 dark:text-slate-100">{t('dashboard.location_map')}</h3>
@@ -411,27 +536,38 @@ export default function Dashboard({
                             
                             <div className="p-6">
                                 <div className="relative">
-                                    {isLoading ? (
-                                        <div className="flex h-96 w-full items-center justify-center rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
-                                            <div className="text-center">
-                                                <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"></div>
-                                                <p className="text-gray-600 dark:text-slate-400">Initializing map visualization...</p>
+                                    <div 
+                                        ref={mapChartRef} 
+                                        className="h-96 w-full rounded-xl overflow-hidden shadow-lg bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900"
+                                    >
+                                        {isLoading || !isMapReady ? (
+                                            <div className="flex h-full w-full items-center justify-center">
+                                                <div className="text-center">
+                                                    <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"></div>
+                                                    <p className="text-gray-600 dark:text-slate-400">{t('dashboard.loading_map')}</p>
+                                                </div>
                                             </div>
-                                        </div>
-                                    ) : (
-                                        <div id="mapChart" className="h-96 w-full rounded-xl overflow-hidden shadow-lg"></div>
-                                    )}
+                                        ) : null}
+                                    </div>
                                 </div>
                                 
                                 {/* Map Legend */}
-                                <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm">
-                                    <div className="flex items-center gap-2">
-                                        <div className="h-3 w-3 rounded-full bg-indigo-500"></div>
-                                        <span className="text-gray-600 dark:text-slate-400">Provinces with incidents</span>
+                                <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm">
+                                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50 dark:bg-slate-700/50">
+                                        <div className="h-3 w-3 rounded-full bg-green-500"></div>
+                                        <span className="text-gray-700 dark:text-slate-300 font-medium">{t('dashboard.low_incidents')} (1-5)</span>
                                     </div>
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50 dark:bg-slate-700/50">
+                                        <div className="h-3 w-3 rounded-full bg-orange-500"></div>
+                                        <span className="text-gray-700 dark:text-slate-300 font-medium">{t('dashboard.medium_incidents')} (6-15)</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50 dark:bg-slate-700/50">
+                                        <div className="h-3 w-3 rounded-full bg-red-500"></div>
+                                        <span className="text-gray-700 dark:text-slate-300 font-medium">{t('dashboard.high_incidents')} (16+)</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50 dark:bg-slate-700/50">
                                         <div className="h-3 w-3 rounded-full bg-gray-400"></div>
-                                        <span className="text-gray-600 dark:text-slate-400">No incidents reported</span>
+                                        <span className="text-gray-700 dark:text-slate-300 font-medium">{t('dashboard.no_incidents')}</span>
                                     </div>
                                 </div>
                             </div>
@@ -441,76 +577,4 @@ export default function Dashboard({
             </div>
         </AppLayout>
     );
-
-    // AmCharts Map Implementation
-    useEffect(() => {
-        // Create root element
-        const root = am5.Root.new("mapChart");
-
-        // Set themes
-        root.setThemes([am5.Theme.new(root)]);
-
-        // Create chart
-        const chart = root.container.children.push(
-            am5map.MapChart.new(root, {
-                panX: "translateX",
-                panY: "translateY"
-            })
-        );
-
-        // Create a simple polygon series for demonstration
-        const polygonSeries = chart.series.push(
-            am5map.MapPolygonSeries.new(root, {
-                fill: am5.color(0xdddddd)
-            })
-        );
-
-        // Add data to the map
-        const mapData = locationStats.provinces.map(province => ({
-            id: province.code,
-            name: province.name,
-            value: province.incidents_count,
-            districts: province.districts_count
-        }));
-
-        polygonSeries.data.setAll(mapData);
-
-        // Configure polygon appearance
-        polygonSeries.mapPolygons.template.setAll({
-            tooltipText: "{name}: {value} incidents, {districts} districts",
-            interactive: true,
-            fill: am5.color(0xdddddd)
-        });
-
-        // Create hover state
-        polygonSeries.mapPolygons.template.states.create("hover", {
-            fill: am5.color(0x999999)
-        });
-
-        // Create active state
-        polygonSeries.mapPolygons.template.states.create("active", {
-            fill: am5.color(0x666666)
-        });
-
-        // Add legend
-        const legend = chart.children.push(
-            am5.Legend.new(root, {
-                centerX: am5.p50,
-                x: am5.p50,
-                centerY: am5.p100,
-                y: am5.p100,
-                layout: root.horizontalLayout
-            })
-        );
-
-        legend.data.setAll([{
-            name: t('dashboard.province_statistics'),
-            fill: am5.color(0x666666)
-        }]);
-
-        // Cleanup function
-        return () => {
-            root.dispose();
-        };
-    }, [locationStats]);
 }

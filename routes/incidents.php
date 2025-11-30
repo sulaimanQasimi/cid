@@ -25,11 +25,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('incidents/{incident}/unconfirm', [IncidentController::class, 'unconfirm'])
         ->name('incidents.unconfirm');
 
-    // Route for viewing incidents within a report
-    Route::get('incident-reports/{incident_report}/incidents', [IncidentReportController::class, 'showIncidents'])
-        ->name('incident-reports.incidents');
-
     // Route for printing incident reports
     Route::get('incident-reports/{incident_report}/print', [IncidentReportController::class, 'print'])
         ->name('incident-reports.print');
+
+    // Route for creating incidents within a report
+    Route::post('incident-reports/{incident_report}/incidents', [IncidentController::class, 'store'])
+        ->name('incident-reports.incidents.store');
 });

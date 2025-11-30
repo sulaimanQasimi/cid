@@ -18,8 +18,6 @@ use Illuminate\Support\Facades\Log;
 
 class InfoController extends Controller
 {
-
-
     /**
      * Store a newly created resource in storage.
      */
@@ -41,7 +39,7 @@ class InfoController extends Controller
                 'regex:/^[A-Za-z0-9_\-\.]+$/',
                 'unique:infos,code'
             ],
-            'description' => 'nullable|string|max:1000',
+            'description' => 'nullable|string',
             'value' => 'nullable|array',
             'value.content' => 'nullable|string',
             'value.location' => 'nullable|array',

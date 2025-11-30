@@ -3,18 +3,16 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Pagination } from '@/components/pagination';
-import {  Edit, Shield, AlertTriangle, FileText, Clock, User, PlusCircle, ChartBar, Pencil, Trash, UserRound, MapPin, Calendar, Building2, Phone, IdCard, Printer, BarChart3, Eye, Users, Home, Gavel, FileCheck, BookText, ArrowLeft } from 'lucide-react';
-import { format } from 'date-fns';
+import { Shield, AlertTriangle, FileText, Clock, User, Pencil, Trash, UserRound, MapPin, Calendar, Building2, Phone, IdCard, Printer, BarChart3, Eye, Users, Home, Gavel, FileCheck, BookText, ArrowLeft } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useState } from 'react';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTranslation } from '@/lib/i18n/translate';
 import { cn } from '@/lib/utils';
 import Header from '@/components/template/header';
+import PersianDateDisplay from '@/components/ui/PersianDateDisplay';
+import { formatPersianDateOnly } from '@/lib/utils/date';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,39 +23,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog';
-import { Separator } from '@/components/ui/separator';
 import { useIncidentReportAccess } from '@/hooks/use-incident-report-access';
-
-interface StatCategory {
-  id: number;
-  name: string;
-  label: string;
-  color: string;
-  status: string;
-}
-
-interface StatCategoryItem {
-  id: number;
-  name: string;
-  label: string;
-  color: string;
-  category: {
-    id: number;
-    name: string;
-    label: string;
-    color: string;
-  };
-}
-
-interface ReportStat {
-  id: number;
-  incident_report_id: number;
-  stat_category_item_id: number;
-  integer_value: number | null;
-  string_value: string | null;
-  notes: string | null;
-  stat_category_item: StatCategoryItem;
-}
+import IncidentCreateModal from '@/components/IncidentCreateModal';
 
 interface ShowProps {
   report: {
@@ -106,13 +73,30 @@ interface ShowProps {
       active: boolean;
     }>;
   };
-  reportStats: ReportStat[];
-  statCategories: StatCategory[];
+  districts: Array<{
+    id: number;
+    name: string;
+    province: {
+      id: number;
+      name: string;
+    };
+  }>;
+  categories: Array<{
+    id: number;
+    name: string;
+    color: string;
+  }>;
+  reports: Array<{
+    id: number;
+    report_number: string;
+    report_date: string;
+  }>;
 }
 
-export default function Show({ report, incidents, reportStats, statCategories }: ShowProps) {
+export default function Show({ report, incidents, districts, categories, reports }: ShowProps) {
   const { t } = useTranslation();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const incidentReportAccess = useIncidentReportAccess();
 
   // Generate breadcrumbs
@@ -132,8 +116,6 @@ export default function Show({ report, incidents, reportStats, statCategories }:
     router.delete(route('incident-reports.destroy', report.id));
   };
 
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-
   function getStatusBadge(status: string) {
     switch (status) {
       case 'approved':
@@ -143,29 +125,6 @@ export default function Show({ report, incidents, reportStats, statCategories }:
       default:
         return <Badge variant="default">{status}</Badge>;
     }
-  }
-
-  // Group stats by category
-  const statsByCategory: Record<string, ReportStat[]> = {};
-  reportStats.forEach(stat => {
-    const categoryName = stat.stat_category_item.category.label;
-    const categoryId = stat.stat_category_item.category.id;
-
-    if (!statsByCategory[categoryName]) {
-      statsByCategory[categoryName] = [];
-    }
-    statsByCategory[categoryName].push(stat);
-  });
-
-  // Filter stats by selected category
-  const filteredStatsByCategory = selectedCategory
-    ? Object.entries(statsByCategory).filter(([_, stats]) =>
-        stats.some(stat => stat.stat_category_item.category.id === selectedCategory))
-    : Object.entries(statsByCategory);
-
-  // Get value from report stat
-  function getStatValue(stat: ReportStat): string {
-    return stat.integer_value !== null ? stat.integer_value.toString() : (stat.string_value || '');
   }
 
   // Show access warning if user doesn't have proper access or access is expired
@@ -213,7 +172,7 @@ export default function Show({ report, incidents, reportStats, statCategories }:
       <div className="container px-0 py-6">
         <Header
           title={report.report_number}
-          description={`${t('incident_reports.show.report_date_label')}: ${format(new Date(report.report_date), 'PPP')}`}
+          description={`${t('incident_reports.show.report_date_label')}: ${formatPersianDateOnly(report.report_date)}`}
           icon={<Shield className="h-5 w-5" />}
           model="incident_reports"
           routeName={() => route('incident-reports.index')}
@@ -270,144 +229,171 @@ export default function Show({ report, incidents, reportStats, statCategories }:
 
         {/* Access badges */}
         {incidentReportAccess.currentAccess && (
-          <div className="mb-6 flex items-center gap-2">
-            <Badge variant="outline" className="bg-white/20 dark:bg-white/10 backdrop-blur-sm border-white/30 dark:border-white/20 text-white px-3 py-1 text-sm font-medium">
-              <Shield className="h-3 w-3 mr-1" />
+          <div className="mb-6 flex flex-wrap items-center gap-3">
+            <Badge variant="outline" className="bg-gradient-to-r from-violet-50/80 dark:from-violet-900/40 to-violet-100/80 dark:to-violet-800/40 backdrop-blur-sm border-violet-200/50 dark:border-violet-700/50 text-violet-700 dark:text-violet-300 px-4 py-2 text-sm font-semibold shadow-sm hover:shadow-md transition-all duration-200">
+              <Shield className="h-3.5 w-3.5 mr-1.5" />
               {incidentReportAccess.currentAccess.access_type === 'full' && t('incident_reports.access.full')}
               {incidentReportAccess.currentAccess.access_type === 'read_only' && t('incident_reports.access.read_only')}
               {incidentReportAccess.currentAccess.access_type === 'incidents_only' && t('incident_reports.access.incidents_only')}
             </Badge>
-            <Badge variant="outline" className="bg-white/20 dark:bg-white/10 backdrop-blur-sm border-white/30 dark:border-white/20 text-white px-3 py-1 text-sm font-medium">
-              <FileText className="h-3 w-3 mr-1" />
+            <Badge variant="outline" className="bg-gradient-to-r from-violet-50/80 dark:from-violet-900/40 to-violet-100/80 dark:to-violet-800/40 backdrop-blur-sm border-violet-200/50 dark:border-violet-700/50 text-violet-700 dark:text-violet-300 px-4 py-2 text-sm font-semibold shadow-sm hover:shadow-md transition-all duration-200">
+              <FileText className="h-3.5 w-3.5 mr-1.5" />
               {incidentReportAccess.isReportSpecific() ? t('incident_reports.access.report_specific') : t('incident_reports.access.global')}
             </Badge>
             {incidentReportAccess.currentAccess.expires_at && (
               <Badge 
                 variant="outline" 
                 className={cn(
-                  "backdrop-blur-sm text-white px-3 py-1 text-sm font-medium",
+                  "backdrop-blur-sm px-4 py-2 text-sm font-semibold shadow-sm hover:shadow-md transition-all duration-200",
                   new Date(incidentReportAccess.currentAccess.expires_at) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-                    ? "bg-yellow-500/20 dark:bg-yellow-500/30 border-yellow-300/30 dark:border-yellow-400/40"
-                    : "bg-white/20 dark:bg-white/10 border-white/30 dark:border-white/20"
+                    ? "bg-gradient-to-r from-yellow-50/80 dark:from-yellow-900/40 to-yellow-100/80 dark:to-yellow-800/40 border-yellow-300/50 dark:border-yellow-600/50 text-yellow-700 dark:text-yellow-300"
+                    : "bg-gradient-to-r from-violet-50/80 dark:from-violet-900/40 to-violet-100/80 dark:to-violet-800/40 border-violet-200/50 dark:border-violet-700/50 text-violet-700 dark:text-violet-300"
                 )}
               >
-                <Clock className="h-3 w-3 mr-1" />
-                {t('incident_reports.access.expires')}: {format(new Date(incidentReportAccess.currentAccess.expires_at), 'PP')}
+                <Clock className="h-3.5 w-3.5 mr-1.5" />
+                {t('incident_reports.access.expires')}: <PersianDateDisplay date={incidentReportAccess.currentAccess.expires_at} format="date" />
               </Badge>
             )}
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-12">
+        <div className="grid grid-cols-1 gap-6 lg:gap-8 md:grid-cols-12">
           {/* Report Information */}
-          <Card className="md:col-span-4 border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-violet-50/30 dark:to-violet-900/20">
-            <CardHeader className="bg-gradient-to-l from-violet-500 dark:from-violet-600 to-violet-600 dark:to-violet-700 text-white border-b pb-4">
-              <CardTitle className="flex items-center gap-3 text-lg">
-                <div className="p-2 bg-white/20 rounded-lg">
+          <Card className="md:col-span-4 border-none shadow-2xl overflow-hidden bg-gradient-to-br from-white dark:from-gray-800 via-violet-50/20 dark:via-violet-900/10 to-white dark:to-gray-800 backdrop-blur-sm">
+            <CardHeader className="bg-gradient-to-r from-violet-500 via-violet-600 to-violet-700 dark:from-violet-600 dark:via-violet-700 dark:to-violet-800 text-white border-b border-violet-400/20 dark:border-violet-600/20 pb-5 shadow-lg">
+              <CardTitle className="flex items-center gap-3 text-xl font-bold">
+                <div className="p-2.5 bg-white/20 backdrop-blur-sm rounded-xl shadow-lg">
                   <FileText className="h-5 w-5" />
                 </div>
                 {t('incident_reports.form.info_title')}
               </CardTitle>
-              <CardDescription className="text-violet-100">
+              <CardDescription className="text-violet-100 text-sm mt-2">
                 {t('incident_reports.details.long_description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6">
-              <div className="space-y-5">
+              <div className="space-y-6">
                 <div>
-                  <h3 className="text-sm font-medium text-violet-600 dark:text-violet-400 dark:text-violet-400 mb-3 flex items-center gap-2" dir="rtl">
-                  <FileText className="h-4 w-4" />
+                  <h3 className="text-sm font-semibold text-violet-700 dark:text-violet-300 mb-4 flex items-center gap-2 uppercase tracking-wide" dir="rtl">
+                    <div className="p-1.5 bg-violet-100 dark:bg-violet-900/50 rounded-lg">
+                      <FileText className="h-3.5 w-3.5 text-violet-600 dark:text-violet-400" />
+                    </div>
                     {t('incident_reports.show.report_info')}
-                  
                   </h3>
-                  <div className="rounded-xl border border-violet-100 dark:border-violet-800 bg-gradient-to-l from-violet-50 dark:from-violet-900/30 to-white dark:to-gray-800 p-4 space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-violet-700 dark:text-violet-300 font-medium flex items-center gap-2" dir="rtl">
-                        <FileText className="h-4 w-4" />
+                  <div className="rounded-2xl border-2 border-violet-100/50 dark:border-violet-800/50 bg-gradient-to-br from-violet-50/50 dark:from-violet-900/20 via-white dark:via-gray-800 to-violet-50/30 dark:to-violet-900/10 p-5 space-y-4 shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <div className="flex justify-between items-center py-2 border-b border-violet-100/50 dark:border-violet-800/30 last:border-0">
+                      <span className="text-sm text-violet-600 dark:text-violet-400 font-semibold flex items-center gap-2" dir="rtl">
+                        <div className="p-1 bg-violet-100 dark:bg-violet-900/50 rounded-md">
+                          <FileText className="h-3.5 w-3.5 text-violet-600 dark:text-violet-400" />
+                        </div>
                         {t('incident_reports.show.report_number')}:
                       </span>
-                      <span className="text-sm text-violet-900 dark:text-violet-100 font-semibold">{report.report_number}</span>
+                      <span className="text-sm text-violet-900 dark:text-violet-100 font-bold">{report.report_number}</span>
                     </div>
 
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-violet-700 dark:text-violet-300 font-medium flex items-center gap-2" dir="rtl">
-                        <Calendar className="h-4 w-4" />
+                    <div className="flex justify-between items-center py-2 border-b border-violet-100/50 dark:border-violet-800/30 last:border-0">
+                      <span className="text-sm text-violet-600 dark:text-violet-400 font-semibold flex items-center gap-2" dir="rtl">
+                        <div className="p-1 bg-violet-100 dark:bg-violet-900/50 rounded-md">
+                          <Calendar className="h-3.5 w-3.5 text-violet-600 dark:text-violet-400" />
+                        </div>
                         {t('incident_reports.show.report_date_label')}:
                       </span>
-                      <span className="text-sm text-violet-900 dark:text-violet-100">{format(new Date(report.report_date), 'PPP')}</span>
+                      <span className="text-sm text-violet-900 dark:text-violet-100 font-medium">
+                        <PersianDateDisplay date={report.report_date} format="date" />
+                      </span>
                     </div>
 
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-violet-700 dark:text-violet-300 font-medium flex items-center gap-2" dir="rtl">
-                        <Clock className="h-4 w-4" />
+                    <div className="flex justify-between items-center py-2 border-b border-violet-100/50 dark:border-violet-800/30 last:border-0">
+                      <span className="text-sm text-violet-600 dark:text-violet-400 font-semibold flex items-center gap-2" dir="rtl">
+                        <div className="p-1 bg-violet-100 dark:bg-violet-900/50 rounded-md">
+                          <Clock className="h-3.5 w-3.5 text-violet-600 dark:text-violet-400" />
+                        </div>
                         {t('incident_reports.show.status')}:
                       </span>
-                      <Badge variant="outline" className="bg-gradient-to-l from-violet-100 dark:from-violet-900/30 to-violet-200 dark:to-violet-800/30 text-violet-800 dark:text-violet-200 border-violet-300 dark:border-violet-700 px-3 py-1 text-xs font-medium">
+                      <Badge variant="outline" className="bg-gradient-to-r from-violet-100 dark:from-violet-900/40 to-violet-200 dark:to-violet-800/40 text-violet-800 dark:text-violet-200 border-violet-300/50 dark:border-violet-700/50 px-3 py-1 text-xs font-semibold shadow-sm">
                         {t(`incident_reports.status.${report.report_status}`)}
                       </Badge>
                     </div>
 
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-violet-700 dark:text-violet-300 font-medium flex items-center gap-2" dir="rtl">
-                        <Shield className="h-4 w-4" />
+                    <div className="flex justify-between items-center py-2 border-b border-violet-100/50 dark:border-violet-800/30 last:border-0">
+                      <span className="text-sm text-violet-600 dark:text-violet-400 font-semibold flex items-center gap-2" dir="rtl">
+                        <div className="p-1 bg-violet-100 dark:bg-violet-900/50 rounded-md">
+                          <Shield className="h-3.5 w-3.5 text-violet-600 dark:text-violet-400" />
+                        </div>
                         {t('incident_reports.show.security_level')}:
                       </span>
-                      <Badge variant="outline" className="bg-gradient-to-l from-violet-100 dark:from-violet-900/30 to-violet-200 dark:to-violet-800/30 text-violet-800 dark:text-violet-200 border-violet-300 dark:border-violet-700 px-3 py-1 text-xs font-medium">
+                      <Badge variant="outline" className="bg-gradient-to-r from-violet-100 dark:from-violet-900/40 to-violet-200 dark:to-violet-800/40 text-violet-800 dark:text-violet-200 border-violet-300/50 dark:border-violet-700/50 px-3 py-1 text-xs font-semibold shadow-sm">
                         {t(`incident_reports.level.${report.security_level}`)}
                       </Badge>
                     </div>
 
                     {report.source && (
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-violet-700 dark:text-violet-300 font-medium flex items-center gap-2" dir="rtl">
-                          <Users className="h-4 w-4" />
+                      <div className="flex justify-between items-center py-2">
+                        <span className="text-sm text-violet-600 dark:text-violet-400 font-semibold flex items-center gap-2" dir="rtl">
+                          <div className="p-1 bg-violet-100 dark:bg-violet-900/50 rounded-md">
+                            <Users className="h-3.5 w-3.5 text-violet-600 dark:text-violet-400" />
+                          </div>
                           {t('incident_reports.show.source_label')}:
                         </span>
-                        <span className="text-sm text-violet-900 dark:text-violet-100">{report.source}</span>
+                        <span className="text-sm text-violet-900 dark:text-violet-100 font-medium">{report.source}</span>
                       </div>
                     )}
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-medium text-violet-600 dark:text-violet-400 mb-3 flex items-center gap-2" dir="rtl">
-                    <UserRound className="h-4 w-4" />
+                  <h3 className="text-sm font-semibold text-violet-700 dark:text-violet-300 mb-4 flex items-center gap-2 uppercase tracking-wide" dir="rtl">
+                    <div className="p-1.5 bg-violet-100 dark:bg-violet-900/50 rounded-lg">
+                      <UserRound className="h-3.5 w-3.5 text-violet-600 dark:text-violet-400" />
+                    </div>
                     {t('incident_reports.show.user_info')}
                   </h3>
-                  <div className="rounded-xl border border-violet-100 dark:border-violet-800 bg-gradient-to-l from-violet-50 dark:from-violet-900/30 to-white dark:to-gray-800 p-4 space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-violet-700 dark:text-violet-300 font-medium flex items-center gap-2" dir="rtl">
-                        <User className="h-4 w-4" />
+                  <div className="rounded-2xl border-2 border-violet-100/50 dark:border-violet-800/50 bg-gradient-to-br from-violet-50/50 dark:from-violet-900/20 via-white dark:via-gray-800 to-violet-50/30 dark:to-violet-900/10 p-5 space-y-4 shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <div className="flex justify-between items-center py-2 border-b border-violet-100/50 dark:border-violet-800/30 last:border-0">
+                      <span className="text-sm text-violet-600 dark:text-violet-400 font-semibold flex items-center gap-2" dir="rtl">
+                        <div className="p-1 bg-violet-100 dark:bg-violet-900/50 rounded-md">
+                          <User className="h-3.5 w-3.5 text-violet-600 dark:text-violet-400" />
+                        </div>
                         {t('incident_reports.show.submitted_by')}:
                       </span>
-                      <span className="text-sm text-violet-900 dark:text-violet-100">{report.submitter?.name || t('incidents.unknown')}</span>
+                      <span className="text-sm text-violet-900 dark:text-violet-100 font-medium">{report.submitter?.name || t('incidents.unknown')}</span>
                     </div>
 
                     {report.approver && (
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-violet-700 dark:text-violet-300 font-medium flex items-center gap-2" dir="rtl">
-                          <User className="h-4 w-4" />
+                      <div className="flex justify-between items-center py-2 border-b border-violet-100/50 dark:border-violet-800/30 last:border-0">
+                        <span className="text-sm text-violet-600 dark:text-violet-400 font-semibold flex items-center gap-2" dir="rtl">
+                          <div className="p-1 bg-violet-100 dark:bg-violet-900/50 rounded-md">
+                            <User className="h-3.5 w-3.5 text-violet-600 dark:text-violet-400" />
+                          </div>
                           {t('incident_reports.show.approved_by')}:
                         </span>
-                        <span className="text-sm text-violet-900 dark:text-violet-100">{report.approver?.name}</span>
+                        <span className="text-sm text-violet-900 dark:text-violet-100 font-medium">{report.approver?.name}</span>
                       </div>
                     )}
 
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-violet-700 dark:text-violet-300 font-medium flex items-center gap-2" dir="rtl">
-                        <Clock className="h-4 w-4" />
+                    <div className="flex justify-between items-center py-2 border-b border-violet-100/50 dark:border-violet-800/30 last:border-0">
+                      <span className="text-sm text-violet-600 dark:text-violet-400 font-semibold flex items-center gap-2" dir="rtl">
+                        <div className="p-1 bg-violet-100 dark:bg-violet-900/50 rounded-md">
+                          <Clock className="h-3.5 w-3.5 text-violet-600 dark:text-violet-400" />
+                        </div>
                         {t('incident_reports.show.created_at')}:
                       </span>
-                      <span className="text-sm text-violet-900 dark:text-violet-100">{format(new Date(report.created_at), 'PPP')}</span>
+                      <span className="text-sm text-violet-900 dark:text-violet-100 font-medium">
+                        <PersianDateDisplay date={report.created_at} format="date" />
+                      </span>
                     </div>
 
                     {report.updated_at !== report.created_at && (
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-violet-700 dark:text-violet-300 font-medium flex items-center gap-2" dir="rtl">
-                          <Clock className="h-4 w-4" />
+                      <div className="flex justify-between items-center py-2">
+                        <span className="text-sm text-violet-600 dark:text-violet-400 font-semibold flex items-center gap-2" dir="rtl">
+                          <div className="p-1 bg-violet-100 dark:bg-violet-900/50 rounded-md">
+                            <Clock className="h-3.5 w-3.5 text-violet-600 dark:text-violet-400" />
+                          </div>
                           {t('incident_reports.show.last_updated')}:
                         </span>
-                        <span className="text-sm text-violet-900 dark:text-violet-100">{format(new Date(report.updated_at), 'PPP')}</span>
+                        <span className="text-sm text-violet-900 dark:text-violet-100 font-medium">
+                          <PersianDateDisplay date={report.updated_at} format="date" />
+                        </span>
                       </div>
                     )}
                   </div>
@@ -417,51 +403,57 @@ export default function Show({ report, incidents, reportStats, statCategories }:
           </Card>
 
           {/* Report Details */}
-          <div className="md:col-span-8 space-y-8">
-            <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-violet-50/30 dark:to-violet-900/20">
-              <CardHeader className="bg-gradient-to-l from-violet-500 dark:from-violet-600 to-violet-600 dark:to-violet-700 text-white border-b pb-4">
-                <CardTitle className="flex items-center gap-3 text-lg">
-                  <div className="p-2 bg-white/20 rounded-lg">
+          <div className="md:col-span-8">
+            <Card className="border-none shadow-2xl overflow-hidden bg-gradient-to-br from-white dark:from-gray-800 via-violet-50/20 dark:via-violet-900/10 to-white dark:to-gray-800 backdrop-blur-sm">
+              <CardHeader className="bg-gradient-to-r from-violet-500 via-violet-600 to-violet-700 dark:from-violet-600 dark:via-violet-700 dark:to-violet-800 text-white border-b border-violet-400/20 dark:border-violet-600/20 pb-5 shadow-lg">
+                <CardTitle className="flex items-center gap-3 text-xl font-bold">
+                  <div className="p-2.5 bg-white/20 backdrop-blur-sm rounded-xl shadow-lg">
                     <BookText className="h-5 w-5" />
                   </div>
                   {t('incident_reports.details.title')}
                 </CardTitle>
-                <CardDescription className="text-violet-100">
+                <CardDescription className="text-violet-100 text-sm mt-2">
                   {t('incident_reports.details.long_description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6">
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-sm font-medium text-violet-600 dark:text-violet-400 mb-3 flex items-center gap-2" dir="rtl">
-                      <FileText className="h-4 w-4" />
+                    <h3 className="text-sm font-semibold text-violet-700 dark:text-violet-300 mb-4 flex items-center gap-2 uppercase tracking-wide" dir="rtl">
+                      <div className="p-1.5 bg-violet-100 dark:bg-violet-900/50 rounded-lg">
+                        <FileText className="h-3.5 w-3.5 text-violet-600 dark:text-violet-400" />
+                      </div>
                       {t('incident_reports.details.details_label')}
                     </h3>
-                    <div className="rounded-xl border border-violet-100 dark:border-violet-800 bg-gradient-to-l from-violet-50 dark:from-violet-900/30 to-white dark:to-gray-800 p-4">
-                      <p className="text-sm text-violet-900 dark:text-violet-100 whitespace-pre-wrap" dir="rtl">{report.details}</p>
+                    <div className="rounded-2xl border-2 border-violet-100/50 dark:border-violet-800/50 bg-gradient-to-br from-violet-50/50 dark:from-violet-900/20 via-white dark:via-gray-800 to-violet-50/30 dark:to-violet-900/10 p-5 shadow-sm hover:shadow-md transition-shadow duration-200">
+                      <p className="text-sm leading-relaxed text-violet-900 dark:text-violet-100 whitespace-pre-wrap" dir="rtl">{report.details}</p>
                     </div>
                   </div>
 
                   {report.action_taken && (
                     <div>
-                      <h3 className="text-sm font-medium text-violet-600 dark:text-violet-400 mb-3 flex items-center gap-2" dir="rtl">
-                        <Gavel className="h-4 w-4" />
+                      <h3 className="text-sm font-semibold text-violet-700 dark:text-violet-300 mb-4 flex items-center gap-2 uppercase tracking-wide" dir="rtl">
+                        <div className="p-1.5 bg-violet-100 dark:bg-violet-900/50 rounded-lg">
+                          <Gavel className="h-3.5 w-3.5 text-violet-600 dark:text-violet-400" />
+                        </div>
                         {t('incident_reports.details.action_taken_label')}
                       </h3>
-                      <div className="rounded-xl border border-violet-100 dark:border-violet-800 bg-gradient-to-l from-violet-50 dark:from-violet-900/30 to-white dark:to-gray-800 p-4">
-                        <p className="text-sm text-violet-900 dark:text-violet-100 whitespace-pre-wrap" dir="rtl">{report.action_taken}</p>
+                      <div className="rounded-2xl border-2 border-violet-100/50 dark:border-violet-800/50 bg-gradient-to-br from-violet-50/50 dark:from-violet-900/20 via-white dark:via-gray-800 to-violet-50/30 dark:to-violet-900/10 p-5 shadow-sm hover:shadow-md transition-shadow duration-200">
+                        <p className="text-sm leading-relaxed text-violet-900 dark:text-violet-100 whitespace-pre-wrap" dir="rtl">{report.action_taken}</p>
                       </div>
                     </div>
                   )}
 
                   {report.recommendation && (
                     <div>
-                      <h3 className="text-sm font-medium text-violet-600 dark:text-violet-400 mb-3 flex items-center gap-2" dir="rtl">
-                        <FileCheck className="h-4 w-4" />
+                      <h3 className="text-sm font-semibold text-violet-700 dark:text-violet-300 mb-4 flex items-center gap-2 uppercase tracking-wide" dir="rtl">
+                        <div className="p-1.5 bg-violet-100 dark:bg-violet-900/50 rounded-lg">
+                          <FileCheck className="h-3.5 w-3.5 text-violet-600 dark:text-violet-400" />
+                        </div>
                         {t('incident_reports.details.recommendation_label')}
                       </h3>
-                      <div className="rounded-xl border border-violet-100 dark:border-violet-800 bg-gradient-to-l from-violet-50 dark:from-violet-900/30 to-white dark:to-gray-800 p-4">
-                        <p className="text-sm text-violet-900 dark:text-violet-100 whitespace-pre-wrap" dir="rtl">{report.recommendation}</p>
+                      <div className="rounded-2xl border-2 border-violet-100/50 dark:border-violet-800/50 bg-gradient-to-br from-violet-50/50 dark:from-violet-900/20 via-white dark:via-gray-800 to-violet-50/30 dark:to-violet-900/10 p-5 shadow-sm hover:shadow-md transition-shadow duration-200">
+                        <p className="text-sm leading-relaxed text-violet-900 dark:text-violet-100 whitespace-pre-wrap" dir="rtl">{report.recommendation}</p>
                       </div>
                     </div>
                   )}
@@ -473,31 +465,6 @@ export default function Show({ report, incidents, reportStats, statCategories }:
 
         {/* Additional Sections */}
         <div className="mt-8">
-          <Tabs defaultValue="incidents" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6 rounded-xl p-1 bg-gradient-to-l from-violet-100 dark:from-violet-900/30 to-violet-200 dark:to-violet-800/30 shadow-lg">
-              <TabsTrigger
-                value="incidents"
-                className={cn(
-                  "data-[state=active]:bg-gradient-to-l data-[state=active]:from-violet-500 data-[state=active]:to-violet-600 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
-                  "transition-all duration-300 rounded-lg"
-                )}
-              >
-                <AlertTriangle className="h-4 w-4" />
-                <span>{t('incidents.page_title')}</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="stats"
-                className={cn(
-                  "data-[state=active]:bg-gradient-to-l data-[state=active]:from-violet-500 data-[state=active]:to-violet-600 data-[state=active]:text-white data-[state=active]:shadow-lg flex items-center gap-2",
-                  "transition-all duration-300 rounded-lg"
-                )}
-              >
-                <ChartBar className="h-4 w-4" />
-                <span>{t('incident_reports.stats.title')}</span>
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="incidents">
               <Header
                 title={t('incidents.page_title')}
                 description={t('incident_reports.incidents.card_description')}
@@ -511,62 +478,83 @@ export default function Show({ report, incidents, reportStats, statCategories }:
                 backButtonText={t('common.back')}
                 showButton={false}
               />
-              <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-violet-50/30 dark:to-violet-900/20">
+              <Card className="mt-6 border-none shadow-2xl overflow-hidden bg-gradient-to-br from-white dark:from-gray-800 via-violet-50/20 dark:via-violet-900/10 to-white dark:to-gray-800 backdrop-blur-sm">
                 <CardContent className="p-6">
-                  <div className="flex justify-end mb-4">
-                    <Button asChild className="bg-gradient-to-l from-violet-500 to-violet-600 hover:from-violet-600 hover:to-violet-700 text-white shadow-lg dark:from-violet-600 dark:to-violet-700 dark:hover:from-violet-700 dark:hover:to-violet-800">
-                      <Link href={route('incident-reports.incidents', report.id)}>
-                        <AlertTriangle className="mr-2 h-4 w-4" />
-                        {t('incident_reports.incidents.view_all')}
-                      </Link>
+                  <div className="flex justify-between items-center mb-6">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 bg-violet-100 dark:bg-violet-900/50 rounded-lg">
+                        <AlertTriangle className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+                      </div>
+                      <h3 className="text-lg font-bold text-violet-900 dark:text-violet-100">{t('incidents.page_title')}</h3>
+                    </div>
+                    <Button 
+                      onClick={() => setIsCreateModalOpen(true)}
+                      className="bg-gradient-to-r from-violet-500 to-violet-600 hover:from-violet-600 hover:to-violet-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 dark:from-violet-600 dark:to-violet-700 dark:hover:from-violet-700 dark:hover:to-violet-800"
+                    >
+                      <AlertTriangle className="mr-2 h-4 w-4" />
+                      {t('incidents.create_title')}
                     </Button>
                   </div>
                   
-                  <div className="relative w-full overflow-auto">
+                  <div className="relative w-full overflow-auto rounded-xl border border-violet-100/50 dark:border-violet-800/50">
                     <table className="w-full caption-bottom text-sm">
                       <thead className="[&_tr]:border-b">
-                        <tr className="border-b transition-colors hover:bg-violet-50/50 dark:hover:bg-violet-900/20 data-[state=selected]:bg-violet-50 dark:data-[state=selected]:bg-violet-900/20">
-                          <th className="h-12 px-4 text-left align-middle font-medium text-violet-700 dark:text-violet-300">{t('incidents.table.title')}</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium text-violet-700 dark:text-violet-300">{t('incidents.table.date')}</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium text-violet-700 dark:text-violet-300">{t('incidents.table.category')}</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium text-violet-700 dark:text-violet-300">{t('incidents.table.severity')}</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium text-violet-700 dark:text-violet-300">{t('common.actions')}</th>
+                        <tr className="bg-gradient-to-r from-violet-50 dark:from-violet-900/30 to-violet-100/50 dark:to-violet-800/30 border-b border-violet-200/50 dark:border-violet-700/50">
+                          <th className="h-14 px-6 text-left align-middle font-bold text-violet-800 dark:text-violet-200 text-sm uppercase tracking-wide">{t('incidents.table.title')}</th>
+                          <th className="h-14 px-6 text-left align-middle font-bold text-violet-800 dark:text-violet-200 text-sm uppercase tracking-wide">{t('incidents.table.date')}</th>
+                          <th className="h-14 px-6 text-left align-middle font-bold text-violet-800 dark:text-violet-200 text-sm uppercase tracking-wide">{t('incidents.table.category')}</th>
+                          <th className="h-14 px-6 text-left align-middle font-bold text-violet-800 dark:text-violet-200 text-sm uppercase tracking-wide">{t('incidents.table.severity')}</th>
+                          <th className="h-14 px-6 text-left align-middle font-bold text-violet-800 dark:text-violet-200 text-sm uppercase tracking-wide">{t('common.actions')}</th>
                         </tr>
                       </thead>
                       <tbody className="[&_tr:last-child]:border-0">
                         {incidents.data.length === 0 ? (
                           <tr>
-                            <td colSpan={5} className="h-12 px-4 text-center align-middle text-violet-600 dark:text-violet-400">
-                              {t('incidents.no_incidents')}
+                            <td colSpan={5} className="h-32 px-6 text-center align-middle">
+                              <div className="flex flex-col items-center gap-3 text-violet-600 dark:text-violet-400">
+                                <div className="p-3 bg-violet-100 dark:bg-violet-900/50 rounded-full">
+                                  <AlertTriangle className="h-8 w-8 text-violet-400 dark:text-violet-500" />
+                                </div>
+                                <p className="text-base font-semibold">{t('incidents.no_incidents')}</p>
+                              </div>
                             </td>
                           </tr>
                         ) : (
                           incidents.data.map((incident) => (
-                            <tr key={incident.id} className="border-b transition-colors hover:bg-violet-50/50 dark:hover:bg-violet-900/20 data-[state=selected]:bg-violet-50 dark:data-[state=selected]:bg-violet-900/20">
-                              <td className="p-4 align-middle text-violet-900 dark:text-violet-100">{incident.title}</td>
-                              <td className="p-4 align-middle text-violet-900 dark:text-violet-100">{format(new Date(incident.incident_date), 'PP')}</td>
-                              <td className="p-4 align-middle">
+                            <tr key={incident.id} className="border-b border-violet-100/50 dark:border-violet-800/30 transition-all duration-200 hover:bg-violet-50/50 dark:hover:bg-violet-900/20 group">
+                              <td className="p-5 align-middle font-semibold text-violet-900 dark:text-violet-100 group-hover:text-violet-700 dark:group-hover:text-violet-200 transition-colors">{incident.title}</td>
+                              <td className="p-5 align-middle text-violet-800 dark:text-violet-200 font-medium">
+                                <PersianDateDisplay date={incident.incident_date} format="date" />
+                              </td>
+                              <td className="p-5 align-middle">
                                 {incident.category ? (
                                   <Badge
                                     style={{ backgroundColor: incident.category.color, color: '#fff' }}
+                                    className="px-3 py-1.5 font-semibold shadow-sm"
                                   >
                                     {incident.category.name}
                                   </Badge>
                                 ) : (
-                                  t('incidents.none')
+                                  <span className="text-violet-600 dark:text-violet-400 text-sm">{t('incidents.none')}</span>
                                 )}
                               </td>
-                              <td className="p-4 align-middle">
-                                <Badge variant={
-                                  incident.severity === 'high' ? 'destructive' :
-                                  incident.severity === 'medium' ? 'warning' : 'default'
-                                }>
+                              <td className="p-5 align-middle">
+                                <Badge 
+                                  variant={
+                                    incident.severity === 'high' ? 'destructive' :
+                                    incident.severity === 'medium' ? 'warning' : 'default'
+                                  }
+                                  className="px-3 py-1.5 font-semibold shadow-sm"
+                                >
                                   {incident.severity}
                                 </Badge>
                               </td>
-                              <td className="p-4 align-middle">
-                                <Button variant="ghost" size="sm" asChild className="text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:text-violet-300 hover:bg-violet-50">
-                                  <Link href={route('incidents.show', incident.id)}>{t('incident_reports.view')}</Link>
+                              <td className="p-5 align-middle">
+                                <Button variant="ghost" size="sm" asChild className="text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-900/40 rounded-lg transition-all duration-200 hover:scale-105">
+                                  <Link href={route('incidents.show', incident.id)}>
+                                    <Eye className="h-4 w-4 mr-1.5" />
+                                    {t('incident_reports.view')}
+                                  </Link>
                                 </Button>
                               </td>
                             </tr>
@@ -575,151 +563,49 @@ export default function Show({ report, incidents, reportStats, statCategories }:
                       </tbody>
                     </table>
                   </div>
-                  <div className="mt-4">
-                    <Pagination links={incidents.links} />
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="stats">
-              <Header
-                title={t('incident_reports.stats.title')}
-                description={t('incident_reports.stats.description')}
-                icon={<ChartBar className="h-5 w-5" />}
-                model="incident_reports"
-                routeName={() => route('incident-reports.index')}
-                buttonText={t('common.back')}
-                theme="violet"
-                showBackButton={true}
-                backRouteName={() => route('incident-reports.index')}
-                backButtonText={t('common.back')}
-                showButton={false}
-              />
-              <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-violet-50/30 dark:to-violet-900/20">
-                <CardContent className="p-6">
-                  {incidentReportAccess.canUpdateIncidentReport && (
-                    <div className="flex justify-end mb-4">
-                      <Button asChild className="bg-gradient-to-l from-violet-500 to-violet-600 hover:from-violet-600 hover:to-violet-700 text-white shadow-lg dark:from-violet-600 dark:to-violet-700 dark:hover:from-violet-700 dark:hover:to-violet-800">
-                        <Link href={route('incident-reports.edit', report.id)}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          {t('incident_reports.stats.edit')}
-                        </Link>
-                      </Button>
-                    </div>
-                  )}
-                  
-                  {Object.keys(statsByCategory).length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-8 text-center">
-                      <p className="text-violet-600 dark:text-violet-400">{t('incident_reports.stats.empty')}</p>
-                      {incidentReportAccess.canUpdateIncidentReport && (
-                        <Button variant="outline" asChild className="mt-4 border-violet-300 dark:border-violet-600 text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-900/20">
-                          <Link href={route('incident-reports.edit', report.id)}>
-                            <PlusCircle className="mr-2 h-4 w-4" />
-                            {t('incident_reports.stats.add_data')}
-                          </Link>
-                        </Button>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="space-y-6">
-                      {statCategories.length > 1 && reportStats.length > 0 && (
-                        <div className="mb-4">
-                          <Label htmlFor="category-filter" className="text-violet-700 dark:text-violet-300 font-medium">{t('incident_reports.stats.filter_by_category')}</Label>
-                          <Select
-                            onValueChange={(value) => setSelectedCategory(value === "all" ? null : parseInt(value))}
-                            defaultValue="all"
-                          >
-                            <SelectTrigger id="category-filter" className="border-violet-200 dark:border-violet-700 focus:border-violet-500 dark:focus:border-violet-400 focus:ring-violet-500/20 dark:focus:ring-violet-400/20 bg-gradient-to-l from-violet-50 dark:from-violet-900/30 to-white dark:to-gray-800">
-                              <SelectValue placeholder={t('incident_reports.stats.select_category')} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="all">{t('incidents.filters.all_categories')}</SelectItem>
-                              {statCategories
-                                .filter(category =>
-                                  Object.entries(statsByCategory).some(([categoryLabel]) =>
-                                    statsByCategory[categoryLabel][0].stat_category_item.category.id === category.id
-                                  )
-                                )
-                                .map((category) => (
-                                  <SelectItem key={category.id} value={category.id.toString()}>
-                                    <div className="flex items-center">
-                                      <div className="h-3 w-3 rounded-full mr-2" style={{ backgroundColor: category.color }}></div>
-                                      {category.label}
-                                    </div>
-                                  </SelectItem>
-                                ))
-                              }
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      )}
-
-                      {filteredStatsByCategory.map(([categoryName, stats]) => (
-                        <div key={categoryName} className="space-y-3">
-                          <h3 className="text-lg font-medium text-violet-700 dark:text-violet-300">
-                            <div className="flex items-center">
-                              <div
-                                className="h-3 w-3 rounded-full mr-2"
-                                style={{ backgroundColor: stats[0].stat_category_item.category.color }}
-                              ></div>
-                              {categoryName}
-                            </div>
-                          </h3>
-                          <Table>
-                            <TableHeader>
-                              <TableRow className="bg-violet-50 dark:bg-violet-900/30">
-                                <TableHead className="text-violet-700 dark:text-violet-300 font-medium">{t('incident_reports.stats.table.item')}</TableHead>
-                                <TableHead className="text-violet-700 dark:text-violet-300 font-medium">{t('incident_reports.stats.table.value')}</TableHead>
-                                <TableHead className="text-violet-700 dark:text-violet-300 font-medium">{t('incident_reports.stats.table.notes')}</TableHead>
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                              {stats.map((stat) => (
-                                <TableRow key={stat.id} className="hover:bg-violet-50/50 dark:hover:bg-violet-900/20">
-                                  <TableCell className="text-violet-900 dark:text-violet-100">
-                                    <div className="flex items-center space-x-2">
-                                      <div
-                                        className="h-3 w-3 rounded-full"
-                                        style={{ backgroundColor: stat.stat_category_item.color || stat.stat_category_item.category.color }}
-                                      ></div>
-                                      <span>{stat.stat_category_item.label}</span>
-                                    </div>
-                                  </TableCell>
-                                  <TableCell className="text-violet-900 dark:text-violet-100 font-medium">{getStatValue(stat)}</TableCell>
-                                  <TableCell className="text-violet-900 dark:text-violet-100">{stat.notes || '-'}</TableCell>
-                                </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
-                        </div>
-                      ))}
+                  {incidents.links && incidents.links.length > 0 && (
+                    <div className="mt-6 flex justify-center">
+                      <div className="bg-gradient-to-r from-violet-50 dark:from-violet-900/20 to-white dark:to-gray-800 p-4 rounded-xl shadow-lg border border-violet-200/50 dark:border-violet-700/50">
+                        <Pagination links={incidents.links} />
+                      </div>
                     </div>
                   )}
                 </CardContent>
               </Card>
-            </TabsContent>
-          </Tabs>
         </div>
       </div>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent className="max-w-md bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+        <AlertDialogContent className="max-w-md bg-gradient-to-br from-white dark:from-gray-800 via-red-50/10 dark:via-red-900/10 to-white dark:to-gray-800 border-red-200/50 dark:border-red-800/50 shadow-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl text-gray-900 dark:text-gray-100">{t('incident_reports.delete_dialog.title')}</AlertDialogTitle>
-            <AlertDialogDescription className="mt-2 text-gray-600 dark:text-gray-400">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-red-100 dark:bg-red-900/50 rounded-lg">
+                <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+              </div>
+              <AlertDialogTitle className="text-xl font-bold text-gray-900 dark:text-gray-100">{t('incident_reports.delete_dialog.title')}</AlertDialogTitle>
+            </div>
+            <AlertDialogDescription className="mt-2 text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
               {t('incident_reports.delete_dialog.description', { number: report.report_number })}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="mt-6">
-            <AlertDialogCancel className="shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600">{t('incident_reports.delete_dialog.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90">
+          <AlertDialogFooter className="mt-6 gap-3">
+            <AlertDialogCancel className="shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 rounded-lg transition-all duration-200">{t('incident_reports.delete_dialog.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 rounded-lg">
               {t('incident_reports.delete_dialog.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Create Incident Modal */}
+      <IncidentCreateModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        districts={districts}
+        categories={categories}
+        reportId={report.id}
+      />
     </AppLayout>
   );
 }

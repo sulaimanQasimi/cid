@@ -112,7 +112,7 @@ class IncidentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, IncidentReport $incidentReport)
     {
         $this->authorize('create', Incident::class);
         
@@ -123,13 +123,9 @@ class IncidentController extends Controller
             'incident_time' => 'nullable|date_format:H:i',
             'district_id' => 'required|exists:districts,id',
             'incident_category_id' => 'required|exists:incident_categories,id',
-            'incident_report_id' => 'nullable|exists:incident_reports,id',
             'location' => 'nullable|string|max:255',
             'coordinates' => 'nullable|string|max:255',
-            'casualties' => 'nullable|integer|min:0',
-            'injuries' => 'nullable|integer|min:0',
             'incident_type' => 'required|string|max:255',
-            'status' => 'required|string|in:reported,investigating,resolved,closed',
         ]);
 
         // Convert Persian date to Carbon date for database storage
@@ -139,10 +135,11 @@ class IncidentController extends Controller
         }
 
         $validated['reported_by'] = Auth::id();
+        $validated['incident_report_id'] = $incidentReport->id;
 
-        $incident = Incident::create($validated);
-
-        return redirect()->route('incidents.show', $incident)
+        $incident = $incidentReport->incidents()->create($validated);
+        
+        return redirect()->route('incident-reports.show', $incidentReport->id)
             ->with('success', 'Incident created successfully.');
     }
 
@@ -214,10 +211,7 @@ class IncidentController extends Controller
             'incident_report_id' => 'nullable|exists:incident_reports,id',
             'location' => 'nullable|string|max:255',
             'coordinates' => 'nullable|string|max:255',
-            'casualties' => 'nullable|integer|min:0',
-            'injuries' => 'nullable|integer|min:0',
             'incident_type' => 'required|string|max:255',
-            'status' => 'required|string|in:reported,investigating,resolved,closed',
         ]);
 
         // Convert Persian date to Carbon date for database storage
