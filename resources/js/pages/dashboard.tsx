@@ -157,7 +157,9 @@ export default function Dashboard({
                     const dataItem = target.dataItem;
                     if (!dataItem) return fill;
                     
-                    const provinceCode = dataItem.get("id");
+                    const provinceCode = dataItem.get("id" as any) as string | undefined;
+                    if (!provinceCode || typeof provinceCode !== "string") return fill;
+                    
                     const province = provinceDataMap.get(provinceCode);
                     
                     if (!province || province.incidents_count === 0) {
