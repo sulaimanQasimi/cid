@@ -3,7 +3,7 @@ import { Head, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, TrendingUp, User, Phone, MapPin, Calendar, FileText, Building2, ChevronDown, ChevronUp } from 'lucide-react';
+import { AlertTriangle, TrendingUp, User, Phone, MapPin, Calendar, FileText, Building2, ChevronDown, ChevronUp, Printer } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -462,6 +462,24 @@ export default function ComprehensiveList({
             showBackButton={false}
             showButton={false}
             buttonText=""
+            actionButtons={
+              <Button
+                asChild
+                variant="outline"
+                className="flex items-center gap-2 bg-white hover:bg-gray-50 text-blue-600 border-blue-200"
+              >
+                <a
+                  href={route('criminals.comprehensive_list.print', {
+                    ...filters,
+                    per_page: 1000,
+                  })}
+                  target="_blank"
+                >
+                  <Printer className="h-4 w-4" />
+                  {t('criminal.comprehensive_list.print_button') || 'چاپ'}
+                </a>
+              </Button>
+            }
           />
         </div>
 

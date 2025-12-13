@@ -203,12 +203,16 @@ class NationalInsightCenterInfoController extends Controller
         $infoCategories = InfoCategory::orderBy('name')->get();
         $departments = Department::orderBy('name')->get();
 
+        // Get aggregated stats using stored procedure
+        $statSums = DB::select('CALL sp_sum_integer_values_by_category(?)', [$nationalInsightCenterInfo->id]);
+
         return Inertia::render('NationalInsightCenterInfo/Show', [
             'nationalInsightCenterInfo' => $nationalInsightCenterInfo,
             'infos' => $infos,
             'statCategories' => $statCategories,
             'infoCategories' => $infoCategories,
             'departments' => $departments,
+            'statSums' => $statSums,
         ]);
     }
 
@@ -439,14 +443,21 @@ class NationalInsightCenterInfoController extends Controller
             ->with([
                 'infoCategory:id,name,code',
                 'department:id,name,code',
+                'province:id,name',
+                'district:id,name',
                 'creator:id,name',
             ])
             ->orderBy('created_at', 'desc')
             ->get();
 
+            $statSums = DB::select('CALL sp_sum_integer_values_by_category(?)', [$nationalInsightCenterInfo->id]);
+            $sub_items = DB::select('CALL sp_get_sub_items_by_ids(?)', [$nationalInsightCenterInfo->id]);
+
         return Inertia::render('NationalInsightCenterInfo/Print', [
             'nationalInsightCenterInfo' => $nationalInsightCenterInfo,
             'infos' => $infos,
+            'statSums' => $statSums,
+            'sub_items' => $sub_items,
         ]);
     }
 

@@ -124,6 +124,23 @@ interface AggregatedStat {
     };
 }
 
+interface StatSum {
+    stat_category_item_id: number;
+    stat_category_id: number;
+    parent_id: number | null;
+    item_name: string;
+    item_label: string;
+    item_color: string | null;
+    item_status: string;
+    item_order: number;
+    category_id: number;
+    category_name: string;
+    category_label: string;
+    category_color: string | null;
+    category_status: string;
+    total_integer_value: number;
+}
+
 interface Props {
     nationalInsightCenterInfo: NationalInsightCenterInfo;
     infos: {
@@ -131,6 +148,7 @@ interface Props {
         links: any[];
     };
     aggregatedStats?: AggregatedStat[];
+    statSums?: StatSum[];
     infoCategories?: InfoCategory[];
     departments?: Department[];
 }
@@ -139,6 +157,7 @@ export default function ShowNationalInsightCenterInfo({
     nationalInsightCenterInfo,
     infos,
     aggregatedStats = [],
+    statSums = [],
     infoCategories = [],
     departments = [],
 }: Props) {
@@ -147,6 +166,21 @@ export default function ShowNationalInsightCenterInfo({
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
     const [selectedItem, setSelectedItem] = React.useState<Info | null>(null);
     const [isItemModalOpen, setIsItemModalOpen] = React.useState(false);
+
+    // Group statSums by category_name
+    const categories = React.useMemo(() => {
+        return statSums.reduce(
+            (acc, item) => {
+                const categoryName = item.category_name || 'بدون دسته‌بندی';
+                if (!acc[categoryName]) {
+                    acc[categoryName] = [];
+                }
+                acc[categoryName].push(item);
+                return acc;
+            },
+            {} as Record<string, StatSum[]>,
+        );
+    }, [statSums]);
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -588,8 +622,63 @@ export default function ShowNationalInsightCenterInfo({
                     </Card>
                 )}
 
-                {/* No Statistics Message */}
-                {(!aggregatedStats || aggregatedStats.length === 0) && (
+                {/* Statistics Table */}
+                {Object.keys(categories).length > 0 ? (
+                    <Card className="mb-8 overflow-hidden border-0 bg-gradient-to-bl from-white to-purple-50/30 shadow-2xl dark:from-gray-800 dark:to-purple-900/20">
+                        <CardContent className="p-6">
+                            <div className="mb-4 flex items-center justify-between">
+                                <h3 className="text-xl font-bold text-purple-800 dark:text-purple-200">
+                                    {t('national_insight_center_info.show.statistics_title') || 'آمار تجمیعی'}
+                                </h3>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <div className="overflow-hidden rounded-lg border border-gray-300 dark:border-gray-700">
+                                    <table className="w-fit min-w-full border-collapse bg-white dark:bg-gray-800">
+                                        <thead>
+                                            <tr className="bg-gradient-to-b from-gray-700 to-gray-800 text-white dark:from-gray-900 dark:to-gray-800">
+                                                {Object.entries(categories).map(([key, category]) => (
+                                                    <th
+                                                        key={key}
+                                                        colSpan={category.length}
+                                                        className="border border-gray-400 px-4 py-3 text-center text-sm font-bold dark:border-gray-600"
+                                                    >
+                                                        {key}
+                                                    </th>
+                                                ))}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr className="bg-white dark:bg-gray-800">
+                                                {Object.values(categories)
+                                                    .flat()
+                                                    .map((item, index) => (
+                                                        <td
+                                                            key={index}
+                                                            className="h-22 rotate-90 border border-gray-300 px-4 py-2 text-center text-sm text-gray-900 dark:border-gray-600 dark:text-gray-100"
+                                                        >
+                                                            {item.item_name}
+                                                        </td>
+                                                    ))}
+                                            </tr>
+                                            <tr className="bg-gray-50 dark:bg-gray-700">
+                                                {Object.values(categories)
+                                                    .flat()
+                                                    .map((item, index) => (
+                                                        <td
+                                                            key={index}
+                                                            className="border border-gray-300 px-4 py-2 text-center text-sm font-medium text-gray-900 dark:border-gray-600 dark:text-gray-100"
+                                                        >
+                                                            {item.total_integer_value ?? 0}
+                                                        </td>
+                                                    ))}
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                ) : (
                     <Card className="mb-8 overflow-hidden border-0 bg-gradient-to-bl from-white to-purple-50/30 shadow-2xl dark:from-gray-800 dark:to-purple-900/20">
                         <CardContent className="py-8 text-center">
                             <div className="flex flex-col items-center gap-4 text-purple-600 dark:text-purple-400">

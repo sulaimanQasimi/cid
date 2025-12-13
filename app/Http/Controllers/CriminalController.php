@@ -433,4 +433,70 @@ class CriminalController extends Controller
             ],
         ]);
     }
+
+    /**
+     * Display a printable version of the comprehensive list.
+     */
+    public function comprehensiveListPrint(Request $request)
+    {
+        $this->authorize('viewComprehensiveList', Criminal::class);
+        
+        // Validate query parameters
+        $validated = $request->validate([
+            'per_page' => 'nullable|integer|min:5|max:1000',
+            'search' => 'nullable|string|max:100',
+            'sort' => [
+                'nullable',
+                'string',
+                Rule::in(['name', 'number', 'crime_type', 'arrest_date', 'created_at', 'updated_at', 'department_id', 'id_card_number', 'phone_number'])
+            ],
+            'direction' => ['nullable', 'string', Rule::in(['asc', 'desc'])],
+            'department_id' => 'nullable|integer|exists:departments,id',
+        ]);
+
+        $perPage = $validated['per_page'] ?? 1000; // Get all for print
+        $search = $validated['search'] ?? '';
+        $sort = $validated['sort'] ?? 'created_at';
+        $direction = $validated['direction'] ?? 'desc';
+        $departmentFilter = $validated['department_id'] ?? null;
+
+        // Apply search and filters
+        $query = Criminal::with(['department', 'creator']);
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('number', 'like', "%{$search}%")
+                  ->orWhere('father_name', 'like', "%{$search}%")
+                  ->orWhere('grandfather_name', 'like', "%{$search}%")
+                  ->orWhere('id_card_number', 'like', "%{$search}%")
+                  ->orWhere('phone_number', 'like', "%{$search}%")
+                  ->orWhere('crime_type', 'like', "%{$search}%")
+                  ->orWhere('arrest_location', 'like', "%{$search}%")
+                  ->orWhere('arrested_by', 'like', "%{$search}%")
+                  ->orWhere('original_residence', 'like', "%{$search}%")
+                  ->orWhere('current_residence', 'like', "%{$search}%")
+                  ->orWhere('referred_to', 'like', "%{$search}%");
+            });
+        }
+
+        if ($departmentFilter) {
+            $query->where('department_id', $departmentFilter);
+        }
+
+        $query->orderBy($sort, $direction);
+        
+        // Get all results for print (no pagination)
+        $criminals = $query->get();
+
+        return Inertia::render('Criminal/ComprehensiveListPrint', [
+            'criminals' => $criminals,
+            'filters' => [
+                'search' => $search,
+                'sort' => $sort,
+                'direction' => $direction,
+                'department_id' => $departmentFilter,
+            ],
+        ]);
+    }
 }

@@ -7,6 +7,10 @@ Route::middleware(['auth'])->group(function () {
     // Comprehensive list of criminals - must be before resource route to avoid conflicts
     Route::get('criminals/comprehensive-list', [CriminalController::class, 'comprehensiveList'])
         ->name('criminals.comprehensive_list');
+    
+    // Print comprehensive list
+    Route::get('criminals/comprehensive-list/print', [CriminalController::class, 'comprehensiveListPrint'])
+        ->name('criminals.comprehensive_list.print');
 
     // Criminal routes
     Route::resource('criminals', CriminalController::class);
