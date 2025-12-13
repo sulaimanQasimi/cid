@@ -127,14 +127,6 @@ class NationalInsightCenterInfoController extends Controller
                 ->withInput();
         }
 
-        // Check uniqueness after conversion
-        if (NationalInsightCenterInfo::where('date', $validated['date'])->exists()) {
-            return redirect()
-                ->back()
-                ->withErrors(['date' => 'A record with this date already exists.'])
-                ->withInput();
-        }
-
         try {
             DB::transaction(function () use ($validated) {
                 $nationalInsightCenterInfo = NationalInsightCenterInfo::create([
@@ -282,14 +274,6 @@ class NationalInsightCenterInfoController extends Controller
             return redirect()
                 ->back()
                 ->withErrors(['date' => 'Invalid date format. Please use Persian date format (YYYY/MM/DD).'])
-                ->withInput();
-        }
-
-        // Check uniqueness after conversion (excluding current record)
-        if (NationalInsightCenterInfo::where('date', $validated['date'])->where('id', '!=', $nationalInsightCenterInfo->id)->exists()) {
-            return redirect()
-                ->back()
-                ->withErrors(['date' => 'A record with this date already exists.'])
                 ->withInput();
         }
 
