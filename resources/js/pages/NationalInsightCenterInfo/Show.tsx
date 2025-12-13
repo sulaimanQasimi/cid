@@ -20,8 +20,8 @@ import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/lib/i18n/translate';
 import { formatPersianDateOnly } from '@/lib/utils/date';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
-import { AlertTriangle, ArrowLeft, BarChart3, Calendar, ExternalLink, FileText, Pencil, Plus, Printer, Trash, TrendingUp } from 'lucide-react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { AlertTriangle, ArrowLeft, BarChart3, Calendar, CheckCircle, ExternalLink, FileText, Pencil, Plus, Printer, Trash, TrendingUp } from 'lucide-react';
 import React from 'react';
 
 interface Info {
@@ -85,6 +85,11 @@ interface NationalInsightCenterInfo {
     updated_at: string;
     code: string;
     date: string | null;
+    created_by?: number;
+    creator?: {
+        id: number;
+        name: string;
+    };
     infoStats?: InfoStat[];
 }
 
@@ -162,10 +167,23 @@ export default function ShowNationalInsightCenterInfo({
     departments = [],
 }: Props) {
     const { t } = useTranslation();
+    const { auth } = usePage().props as any;
     const { canCreate, canView, canUpdate, canDelete, can } = usePermissions();
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
     const [selectedItem, setSelectedItem] = React.useState<Info | null>(null);
     const [isItemModalOpen, setIsItemModalOpen] = React.useState(false);
+
+    // Check if current user is the creator of the NationalInsightCenterInfo
+    const isCreator = auth?.user?.id === (nationalInsightCenterInfo.created_by || nationalInsightCenterInfo.creator?.id);
+
+    const handleConfirmItem = (itemId: number) => {
+        router.patch(route('national-insight-center-info-items.confirm', itemId), {}, {
+            preserveScroll: true,
+            onSuccess: () => {
+                // Success is handled by the redirect with flash message
+            },
+        });
+    };
 
     // Group statSums by category_name
     const categories = React.useMemo(() => {
@@ -786,6 +804,17 @@ export default function ShowNationalInsightCenterInfo({
                                                             >
                                                                 <BarChart3 className="h-5 w-5" />
                                                             </Button>
+                                                            {isCreator && !info.confirmed && (
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    onClick={() => handleConfirmItem(info.id)}
+                                                                    title={t('national_insight_center_info.show.actions.confirm') || 'تأیید'}
+                                                                    className="h-10 w-10 rounded-xl text-green-600 transition-all duration-300 hover:scale-110 hover:bg-green-100 hover:text-green-700 dark:text-green-400 dark:hover:bg-green-800 dark:hover:text-green-300"
+                                                                >
+                                                                    <CheckCircle className="h-5 w-5" />
+                                                                </Button>
+                                                            )}
                                                             <CanView model="national_insight_center_info_item">
                                                                 <Button
                                                                     variant="ghost"

@@ -314,6 +314,9 @@ class NationalInsightCenterInfoItemController extends Controller
      */
     public function confirm(NationalInsightCenterInfoItem $item): RedirectResponse
     {
+        // Load the relationship needed for policy check
+        $item->load('nationalInsightCenterInfo');
+        
         $this->authorize('confirm', $item);
         
         try {

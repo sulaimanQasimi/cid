@@ -114,4 +114,23 @@ class NationalInsightCenterInfoItemPolicy
                ($nationalInsightCenterInfoItem->created_by === $user->id ||
                 $nationalInsightCenterInfoItem->nationalInsightCenterInfo->hasAccess($user));
     }
+
+    /**
+     * Determine whether the user can confirm the model.
+     */
+    public function confirm(User $user, NationalInsightCenterInfoItem $nationalInsightCenterInfoItem): bool
+    {
+        // Cannot confirm if parent is confirmed
+        if ($nationalInsightCenterInfoItem->nationalInsightCenterInfo->confirmed) {
+            return false;
+        }
+
+        // Cannot confirm if item is already confirmed
+        if ($nationalInsightCenterInfoItem->confirmed) {
+            return false;
+        }
+
+        // Only the creator of the NationalInsightCenterInfo can confirm items
+        return                $nationalInsightCenterInfoItem->nationalInsightCenterInfo->created_by === $user->id;
+    }
 }
