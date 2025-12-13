@@ -85,6 +85,51 @@ export default function PrintDates({ sub_items = [], statSums = [], dateFrom, da
         );
     }, [statSums]);
 
+    // Split categories into chunks of max 80 columns, combining shorter ones
+    const categoryChunks = React.useMemo(() => {
+        const maxColumns = 80;
+        const chunks: Array<Record<string, StatSum[]>> = [];
+        let currentChunk: Record<string, StatSum[]> = {};
+        let currentColumnCount = 0;
+
+        // Sort categories by size (smaller first) to better combine them
+        const sortedCategories = Object.entries(categories).sort((a, b) => a[1].length - b[1].length);
+
+        sortedCategories.forEach(([categoryName, items]) => {
+            // If a single category is larger than maxColumns, split it
+            if (items.length > maxColumns) {
+                // First, save current chunk if it has items
+                if (currentColumnCount > 0) {
+                    chunks.push(currentChunk);
+                    currentChunk = {};
+                    currentColumnCount = 0;
+                }
+                // Split the large category into multiple chunks
+                for (let i = 0; i < items.length; i += maxColumns) {
+                    const chunkItems = items.slice(i, i + maxColumns);
+                    chunks.push({ [categoryName]: chunkItems });
+                }
+            } else {
+                // If adding this category would exceed the limit, start a new chunk
+                if (currentColumnCount + items.length > maxColumns && currentColumnCount > 0) {
+                    chunks.push(currentChunk);
+                    currentChunk = {};
+                    currentColumnCount = 0;
+                }
+                // Add category to current chunk
+                currentChunk[categoryName] = items;
+                currentColumnCount += items.length;
+            }
+        });
+
+        // Add the last chunk if it has items
+        if (currentColumnCount > 0) {
+            chunks.push(currentChunk);
+        }
+
+        return chunks;
+    }, [categories]);
+
     const handlePrint = () => {
         window.print();
     };
@@ -298,51 +343,62 @@ export default function PrintDates({ sub_items = [], statSums = [], dateFrom, da
                 </div>
 
                 {/* Statistics Table */}
-                {Object.keys(categories).length > 0 && (
-                    <div className="mb-8 flex justify-start">
-                        <div className="overflow-hidden rounded-lg border border-gray-300 print:border-gray-800">
-                            <table className="w-fit border-collapse bg-white">
-                                <thead>
-                                    <tr className="bg-gradient-to-b from-gray-700 to-gray-800 text-white print:bg-gray-900">
-                                        {Object.entries(categories).map(([key, category]) => (
-                                            <th
-                                                key={key}
-                                                colSpan={category.length}
-                                                className="border border-gray-400 px-4 py-3 text-center text-sm font-bold print:border-gray-800"
-                                            >
-                                                {key}
-                                            </th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr className="bg-white print:bg-white">
-                                        {Object.values(categories)
-                                            .flat()
-                                            .map((item, index) => (
-                                                <td
-                                                    key={index}
-                                                    className="h-22 rotate-90 border border-gray-300 px-4 py-2 text-center text-sm text-gray-900 print:border-gray-800"
-                                                >
-                                                    {item.item_name}
-                                                </td>
-                                            ))}
-                                    </tr>
-                                    <tr className="bg-gray-50 print:bg-gray-100">
-                                        {Object.values(categories)
-                                            .flat()
-                                            .map((item, index) => (
-                                                <td
-                                                    key={index}
-                                                    className="border border-gray-300 px-4 py-2 text-center text-sm font-medium text-gray-900 print:border-gray-800"
-                                                >
-                                                    {item.total_integer_value ?? 0}
-                                                </td>
-                                            ))}
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                {categoryChunks.length > 0 && (
+                    <div className="mb-8 space-y-4">
+                        {categoryChunks.map((chunk, chunkIndex) => (
+                            <div key={chunkIndex} className="flex justify-start">
+                                <div className="overflow-hidden rounded-lg border border-gray-300 print:border-gray-800">
+                                    <table className="border-collapse bg-white" style={{ tableLayout: 'auto' }}>
+                                        <thead>
+                                            <tr className="bg-gradient-to-b from-gray-700 to-gray-800 text-white print:bg-gray-900">
+                                                {Object.entries(chunk).map(([key, category]) => (
+                                                    <th
+                                                        key={key}
+                                                        colSpan={category.length}
+                                                        className="border border-gray-400 px-2 py-2 text-center text-xs font-bold print:border-gray-800 whitespace-nowrap"
+                                                    >
+                                                        {key}
+                                                    </th>
+                                                ))}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr className="bg-white print:bg-white">
+                                                {Object.values(chunk)
+                                                    .flat()
+                                                    .map((item, index) => (
+                                                        <td
+                                                            key={index}
+                                                            className="border border-gray-300 px-2 py-1 text-center text-xs text-gray-900 print:border-gray-800 align-middle"
+                                                            style={{
+                                                                writingMode: 'vertical-rl',
+                                                                textOrientation: 'mixed',
+                                                                whiteSpace: 'nowrap',
+                                                                minWidth: 'fit-content',
+                                                                height: 'auto',
+                                                            }}
+                                                        >
+                                                            {item.item_name}
+                                                        </td>
+                                                    ))}
+                                            </tr>
+                                            <tr className="bg-gray-50 print:bg-gray-100">
+                                                {Object.values(chunk)
+                                                    .flat()
+                                                    .map((item, index) => (
+                                                        <td
+                                                            key={index}
+                                                            className="border border-gray-300 px-2 py-1 text-center text-xs font-medium text-gray-900 print:border-gray-800 whitespace-nowrap"
+                                                        >
+                                                            {item.total_integer_value ?? 0}
+                                                        </td>
+                                                    ))}
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 )}
 
