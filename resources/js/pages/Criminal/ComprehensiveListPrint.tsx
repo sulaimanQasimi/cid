@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Head } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, FileText, Settings, X, TabletSmartphone, Tag } from 'lucide-react';
+import { ArrowLeft, FileText, Settings, X, TabletSmartphone, Tag, User } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/translate';
 import { formatPersianDateOnly } from '@/lib/utils/date';
 import { format } from 'date-fns';
@@ -273,6 +273,9 @@ export default function ComprehensiveListPrint({ criminals, filters }: Props) {
                     #
                   </th>
                   <th className="border border-gray-400 px-3 py-2 text-center text-xs font-bold print:border-gray-800">
+                    {t('criminal.comprehensive_list.table.photo') || 'عکس'}
+                  </th>
+                  <th className="border border-gray-400 px-3 py-2 text-center text-xs font-bold print:border-gray-800">
                     {t('criminal.comprehensive_list.table.name') || 'نوم'}
                   </th>
                   <th className="border border-gray-400 px-3 py-2 text-center text-xs font-bold print:border-gray-800">
@@ -315,6 +318,19 @@ export default function ComprehensiveListPrint({ criminals, filters }: Props) {
                       <td className="border border-gray-300 px-3 py-2 text-center text-xs text-gray-900 print:border-gray-800">
                         {index + 1}
                       </td>
+                      <td className="border border-gray-300 px-3 py-2 text-center print:border-gray-800">
+                        {criminal.photo ? (
+                          <img
+                            src={`/storage/${criminal.photo}`}
+                            alt={criminal.name}
+                            className="mx-auto h-12 w-12 rounded object-cover print:h-10 print:w-10"
+                          />
+                        ) : (
+                          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded bg-gray-200 print:h-10 print:w-10">
+                            <User className="h-6 w-6 text-gray-400 print:h-5 print:w-5" />
+                          </div>
+                        )}
+                      </td>
                       <td className="border border-gray-300 px-3 py-2 text-center text-xs text-gray-900 print:border-gray-800">
                         {criminal.name}
                       </td>
@@ -347,7 +363,7 @@ export default function ComprehensiveListPrint({ criminals, filters }: Props) {
                 ) : (
                   <tr>
                     <td
-                      colSpan={10}
+                      colSpan={11}
                       className="border border-gray-300 px-4 py-8 text-center text-sm text-gray-500 print:border-gray-800"
                     >
                       {t('criminal.comprehensive_list.no_records') || 'هیچ موردی یافت نشد'}

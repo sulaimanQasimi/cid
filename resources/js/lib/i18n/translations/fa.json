@@ -2464,6 +2464,26 @@
     "national_insight_center_info.na":"ندارد",
     "national_insight_center_info.show.no_description": "توضیحات ندارد",
     "national_insight_center_info_item.show.creator_email":"ایمیل ایجادکننده",
-    "national_insight_center_info_item.show.creator_department":"بخش ایجادکننده"
+    "national_insight_center_info_item.show.creator_department":"بخش ایجادکننده",
+        "criminal.comprehensive_list.print_button": "چاپ کول",
+        "criminal.comprehensive_list.print.back_button": "شاته",
+        "criminal.comprehensive_list.print.settings_button": "امستنې",
+        "criminal.comprehensive_list.print.print_button": "چاپ",
+        "criminal.comprehensive_list.print.date": "نیټه",
+        "criminal.comprehensive_list.print.total": "ټولټال",
+        "criminal.comprehensive_list.print.settings_title": "امستنې",
+        "criminal.comprehensive_list.print.settings.tabs.labels": "لیبلونه",
+        "criminal.comprehensive_list.print.settings.tabs.date_format": "د نیټې بڼه",
+        "criminal.comprehensive_list.print.settings_labels_title": "د لیبل امستنې",
+        "criminal.comprehensive_list.print.settings_government_name": "امارت اسلامی افغانستان",
+        "criminal.comprehensive_list.print.settings_ministry_name": "وزارت دفاع",
+        "criminal.comprehensive_list.print.settings_report_title": "فهرست مجرمین",
+        "criminal.comprehensive_list.print.settings_preview": "مخکتنه",
+        "criminal.comprehensive_list.print.apply_and_print": "ثبت او چاپ",
+        "criminal.comprehensive_list.print.settings.date_format.title": "د نیټې د بڼې امستنې",
+        "criminal.comprehensive_list.print.settings.date_format.gregorian": "میلادي نیټه",
+        "criminal.comprehensive_list.print.settings.date_format.hijri": "هجري قمري نیټه",
+        "criminal.comprehensive_list.print.settings.date_format.persian": "شمسي نیټه",
+        "criminal.comprehensive_list.print.settings.date_format.preview": "پیش نمایش د نیټې بڼه"
 
 }
