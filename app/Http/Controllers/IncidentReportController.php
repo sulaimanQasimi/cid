@@ -278,6 +278,26 @@ class IncidentReportController extends Controller
     }
 
     /**
+     * Display incidents for a specific report.
+     */
+    public function incidents(IncidentReport $incidentReport)
+    {
+        $this->authorize('view', $incidentReport);
+        
+        $incidentReport->load(['submitter:id,name']);
+
+        $incidents = $incidentReport->incidents()
+            ->with(['district:id,name', 'category:id,name,color'])
+            ->orderBy('incident_date', 'desc')
+            ->get();
+
+        return Inertia::render('Incidents/Reports/Incidents', [
+            'report' => $incidentReport,
+            'incidents' => $incidents,
+        ]);
+    }
+
+    /**
      * Show the form for editing the specified resource.
      */
     public function edit(IncidentReport $incidentReport)
