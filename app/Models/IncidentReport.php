@@ -109,7 +109,7 @@ class IncidentReport extends Model
     }
 
     /**
-     * Get the user that approved the report.
+     * Get the user that approved/confirmed the report.
      */
     public function approver(): BelongsTo
     {

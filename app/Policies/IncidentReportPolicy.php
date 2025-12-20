@@ -60,6 +60,11 @@ class IncidentReportPolicy
      */
     public function update(User $user, IncidentReport $incidentReport): bool
     {
+        // Don't allow update if report is approved
+        if (!is_null($incidentReport->approved_by)) {
+            return false;
+        }
+
         // Allow update if user has appropriate 'update' access, or is submitter
         return $user->hasPermissionTo('incident_report.update') && $user->id === $incidentReport->submitted_by;
     }
@@ -69,6 +74,11 @@ class IncidentReportPolicy
      */
     public function delete(User $user, IncidentReport $incidentReport): bool
     {
+        // Don't allow delete if report is approved
+        if (!is_null($incidentReport->approved_by)) {
+            return false;
+        }
+
         return $user->hasPermissionTo('incident_report.delete') && $user->id === $incidentReport->submitted_by;
     }
 
@@ -87,10 +97,8 @@ class IncidentReportPolicy
     {
         return $user->hasPermissionTo('incident_report.force_delete') && $user->id === $incidentReport->submitted_by;
     }
-        public function printReport(User $user, IncidentReport $incidentReport): bool
-        {
-
-
+    public function printReport(User $user, IncidentReport $incidentReport): bool
+    {
         // Check if user is the submitter (always has access)
         if ($user->id === $incidentReport->submitted_by) {
             return true;
@@ -104,7 +112,15 @@ class IncidentReportPolicy
         if ($hasAccess) {
             return true;
         }
-            return false;
-        }
+        return false;
+    }
 
+    /**
+     * Determine whether the user can confirm the incident report.
+     */
+    public function confirm(User $user, IncidentReport $incidentReport): bool
+    {
+        // Only admin and superadmin can confirm reports
+        return $user->hasAnyRole(['admin', 'superadmin']);
+    }
 }

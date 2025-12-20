@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Pagination } from '@/components/pagination';
 import { PageHeader } from '@/components/page-header';
-import { Plus, FileText, AlertCircle, Shield, Search, ArrowUpDown, X, Users, Building2, Calendar, TrendingUp, AlertTriangle, ChevronDown, FilterX, ChevronRight, ChevronLeft, Printer, Pencil, Trash } from 'lucide-react';
+import { Plus, FileText, AlertCircle, Shield, Search, ArrowUpDown, X, Users, Building2, Calendar, TrendingUp, AlertTriangle, ChevronDown, FilterX, ChevronRight, ChevronLeft, Printer, Pencil, Trash, CheckCircle, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -34,6 +34,8 @@ interface IncidentReportProps {
       can_update: boolean;
       can_delete: boolean;
       can_print: boolean;
+      can_confirm: boolean;
+      is_confirmed: boolean;
     }>;
     links: Array<{
       url: string | null;
@@ -417,6 +419,33 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
                                   <Link href={route('incident-reports.edit', report.id)}>
                                     <Pencil className="h-5 w-5" />
                                   </Link>
+                                </Button>
+                              )}
+                              {report.can_confirm && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => {
+                                    if (report.is_confirmed) {
+                                      if (confirm(t('incident_reports.confirm_unconfirm', { number: report.report_number }))) {
+                                        router.post(route('incident-reports.unconfirm', report.id));
+                                      }
+                                    } else {
+                                      router.post(route('incident-reports.confirm', report.id));
+                                    }
+                                  }}
+                                  title={report.is_confirmed ? t('incident_reports.unconfirm') : t('incident_reports.confirm')}
+                                  className={`h-10 w-10 rounded-xl transition-all duration-300 hover:scale-110 ${
+                                    report.is_confirmed
+                                      ? 'hover:bg-orange-100 dark:hover:bg-orange-800 text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300'
+                                      : 'hover:bg-green-100 dark:hover:bg-green-800 text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300'
+                                  }`}
+                                >
+                                  {report.is_confirmed ? (
+                                    <XCircle className="h-5 w-5" />
+                                  ) : (
+                                    <CheckCircle className="h-5 w-5" />
+                                  )}
                                 </Button>
                               )}
                               {report.can_delete && (

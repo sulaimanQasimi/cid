@@ -85,10 +85,13 @@ class IncidentReportController extends Controller
                                 'security_level' => $report->security_level,
                                 'incidents_count' => $report->incidents_count,
                                 'submitter' => $report->submitter,
+                                'approved_by' => $report->approved_by,
+                                'is_confirmed' => !is_null($report->approved_by),
                                 'can_view' => Auth::user()->can('view', $report),
                                 'can_update' => Auth::user()->can('update', $report),
                                 'can_delete' => Auth::user()->can('delete', $report),
                                 'can_print' => Auth::user()->can('printReport', $report),
+                                'can_confirm' => Auth::user()->can('confirm', $report),
                             ];
                         })
                         ->withQueryString(); // Preserve the query parameters in pagination links
@@ -448,5 +451,35 @@ class IncidentReportController extends Controller
             'statCategories' => $statCategories,
             'barcodeData' => $barcodeData,
         ]);
+    }
+
+    /**
+     * Confirm an incident report (admin/superadmin only).
+     */
+    public function confirm(Request $request, IncidentReport $incidentReport)
+    {
+        $this->authorize('confirm', $incidentReport);
+
+        $incidentReport->update([
+            'approved_by' => Auth::id(),
+        ]);
+
+        return redirect()->route('incident-reports.index')
+            ->with('success', 'Incident report confirmed successfully.');
+    }
+
+    /**
+     * Unconfirm an incident report (admin/superadmin only).
+     */
+    public function unconfirm(IncidentReport $incidentReport)
+    {
+        $this->authorize('confirm', $incidentReport);
+        
+        $incidentReport->update([
+            'approved_by' => null,
+        ]);
+
+        return redirect()->route('incident-reports.index')
+            ->with('success', 'Incident report confirmation removed successfully.');
     }
 }

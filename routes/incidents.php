@@ -36,4 +36,10 @@ Route::middleware(['auth'])->group(function () {
     // Route for creating incidents within a report
     Route::post('incident-reports/{incident_report}/incidents', [IncidentController::class, 'store'])
         ->name('incident-reports.incidents.store');
+
+    // Confirmation routes for incident reports
+    Route::post('incident-reports/{incident_report}/confirm', [IncidentReportController::class, 'confirm'])
+        ->name('incident-reports.confirm');
+    Route::post('incident-reports/{incident_report}/unconfirm', [IncidentReportController::class, 'unconfirm'])
+        ->name('incident-reports.unconfirm');
 });
