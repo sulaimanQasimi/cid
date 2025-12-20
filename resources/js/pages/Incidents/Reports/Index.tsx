@@ -103,14 +103,14 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
   ];
 
   // Function to perform search with loading state
-  const performSearch = (searchTerm: string, currentFilters: any) => {
+  const performSearch = (searchTerm: string, currentFilters: any, page: number = 1) => {
     if (isLoading) return; // Prevent simultaneous requests
     
     setIsLoading(true);
     
     const [sortField, sortDirection] = (currentFilters.sort || 'report_date:desc').split(':');
     
-    const params = {
+    const params: any = {
       search: searchTerm,
       status: currentFilters.category === 'all' ? '' : currentFilters.category,
       security_level: currentFilters.type === 'all' ? '' : currentFilters.type,
@@ -118,6 +118,11 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
       sort_direction: sortDirection,
       per_page: currentFilters.per_page || 10,
     };
+
+    // Only include page if explicitly provided (for filter changes, reset to page 1)
+    if (page > 1) {
+      params.page = page;
+    }
 
     const routeUrl = route('incident-reports.index');
     const options = {
@@ -190,9 +195,10 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
     }
 
     // Only trigger search if search term has changed and is different from current filter
-    if (debouncedSearch !== filters.search) {
+    // Don't trigger if we're just changing pages (pagination handles that via URL)
+    if (debouncedSearch !== (filters.search || '')) {
       searchTimeoutRef.current = setTimeout(() => {
-        performSearch(debouncedSearch, currentFilters);
+        performSearch(debouncedSearch, currentFilters, 1); // Reset to page 1 when search changes
       }, 100);
     }
   }, [debouncedSearch]);

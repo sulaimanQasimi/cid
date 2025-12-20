@@ -53,6 +53,8 @@ Pagination.Item = function PaginationItem({
           href={href}
           className={className}
           aria-current={isActive ? "page" : undefined}
+          preserveState
+          preserveScroll
         >
           {children}
         </Link>
@@ -77,7 +79,7 @@ Pagination.Prev = function PaginationPrev({
         </Button>
       ) : (
         <Button asChild variant="outline" className="h-9 w-9 p-0">
-          <Link href={href}>
+          <Link href={href} preserveState preserveScroll>
             <ChevronRight className="h-4 w-4" />
             <span className="sr-only">Previous</span>
           </Link>
@@ -103,7 +105,7 @@ Pagination.Next = function PaginationNext({
         </Button>
       ) : (
         <Button asChild variant="outline" className="h-9 w-9 p-0">
-          <Link href={href}>
+          <Link href={href} preserveState preserveScroll>
             <ChevronLeft className="h-4 w-4" />
             <span className="sr-only">Next</span>
           </Link>
