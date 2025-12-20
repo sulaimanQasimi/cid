@@ -282,10 +282,16 @@ export default function ComprehensiveListPrint({ criminals, filters }: Props) {
                     {t('criminal.comprehensive_list.table.father_name') || 'د پلار نوم'}
                   </th>
                   <th className="border border-gray-400 px-3 py-2 text-center text-xs font-bold print:border-gray-800">
-                    {t('criminal.comprehensive_list.table.number') || 'شمېره'}
+                    {t('criminal.comprehensive_list.table.id_card_number') || 'د تذکره شمېره'}
                   </th>
                   <th className="border border-gray-400 px-3 py-2 text-center text-xs font-bold print:border-gray-800">
-                    {t('criminal.comprehensive_list.table.id_card_number') || 'د تذکره شمېره'}
+                    {t('criminal.comprehensive_list.table.original_residence') || 'سکونت اصلی'}
+                  </th>
+                  <th className="border border-gray-400 px-3 py-2 text-center text-xs font-bold print:border-gray-800">
+                    {t('criminal.comprehensive_list.table.current_residence') || 'سکونت فعلی'}
+                  </th>
+                  <th className="border border-gray-400 px-3 py-2 text-center text-xs font-bold print:border-gray-800">
+                    {t('criminal.comprehensive_list.table.notes') || 'ملاحظات'}
                   </th>
                   <th className="border border-gray-400 px-3 py-2 text-center text-xs font-bold print:border-gray-800">
                     {t('criminal.comprehensive_list.table.phone_number') || 'د تلیفون شمېره'}
@@ -337,11 +343,17 @@ export default function ComprehensiveListPrint({ criminals, filters }: Props) {
                       <td className="border border-gray-300 px-3 py-2 text-center text-xs text-gray-900 print:border-gray-800">
                         {criminal.father_name || '-'}
                       </td>
-                      <td className="border border-gray-300 px-3 py-2 text-center text-xs text-gray-900 print:border-gray-800">
-                        {criminal.number || '-'}
-                      </td>
                       <td className="border border-gray-300 px-3 py-2 text-center text-xs text-gray-900 print:border-gray-800" dir="ltr">
                         {criminal.id_card_number || '-'}
+                      </td>
+                      <td className="border border-gray-300 px-3 py-2 text-center text-xs text-gray-900 print:border-gray-800">
+                        {criminal.original_residence || '-'}
+                      </td>
+                      <td className="border border-gray-300 px-3 py-2 text-center text-xs text-gray-900 print:border-gray-800">
+                        {criminal.current_residence || '-'}
+                      </td>
+                      <td className="border border-gray-300 px-3 py-2 text-justify text-xs leading-relaxed text-gray-900 break-words whitespace-normal print:border-gray-800">
+                        {criminal.notes || '-'}
                       </td>
                       <td className="border border-gray-300 px-3 py-2 text-center text-xs text-gray-900 print:border-gray-800" dir="ltr">
                         {criminal.phone_number || '-'}
@@ -363,7 +375,7 @@ export default function ComprehensiveListPrint({ criminals, filters }: Props) {
                 ) : (
                   <tr>
                     <td
-                      colSpan={11}
+                      colSpan={13}
                       className="border border-gray-300 px-4 py-8 text-center text-sm text-gray-500 print:border-gray-800"
                     >
                       {t('criminal.comprehensive_list.no_records') || 'هیچ موردی یافت نشد'}
