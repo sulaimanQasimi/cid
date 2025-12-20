@@ -8,9 +8,12 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Crown, Shield, Users, Plus, ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Crown, Shield, Users, Plus, ArrowLeft, CheckCircle, XCircle, Key, ChevronDown } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/translate';
 import Header from '@/components/template/header';
+import FooterButtons from '@/components/template/FooterButtons';
 
 interface Permission {
   id: number;
@@ -18,11 +21,16 @@ interface Permission {
   label: string;
 }
 
+interface GroupedPermissions {
+  [key: string]: Permission[];
+}
+
 interface RoleCreateProps {
   auth: {
     user: any;
   };
   permissions: Permission[];
+  groupedPermissions: GroupedPermissions;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -40,7 +48,7 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ];
 
-export default function Create({ auth, permissions }: RoleCreateProps) {
+export default function Create({ auth, permissions, groupedPermissions = {} }: RoleCreateProps) {
   const { t } = useTranslation();
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
   const { data, setData, post, processing, errors } = useForm({
@@ -73,50 +81,40 @@ export default function Create({ auth, permissions }: RoleCreateProps) {
     setSelectedPermissions([]);
   };
 
-  // Group permissions by model with better parsing
-  const groupedPermissions: Record<string, Permission[]> = {};
-  permissions.forEach(permission => {
-    // Parse permission name (format: action.model)
-    const parts = permission.name.split('.');
-    if (parts.length === 2) {
-      const [action, model] = parts;
-      const groupKey = model;
-      if (!groupedPermissions[groupKey]) {
-        groupedPermissions[groupKey] = [];
-      }
-      groupedPermissions[groupKey].push(permission);
-    } else {
-      // Fallback for other formats (like hyphen-separated)
-      const parts = permission.name.split('_');
-      if (parts.length >= 2) {
-        const model = parts[parts.length - 1]; // Last part is usually the model
-        if (!groupedPermissions[model]) {
-          groupedPermissions[model] = [];
-        }
-        groupedPermissions[model].push(permission);
-      } else {
-        // Final fallback
-        const groupKey = 'other';
-        if (!groupedPermissions[groupKey]) {
-          groupedPermissions[groupKey] = [];
-        }
-        groupedPermissions[groupKey].push(permission);
-      }
-    }
-  });
-
-  const getModelIcon = (modelName: string) => {
-    switch (modelName.toLowerCase()) {
-      case 'user':
-        return <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />;
-      case 'role':
-        return <Crown className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />;
-      case 'permission':
-        return <Shield className="h-4 w-4 text-blue-600 dark:text-blue-400" />;
-      default:
-        return <Shield className="h-4 w-4 text-blue-600 dark:text-blue-400" />;
-    }
+  const getModelDisplayName = (model: string) => {
+    const modelNames: { [key: string]: string } = {
+      'criminal': 'Criminals',
+      'department': 'Departments',
+      'district': 'Districts',
+      'incident': 'Incidents',
+      'incident_category': 'Incident Categories',
+      'incident_report': 'Incident Reports',
+      'info': 'Information',
+      'info_category': 'Info Categories',
+      'info_type': 'Info Types',
+      'language': 'Languages',
+      'meeting': 'Meetings',
+      'meeting_message': 'Meeting Messages',
+      'meeting_session': 'Meeting Sessions',
+      'province': 'Provinces',
+      'report': 'Reports',
+      'report_stat': 'Report Statistics',
+      'stat_category': 'Statistics Categories',
+      'stat_category_item': 'Statistics Items',
+      'translation': 'Translations',
+      'user': 'Users',
+      'role': 'Roles',
+      'permission': 'Permissions',
+    };
+    return modelNames[model] || model;
   };
+
+  // Sort groups by model display name
+  const sortedGroupedPermissions = Object.entries(groupedPermissions).sort(([modelA], [modelB]) => {
+    const displayNameA = getModelDisplayName(modelA).toLowerCase();
+    const displayNameB = getModelDisplayName(modelB).toLowerCase();
+    return displayNameA.localeCompare(displayNameB);
+  });
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -138,8 +136,7 @@ export default function Create({ auth, permissions }: RoleCreateProps) {
           showButton={false}
         />
 
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Role Name Card */}
+        <form onSubmit={handleSubmit}>
           <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30 dark:from-gray-800 dark:to-gray-900 border-0 rounded-3xl">
             <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 text-white py-6">
               <CardTitle className="flex items-center gap-4">
@@ -177,109 +174,101 @@ export default function Create({ auth, permissions }: RoleCreateProps) {
             </CardContent>
           </Card>
 
-          {/* Permissions Card */}
-          <Card className="shadow-2xl overflow-hidden bg-gradient-to-bl from-white to-blue-50/30 dark:from-gray-800 dark:to-gray-900 border-0 rounded-3xl">
-            <CardHeader className="bg-gradient-to-l from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 text-white py-6">
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-lg">
-                    <Shield className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold">{t('roles.permissions')}</div>
-                    <div className="text-blue-100 text-sm font-medium">
-                      {selectedPermissions.length} {t('roles.permissions_selected')}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={selectAllPermissions}
-                    className="bg-white/20 border-white/30 text-white hover:bg-white/30 rounded-xl"
-                  >
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    {t('roles.select_all')}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={clearAllPermissions}
-                    className="bg-white/20 border-white/30 text-white hover:bg-white/30 rounded-xl"
-                  >
-                    <XCircle className="h-4 w-4 mr-2" />
-                    {t('roles.clear_all')}
-                  </Button>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-8 bg-white dark:bg-gray-800">
-              <div className="space-y-8">
-                {Object.entries(groupedPermissions).map(([model, modelPermissions]) => (
-                  <div key={model} className="space-y-4">
-                    <div className="flex items-center gap-3 pb-2 border-b border-gray-200 dark:border-gray-700">
-                      <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                        {getModelIcon(model)}
-                      </div>
-                      <h4 className="text-xl font-bold text-gray-900 dark:text-gray-100 capitalize">
-                        {model} {t('roles.permissions')}
-                      </h4>
-                      <Badge variant="outline" className="bg-blue-100 dark:bg-gray-600 text-blue-800 dark:text-blue-200 border-blue-300 dark:border-gray-500">
-                        {modelPermissions.length}
-                      </Badge>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {modelPermissions.map((permission) => (
-                        <div key={permission.id} className="flex items-center space-x-3 p-3 bg-gradient-to-l from-blue-50 to-white dark:from-gray-700 dark:to-gray-800 rounded-xl border border-blue-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-gray-500 transition-colors duration-300">
-                          <Checkbox
-                            id={`permission-${permission.id}`}
-                            checked={data.permissions.includes(permission.name)}
-                            onCheckedChange={() => togglePermission(permission.name)}
-                            className="border-blue-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
-                          />
-                          <Label htmlFor={`permission-${permission.id}`} className="font-medium text-gray-900 dark:text-gray-100 cursor-pointer flex-1">
-                            {permission.label || permission.name}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+          <Separator className="my-8 bg-blue-200 dark:bg-gray-600" />
 
-                {errors.permissions && (
-                  <p className="text-sm text-red-600 dark:text-red-400 mt-4 flex items-center gap-2">
-                    <XCircle className="h-4 w-4" />
-                    {errors.permissions}
-                  </p>
-                )}
+          {/* Permissions Section */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+                <Key className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Submit Button */}
-          <div className="flex justify-end">
-            <Button
-              type="submit"
-              disabled={processing}
-              size="lg"
-              className="bg-gradient-to-l from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 text-white rounded-2xl px-12 py-4 text-lg font-semibold shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105"
-            >
-              {processing ? (
-                <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  {t('roles.creating')}
-                </div>
-              ) : (
-                <div className="flex items-center gap-3">
-                  <Plus className="h-5 w-5" />
-                  {t('roles.create_role')}
+              <h3 className="text-xl font-bold text-blue-900 dark:text-blue-100">{t('roles.permissions')}</h3>
+              <div className="flex gap-2 ml-auto">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={selectAllPermissions}
+                  className="bg-blue-50 dark:bg-gray-700 border-blue-200 dark:border-gray-600 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-gray-600 rounded-xl"
+                >
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  {t('roles.select_all')}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={clearAllPermissions}
+                  className="bg-blue-50 dark:bg-gray-700 border-blue-200 dark:border-gray-600 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-gray-600 rounded-xl"
+                >
+                  <XCircle className="h-4 w-4 mr-2" />
+                  {t('roles.clear_all')}
+                </Button>
+              </div>
+            </div>
+            
+            <div className="bg-gradient-to-l from-blue-50 to-white dark:from-gray-700 dark:to-gray-800 border-2 border-blue-200 dark:border-gray-600 rounded-2xl p-6 shadow-lg">
+              <p className="text-blue-700 dark:text-blue-300 mb-6 font-medium">
+                {selectedPermissions.length} {t('roles.permissions_selected')}
+              </p>
+              
+              <div className="space-y-4">
+                {sortedGroupedPermissions.map(([model, modelPermissions]) => (
+                  <Collapsible key={model} className="border border-blue-200 dark:border-gray-600 rounded-xl overflow-hidden">
+                    <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-gradient-to-l from-blue-100 to-blue-200 dark:from-gray-700 dark:to-gray-600 hover:from-blue-200 hover:to-blue-300 dark:hover:from-gray-600 dark:hover:to-gray-500 transition-all duration-300">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-blue-600 rounded-lg">
+                          <Shield className="h-4 w-4 text-white" />
+                        </div>
+                        <h4 className="text-lg font-bold text-blue-900 dark:text-blue-100">{getModelDisplayName(model)}</h4>
+                        <Badge variant="outline" className="bg-blue-100 dark:bg-gray-600 text-blue-800 dark:text-blue-200 border-blue-300 dark:border-gray-500">
+                          {modelPermissions.length} permissions
+                        </Badge>
+                      </div>
+                      <ChevronDown className="h-5 w-5 text-blue-700 dark:text-blue-300 transition-transform duration-300" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="p-4 bg-white dark:bg-gray-800">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {modelPermissions.map((permission: Permission) => (
+                          <div key={permission.id} className="flex items-center space-x-3 p-3 bg-blue-50 dark:bg-gray-700 rounded-lg border border-blue-100 dark:border-gray-600 hover:bg-blue-100 dark:hover:bg-gray-600 transition-all duration-300">
+                            <Checkbox
+                              id={`permission-${permission.id}`}
+                              checked={data.permissions.includes(permission.name)}
+                              onCheckedChange={() => togglePermission(permission.name)}
+                              className="h-4 w-4 text-blue-600 border-blue-300 rounded"
+                            />
+                            <Label
+                              htmlFor={`permission-${permission.id}`}
+                              className="cursor-pointer text-sm font-medium text-blue-900 dark:text-blue-100 hover:text-blue-700 dark:hover:text-blue-300 transition-colors duration-300 flex-1"
+                              title={permission.name}
+                            >
+                              {permission.label || permission.name}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                ))}
+              </div>
+              
+              {errors.permissions && (
+                <div className="flex items-center gap-2 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-3 rounded-xl border border-red-200 dark:border-red-800 mt-4">
+                  <XCircle className="h-4 w-4" />
+                  <p className="text-sm font-medium">{errors.permissions}</p>
                 </div>
               )}
-            </Button>
+            </div>
           </div>
+
+          <FooterButtons
+            onCancel={() => window.history.back()}
+            onSubmit={() => handleSubmit({} as React.FormEvent)}
+            processing={processing}
+            cancelText={t('common.cancel')}
+            submitText={t('roles.create_role')}
+            savingText={t('roles.creating')}
+          />
         </form>
       </div>
     </AppLayout>
