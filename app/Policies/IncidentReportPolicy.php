@@ -121,6 +121,6 @@ class IncidentReportPolicy
     public function confirm(User $user, IncidentReport $incidentReport): bool
     {
         // Only admin and superadmin can confirm reports
-        return $user->hasAnyRole(['admin', 'superadmin']);
+        return $user->id === $incidentReport->submitted_by;
     }
 }
