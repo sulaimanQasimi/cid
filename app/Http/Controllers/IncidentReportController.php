@@ -87,6 +87,7 @@ class IncidentReportController extends Controller
                                 'can_view' => Auth::user()->can('view', $report),
                                 'can_update' => Auth::user()->can('update', $report),
                                 'can_delete' => Auth::user()->can('delete', $report),
+                                'can_print' => Auth::user()->can('printReport', $report),
                             ];
                         })
                         ->withQueryString(); // Preserve the query parameters in pagination links
@@ -314,12 +315,7 @@ class IncidentReportController extends Controller
      */
     public function print(IncidentReport $incidentReport)
     {
-        $this->authorize('view', $incidentReport);
-        
-        // Check if user is admin
-        if (!auth()->user()->hasRole('admin')) {
-            abort(403, 'Only administrators can print reports.');
-        }
+        $this->authorize('printReport', $incidentReport);
         
         // Load the report with all necessary relationships
         $incidentReport->load([
@@ -375,7 +371,6 @@ class IncidentReportController extends Controller
             'statsByCategory' => $statsByCategory,
             'statCategories' => $statCategories,
             'barcodeData' => $barcodeData,
-            'isAdmin' => auth()->user()->hasRole('admin'),
         ]);
     }
 }

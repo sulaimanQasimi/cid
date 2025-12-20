@@ -33,6 +33,7 @@ interface IncidentReportProps {
       can_view: boolean;
       can_update: boolean;
       can_delete: boolean;
+      can_print: boolean;
     }>;
     links: Array<{
       url: string | null;
@@ -384,18 +385,20 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
                                       <AlertCircle className="h-5 w-5" />
                                     </Link>
                                   </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    asChild
-                                    title={t('incident_reports.print.title')}
-                                    className="h-10 w-10 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-800 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-300 hover:scale-110"
-                                  >
-                                    <Link href={route('incident-reports.print', report.id)}>
-                                      <Printer className="h-5 w-5" />
-                                    </Link>
-                                  </Button>
                                 </>
+                              )}
+                              {report.can_print && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  asChild
+                                  title={t('incident_reports.print.title')}
+                                  className="h-10 w-10 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-800 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-300 hover:scale-110"
+                                >
+                                  <Link href={route('incident-reports.print', report.id)}>
+                                    <Printer className="h-5 w-5" />
+                                  </Link>
+                                </Button>
                               )}
                               {report.can_update && (
                                 <Button

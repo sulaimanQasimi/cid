@@ -77,4 +77,12 @@ class IncidentReportPolicy
     {
         return $user->hasPermissionTo('incident_report.force_delete') && $user->id === $incidentReport->submitted_by;
     }
+        public function printReport(User $user, IncidentReport $incidentReport): bool
+        {
+            if ($user->id === $incidentReport->submitted_by) {
+                return true;
+            }
+            return false;
+        }
+
 }

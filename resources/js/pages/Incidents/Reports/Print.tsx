@@ -79,10 +79,9 @@ interface PrintProps {
     };
   }>;
   barcodeData: BarcodeData;
-  isAdmin: boolean;
 }
 
-export default function Print({ report, incidents, barcodeData, isAdmin }: PrintProps) {
+export default function Print({ report, incidents, barcodeData }: PrintProps) {
   const { t } = useTranslation();
   const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'colors' | 'typography' | 'layout' | 'labels' | 'date_format'>('colors');
@@ -228,31 +227,6 @@ export default function Print({ report, incidents, barcodeData, isAdmin }: Print
   };
 
 
-  // If not admin, show access denied
-  if (!isAdmin) {
-    return (
-      <div className="print:max-w-none print:p-0 print:m-0" style={{ fontFamily: 'Arial, sans-serif' }}>
-        <Head title={t('incident_reports.print.access_denied')} />
-        <div className="min-h-screen bg-white p-8 flex items-center justify-center" dir="rtl">
-          <div className="border border-red-200 shadow-sm max-w-md">
-            <div className="bg-red-50 border-b border-red-200 p-4">
-              <h1 className="flex items-center gap-3 text-lg text-red-900">
-                <Lock className="h-5 w-5" />
-                {t('incident_reports.print.access_denied')}
-              </h1>
-            </div>
-            <div className="p-6">
-              <p className="text-gray-700 mb-4">{t('incident_reports.print.admin_only')}</p>
-              <Button onClick={handleBack} variant="outline" className="w-full">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                {t('common.back')}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <>
