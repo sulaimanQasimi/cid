@@ -79,15 +79,8 @@ class DistrictController extends Controller
         
         $district->load(['creator:id,name', 'province:id,name,code']);
 
-        $incidents = $district->incidents()
-            ->with(['category:id,name,color'])
-            ->orderBy('created_at', 'desc')
-            ->limit(5)
-            ->get();
-
         return Inertia::render('District/Show', [
             'district' => $district,
-            'incidents' => $incidents,
         ]);
     }
 
