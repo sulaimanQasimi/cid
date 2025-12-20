@@ -2484,6 +2484,12 @@
         "criminal.comprehensive_list.print.settings.date_format.gregorian": "میلادي نیټه",
         "criminal.comprehensive_list.print.settings.date_format.hijri": "هجري قمري نیټه",
         "criminal.comprehensive_list.print.settings.date_format.persian": "شمسي نیټه",
-        "criminal.comprehensive_list.print.settings.date_format.preview": "پیش نمایش د نیټې بڼه"
+        "criminal.comprehensive_list.print.settings.date_format.preview": "پیش نمایش د نیټې بڼه",
+        "incident_reports.form.access_title": "د لاسرسي کنټرول",    
+        "incident_reports.form.access_description": "د گزارش ثبت کننده لاسرسي کنټرول کړئ",
+        "incident_reports.form.search_users_placeholder": "د کارونکو لټون...",
+        "incident_reports.form.submitter_note": "د ثبت جوړونکی په اتوماتیک ډول د لاسرسي حق لري",
+        "incident_reports.form.permissions_note": "ټاکل شوي کارونکي به د دې مجرم د ثبت کتل، سمول او ړنګولو وړتیا ولري"
+        
 
 }

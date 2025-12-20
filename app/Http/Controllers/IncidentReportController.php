@@ -6,13 +6,14 @@ use App\Models\IncidentReport;
 use App\Models\Incident;
 use App\Models\District;
 use App\Models\IncidentCategory;
+use App\Models\User;
 use App\Services\PersianDateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use App\Models\StatCategoryItem;
 use App\Models\StatCategory;
-use App\Models\ReportStat;
 
 class IncidentReportController extends Controller
 {
@@ -110,7 +111,11 @@ class IncidentReportController extends Controller
             ->orderBy('label')
             ->get();
 
+        // Get all users for access selection
+        $users = User::orderBy('name')->get(['id', 'name', 'email']);
+
         return Inertia::render('Incidents/Reports/Create', [
+            'users' => $users,
         ]);
     }
 
@@ -130,7 +135,10 @@ class IncidentReportController extends Controller
             'report_date' => 'required|string',
             'report_status' => 'required|string|in:submitted,reviewed,approved',
             'source' => 'nullable|string',
-            'attachments' => 'nullable|array',        ]);
+            'attachments' => 'nullable|array',
+            'access_users' => 'nullable|array',
+            'access_users.*' => 'integer|exists:users,id',
+        ]);
 
         // Convert Persian date to Carbon date for database storage
         $validated['report_date'] = PersianDateService::toDatabaseFormat($validated['report_date']);
@@ -145,11 +153,32 @@ class IncidentReportController extends Controller
             $validated['report_number'] = 'RPT-' . date('Y') . '-' . str_pad(IncidentReport::count() + 1, 4, '0', STR_PAD_LEFT);
         }
 
-        $report = IncidentReport::create($validated);
+        try {
+            DB::transaction(function () use ($validated, &$report) {
+                $report = IncidentReport::create($validated);
 
+                // Create access permissions
+                if (isset($validated['access_users']) && is_array($validated['access_users'])) {
+                    foreach ($validated['access_users'] as $userId) {
+                        // Don't create access for the submitter
+                        if ($userId != Auth::id()) {
+                            $report->accesses()->create([
+                                'user_id' => $userId,
+                                'granted_by' => Auth::id(),
+                                'access_type' => 'read_only',
+                                'is_active' => true,
+                            ]);
+                        }
+                    }
+                }
+            });
 
-        return redirect()->route('incident-reports.show', $report)
-            ->with('success', 'Incident report created successfully.');
+            return redirect()->route('incident-reports.show', $report)
+                ->with('success', 'Incident report created successfully.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to create incident report. Please try again.')
+                ->withInput();
+        }
     }
 
     /**
@@ -252,11 +281,18 @@ class IncidentReportController extends Controller
             ->with(['statCategoryItem.category'])
             ->get();
 
+        // Load existing access users
+        $incidentReport->load(['accesses.user:id,name,email']);
+
+        // Get all users for access selection
+        $users = User::orderBy('name')->get(['id', 'name', 'email']);
+
         return Inertia::render('Incidents/Reports/Edit', [
             'report' => $incidentReport,
             'statItems' => $statItems,
             'reportStats' => $reportStats,
             'statCategories' => $statCategories,
+            'users' => $users,
         ]);
     }
 
@@ -278,6 +314,10 @@ class IncidentReportController extends Controller
             'source' => 'nullable|string',
             'attachments' => 'nullable|array',
             'approved_by' => 'nullable|exists:users,id',
+            'access_users' => 'nullable|array',
+            'access_users.*' => 'integer|exists:users,id',
+            'deleted_users' => 'nullable|array',
+            'deleted_users.*' => 'integer|exists:users,id',
         ]);
 
         // Convert Persian date to Carbon date for database storage
@@ -291,10 +331,46 @@ class IncidentReportController extends Controller
             $validated['approved_by'] = Auth::id();
         }
 
-        $incidentReport->update($validated);
+        try {
+            DB::transaction(function () use ($incidentReport, $validated) {
+                $incidentReport->update($validated);
 
-        return redirect()->route('incident-reports.show', $incidentReport)
-            ->with('success', 'Incident report updated successfully.');
+                // Handle access permissions update
+                if (isset($validated['access_users'])) {
+                    // Remove all existing access permissions for this report
+                    $incidentReport->accesses()->delete();
+                    
+                    // Add new access permissions
+                    foreach ($validated['access_users'] as $userId) {
+                        // Don't create access for the submitter
+                        if ($userId != $incidentReport->submitted_by) {
+                            $incidentReport->accesses()->create([
+                                'user_id' => $userId,
+                                'granted_by' => Auth::id(),
+                                'access_type' => 'read_only',
+                                'is_active' => true,
+                            ]);
+                        }
+                    }
+                }
+
+                // Handle deleted users (for logging/audit purposes)
+                if (isset($validated['deleted_users']) && is_array($validated['deleted_users'])) {
+                    \Log::info('Users removed from incident report access', [
+                        'incident_report_id' => $incidentReport->id,
+                        'deleted_user_ids' => $validated['deleted_users'],
+                        'deleted_by' => Auth::id(),
+                        'timestamp' => now()
+                    ]);
+                }
+            });
+
+            return redirect()->route('incident-reports.show', $incidentReport)
+                ->with('success', 'Incident report updated successfully.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to update incident report. Please try again.')
+                ->withInput();
+        }
     }
 
     /**

@@ -123,4 +123,12 @@ class IncidentReport extends Model
     {
         return $this->hasMany(ReportStat::class);
     }
+
+    /**
+     * Get the access records for this report.
+     */
+    public function accesses(): HasMany
+    {
+        return $this->hasMany(IncidentReportAccess::class);
+    }
 }

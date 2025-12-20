@@ -25,12 +25,14 @@ class IncidentPolicy
      */
     public function view(User $user, Incident $incident): bool
     {
-        // Check if user has incident report access (for incidents only or full access)
-        if (!$user->hasIncidentReportAccess('incidents_only') && !$user->hasIncidentReportAccess('read_only')) {
-            return false;
+        // Check if user is the submitter, reporter, or has access to the incident report
+        if ($user->id === $incident->report->submitted_by || $user->id === $incident->reported_by || $incident->report->accesses()
+            ->where('user_id', $user->id)
+            ->exists()) {
+            return true;
         }
 
-        return $user->hasPermissionTo('incident.view');
+        return false;
     }
 
     /**
@@ -38,7 +40,17 @@ class IncidentPolicy
      */
     public function create(User $user, ?IncidentReport $incidentReport = null): bool
     {
-        return $user->hasPermissionTo('incident.create');
+
+        // Check if user has been granted access to this specific report
+        $hasAccess = $incidentReport->accesses()
+            ->where('user_id', $user->id)
+            ->exists();
+
+        if ($hasAccess) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -47,17 +59,7 @@ class IncidentPolicy
     public function update(User $user, Incident $incident): bool
     {
         // Check if user has incident report access with update permissions
-        if (!$user->canUpdateIncidentReports()) {
-            return false;
-        }
-
-        // Check basic permission first
-        if (!$user->hasPermissionTo('incident.update')) {
-            return false;
-        }
-
-        // Use the model's method to check if user can edit
-        return $incident->canBeEditedBy($user);
+        return $user->hasPermissionTo('incident.update') && $user->id === $incident->submitted_by;
     }
 
     /**
@@ -66,17 +68,7 @@ class IncidentPolicy
     public function delete(User $user, Incident $incident): bool
     {
         // Check if user has incident report access with delete permissions
-        if (!$user->canDeleteIncidentReports()) {
-            return false;
-        }
-
-        // Check basic permission first
-        if (!$user->hasPermissionTo('incident.delete')) {
-            return false;
-        }
-
-        // Use the model's method to check if user can delete
-        return $incident->canBeDeletedBy($user);
+        return $user->hasPermissionTo('incident.delete') && $user->id === $incident->report->submitted_by;
     }
 
     /**
@@ -85,11 +77,7 @@ class IncidentPolicy
     public function confirm(User $user, Incident $incident): bool
     {
         // Check if user has incident report access with update permissions
-        if (!$user->canUpdateIncidentReports()) {
-            return false;
-        }
-
-        return $user->hasRole('admin') && $user->hasPermissionTo('incident.confirm');
+        return $user->hasPermissionTo('incident.confirm') && $user->id === $incident->report->submitted_by;
     }
 
     /**
@@ -97,12 +85,7 @@ class IncidentPolicy
      */
     public function restore(User $user, Incident $incident): bool
     {
-        // Check if user has incident report access with update permissions
-        if (!$user->canUpdateIncidentReports()) {
-            return false;
-        }
-
-        return $user->hasPermissionTo('incident.restore');
+        return false;
     }
 
     /**
@@ -110,11 +93,6 @@ class IncidentPolicy
      */
     public function forceDelete(User $user, Incident $incident): bool
     {
-        // Check if user has incident report access with delete permissions
-        if (!$user->canDeleteIncidentReports()) {
-            return false;
-        }
-
-        return $user->hasPermissionTo('incident.force_delete');
+        return false;
     }
 }

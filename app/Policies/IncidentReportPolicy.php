@@ -25,15 +25,25 @@ class IncidentReportPolicy
      */
     public function view(User $user, IncidentReport $incidentReport): bool
     {
-        // Check if user has incident report access for this specific report
-        if ($user->canViewIncidentReport($incidentReport->id)) {
-            return true;
-        }
+        // Check if user is the submitter (always has access)
         if ($user->id === $incidentReport->submitted_by) {
             return true;
         }
 
-        // return $user->hasPermissionTo('incident_report.view');
+        // Check if user has global incident report access
+        if ($user->canViewIncidentReport($incidentReport->id)) {
+            return true;
+        }
+
+        // Check if user has been granted access to this specific report
+        $hasAccess = $incidentReport->accesses()
+            ->where('user_id', $user->id)
+            ->exists();
+
+        if ($hasAccess) {
+            return true;
+        }
+
         return false;
     }
 
@@ -51,7 +61,7 @@ class IncidentReportPolicy
     public function update(User $user, IncidentReport $incidentReport): bool
     {
         // Allow update if user has appropriate 'update' access, or is submitter
-        return $user->canUpdateIncidentReport($incidentReport->id) || $user->id === $incidentReport->submitted_by;
+        return $user->hasPermissionTo('incident_report.update') && $user->id === $incidentReport->submitted_by;
     }
 
     /**
@@ -79,9 +89,21 @@ class IncidentReportPolicy
     }
         public function printReport(User $user, IncidentReport $incidentReport): bool
         {
-            if ($user->id === $incidentReport->submitted_by) {
-                return true;
-            }
+
+
+        // Check if user is the submitter (always has access)
+        if ($user->id === $incidentReport->submitted_by) {
+            return true;
+        }
+
+        // Check if user has been granted access to this specific report
+        $hasAccess = $incidentReport->accesses()
+            ->where('user_id', $user->id)
+            ->exists();
+
+        if ($hasAccess) {
+            return true;
+        }
             return false;
         }
 

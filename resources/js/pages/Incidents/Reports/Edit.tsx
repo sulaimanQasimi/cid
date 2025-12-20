@@ -4,12 +4,27 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Shield, FileText, AlertTriangle, Calendar, Clock, Users, Gavel, FileCheck } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Shield, FileText, AlertTriangle, Calendar, Clock, Users, Gavel, FileCheck, Search, User, Trash, ArrowRight } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { useTranslation } from '@/lib/i18n/translate';
 import Header from '@/components/template/header';
 import FooterButtons from '@/components/template/FooterButtons';
+import { useState } from 'react';
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+interface Access {
+  id: number;
+  user_id: number;
+  user: User;
+}
 
 interface EditProps {
   report: {
@@ -26,11 +41,21 @@ interface EditProps {
     approved_by?: number;
     created_at: string;
     updated_at: string;
+    accesses?: Access[];
   };
+  users: User[];
 }
 
-export default function Edit({ report }: EditProps) {
+export default function Edit({ report, users }: EditProps) {
   const { t } = useTranslation();
+  const [selectedUsers, setSelectedUsers] = useState<number[]>(
+    report.accesses?.map(access => access.user_id) || []
+  );
+  const [userSearchTerm, setUserSearchTerm] = useState<string>('');
+  const [isRemoveUserDialogOpen, setIsRemoveUserDialogOpen] = useState<boolean>(false);
+  const [userToRemove, setUserToRemove] = useState<{ id: number; name: string } | null>(null);
+  const [deletedUsers, setDeletedUsers] = useState<number[]>([]);
+
   const { data, setData, put, processing, errors } = useForm({
     report_number: report.report_number,
     report_date: report.report_date,
@@ -40,6 +65,8 @@ export default function Edit({ report }: EditProps) {
     recommendation: report.recommendation || '',
     report_status: report.report_status,
     source: report.source || '',
+    access_users: report.accesses?.map(access => access.user_id) || [],
+    deleted_users: [] as number[],
   });
 
   // Generate breadcrumbs
@@ -65,6 +92,41 @@ export default function Edit({ report }: EditProps) {
   function handleFormSubmit() {
     put(route('incident-reports.update', report.id));
   }
+
+  // Access control functions
+  const handleUserSelect = (userId: number) => {
+    if (!selectedUsers.includes(userId)) {
+      const newSelectedUsers = [...selectedUsers, userId];
+      setSelectedUsers(newSelectedUsers);
+      setData('access_users', newSelectedUsers);
+    }
+  };
+
+  const handleUserRemoveClick = (userId: number) => {
+    const user = users.find(u => u.id === userId);
+    if (user) {
+      setUserToRemove({ id: userId, name: user.name });
+      setIsRemoveUserDialogOpen(true);
+    }
+  };
+
+  const confirmUserRemove = () => {
+    if (userToRemove) {
+      const newSelectedUsers = selectedUsers.filter((id) => id !== userToRemove.id);
+      const newDeletedUsers = [...deletedUsers, userToRemove.id];
+      setSelectedUsers(newSelectedUsers);
+      setDeletedUsers(newDeletedUsers);
+      setData('access_users', newSelectedUsers);
+      setData('deleted_users', newDeletedUsers);
+      setIsRemoveUserDialogOpen(false);
+      setUserToRemove(null);
+    }
+  };
+
+  // Filter users based on search term
+  const filteredUsers = users.filter(
+    (user) => user.name.toLowerCase().includes(userSearchTerm.toLowerCase()) || user.email.toLowerCase().includes(userSearchTerm.toLowerCase()),
+  );
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -267,6 +329,156 @@ export default function Edit({ report }: EditProps) {
                     <AlertTriangle className="h-4 w-4" />
                     {errors.recommendation}
                   </p>}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* User Access Card */}
+            <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-white dark:from-gray-800 to-indigo-50/30 dark:to-indigo-900/20">
+              <CardHeader className="bg-gradient-to-l from-indigo-500 dark:from-indigo-600 to-indigo-600 dark:to-indigo-700 text-white border-b pb-4">
+                <CardTitle className="flex items-center gap-3 text-lg">
+                  <div className="p-2 bg-white/20 rounded-lg">
+                    <Users className="h-5 w-5" />
+                  </div>
+                  {t('incident_reports.form.access_title')}
+                </CardTitle>
+                <CardDescription className="text-indigo-100">
+                  {t('incident_reports.form.access_description')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-6 space-y-6">
+                {/* User Search */}
+                <div className="space-y-3">
+                  <Label className="text-base font-medium flex items-center gap-2 text-indigo-700 dark:text-indigo-400 text-right" dir="rtl">
+                    <Search className="h-4 w-4" />
+                    {t('incident_reports.form.search_users')}
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      value={userSearchTerm}
+                      onChange={(e) => setUserSearchTerm(e.target.value)}
+                      placeholder={t('incident_reports.form.search_users_placeholder')}
+                      className="h-12 border-indigo-200 dark:border-indigo-700 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-indigo-500/20 dark:focus:ring-indigo-400/20 bg-gradient-to-l from-indigo-50 dark:from-indigo-900/30 to-white dark:to-gray-800 text-right"
+                    />
+                    <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-indigo-400 pointer-events-none" />
+                  </div>
+                </div>
+
+                {/* User Search Results */}
+                {userSearchTerm && (
+                  <div className="space-y-3">
+                    <Label className="text-base font-medium flex items-center gap-2 text-indigo-700 dark:text-indigo-400 text-right" dir="rtl">
+                      {t('incident_reports.form.select_users')}
+                    </Label>
+                    <div className="max-h-48 overflow-y-auto space-y-2 border border-indigo-200 dark:border-indigo-700 rounded-xl p-4 bg-white dark:bg-gray-800">
+                      {filteredUsers
+                        .filter(user => !selectedUsers.includes(user.id))
+                        .map(user => (
+                          <div
+                            key={user.id}
+                            onClick={() => handleUserSelect(user.id)}
+                            className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg border border-indigo-200 dark:border-indigo-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 bg-gradient-to-br from-indigo-100 to-indigo-200 dark:from-indigo-800 dark:to-indigo-900 rounded-lg">
+                                <User className="h-4 w-4 text-indigo-600 dark:text-indigo-300" />
+                              </div>
+                              <div className="text-right">
+                                <p className="font-medium text-indigo-900 dark:text-indigo-100">{user.name}</p>
+                                <p className="text-sm text-indigo-600 dark:text-indigo-400">{user.email}</p>
+                              </div>
+                            </div>
+                            <ArrowRight className="h-4 w-4 text-indigo-500" />
+                          </div>
+                        ))}
+                      {filteredUsers.filter(user => !selectedUsers.includes(user.id)).length === 0 && (
+                        <p className="text-center text-indigo-600 dark:text-indigo-400 py-4">
+                          {t('incident_reports.form.no_users_found')}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Selected Users */}
+                <div className="space-y-3">
+                  <Label className="text-base font-medium flex items-center gap-2 text-indigo-700 dark:text-indigo-400 text-right" dir="rtl">
+                    <Users className="h-4 w-4" />
+                    {t('incident_reports.form.selected_users')}
+                  </Label>
+                  {selectedUsers.length > 0 ? (
+                    <div className="space-y-2">
+                      {selectedUsers.map(userId => {
+                        const user = users.find(u => u.id === userId);
+                        return user ? (
+                          <div
+                            key={userId}
+                            className={`flex items-center justify-between p-3 rounded-lg border transition-all duration-200 ${
+                              userId === report.submitted_by
+                                ? 'bg-gradient-to-r from-green-100 to-green-200 dark:from-green-800 dark:to-green-900 border-green-200 dark:border-green-700'
+                                : 'bg-gradient-to-r from-indigo-50 to-indigo-100 dark:from-indigo-900/30 dark:to-indigo-800/30 border-indigo-200 dark:border-indigo-700'
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className={`p-2 rounded-lg ${
+                                userId === report.submitted_by
+                                  ? 'bg-gradient-to-br from-green-200 to-green-300 dark:from-green-700 dark:to-green-800'
+                                  : 'bg-gradient-to-br from-indigo-200 to-indigo-300 dark:from-indigo-700 dark:to-indigo-800'
+                              }`}>
+                                <User className={`h-4 w-4 ${
+                                  userId === report.submitted_by
+                                    ? 'text-green-700 dark:text-green-200'
+                                    : 'text-indigo-700 dark:text-indigo-200'
+                                }`} />
+                              </div>
+                              <div className="text-right">
+                                <div className="flex items-center gap-2">
+                                  <p className="font-medium text-indigo-900 dark:text-indigo-100">{user.name}</p>
+                                  {userId === report.submitted_by && (
+                                    <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300 px-2 py-0.5 text-xs font-medium">
+                                      {t('incident_reports.form.submitter')}
+                                    </Badge>
+                                  )}
+                                </div>
+                                <p className="text-sm text-indigo-600 dark:text-indigo-400">{user.email}</p>
+                              </div>
+                            </div>
+                            {userId !== report.submitted_by && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleUserRemoveClick(userId)}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20 border-red-200 dark:border-red-700"
+                              >
+                                <Trash className="h-3 w-3" />
+                              </Button>
+                            )}
+                          </div>
+                        ) : null;
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-indigo-600 dark:text-indigo-400">
+                      <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                      <p>{t('incident_reports.form.no_users_selected')}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Notes */}
+                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+                  <div className="flex items-start gap-2">
+                    <AlertTriangle className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5" />
+                    <div className="text-right">
+                      <p className="text-sm text-blue-800 dark:text-blue-200 font-medium mb-1">
+                        {t('incident_reports.form.submitter_note')}
+                      </p>
+                      <p className="text-xs text-blue-600 dark:text-blue-300">
+                        {t('incident_reports.form.permissions_note')}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
