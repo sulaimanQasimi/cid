@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Pagination } from '@/components/pagination';
 import { PageHeader } from '@/components/page-header';
-import { Plus, FileText, AlertCircle, Shield, Search, ArrowUpDown, X, Users, Building2, Calendar, TrendingUp, AlertTriangle, ChevronDown, FilterX, ChevronRight, ChevronLeft, Printer } from 'lucide-react';
+import { Plus, FileText, AlertCircle, Shield, Search, ArrowUpDown, X, Users, Building2, Calendar, TrendingUp, AlertTriangle, ChevronDown, FilterX, ChevronRight, ChevronLeft, Printer, Pencil, Trash } from 'lucide-react';
 import { format } from 'date-fns';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -30,6 +30,9 @@ interface IncidentReportProps {
         id: number;
         name: string;
       };
+      can_view: boolean;
+      can_update: boolean;
+      can_delete: boolean;
     }>;
     links: Array<{
       url: string | null;
@@ -357,39 +360,71 @@ export default function Index({ reports, filters = {} }: IncidentReportProps) {
                           </td>
                           <td className="p-6 align-middle">
                             <div className="flex items-center gap-2">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                asChild
-                                title={t('incident_reports.view')}
-                                className="h-10 w-10 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-800 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-300 hover:scale-110"
-                              >
-                                <Link href={route('incident-reports.show', report.id)}>
-                                  <FileText className="h-5 w-5" />
-                                </Link>
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                asChild
-                                title={t('incidents.page_title')}
-                                className="h-10 w-10 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-800 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-300 hover:scale-110"
-                              >
-                                <Link href={route('incident-reports.incidents', report.id)}>
-                                  <AlertCircle className="h-5 w-5" />
-                                </Link>
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                asChild
-                                title={t('incident_reports.print.title')}
-                                className="h-10 w-10 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-800 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-300 hover:scale-110"
-                              >
-                                <Link href={route('incident-reports.print', report.id)}>
-                                  <Printer className="h-5 w-5" />
-                                </Link>
-                              </Button>
+                              {report.can_view && (
+                                <>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    asChild
+                                    title={t('incident_reports.view')}
+                                    className="h-10 w-10 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-800 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-300 hover:scale-110"
+                                  >
+                                    <Link href={route('incident-reports.show', report.id)}>
+                                      <FileText className="h-5 w-5" />
+                                    </Link>
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    asChild
+                                    title={t('incidents.page_title')}
+                                    className="h-10 w-10 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-800 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-300 hover:scale-110"
+                                  >
+                                    <Link href={route('incident-reports.incidents', report.id)}>
+                                      <AlertCircle className="h-5 w-5" />
+                                    </Link>
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    asChild
+                                    title={t('incident_reports.print.title')}
+                                    className="h-10 w-10 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-800 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-300 hover:scale-110"
+                                  >
+                                    <Link href={route('incident-reports.print', report.id)}>
+                                      <Printer className="h-5 w-5" />
+                                    </Link>
+                                  </Button>
+                                </>
+                              )}
+                              {report.can_update && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  asChild
+                                  title={t('common.edit')}
+                                  className="h-10 w-10 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-800 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-300 hover:scale-110"
+                                >
+                                  <Link href={route('incident-reports.edit', report.id)}>
+                                    <Pencil className="h-5 w-5" />
+                                  </Link>
+                                </Button>
+                              )}
+                              {report.can_delete && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => {
+                                    if (confirm(t('incident_reports.confirm_delete', { number: report.report_number }))) {
+                                      router.delete(route('incident-reports.destroy', report.id));
+                                    }
+                                  }}
+                                  title={t('common.delete')}
+                                  className="h-10 w-10 rounded-xl hover:bg-red-100 dark:hover:bg-red-800 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-all duration-300 hover:scale-110"
+                                >
+                                  <Trash className="h-5 w-5" />
+                                </Button>
+                              )}
                             </div>
                           </td>
                         </tr>

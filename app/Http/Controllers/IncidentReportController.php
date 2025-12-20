@@ -75,34 +75,25 @@ class IncidentReportController extends Controller
         }
 
         $reports = $query->paginate(10)
+                        ->through(function ($report) {
+                            return [
+                                'id' => $report->id,
+                                'report_number' => $report->report_number,
+                                'report_date' => $report->report_date,
+                                'report_status' => $report->report_status,
+                                'security_level' => $report->security_level,
+                                'incidents_count' => $report->incidents_count,
+                                'submitter' => $report->submitter,
+                                'can_view' => Auth::user()->can('view', $report),
+                                'can_update' => Auth::user()->can('update', $report),
+                                'can_delete' => Auth::user()->can('delete', $report),
+                            ];
+                        })
                         ->withQueryString(); // Preserve the query parameters in pagination links
-
-        // Get incident report access information for the current user
-        $user = auth()->user();
-        $incidentReportAccess = null;
-        
-        if ($user) {
-            $incidentReportAccess = [
-                'canViewIncidentReports' => $user->canViewIncidentReports(),
-                'canCreateIncidentReports' => $user->canCreateIncidentReports(),
-                'canUpdateIncidentReports' => $user->canUpdateIncidentReports(),
-                'canDeleteIncidentReports' => $user->canDeleteIncidentReports(),
-                'canAccessIncidentsOnly' => $user->canAccessIncidentsOnly(),
-                'hasIncidentReportAccess' => $user->hasIncidentReportAccess(),
-                'currentAccess' => $user->getCurrentIncidentReportAccess() ? [
-                    'access_type' => $user->getCurrentIncidentReportAccess()->access_type,
-                    'expires_at' => $user->getCurrentIncidentReportAccess()->expires_at,
-                    'is_active' => $user->getCurrentIncidentReportAccess()->is_active,
-                    'is_global' => $user->getCurrentIncidentReportAccess()->isGlobal(),
-                    'incident_report_id' => $user->getCurrentIncidentReportAccess()->incident_report_id,
-                ] : null,
-            ];
-        }
 
         return Inertia::render('Incidents/Reports/Index', [
             'reports' => $reports,
             'filters' => $request->only(['search', 'status', 'security_level', 'sort_field', 'sort_direction']),
-            'incidentReportAccess' => $incidentReportAccess,
         ]);
     }
 
