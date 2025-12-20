@@ -177,7 +177,7 @@ class User extends Authenticatable
         }
 
         return false;
-    }
+    }   
 
     /**
      * Check if user can view incident reports (global access).

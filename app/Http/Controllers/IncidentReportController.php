@@ -118,36 +118,7 @@ class IncidentReportController extends Controller
             ->orderBy('label')
             ->get();
 
-        // Get active statistical category items with parent-child relationships
-        $statItems = StatCategoryItem::with(['category', 'parent'])
-            ->withCount('children')  // Add count of children
-            ->whereHas('category', function ($query) {
-                $query->where('status', 'active');
-            })
-            ->where('status', 'active')
-            ->orderBy('order')
-            ->get()
-            ->map(function ($item) {
-                // Convert to array and include essential fields for tree view
-                return [
-                    'id' => $item->id,
-                    'name' => $item->name,
-                    'label' => $item->label,
-                    'color' => $item->color,
-                    'parent_id' => $item->parent_id,
-                    'children_count' => $item->children_count,
-                    'category' => [
-                        'id' => $item->category->id,
-                        'name' => $item->category->name,
-                        'label' => $item->category->label,
-                        'color' => $item->category->color,
-                    ]
-                ];
-            });
-
         return Inertia::render('Incidents/Reports/Create', [
-            'statItems' => $statItems,
-            'statCategories' => $statCategories,
         ]);
     }
 
@@ -167,12 +138,7 @@ class IncidentReportController extends Controller
             'report_date' => 'required|string',
             'report_status' => 'required|string|in:submitted,reviewed,approved',
             'source' => 'nullable|string',
-            'attachments' => 'nullable|array',
-            'stats' => 'nullable|array',
-            'stats.*.stat_category_item_id' => 'required|exists:stat_category_items,id',
-            'stats.*.value' => 'required',
-            'stats.*.notes' => 'nullable|string|max:1000',
-        ]);
+            'attachments' => 'nullable|array',        ]);
 
         // Convert Persian date to Carbon date for database storage
         $validated['report_date'] = PersianDateService::toDatabaseFormat($validated['report_date']);
@@ -189,18 +155,6 @@ class IncidentReportController extends Controller
 
         $report = IncidentReport::create($validated);
 
-        // Create report stats if provided
-        if (!empty($validated['stats'])) {
-            foreach ($validated['stats'] as $stat) {
-                $reportStat = new ReportStat();
-                $reportStat->incident_report_id = $report->id;
-                $reportStat->stat_category_item_id = $stat['stat_category_item_id'];
-                $reportStat->setValue($stat['value']);
-                $reportStat->notes = $stat['notes'] ?? null;
-                $reportStat->created_by = Auth::id();
-                $reportStat->save();
-            }
-        }
 
         return redirect()->route('incident-reports.show', $report)
             ->with('success', 'Incident report created successfully.');
@@ -246,14 +200,14 @@ class IncidentReportController extends Controller
             
             $incidentReportAccess = [
                 'canViewIncidentReports' => $user->canViewIncidentReports(),
-                'canViewIncidentReport' => $user->canViewIncidentReport($incidentReport->id),
+                'canViewIncidentReport' => $user->canViewIncidentReport($incidentReport->id) || $user->id === $incidentReport->submitted_by,
                 'canCreateIncidentReports' => $user->canCreateIncidentReports(),
                 'canUpdateIncidentReports' => $user->canUpdateIncidentReports(),
-                'canUpdateIncidentReport' => $user->canUpdateIncidentReport($incidentReport->id),
+                'canUpdateIncidentReport' => $user->canUpdateIncidentReport($incidentReport->id) || $user->id === $incidentReport->submitted_by,
                 'canDeleteIncidentReports' => $user->canDeleteIncidentReports(),
                 'canDeleteIncidentReport' => $user->canDeleteIncidentReport($incidentReport->id),
-                'canAccessIncidentsOnly' => $user->canAccessIncidentsOnly(),
-                'canAccessIncidentsOnlyForReport' => $user->canAccessIncidentsOnlyForReport($incidentReport->id),
+                'canAccessIncidentsOnly' => method_exists($user, 'canAccessIncidentsOnly') ? $user->canAccessIncidentsOnly() : false,
+                'canAccessIncidentsOnlyForReport' => method_exists($user, 'canAccessIncidentsOnlyForReport') ? $user->canAccessIncidentsOnlyForReport($incidentReport->id) : false,
                 'hasIncidentReportAccess' => $user->hasIncidentReportAccess(),
                 'hasIncidentReportAccessForReport' => $user->hasIncidentReportAccessForReport($incidentReport->id),
                 'currentAccess' => $currentAccess ? [
@@ -262,7 +216,7 @@ class IncidentReportController extends Controller
                     'is_active' => $currentAccess->is_active,
                     'is_global' => $currentAccess->isGlobal(),
                     'incident_report_id' => $currentAccess->incident_report_id,
-                    'is_report_specific' => $reportSpecificAccess ? true : false,
+                    'is_report_specific' => (bool)$reportSpecificAccess,
                 ] : null,
             ];
         }

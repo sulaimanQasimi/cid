@@ -86,9 +86,17 @@ class IncidentController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        $this->authorize('create', Incident::class);
+        $incidentReport = $request->has('report_id') 
+            ? IncidentReport::find($request->report_id) 
+            : null;
+
+        // Authorize - pass null if no report (for standalone creation)
+        $policy = app(\App\Policies\IncidentPolicy::class);
+        if (!$policy->create(Auth::user(), $incidentReport)) {
+            abort(403, 'You do not have permission to create incidents.');
+        }
         
         $districts = District::with('province:id,name')
             ->orderBy('name')
@@ -98,14 +106,9 @@ class IncidentController extends Controller
             ->orderBy('name')
             ->get();
 
-        $reports = IncidentReport::select('id', 'report_number', 'report_date')
-            ->orderBy('report_date', 'desc')
-            ->get();
-
         return Inertia::render('Incidents/Create', [
             'districts' => $districts,
             'categories' => $categories,
-            'reports' => $reports,
         ]);
     }
 
@@ -114,7 +117,11 @@ class IncidentController extends Controller
      */
     public function store(Request $request, IncidentReport $incidentReport)
     {
-        $this->authorize('create', Incident::class);
+        // Authorize using policy with IncidentReport parameter
+        $policy = app(\App\Policies\IncidentPolicy::class);
+        if (!$policy->create(Auth::user(), $incidentReport)) {
+            abort(403, 'You do not have permission to create incidents for this report.');
+        }
         
         $validated = $request->validate([
             'title' => 'required|string|max:255',

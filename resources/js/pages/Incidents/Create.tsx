@@ -44,11 +44,6 @@ interface CreateIncidentProps {
     name: string;
     color: string;
   }>;
-  reports: Array<{
-    id: number;
-    report_number: string;
-    report_date: string;
-  }>;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -62,8 +57,13 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ];
 
-export default function Create({ districts, categories, reports }: CreateIncidentProps) {
+export default function Create({ districts, categories }: CreateIncidentProps) {
   const { t } = useTranslation();
+  
+  // Get report_id from URL query parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const reportId = urlParams.get('report_id');
+  
   const { data, setData, post, processing, errors, reset } = useForm({
     title: '',
     description: '',
@@ -71,7 +71,7 @@ export default function Create({ districts, categories, reports }: CreateInciden
     incident_time: '',
     district_id: '',
     incident_category_id: '',
-    incident_report_id: 'none',
+    incident_report_id: reportId || null,
     location: '',
     coordinates: '',
     casualties: '0',
@@ -87,19 +87,26 @@ export default function Create({ districts, categories, reports }: CreateInciden
   const submit: FormEventHandler = (e) => {
     e.preventDefault();
 
-    // Create a copy of the data to modify
-    const formData = { ...data };
-
-    // Convert "none" to null for the incident_report_id
-    if (formData.incident_report_id === 'none') {
-      formData.incident_report_id = null as unknown as string;
+    // If report_id is in URL, use the report-specific route
+    if (reportId) {
+      post(route('incident-reports.incidents.store', reportId), {
+        onSuccess: () => {
+          // handle success if needed
+        },
+      });
+    } else {
+      // Otherwise use the standard incidents.store route
+      const formData = { ...data };
+      if (!formData.incident_report_id) {
+        formData.incident_report_id = null as unknown as string;
+      }
+      
+      post(route('incidents.store'), {
+        onSuccess: () => {
+          // handle success if needed
+        },
+      });
     }
-
-    post(route('incidents.store'), {
-      onSuccess: () => {
-        // handle success if needed
-      },
-    });
   };
 
   const handleCancel = () => {
@@ -137,6 +144,42 @@ export default function Create({ districts, categories, reports }: CreateInciden
             </CardDescription>
           </CardHeader>
           <CardContent className="p-6 space-y-6">
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div className="space-y-3">
+                <PersianDatePicker
+                  id="incident_date"
+                  label={t('incidents.form.date')}
+                  value={data.incident_date}
+                  onChange={(value) => setData('incident_date', value)}
+                  placeholder={t('incidents.form.date_placeholder')}
+                  required
+                  error={errors.incident_date}
+                  className="w-full"
+                />
+              </div>
+
+              <div className="space-y-3">
+                <Label htmlFor="incident_time" className="text-base font-medium flex items-center gap-2 text-gray-800 dark:text-gray-200 text-right" dir="rtl">
+                  {t('incidents.form.time')}
+                  <Clock className="h-4 w-4" />
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="incident_time"
+                    type="time"
+                    value={data.incident_time}
+                    onChange={e => setData('incident_time', e.target.value)}
+                    className="h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 bg-white dark:bg-gray-800 text-right"
+                  />
+                  <Clock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-400 pointer-events-none" />
+                </div>
+                {errors.incident_time && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
+                  <AlertTriangle className="h-4 w-4" />
+                  {errors.incident_time}
+                </p>}
+              </div>
+            </div>
+
             <div className="grid gap-6 sm:grid-cols-2">
               <div className="space-y-3">
                 <Label htmlFor="title" className="text-base font-medium flex items-center gap-2 text-gray-800 dark:text-gray-200 text-right" dir="rtl">
@@ -198,42 +241,6 @@ export default function Create({ districts, categories, reports }: CreateInciden
                 <AlertTriangle className="h-4 w-4" />
                 {errors.description}
               </p>}
-            </div>
-
-            <div className="grid gap-6 sm:grid-cols-2">
-              <div className="space-y-3">
-                <PersianDatePicker
-                  id="incident_date"
-                  label={t('incidents.form.date')}
-                  value={data.incident_date}
-                  onChange={(value) => setData('incident_date', value)}
-                  placeholder={t('incidents.form.date_placeholder')}
-                  required
-                  error={errors.incident_date}
-                  className="w-full"
-                />
-              </div>
-
-              <div className="space-y-3">
-                <Label htmlFor="incident_time" className="text-base font-medium flex items-center gap-2 text-gray-800 dark:text-gray-200 text-right" dir="rtl">
-                  {t('incidents.form.time')}
-                  <Clock className="h-4 w-4" />
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="incident_time"
-                    type="time"
-                    value={data.incident_time}
-                    onChange={e => setData('incident_time', e.target.value)}
-                    className="h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 bg-white dark:bg-gray-800 text-right"
-                  />
-                  <Clock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-400 pointer-events-none" />
-                </div>
-                {errors.incident_time && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
-                  <AlertTriangle className="h-4 w-4" />
-                  {errors.incident_time}
-                </p>}
-              </div>
             </div>
           </CardContent>
         </Card>
@@ -421,34 +428,6 @@ export default function Create({ districts, categories, reports }: CreateInciden
               </p>}
             </div>
 
-            <Separator className="my-6" />
-
-            <div className="space-y-3">
-              <Label htmlFor="incident_report_id" className="text-base font-medium flex items-center gap-2 text-gray-800 dark:text-gray-200 text-right" dir="rtl">
-                {t('incidents.form.assign_report')}
-                <FileText className="h-4 w-4" />
-              </Label>
-              <Select
-                value={data.incident_report_id}
-                onValueChange={value => setData('incident_report_id', value)}
-              >
-                <SelectTrigger className="h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 bg-white dark:bg-gray-800 text-right">
-                  <SelectValue placeholder={t('incidents.form.select_report_optional')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">{t('incidents.none')}</SelectItem>
-                  {reports.map(report => (
-                    <SelectItem key={report.id} value={report.id.toString()}>
-                      {report.report_number}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.incident_report_id && <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-2 text-right">
-                <AlertTriangle className="h-4 w-4" />
-                {errors.incident_report_id}
-              </p>}
-            </div>
           </CardContent>
 
         </Card>

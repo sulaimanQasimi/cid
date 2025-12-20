@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Incident;
+use App\Models\IncidentReport;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -15,10 +16,6 @@ class IncidentPolicy
      */
     public function viewAny(User $user): bool
     {
-        // Check if user has incident report access (for incidents only or full access)
-        if (!$user->hasIncidentReportAccess('incidents_only') && !$user->hasIncidentReportAccess('read_only')) {
-            return false;
-        }
 
         return $user->hasPermissionTo('incident.view_any');
     }
@@ -39,13 +36,8 @@ class IncidentPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(User $user, ?IncidentReport $incidentReport = null): bool
     {
-        // Check if user has incident report access with create permissions
-        if (!$user->canCreateIncidentReports()) {
-            return false;
-        }
-
         return $user->hasPermissionTo('incident.create');
     }
 

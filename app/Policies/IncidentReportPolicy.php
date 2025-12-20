@@ -26,11 +26,15 @@ class IncidentReportPolicy
     public function view(User $user, IncidentReport $incidentReport): bool
     {
         // Check if user has incident report access for this specific report
-        if (!$user->canViewIncidentReport($incidentReport->id)) {
-            return false;
+        if ($user->canViewIncidentReport($incidentReport->id)) {
+            return true;
+        }
+        if ($user->id === $incidentReport->submitted_by) {
+            return true;
         }
 
-        return $user->hasPermissionTo('incident_report.view');
+        // return $user->hasPermissionTo('incident_report.view');
+        return false;
     }
 
     /**
@@ -46,7 +50,8 @@ class IncidentReportPolicy
      */
     public function update(User $user, IncidentReport $incidentReport): bool
     {
-        return $user->hasPermissionTo('incident_report.update') && $user->id === $incidentReport->submitted_by;
+        // Allow update if user has appropriate 'update' access, or is submitter
+        return $user->canUpdateIncidentReport($incidentReport->id) || $user->id === $incidentReport->submitted_by;
     }
 
     /**
