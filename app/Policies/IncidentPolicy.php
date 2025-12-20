@@ -44,6 +44,9 @@ class IncidentPolicy
         if ($incidentReport && !is_null($incidentReport->approved_by)) {
             return false;
         }
+        if ($incidentReport &&$user->id === $incidentReport->submitted_by) {
+            return true;
+        }
 
         // Check if user has been granted access to this specific report
         if ($incidentReport) {
