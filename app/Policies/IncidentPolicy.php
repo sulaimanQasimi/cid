@@ -40,14 +40,20 @@ class IncidentPolicy
      */
     public function create(User $user, ?IncidentReport $incidentReport = null): bool
     {
+        // Don't allow create if report is approved
+        if ($incidentReport && !is_null($incidentReport->approved_by)) {
+            return false;
+        }
 
         // Check if user has been granted access to this specific report
-        $hasAccess = $incidentReport->accesses()
-            ->where('user_id', $user->id)
-            ->exists();
+        if ($incidentReport) {
+            $hasAccess = $incidentReport->accesses()
+                ->where('user_id', $user->id)
+                ->exists();
 
-        if ($hasAccess) {
-            return true;
+            if ($hasAccess) {
+                return true;
+            }
         }
 
         return false;
@@ -58,8 +64,17 @@ class IncidentPolicy
      */
     public function update(User $user, Incident $incident): bool
     {
+        // Don't allow update if report is approved
+        if ($incident->report && !is_null($incident->report->approved_by)) {
+            return false;
+        }
+
         // Check if user has incident report access with update permissions
-        return $user->hasPermissionTo('incident.update') && $user->id === $incident->submitted_by;
+        if ($incident->report) {
+            return $user->hasPermissionTo('incident.update') && $user->id === $incident->report->submitted_by;
+        }
+
+        return $user->hasPermissionTo('incident.update') && $user->id === $incident->reported_by;
     }
 
     /**
@@ -67,8 +82,17 @@ class IncidentPolicy
      */
     public function delete(User $user, Incident $incident): bool
     {
+        // Don't allow delete if report is approved
+        if ($incident->report && !is_null($incident->report->approved_by)) {
+            return false;
+        }
+
         // Check if user has incident report access with delete permissions
-        return $user->hasPermissionTo('incident.delete') && $user->id === $incident->report->submitted_by;
+        if ($incident->report) {
+            return $user->hasPermissionTo('incident.delete') && $user->id === $incident->report->submitted_by;
+        }
+
+        return $user->hasPermissionTo('incident.delete') && $user->id === $incident->reported_by;
     }
 
     /**
