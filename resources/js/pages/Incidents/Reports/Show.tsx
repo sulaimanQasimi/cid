@@ -23,7 +23,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog';
-import { useIncidentReportAccess } from '@/hooks/use-incident-report-access';
 import IncidentCreateModal from '@/components/IncidentCreateModal';
 
 interface ShowProps {
@@ -97,7 +96,6 @@ export default function Show({ report, incidents, districts, categories, reports
   const { t } = useTranslation();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const incidentReportAccess = useIncidentReportAccess();
 
   // Generate breadcrumbs
   const breadcrumbs: BreadcrumbItem[] = [
@@ -127,44 +125,6 @@ export default function Show({ report, incidents, districts, categories, reports
     }
   }
 
-  // Show access warning if user doesn't have proper access or access is expired
-  if (!incidentReportAccess.hasIncidentReportAccessForReport || incidentReportAccess.isAccessExpired()) {
-    return (
-      <AppLayout breadcrumbs={breadcrumbs}>
-        <Head title={t('incident_reports.show.page_title', { number: report.report_number })} />
-        <div className="container px-0 py-6">
-          <Card className="border-none shadow-xl overflow-hidden bg-gradient-to-bl from-red-50 to-red-100/30">
-            <CardHeader className="bg-gradient-to-l from-red-500 to-red-600 text-white border-b pb-4">
-              <CardTitle className="flex items-center gap-3 text-lg">
-                <div className="p-2 bg-white/20 rounded-lg">
-                  <Shield className="h-5 w-5" />
-                </div>
-                {t('incident_reports.access_denied.title')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="text-center py-8">
-                <Shield className="h-16 w-16 text-red-500 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-red-700 mb-2">
-                  {t('incident_reports.access_denied.message')}
-                </h3>
-                <p className="text-red-600 mb-6">
-                  {t('incident_reports.access_denied.description')}
-                </p>
-                <Button asChild className="bg-gradient-to-l from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white">
-                  <Link href={route('incident-reports.index')}>
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    {t('common.back_to_list')}
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </AppLayout>
-    );
-  }
-
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={t('incident_reports.show.page_title', { number: report.report_number })} />
@@ -184,78 +144,43 @@ export default function Show({ report, incidents, districts, categories, reports
           showButton={false}
           actionButtons={
             <div className="flex items-center gap-2">
-              {incidentReportAccess.canDeleteIncidentReport && (
-                <Button
-                  onClick={() => setIsDeleteDialogOpen(true)}
-                  className="bg-red-500/20 dark:bg-red-500/30 backdrop-blur-md border-red-300/30 dark:border-red-400/40 text-white hover:bg-red-500/30 dark:hover:bg-red-500/40 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105"
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="p-1 bg-red-500/20 dark:bg-red-500/30 rounded-lg">
-                      <Trash className="h-4 w-4" />
-                    </div>
-                    {t('common.delete')}
+              <Button
+                onClick={() => setIsDeleteDialogOpen(true)}
+                className="bg-red-500/20 dark:bg-red-500/30 backdrop-blur-md border-red-300/30 dark:border-red-400/40 text-white hover:bg-red-500/30 dark:hover:bg-red-500/40 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105"
+              >
+                <div className="flex items-center gap-2">
+                  <div className="p-1 bg-red-500/20 dark:bg-red-500/30 rounded-lg">
+                    <Trash className="h-4 w-4" />
                   </div>
-                </Button>
-              )}
+                  {t('common.delete')}
+                </div>
+              </Button>
               
-              {incidentReportAccess.canUpdateIncidentReport && (
-                <Button asChild className="bg-white/20 dark:bg-white/10 backdrop-blur-md border-white/30 dark:border-white/20 text-white hover:bg-white/30 dark:hover:bg-white/20 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105">
-                  <Link href={route('incident-reports.edit', report.id)}>
-                    <div className="flex items-center gap-2">
-                      <div className="p-1 bg-white/20 dark:bg-white/10 rounded-lg">
-                        <Pencil className="h-4 w-4" />
-                      </div>
-                      {t('incident_reports.actions.edit_report')}
+              <Button asChild className="bg-white/20 dark:bg-white/10 backdrop-blur-md border-white/30 dark:border-white/20 text-white hover:bg-white/30 dark:hover:bg-white/20 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105">
+                <Link href={route('incident-reports.edit', report.id)}>
+                  <div className="flex items-center gap-2">
+                    <div className="p-1 bg-white/20 dark:bg-white/10 rounded-lg">
+                      <Pencil className="h-4 w-4" />
                     </div>
-                  </Link>
-                </Button>
-              )}
+                    {t('incident_reports.actions.edit_report')}
+                  </div>
+                </Link>
+              </Button>
               
-              {incidentReportAccess.canViewIncidentReport && (
-                <Button asChild className="bg-white/20 dark:bg-white/10 backdrop-blur-md border-white/30 dark:border-white/20 text-white hover:bg-white/30 dark:hover:bg-white/20 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105">
-                  <Link href={route('incident-reports.print', report.id)}>
-                    <div className="flex items-center gap-2">
-                      <div className="p-1 bg-white/20 dark:bg-white/10 rounded-lg">
-                        <Printer className="h-4 w-4" />
-                      </div>
-                      {t('incident_reports.actions.print_report')}
+              <Button asChild className="bg-white/20 dark:bg-white/10 backdrop-blur-md border-white/30 dark:border-white/20 text-white hover:bg-white/30 dark:hover:bg-white/20 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105">
+                <Link href={route('incident-reports.print', report.id)}>
+                  <div className="flex items-center gap-2">
+                    <div className="p-1 bg-white/20 dark:bg-white/10 rounded-lg">
+                      <Printer className="h-4 w-4" />
                     </div>
-                  </Link>
-                </Button>
-              )}
+                    {t('incident_reports.actions.print_report')}
+                  </div>
+                </Link>
+              </Button>
             </div>
           }
         />
 
-        {/* Access badges */}
-        {incidentReportAccess.currentAccess && (
-          <div className="mb-6 flex flex-wrap items-center gap-3">
-            <Badge variant="outline" className="bg-gradient-to-r from-violet-50/80 dark:from-violet-900/40 to-violet-100/80 dark:to-violet-800/40 backdrop-blur-sm border-violet-200/50 dark:border-violet-700/50 text-violet-700 dark:text-violet-300 px-4 py-2 text-sm font-semibold shadow-sm hover:shadow-md transition-all duration-200">
-              <Shield className="h-3.5 w-3.5 mr-1.5" />
-              {incidentReportAccess.currentAccess.access_type === 'full' && t('incident_reports.access.full')}
-              {incidentReportAccess.currentAccess.access_type === 'read_only' && t('incident_reports.access.read_only')}
-              {incidentReportAccess.currentAccess.access_type === 'incidents_only' && t('incident_reports.access.incidents_only')}
-            </Badge>
-            <Badge variant="outline" className="bg-gradient-to-r from-violet-50/80 dark:from-violet-900/40 to-violet-100/80 dark:to-violet-800/40 backdrop-blur-sm border-violet-200/50 dark:border-violet-700/50 text-violet-700 dark:text-violet-300 px-4 py-2 text-sm font-semibold shadow-sm hover:shadow-md transition-all duration-200">
-              <FileText className="h-3.5 w-3.5 mr-1.5" />
-              {incidentReportAccess.isReportSpecific() ? t('incident_reports.access.report_specific') : t('incident_reports.access.global')}
-            </Badge>
-            {incidentReportAccess.currentAccess.expires_at && (
-              <Badge 
-                variant="outline" 
-                className={cn(
-                  "backdrop-blur-sm px-4 py-2 text-sm font-semibold shadow-sm hover:shadow-md transition-all duration-200",
-                  new Date(incidentReportAccess.currentAccess.expires_at) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-                    ? "bg-gradient-to-r from-yellow-50/80 dark:from-yellow-900/40 to-yellow-100/80 dark:to-yellow-800/40 border-yellow-300/50 dark:border-yellow-600/50 text-yellow-700 dark:text-yellow-300"
-                    : "bg-gradient-to-r from-violet-50/80 dark:from-violet-900/40 to-violet-100/80 dark:to-violet-800/40 border-violet-200/50 dark:border-violet-700/50 text-violet-700 dark:text-violet-300"
-                )}
-              >
-                <Clock className="h-3.5 w-3.5 mr-1.5" />
-                {t('incident_reports.access.expires')}: <PersianDateDisplay date={incidentReportAccess.currentAccess.expires_at} format="date" />
-              </Badge>
-            )}
-          </div>
-        )}
 
         <div className="grid grid-cols-1 gap-6 lg:gap-8 md:grid-cols-12">
           {/* Report Information */}

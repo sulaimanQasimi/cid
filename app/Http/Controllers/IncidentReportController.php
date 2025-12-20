@@ -187,47 +187,12 @@ class IncidentReportController extends Controller
             ->orderBy('report_date', 'desc')
             ->get();
 
-        // Get incident report access information for the current user and specific report
-        $user = auth()->user();
-        $incidentReportAccess = null;
-        
-        if ($user) {
-            // Get report-specific access first, then fall back to global access
-            $reportSpecificAccess = $user->getCurrentIncidentReportAccessForReport($incidentReport->id);
-            $globalAccess = $user->getCurrentIncidentReportAccess();
-            
-            $currentAccess = $reportSpecificAccess ?: $globalAccess;
-            
-            $incidentReportAccess = [
-                'canViewIncidentReports' => $user->canViewIncidentReports(),
-                'canViewIncidentReport' => $user->canViewIncidentReport($incidentReport->id) || $user->id === $incidentReport->submitted_by,
-                'canCreateIncidentReports' => $user->canCreateIncidentReports(),
-                'canUpdateIncidentReports' => $user->canUpdateIncidentReports(),
-                'canUpdateIncidentReport' => $user->canUpdateIncidentReport($incidentReport->id) || $user->id === $incidentReport->submitted_by,
-                'canDeleteIncidentReports' => $user->canDeleteIncidentReports(),
-                'canDeleteIncidentReport' => $user->canDeleteIncidentReport($incidentReport->id),
-                'canAccessIncidentsOnly' => method_exists($user, 'canAccessIncidentsOnly') ? $user->canAccessIncidentsOnly() : false,
-                'canAccessIncidentsOnlyForReport' => method_exists($user, 'canAccessIncidentsOnlyForReport') ? $user->canAccessIncidentsOnlyForReport($incidentReport->id) : false,
-                'hasIncidentReportAccess' => $user->hasIncidentReportAccess(),
-                'hasIncidentReportAccessForReport' => $user->hasIncidentReportAccessForReport($incidentReport->id),
-                'currentAccess' => $currentAccess ? [
-                    'access_type' => $currentAccess->access_type,
-                    'expires_at' => $currentAccess->expires_at,
-                    'is_active' => $currentAccess->is_active,
-                    'is_global' => $currentAccess->isGlobal(),
-                    'incident_report_id' => $currentAccess->incident_report_id,
-                    'is_report_specific' => (bool)$reportSpecificAccess,
-                ] : null,
-            ];
-        }
-
         return Inertia::render('Incidents/Reports/Show', [
             'report' => $incidentReport,
             'incidents' => $incidents,
             'districts' => $districts,
             'categories' => $categories,
             'reports' => $reports,
-            'incidentReportAccess' => $incidentReportAccess,
         ]);
     }
 
