@@ -23,8 +23,7 @@ class NationalInsightCenterInfoPolicy
      */
     public function view(User $user, NationalInsightCenterInfo $nationalInsightCenterInfo): bool
     {
-        return $user->hasPermissionTo('national_insight_center_info.view') && 
-               ($nationalInsightCenterInfo->created_by === $user->id || $nationalInsightCenterInfo->hasAccess($user));
+        return $nationalInsightCenterInfo->created_by === $user->id || $nationalInsightCenterInfo->hasAccess($user);
     }
 
     /**
@@ -40,13 +39,9 @@ class NationalInsightCenterInfoPolicy
      */
     public function update(User $user, NationalInsightCenterInfo $nationalInsightCenterInfo): bool
     {
-        // Cannot update if confirmed
-        if ($nationalInsightCenterInfo->confirmed) {
-            return false;
-        }
-        
-        return $user->hasPermissionTo('national_insight_center_info.update') && 
-               ($nationalInsightCenterInfo->created_by === $user->id);
+        return ! $nationalInsightCenterInfo->confirmed
+            && $user->hasPermissionTo('national_insight_center_info.update')
+            && $nationalInsightCenterInfo->created_by === $user->id;
     }
 
     /**
@@ -58,8 +53,8 @@ class NationalInsightCenterInfoPolicy
         if ($nationalInsightCenterInfo->confirmed) {
             return false;
         }
-        
-        return $user->hasPermissionTo('national_insight_center_info.delete') && 
+
+        return $user->hasPermissionTo('national_insight_center_info.delete') &&
                $nationalInsightCenterInfo->created_by === $user->id;
     }
 
@@ -69,9 +64,7 @@ class NationalInsightCenterInfoPolicy
     public function confirm(User $user, NationalInsightCenterInfo $nationalInsightCenterInfo): bool
     {
         // Only the creator can confirm and only if not already confirmed
-        return $user->hasPermissionTo('national_insight_center_info.confirm') && 
-               $nationalInsightCenterInfo->created_by === $user->id && 
-               !$nationalInsightCenterInfo->confirmed;
+        return $nationalInsightCenterInfo->created_by === $user->id && ! $nationalInsightCenterInfo->confirmed;
     }
 
     /**
@@ -80,7 +73,7 @@ class NationalInsightCenterInfoPolicy
     public function print(User $user, NationalInsightCenterInfo $nationalInsightCenterInfo): bool
     {
         // Creator can always print, or user with print permission
-        return $nationalInsightCenterInfo->created_by === $user->id || 
+        return $nationalInsightCenterInfo->created_by === $user->id ||
                $user->hasPermissionTo('national_insight_center_info.print');
     }
 
@@ -88,18 +81,18 @@ class NationalInsightCenterInfoPolicy
      * Determine whether the user can print dates report.
      * If a specific record is provided, also checks access to that record.
      */
-    public function printDates(User $user, NationalInsightCenterInfo $nationalInsightCenterInfo = null): bool
+    public function printDates(User $user, ?NationalInsightCenterInfo $nationalInsightCenterInfo = null): bool
     {
         // Check permission first
-        if (!$user->hasPermissionTo('national_insight_center_info.print')) {
+        if (! $user->hasPermissionTo('national_insight_center_info.print')) {
             return false;
         }
-        
+
         // If a specific record is provided, also check access
         if ($nationalInsightCenterInfo !== null) {
             return $nationalInsightCenterInfo->created_by === $user->id || $nationalInsightCenterInfo->hasAccess($user);
         }
-        
+
         // If no record provided, just check permission (for print-dates route)
         return true;
     }
@@ -113,8 +106,8 @@ class NationalInsightCenterInfoPolicy
         if ($nationalInsightCenterInfo->confirmed) {
             return false;
         }
-        
-        return $user->hasPermissionTo('national_insight_center_info.restore') && 
+
+        return $user->hasPermissionTo('national_insight_center_info.restore') &&
                $nationalInsightCenterInfo->created_by === $user->id;
     }
 
@@ -127,8 +120,8 @@ class NationalInsightCenterInfoPolicy
         if ($nationalInsightCenterInfo->confirmed) {
             return false;
         }
-        
-        return $user->hasPermissionTo('national_insight_center_info.force_delete') && 
+
+        return $user->hasPermissionTo('national_insight_center_info.force_delete') &&
                $nationalInsightCenterInfo->created_by === $user->id;
     }
 }

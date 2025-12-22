@@ -39,15 +39,11 @@ class NationalInsightCenterInfoItemPolicy
         if ($nationalInsightCenterInfo && $nationalInsightCenterInfo->confirmed) {
             return false;
         }
-
-        // Check if user has access to the parent NationalInsightCenterInfo
-        if ($nationalInsightCenterInfo) {
-            if ($nationalInsightCenterInfo->created_by !== $user->id && ! $nationalInsightCenterInfo->hasAccess($user)) {
-                return false;
-            }
+         if ( $nationalInsightCenterInfo->hasAccess($user)) {
+            return true;
         }
 
-        return $user->hasPermissionTo('national_insight_center_info_item.create');
+        return false;  
     }
 
     /**
@@ -65,9 +61,7 @@ class NationalInsightCenterInfoItemPolicy
             return false;
         }
 
-        return $user->hasPermissionTo('national_insight_center_info_item.update') &&
-               ($nationalInsightCenterInfoItem->created_by === $user->id ||
-                $nationalInsightCenterInfoItem->nationalInsightCenterInfo->hasAccess($user));
+        return $nationalInsightCenterInfoItem->created_by === $user->id;
     }
 
     /**
@@ -81,8 +75,7 @@ class NationalInsightCenterInfoItemPolicy
         }
 
         return $user->hasPermissionTo('national_insight_center_info_item.delete') &&
-               ($nationalInsightCenterInfoItem->created_by === $user->id ||
-                $nationalInsightCenterInfoItem->nationalInsightCenterInfo->hasAccess($user));
+               ($nationalInsightCenterInfoItem->created_by === $user->id);
     }
 
     /**
@@ -96,8 +89,7 @@ class NationalInsightCenterInfoItemPolicy
         }
 
         return $user->hasPermissionTo('national_insight_center_info_item.restore') &&
-               ($nationalInsightCenterInfoItem->created_by === $user->id ||
-                $nationalInsightCenterInfoItem->nationalInsightCenterInfo->hasAccess($user));
+               ($nationalInsightCenterInfoItem->created_by === $user->id);
     }
 
     /**
@@ -111,8 +103,7 @@ class NationalInsightCenterInfoItemPolicy
         }
 
         return $user->hasPermissionTo('national_insight_center_info_item.force_delete') &&
-               ($nationalInsightCenterInfoItem->created_by === $user->id ||
-                $nationalInsightCenterInfoItem->nationalInsightCenterInfo->hasAccess($user));
+               ($nationalInsightCenterInfoItem->created_by === $user->id);
     }
 
     /**
@@ -131,6 +122,6 @@ class NationalInsightCenterInfoItemPolicy
         }
 
         // Only the creator of the NationalInsightCenterInfo can confirm items
-        return                $nationalInsightCenterInfoItem->nationalInsightCenterInfo->created_by === $user->id;
+        return $nationalInsightCenterInfoItem->nationalInsightCenterInfo->created_by === $user->id;
     }
 }
