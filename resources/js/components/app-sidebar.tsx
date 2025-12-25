@@ -29,6 +29,7 @@ import {
     MessageCircle,
     Sun,
     Moon,
+    Calendar,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/language-context';
 import { useTranslation } from '@/lib/i18n/translate';
@@ -56,6 +57,15 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
         href: '/chats',
         icon: MessageCircle
     });
+
+    // Meetings - check for meeting permissions
+    if (auth.permissions.includes('meeting.view_any') || auth.permissions.includes('list-meeting')) {
+        navigation.push({
+            title: t('sidebar.meetings') || t('meeting.page_title') || 'Meetings',
+            href: '/meetings',
+            icon: Calendar
+        });
+    }
 
     // Intelligence Operations
     const intelligenceItems: NavItem[] = [];

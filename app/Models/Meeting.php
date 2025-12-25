@@ -19,6 +19,9 @@ class Meeting extends Model
         'description',
         'meeting_code',
         'scheduled_at',
+        'start_date',
+        'end_date',
+        'members',
         'duration_minutes',
         'is_recurring',
         'status',
@@ -28,6 +31,9 @@ class Meeting extends Model
 
     protected $casts = [
         'scheduled_at' => 'datetime',
+        'start_date' => 'date',
+        'end_date' => 'date',
+        'members' => 'array',
         'is_recurring' => 'boolean',
         'offline_enabled' => 'boolean',
     ];

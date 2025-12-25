@@ -1101,6 +1101,7 @@
     "analytics.common.percentage": "سلنه",
     "sidebar.intelligence_dashboard": "د استخباراتو ډیشبورډ",
     "sidebar.chats": "چټونه",
+    "sidebar.meetings": "مجلسونه",
     "sidebar.active_cases": "فعاله قضیې",
     "sidebar.surveillance": "څارنه",
     "sidebar.intelligence_reports": "د استخباراتو راپورونه",
@@ -2489,7 +2490,28 @@
         "incident_reports.form.access_description": "د گزارش ثبت کننده لاسرسي کنټرول کړئ",
         "incident_reports.form.search_users_placeholder": "د کارونکو لټون...",
         "incident_reports.form.submitter_note": "د ثبت جوړونکی په اتوماتیک ډول د لاسرسي حق لري",
-        "incident_reports.form.permissions_note": "ټاکل شوي کارونکي به د دې مجرم د ثبت کتل، سمول او ړنګولو وړتیا ولري"
-        
+        "incident_reports.form.permissions_note": "ټاکل شوي کارونکي به د دې مجرم د ثبت کتل، سمول او ړنګولو وړتیا ولري",
+    "meeting.page_title": "مجلسونه",
+    "meeting.title": "عنوان",
+    "meeting.description": "تفصیلات",
+    "meeting.start_date": "د پیل نیټه",
+    "meeting.end_date": "د پای نیټه",
+    "meeting.date_range": "د نیټو سلسله",
+    "meeting.members": "غړي",
+    "meeting.search_members": "د غړو لټون...",
+    "meeting.no_users_found": "هیڅ کارونکي ونه موندل شول",
+    "meeting.created_by": "جوړونکی",
+    "meeting.meeting_code": "د مجلس کوډ",
+    "meeting.scheduled_at": "د مهالویش نیټه",
+    "meeting.duration": "موده",
+    "meeting.minutes": "دقیقې",
+    "meeting.status": "حالت",
+    "meeting.no_meetings": "هیڅ مجلسونه ونه موندل شول",
+    "meeting.create.page_title": "نوی مجلس جوړول",
+    "meeting.create.form_title": "د مجلس معلومات",
+    "meeting.create.button": "نوی مجلس جوړول",
+    "meeting.edit.page_title": "مجلس سمول",
+    "meeting.edit.form_title": "د مجلس معلومات",
+    "meeting.show.page_title": "مجلس"
 
 }

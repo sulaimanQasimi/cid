@@ -14,9 +14,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { CanConfirm, CanDelete, CanUpdate, CanView } from '@/components/ui/permission-guard';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { usePermissions } from '@/hooks/use-permissions';
 import AppLayout from '@/layouts/app-layout';
 import { useTranslation } from '@/lib/i18n/translate';
 import { formatPersianDateOnly } from '@/lib/utils/date';
@@ -33,6 +31,7 @@ interface NationalInsightCenterInfo {
     created_at: string;
     updated_at: string;
     confirmed: boolean;
+    is_confirmed?: boolean;
     confirmed_at: string | null;
     confirmed_by: number | null;
     confirmer?: {
@@ -41,6 +40,12 @@ interface NationalInsightCenterInfo {
     };
     info_items_count?: number;
     info_stats_count?: number;
+    can_view?: boolean;
+    can_update?: boolean;
+    can_delete?: boolean;
+    can_confirm?: boolean;
+    can_print?: boolean;
+    can_print_dates?: boolean;
 }
 
 interface PaginationLinks {
@@ -87,7 +92,6 @@ export default function NationalInsightCenterInfosIndex({
     nationalInsightCenterInfos = { data: [], links: [], meta: undefined },
     filters = { search: '', per_page: 10 },
 }: Props) {
-    const { canCreate, canView, canUpdate, canDelete, canConfirm } = usePermissions();
     const { t } = useTranslation();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -350,7 +354,7 @@ export default function NationalInsightCenterInfosIndex({
                                                     </TableCell>
                                                     <TableCell className="px-6 py-6">
                                                         <div className="flex items-center gap-2">
-                                                            <CanView model="national_insight_center_info">
+                                                            {nationalInsightCenterInfo.can_view && (
                                                                 <Button
                                                                     variant="ghost"
                                                                     size="icon"
@@ -366,43 +370,38 @@ export default function NationalInsightCenterInfosIndex({
                                                                         <Eye className="h-5 w-5" />
                                                                     </Link>
                                                                 </Button>
-                                                            </CanView>
-                                                            {!nationalInsightCenterInfo.confirmed && (
-                                                                <CanUpdate model="national_insight_center_info">
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        size="icon"
-                                                                        asChild
-                                                                        title={t('national_insight_center_info.actions.edit')}
-                                                                        className="h-10 w-10 rounded-xl text-green-600 transition-all duration-300 hover:scale-110 hover:bg-green-100 hover:text-green-700 dark:text-green-400 dark:hover:bg-green-800 dark:hover:text-green-300"
-                                                                        disabled={nationalInsightCenterInfo.confirmed}
-                                                                    >
-                                                                        <Link
-                                                                            href={route(
-                                                                                'national-insight-center-infos.edit',
-                                                                                nationalInsightCenterInfo.id,
-                                                                            )}
-                                                                        >
-                                                                            <Pencil className="h-5 w-5" />
-                                                                        </Link>
-                                                                    </Button>
-                                                                </CanUpdate>
                                                             )}
-                                                            <CanConfirm model="national_insight_center_info">
-                                                                {!nationalInsightCenterInfo.confirmed && (
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        size="icon"
-                                                                        onClick={() => handleConfirm(nationalInsightCenterInfo.id)}
-                                                                        title={t('national_insight_center_info.actions.confirm')}
-                                                                        className="h-10 w-10 rounded-xl text-blue-600 transition-all duration-300 hover:scale-110 hover:bg-blue-100 hover:text-blue-700 dark:text-blue-400 dark:hover:bg-blue-800 dark:hover:text-blue-300"
+                                                            {!nationalInsightCenterInfo.confirmed && nationalInsightCenterInfo.can_update && (
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    asChild
+                                                                    title={t('national_insight_center_info.actions.edit')}
+                                                                    className="h-10 w-10 rounded-xl text-green-600 transition-all duration-300 hover:scale-110 hover:bg-green-100 hover:text-green-700 dark:text-green-400 dark:hover:bg-green-800 dark:hover:text-green-300"
+                                                                    disabled={nationalInsightCenterInfo.confirmed}
+                                                                >
+                                                                    <Link
+                                                                        href={route(
+                                                                            'national-insight-center-infos.edit',
+                                                                            nationalInsightCenterInfo.id,
+                                                                        )}
                                                                     >
-                                                                        <CheckCircle className="h-5 w-5" />
-                                                                    </Button>
-                                                                )}
-                                                            </CanConfirm>
-                                                            {!nationalInsightCenterInfo.confirmed && (
-                                                            <CanDelete model="national_insight_center_info">
+                                                                        <Pencil className="h-5 w-5" />
+                                                                    </Link>
+                                                                </Button>
+                                                            )}
+                                                            {!nationalInsightCenterInfo.confirmed && nationalInsightCenterInfo.can_confirm && (
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    onClick={() => handleConfirm(nationalInsightCenterInfo.id)}
+                                                                    title={t('national_insight_center_info.actions.confirm')}
+                                                                    className="h-10 w-10 rounded-xl text-blue-600 transition-all duration-300 hover:scale-110 hover:bg-blue-100 hover:text-blue-700 dark:text-blue-400 dark:hover:bg-blue-800 dark:hover:text-blue-300"
+                                                                >
+                                                                    <CheckCircle className="h-5 w-5" />
+                                                                </Button>
+                                                            )}
+                                                            {!nationalInsightCenterInfo.confirmed && nationalInsightCenterInfo.can_delete && (
                                                                 <Button
                                                                     variant="ghost"
                                                                     size="icon"
@@ -413,7 +412,6 @@ export default function NationalInsightCenterInfosIndex({
                                                                 >
                                                                     <Trash className="h-5 w-5" />
                                                                 </Button>
-                                                            </CanDelete>
                                                             )}
                                                         </div>
                                                     </TableCell>

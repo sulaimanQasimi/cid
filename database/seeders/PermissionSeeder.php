@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-use Illuminate\Support\Str;
 
 class PermissionSeeder extends Seeder
 {
@@ -186,6 +185,15 @@ class PermissionSeeder extends Seeder
             ['name' => 'translation.restore', 'label' => 'بازیابی ترجمه'],
             ['name' => 'translation.force_delete', 'label' => 'حذف دائمی ترجمه'],
 
+            // Meeting permissions
+            ['name' => 'meeting.view_any', 'label' => 'مشاهده همه جلسات'],
+            ['name' => 'meeting.view', 'label' => 'مشاهده جلسه'],
+            ['name' => 'meeting.create', 'label' => 'ایجاد جلسه'],
+            ['name' => 'meeting.update', 'label' => 'ویرایش جلسه'],
+            ['name' => 'meeting.delete', 'label' => 'حذف جلسه'],
+            ['name' => 'meeting.restore', 'label' => 'بازیابی جلسه'],
+            ['name' => 'meeting.force_delete', 'label' => 'حذف دائمی جلسه'],
+
             // User permissions
             ['name' => 'user.view_any', 'label' => 'مشاهده همه کاربران'],
             ['name' => 'user.view', 'label' => 'مشاهده کاربر'],
@@ -245,7 +253,7 @@ class PermissionSeeder extends Seeder
             'incident.view_any', 'incident.view',
             'incident_report.view_any', 'incident_report.view',
             'info.view_any', 'info.view', 'info.confirm',
-                  'report.view_any', 'report.view',
+            'report.view_any', 'report.view',
         ]);
 
         // Assign manager permissions
@@ -258,7 +266,7 @@ class PermissionSeeder extends Seeder
             'info_type.view_any', 'info_type.view', 'info_type.confirm',
             'national_insight_center_info.view_any', 'national_insight_center_info.view', 'national_insight_center_info.confirm',
             'national_insight_center_info_item.view_any', 'national_insight_center_info_item.view', 'national_insight_center_info_item.create', 'national_insight_center_info_item.update', 'national_insight_center_info_item.confirm',
-           
+
             'report.view_any', 'report.view', 'report.create', 'report.update',
             'report_stat.view_any', 'report_stat.view', 'report_stat.create', 'report_stat.update',
         ]);

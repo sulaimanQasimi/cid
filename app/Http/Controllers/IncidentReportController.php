@@ -76,7 +76,7 @@ class IncidentReportController extends Controller
         }
 
         $reports = $query->paginate(10)
-                        ->through(function ($report) {
+                            ->through(function ($report) {
                             return [
                                 'id' => $report->id,
                                 'report_number' => $report->report_number,

@@ -59,8 +59,26 @@ class NationalInsightCenterInfoController extends Controller
 
         // Get paginated results
         $perPage = $validated['per_page'] ?? 10;
-        $nationalInsightCenterInfos = $query->paginate($perPage);
 
+        $nationalInsightCenterInfos = $query->paginate($perPage)
+        ->through(function ($nationalInsightCenterInfo) {
+            return [
+                'id' => $nationalInsightCenterInfo->id,
+                'name' => $nationalInsightCenterInfo->name,
+                'code' => $nationalInsightCenterInfo->code,
+                'description' => $nationalInsightCenterInfo->description,
+                'date' => $nationalInsightCenterInfo->date,
+                'created_by' => $nationalInsightCenterInfo->created_by,
+                'created_at' => $nationalInsightCenterInfo->created_at,
+                'is_confirmed' => $nationalInsightCenterInfo->confirmed,
+                'can_view' => Auth::user()->can('view', $nationalInsightCenterInfo),
+                'can_update' => Auth::user()->can('update', $nationalInsightCenterInfo),
+                'can_delete' => Auth::user()->can('delete', $nationalInsightCenterInfo),
+                'can_confirm' => Auth::user()->can('confirm', $nationalInsightCenterInfo),
+                'can_print' => Auth::user()->can('print', $nationalInsightCenterInfo),
+                'can_print_dates' => Auth::user()->can('printDates', $nationalInsightCenterInfo),
+            ];
+        });
         return Inertia::render('NationalInsightCenterInfo/Index', [
             'nationalInsightCenterInfos' => $nationalInsightCenterInfos,
             'filters' => [
@@ -364,7 +382,7 @@ class NationalInsightCenterInfoController extends Controller
                 'confirmed_by' => Auth::id(),
                 'confirmed_at' => now(),
             ]);
-
+Inertia::flash('success', 'National Insight Center Info confirmed successfully.');
             return redirect()
                 ->back()
                 ->with('success', 'National Insight Center Info confirmed successfully.');
