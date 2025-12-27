@@ -24,7 +24,7 @@ interface Meeting {
   scheduled_at: string | null;
   duration_minutes: number | null;
   status: string;
-  members: Array<{ id: number; name: string }> | null;
+  members: string[];
   is_recurring: boolean;
   offline_enabled: boolean;
   created_by: number;
@@ -161,11 +161,11 @@ export default function Show({ auth, meeting }: MeetingShowProps) {
                   <div className="border border-gray-200 dark:border-gray-700 rounded-md divide-y divide-gray-200 dark:divide-gray-700">
                     {meeting.members.map((member, index) => (
                       <div
-                        key={member.id || index}
+                        key={index}
                         className="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800"
                       >
                         <span className="text-sm text-gray-900 dark:text-gray-100">
-                          {member.name}
+                          {member}
                         </span>
                       </div>
                     ))}

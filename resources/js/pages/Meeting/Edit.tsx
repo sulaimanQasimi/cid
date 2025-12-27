@@ -8,12 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
-interface User {
-  id: number;
-  name: string;
-  email: string;
-}
+import { X, Plus } from 'lucide-react';
 
 interface Meeting {
   id: number;
@@ -24,52 +19,48 @@ interface Meeting {
   scheduled_at: string | null;
   duration_minutes: number | null;
   status: string;
-  members: Array<{ id: number; name: string }> | null;
+  members: string[];
   is_recurring: boolean;
   offline_enabled: boolean;
 }
 
 interface MeetingEditProps {
   auth: {
-    user: User;
+    user: any;
   };
   meeting: Meeting;
-  users: User[];
-  selectedMemberIds: number[];
 }
 
-export default function Edit({ auth, meeting, users, selectedMemberIds: initialSelectedMemberIds }: MeetingEditProps) {
+export default function Edit({ auth, meeting }: MeetingEditProps) {
   const { t } = useTranslation();
-  const [selectedMemberIds, setSelectedMemberIds] = useState<number[]>(initialSelectedMemberIds);
-  const [userSearchTerm, setUserSearchTerm] = useState<string>('');
+  const [memberName, setMemberName] = useState<string>('');
 
   const { data, setData, put, processing, errors } = useForm({
     title: meeting.title,
     description: meeting.description || '',
     start_date: meeting.start_date || '',
     end_date: meeting.end_date || '',
-    members: meeting.members?.map(m => ({ id: m.id })) || [],
+    members: meeting.members || [],
   });
 
-  useEffect(() => {
-    // Update form data when selectedMemberIds changes
-    const memberObjects = selectedMemberIds.map(id => ({ id }));
-    setData('members', memberObjects);
-  }, [selectedMemberIds]);
-
-  const handleMemberToggle = (userId: number) => {
-    setSelectedMemberIds(prev => {
-      const newIds = prev.includes(userId)
-        ? prev.filter(id => id !== userId)
-        : [...prev, userId];
-      return newIds;
-    });
+  const handleAddMember = () => {
+    const trimmedName = memberName.trim();
+    if (trimmedName && !data.members.includes(trimmedName)) {
+      setData('members', [...data.members, trimmedName]);
+      setMemberName('');
+    }
   };
 
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(userSearchTerm.toLowerCase())
-  );
+  const handleRemoveMember = (index: number) => {
+    setData('members', data.members.filter((_, i) => i !== index));
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddMember();
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,40 +149,46 @@ export default function Edit({ auth, meeting, users, selectedMemberIds: initialS
                     {t('meeting.members') || 'Members'}
                   </Label>
                   <div className="space-y-3">
-                    <Input
-                      type="text"
-                      placeholder={t('meeting.search_members') || 'Search members...'}
-                      value={userSearchTerm}
-                      onChange={(e) => setUserSearchTerm(e.target.value)}
-                      className="w-full"
-                    />
-                    <div className="max-h-60 overflow-y-auto border border-gray-300 dark:border-gray-700 rounded-md p-3 space-y-2">
-                      {filteredUsers.length === 0 ? (
-                        <p className="text-sm text-gray-500 text-center py-4">
-                          {t('meeting.no_users_found') || 'No users found'}
-                        </p>
-                      ) : (
-                        filteredUsers.map((user) => (
-                          <div key={user.id} className="flex items-center space-x-2 space-x-reverse">
-                            <input
-                              type="checkbox"
-                              id={`user-${user.id}`}
-                              checked={selectedMemberIds.includes(user.id)}
-                              onChange={() => handleMemberToggle(user.id)}
-                              className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                            />
-                            <label
-                              htmlFor={`user-${user.id}`}
-                              className="flex-1 text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
-                            >
-                              {user.name} ({user.email})
-                            </label>
-                          </div>
-                        ))
-                      )}
+                    <div className="flex gap-2">
+                      <Input
+                        type="text"
+                        placeholder={t('meeting.add_member_placeholder') || 'Enter member name...'}
+                        value={memberName}
+                        onChange={(e) => setMemberName(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        className="flex-1"
+                      />
+                      <Button
+                        type="button"
+                        onClick={handleAddMember}
+                        variant="outline"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
                     </div>
-                    {errors.members && <div className="text-red-500 text-sm mt-1">{errors.members}</div>}
+                    {data.members.length > 0 && (
+                      <div className="border border-gray-300 dark:border-gray-700 rounded-md p-3 space-y-2">
+                        {data.members.map((member, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded"
+                          >
+                            <span className="text-sm text-gray-900 dark:text-gray-100">{member}</span>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleRemoveMember(index)}
+                              className="h-6 w-6 p-0"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
+                  {errors.members && <div className="text-red-500 text-sm mt-1">{errors.members}</div>}
                 </div>
 
                 <div className="flex justify-end space-x-3 space-x-reverse">

@@ -23,7 +23,7 @@ interface Meeting {
   start_date: string | null;
   end_date: string | null;
   scheduled_at: string | null;
-  members: Array<{ id: number; name: string }> | null;
+  members: string[];
   member_count: number;
   created_by: number;
   created_at: string;

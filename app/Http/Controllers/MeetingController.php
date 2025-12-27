@@ -29,11 +29,7 @@ class MeetingController extends Controller
         ]);
 
         $query = Meeting::with(['creator:id,name'])
-            ->where(function ($q) {
-                $userId = Auth::id();
-                $q->where('created_by', $userId)
-                    ->orWhereRaw('JSON_SEARCH(members, "one", ?, NULL, "$[*].id") IS NOT NULL', [$userId]);
-            });
+            ->where('created_by', Auth::id());
 
         // Apply search filter
         if (! empty($validated['search'])) {
@@ -53,26 +49,34 @@ class MeetingController extends Controller
         $meetings = $query->paginate($perPage)
             ->through(function ($meeting) {
                 $members = $meeting->members ?? [];
-                $memberCount = is_array($members) ? count($members) : 0;
+                // Handle both old format (objects with id/name) and new format (strings)
+                if (is_array($members) && count($members) > 0) {
+                    $memberNames = array_map(function($member) {
+                        return is_array($member) && isset($member['name']) ? $member['name'] : (is_string($member) ? $member : '');
+                    }, $members);
+                    $members = array_values(array_filter($memberNames));
+                } else {
+                    $members = [];
+                }
                 
-                return [
-                    'id' => $meeting->id,
-                    'title' => $meeting->title,
-                    'description' => $meeting->description,
-                    'meeting_code' => $meeting->meeting_code,
-                    'start_date' => $meeting->start_date,
-                    'end_date' => $meeting->end_date,
-                    'scheduled_at' => $meeting->scheduled_at,
-                    'status' => $meeting->status,
-                    'members' => $members,
-                    'member_count' => $memberCount,
-                    'created_by' => $meeting->created_by,
-                    'created_at' => $meeting->created_at,
-                    'creator' => $meeting->creator,
-                    'can_view' => Auth::user()->can('view', $meeting),
-                    'can_update' => Auth::user()->can('update', $meeting),
-                    'can_delete' => Auth::user()->can('delete', $meeting),
-                ];
+            return [
+                'id' => $meeting->id,
+                'title' => $meeting->title,
+                'description' => $meeting->description,
+                'meeting_code' => $meeting->meeting_code,
+                'start_date' => $meeting->start_date,
+                'end_date' => $meeting->end_date,
+                'scheduled_at' => $meeting->scheduled_at,
+                'status' => $meeting->status,
+                'members' => $members,
+                'member_count' => count($members),
+                'created_by' => $meeting->created_by,
+                'created_at' => $meeting->created_at,
+                'creator' => $meeting->creator,
+                'can_view' => Auth::user()->can('view', $meeting),
+                'can_update' => Auth::user()->can('update', $meeting),
+                'can_delete' => Auth::user()->can('delete', $meeting),
+            ];
             });
 
         return Inertia::render('Meeting/Index', [
@@ -91,11 +95,7 @@ class MeetingController extends Controller
     {
         $this->authorize('create', Meeting::class);
 
-        $users = User::orderBy('name')->get(['id', 'name', 'email']);
-
-        return Inertia::render('Meeting/Create', [
-            'users' => $users,
-        ]);
+        return Inertia::render('Meeting/Create');
     }
 
     /**
@@ -111,7 +111,7 @@ class MeetingController extends Controller
             'start_date' => 'required|string',
             'end_date' => 'required|string',
             'members' => 'nullable|array',
-            'members.*.id' => 'required|integer|exists:users,id',
+            'members.*' => 'required|string|max:255',
         ]);
 
         // Convert Persian dates to database format
@@ -142,18 +142,12 @@ class MeetingController extends Controller
 
         try {
             DB::transaction(function () use ($validated, $startDate, $endDate) {
-                // Prepare members JSON with user names
-                $membersJson = [];
+                // Prepare members as simple array of names
+                $membersArray = [];
                 if (isset($validated['members']) && is_array($validated['members'])) {
-                    foreach ($validated['members'] as $member) {
-                        $user = User::find($member['id']);
-                        if ($user) {
-                            $membersJson[] = [
-                                'id' => $user->id,
-                                'name' => $user->name,
-                            ];
-                        }
-                    }
+                    $membersArray = array_filter(array_map('trim', $validated['members']), function($name) {
+                        return !empty($name);
+                    });
                 }
 
                 // Generate unique meeting code
@@ -164,7 +158,7 @@ class MeetingController extends Controller
                     'description' => $validated['description'] ?? null,
                     'start_date' => $startDate,
                     'end_date' => $endDate,
-                    'members' => ! empty($membersJson) ? $membersJson : null,
+                    'members' => ! empty($membersArray) ? array_values($membersArray) : null,
                     'meeting_code' => $meetingCode,
                     'status' => 'scheduled',
                     'created_by' => Auth::id(),
@@ -199,6 +193,16 @@ class MeetingController extends Controller
 
         $meeting->load(['creator:id,name']);
 
+        // Get members as simple array of names
+        $members = $meeting->members ?? [];
+        if (is_array($members)) {
+            // Handle both old format (objects with id/name) and new format (strings)
+            $memberNames = array_map(function($member) {
+                return is_array($member) && isset($member['name']) ? $member['name'] : (is_string($member) ? $member : '');
+            }, $members);
+            $members = array_values(array_filter($memberNames));
+        }
+
         return Inertia::render('Meeting/Show', [
             'meeting' => [
                 'id' => $meeting->id,
@@ -210,7 +214,7 @@ class MeetingController extends Controller
                 'scheduled_at' => $meeting->scheduled_at,
                 'duration_minutes' => $meeting->duration_minutes,
                 'status' => $meeting->status,
-                'members' => $meeting->members ?? [],
+                'members' => $members,
                 'is_recurring' => $meeting->is_recurring,
                 'offline_enabled' => $meeting->offline_enabled,
                 'created_by' => $meeting->created_by,
@@ -227,12 +231,14 @@ class MeetingController extends Controller
     {
         $this->authorize('update', $meeting);
 
-        $users = User::orderBy('name')->get(['id', 'name', 'email']);
-
-        // Get selected member IDs from JSON
-        $selectedMemberIds = [];
-        if ($meeting->members && is_array($meeting->members)) {
-            $selectedMemberIds = array_column($meeting->members, 'id');
+        // Get members as simple array of names
+        $members = $meeting->members ?? [];
+        if (is_array($members)) {
+            // Handle both old format (objects with id/name) and new format (strings)
+            $memberNames = array_map(function($member) {
+                return is_array($member) && isset($member['name']) ? $member['name'] : (is_string($member) ? $member : '');
+            }, $members);
+            $members = array_filter($memberNames);
         }
 
         return Inertia::render('Meeting/Edit', [
@@ -245,12 +251,10 @@ class MeetingController extends Controller
                 'scheduled_at' => $meeting->scheduled_at,
                 'duration_minutes' => $meeting->duration_minutes,
                 'status' => $meeting->status,
-                'members' => $meeting->members ?? [],
+                'members' => array_values($members),
                 'is_recurring' => $meeting->is_recurring,
                 'offline_enabled' => $meeting->offline_enabled,
             ],
-            'users' => $users,
-            'selectedMemberIds' => $selectedMemberIds,
         ]);
     }
 
@@ -267,7 +271,7 @@ class MeetingController extends Controller
             'start_date' => 'required|string',
             'end_date' => 'required|string',
             'members' => 'nullable|array',
-            'members.*.id' => 'required|integer|exists:users,id',
+            'members.*' => 'required|string|max:255',
         ]);
 
         // Convert Persian dates to database format
@@ -298,18 +302,12 @@ class MeetingController extends Controller
 
         try {
             DB::transaction(function () use ($meeting, $validated, $startDate, $endDate) {
-                // Prepare members JSON with user names
-                $membersJson = [];
+                // Prepare members as simple array of names
+                $membersArray = [];
                 if (isset($validated['members']) && is_array($validated['members'])) {
-                    foreach ($validated['members'] as $member) {
-                        $user = User::find($member['id']);
-                        if ($user) {
-                            $membersJson[] = [
-                                'id' => $user->id,
-                                'name' => $user->name,
-                            ];
-                        }
-                    }
+                    $membersArray = array_filter(array_map('trim', $validated['members']), function($name) {
+                        return !empty($name);
+                    });
                 }
 
                 $meeting->update([
@@ -317,7 +315,7 @@ class MeetingController extends Controller
                     'description' => $validated['description'] ?? null,
                     'start_date' => $startDate,
                     'end_date' => $endDate,
-                    'members' => ! empty($membersJson) ? $membersJson : null,
+                    'members' => ! empty($membersArray) ? array_values($membersArray) : null,
                 ]);
             });
 

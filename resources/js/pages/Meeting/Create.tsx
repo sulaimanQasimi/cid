@@ -8,52 +8,45 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { X, Plus } from 'lucide-react';
 import moment from 'moment-jalaali';
-
-interface User {
-  id: number;
-  name: string;
-  email: string;
-}
 
 interface MeetingCreateProps {
   auth: {
-    user: User;
+    user: any;
   };
-  users: User[];
 }
 
-export default function Create({ auth, users }: MeetingCreateProps) {
+export default function Create({ auth }: MeetingCreateProps) {
   const { t } = useTranslation();
-  const [selectedMemberIds, setSelectedMemberIds] = useState<number[]>([]);
-  const [userSearchTerm, setUserSearchTerm] = useState<string>('');
+  const [memberName, setMemberName] = useState<string>('');
 
   const { data, setData, post, processing, errors } = useForm({
     title: '',
     description: '',
     start_date: moment().format('jYYYY/jMM/jDD'),
     end_date: moment().format('jYYYY/jMM/jDD'),
-    members: [] as Array<{ id: number }>,
+    members: [] as string[],
   });
 
-  const handleMemberToggle = (userId: number) => {
-    setSelectedMemberIds(prev => {
-      const newIds = prev.includes(userId)
-        ? prev.filter(id => id !== userId)
-        : [...prev, userId];
-      
-      // Update form data with member objects
-      const memberObjects = newIds.map(id => ({ id }));
-      setData('members', memberObjects);
-      
-      return newIds;
-    });
+  const handleAddMember = () => {
+    const trimmedName = memberName.trim();
+    if (trimmedName && !data.members.includes(trimmedName)) {
+      setData('members', [...data.members, trimmedName]);
+      setMemberName('');
+    }
   };
 
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(userSearchTerm.toLowerCase())
-  );
+  const handleRemoveMember = (index: number) => {
+    setData('members', data.members.filter((_, i) => i !== index));
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddMember();
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,40 +135,46 @@ export default function Create({ auth, users }: MeetingCreateProps) {
                     {t('meeting.members') || 'Members'}
                   </Label>
                   <div className="space-y-3">
-                    <Input
-                      type="text"
-                      placeholder={t('meeting.search_members') || 'Search members...'}
-                      value={userSearchTerm}
-                      onChange={(e) => setUserSearchTerm(e.target.value)}
-                      className="w-full"
-                    />
-                    <div className="max-h-60 overflow-y-auto border border-gray-300 dark:border-gray-700 rounded-md p-3 space-y-2">
-                      {filteredUsers.length === 0 ? (
-                        <p className="text-sm text-gray-500 text-center py-4">
-                          {t('meeting.no_users_found') || 'No users found'}
-                        </p>
-                      ) : (
-                        filteredUsers.map((user) => (
-                          <div key={user.id} className="flex items-center space-x-2 space-x-reverse">
-                            <input
-                              type="checkbox"
-                              id={`user-${user.id}`}
-                              checked={selectedMemberIds.includes(user.id)}
-                              onChange={() => handleMemberToggle(user.id)}
-                              className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                            />
-                            <label
-                              htmlFor={`user-${user.id}`}
-                              className="flex-1 text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
-                            >
-                              {user.name} ({user.email})
-                            </label>
-                          </div>
-                        ))
-                      )}
+                    <div className="flex gap-2">
+                      <Input
+                        type="text"
+                        placeholder={t('meeting.add_member_placeholder') || 'Enter member name...'}
+                        value={memberName}
+                        onChange={(e) => setMemberName(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        className="flex-1"
+                      />
+                      <Button
+                        type="button"
+                        onClick={handleAddMember}
+                        variant="outline"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
                     </div>
-                    {errors.members && <div className="text-red-500 text-sm mt-1">{errors.members}</div>}
+                    {data.members.length > 0 && (
+                      <div className="border border-gray-300 dark:border-gray-700 rounded-md p-3 space-y-2">
+                        {data.members.map((member, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded"
+                          >
+                            <span className="text-sm text-gray-900 dark:text-gray-100">{member}</span>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleRemoveMember(index)}
+                              className="h-6 w-6 p-0"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
+                  {errors.members && <div className="text-red-500 text-sm mt-1">{errors.members}</div>}
                 </div>
 
                 <div className="flex justify-end space-x-3 space-x-reverse">

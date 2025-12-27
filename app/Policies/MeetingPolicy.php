@@ -15,7 +15,7 @@ class MeetingPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('list-meeting');
+        return $user->hasPermissionTo('meeting.view_any');
     }
 
     /**
@@ -23,17 +23,8 @@ class MeetingPolicy
      */
     public function view(User $user, Meeting $meeting): bool
     {
-        if ($user->hasPermissionTo('view-meeting')) {
-            // Allow if user is the creator
-            if ($meeting->created_by === $user->id) {
-                return true;
-            }
-
-            // Allow if user is a participant
-            return $meeting->participants()->where('user_id', $user->id)->exists();
-        }
-
-        return false;
+        // Only the creator can view the meeting
+        return $user->hasPermissionTo('meeting.view') && $meeting->created_by === $user->id;
     }
 
     /**
@@ -41,7 +32,7 @@ class MeetingPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('create-meeting');
+        return $user->hasPermissionTo('meeting.create');
     }
 
     /**
@@ -49,20 +40,8 @@ class MeetingPolicy
      */
     public function update(User $user, Meeting $meeting): bool
     {
-        if ($user->hasPermissionTo('update-meeting')) {
-            // Allow if user is the creator
-            if ($meeting->created_by === $user->id) {
-                return true;
-            }
-
-            // Allow if user is a co-host
-            return $meeting->participants()
-                ->where('user_id', $user->id)
-                ->wherePivot('role', 'co-host')
-                ->exists();
-        }
-
-        return false;
+        // Only the creator can update the meeting
+        return $user->hasPermissionTo('meeting.update') && $meeting->created_by === $user->id;
     }
 
     /**
@@ -70,60 +49,23 @@ class MeetingPolicy
      */
     public function delete(User $user, Meeting $meeting): bool
     {
-        if ($user->hasPermissionTo('delete-meeting')) {
-            // Only allow creator to delete
-            return $meeting->created_by === $user->id;
-        }
-
-        return false;
+        // Only the creator can delete the meeting
+        return $user->hasPermissionTo('meeting.delete') && $meeting->created_by === $user->id;
     }
 
     /**
-     * Determine whether the user can join the meeting.
+     * Determine whether the user can restore the model.
      */
-    public function join(User $user, Meeting $meeting): bool
+    public function restore(User $user, Meeting $meeting): bool
     {
-        if ($user->hasPermissionTo('join-meeting')) {
-            // Creator can always join
-            if ($meeting->created_by === $user->id) {
-                return true;
-            }
-
-            // Participants can join
-            return $meeting->participants()->where('user_id', $user->id)->exists();
-        }
-
-        return false;
+        return $user->hasPermissionTo('meeting.restore') && $meeting->created_by === $user->id;
     }
 
     /**
-     * Determine whether the user can start an offline meeting.
+     * Determine whether the user can permanently delete the model.
      */
-    public function startOffline(User $user): bool
+    public function forceDelete(User $user, Meeting $meeting): bool
     {
-        return $user->hasPermissionTo('start-offline-meeting');
-    }
-
-    /**
-     * Determine whether the user can join an offline meeting.
-     */
-    public function joinOffline(User $user, Meeting $meeting): bool
-    {
-        if ($user->hasPermissionTo('join-offline-meeting')) {
-            // Only if meeting is offline enabled
-            if (!$meeting->offline_enabled) {
-                return false;
-            }
-
-            // Creator can always join
-            if ($meeting->created_by === $user->id) {
-                return true;
-            }
-
-            // Participants can join
-            return $meeting->participants()->where('user_id', $user->id)->exists();
-        }
-
-        return false;
+        return $user->hasPermissionTo('meeting.force_delete') && $meeting->created_by === $user->id;
     }
 }

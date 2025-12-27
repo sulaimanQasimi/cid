@@ -59,7 +59,7 @@ function getPermissionBasedNavigation(auth: any, t: any): NavItem[] {
     });
 
     // Meetings - check for meeting permissions
-    if (auth.permissions.includes('meeting.view_any') || auth.permissions.includes('list-meeting')) {
+    if (auth.permissions.includes('meeting.view_any')) {
         navigation.push({
             title: t('sidebar.meetings') || t('meeting.page_title') || 'Meetings',
             href: '/meetings',

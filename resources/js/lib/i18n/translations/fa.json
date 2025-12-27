@@ -2499,6 +2499,7 @@
     "meeting.date_range": "د نیټو سلسله",
     "meeting.members": "غړي",
     "meeting.search_members": "د غړو لټون...",
+    "meeting.add_member_placeholder": "د غړي نوم ولیکئ...",
     "meeting.no_users_found": "هیڅ کارونکي ونه موندل شول",
     "meeting.created_by": "جوړونکی",
     "meeting.meeting_code": "د مجلس کوډ",
