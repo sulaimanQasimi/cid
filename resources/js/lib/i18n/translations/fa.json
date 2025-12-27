@@ -2513,6 +2513,20 @@
     "meeting.create.button": "نوی مجلس جوړول",
     "meeting.edit.page_title": "مجلس سمول",
     "meeting.edit.form_title": "د مجلس معلومات",
-    "meeting.show.page_title": "مجلس"
-
+    "meeting.show.page_title": "مجلس",
+    "meeting.page_description": "د مجلسونو او جزییاتو کتنه",
+    "meeting.search_filters": "فلټرونه",
+    "meeting.search_description": "د مجلسونو په نوم، کوډ، غړو، یا حالت سره لټون وکړئ",
+    "meeting.reset_filters": "فلټرونه پاک کړئ",
+    "meeting.table.id": "آی ډی",
+    "meeting.table.title": "عنوان",
+    "meeting.table.meeting_code": "د مجلس کوډ",
+    "meeting.table.status": "حالت",
+    "meeting.table.date_range": "د نیټو سلسله",
+    "meeting.table.members": "غړي",
+    "meeting.table.creator": "جوړونکی",
+    "meeting.table.actions": "عملیات",
+    "meeting.status.scheduled": "مهالویش شوی",
+    "meeting.status.ongoing": "جاري",
+    "meeting.status.finished": "پای ته رسیدلی"
 }
