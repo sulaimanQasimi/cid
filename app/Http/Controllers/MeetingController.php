@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Meeting;
 use App\Models\User;
+use App\Rules\PersianDate;
 use App\Services\PersianDateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +16,54 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class MeetingController extends Controller
 {
+    /**
+     * Meeting status constants
+     */
+    private const STATUS_SCHEDULED = 'scheduled';
+
+    /**
+     * Normalize members array to handle both old format (objects with id/name) and new format (strings).
+     * Returns a clean array of member names.
+     *
+     * @param array|null $members
+     * @return array
+     */
+    private function normalizeMembers(?array $members): array
+    {
+        if (!is_array($members) || empty($members)) {
+            return [];
+        }
+
+        $memberNames = array_map(function($member) {
+            if (is_array($member) && isset($member['name'])) {
+                return $member['name'];
+            }
+            return is_string($member) ? $member : '';
+        }, $members);
+
+        return array_values(array_filter($memberNames));
+    }
+
+    /**
+     * Sanitize and prepare members array from validated input.
+     *
+     * @param array|null $members
+     * @return array
+     */
+    private function prepareMembers(?array $members): array
+    {
+        if (!isset($members) || !is_array($members)) {
+            return [];
+        }
+
+        return array_values(array_filter(
+            array_map(function($name) {
+                // Trim and sanitize member names
+                return trim(strip_tags($name));
+            }, $members),
+            fn($name) => !empty($name)
+        ));
+    }
     /**
      * Display a listing of the resource.
      */
@@ -48,16 +97,7 @@ class MeetingController extends Controller
 
         $meetings = $query->paginate($perPage)
             ->through(function ($meeting) {
-                $members = $meeting->members ?? [];
-                // Handle both old format (objects with id/name) and new format (strings)
-                if (is_array($members) && count($members) > 0) {
-                    $memberNames = array_map(function($member) {
-                        return is_array($member) && isset($member['name']) ? $member['name'] : (is_string($member) ? $member : '');
-                    }, $members);
-                    $members = array_values(array_filter($memberNames));
-                } else {
-                    $members = [];
-                }
+                $members = $this->normalizeMembers($meeting->members);
                 
             return [
                 'id' => $meeting->id,
@@ -108,8 +148,8 @@ class MeetingController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'start_date' => 'required|string',
-            'end_date' => 'required|string',
+            'start_date' => ['required', 'string', new PersianDate()],
+            'end_date' => ['required', 'string', new PersianDate()],
             'members' => 'nullable|array',
             'members.*' => 'required|string|max:255',
         ]);
@@ -142,29 +182,21 @@ class MeetingController extends Controller
 
         try {
             DB::transaction(function () use ($validated, $startDate, $endDate) {
-                // Prepare members as simple array of names
-                $membersArray = [];
-                if (isset($validated['members']) && is_array($validated['members'])) {
-                    $membersArray = array_filter(array_map('trim', $validated['members']), function($name) {
-                        return !empty($name);
-                    });
-                }
+                $membersArray = $this->prepareMembers($validated['members'] ?? null);
 
                 // Generate unique meeting code
                 $meetingCode = 'MTG-' . strtoupper(uniqid());
 
-                $meeting = Meeting::create([
+                Meeting::create([
                     'title' => $validated['title'],
                     'description' => $validated['description'] ?? null,
                     'start_date' => $startDate,
                     'end_date' => $endDate,
-                    'members' => ! empty($membersArray) ? array_values($membersArray) : null,
+                    'members' => !empty($membersArray) ? $membersArray : null,
                     'meeting_code' => $meetingCode,
-                    'status' => 'scheduled',
+                    'status' => self::STATUS_SCHEDULED,
                     'created_by' => Auth::id(),
                 ]);
-
-                return $meeting;
             });
 
             return redirect()
@@ -191,17 +223,9 @@ class MeetingController extends Controller
     {
         $this->authorize('view', $meeting);
 
-        $meeting->load(['creator:id,name']);
+        $meeting->loadMissing(['creator:id,name']);
 
-        // Get members as simple array of names
-        $members = $meeting->members ?? [];
-        if (is_array($members)) {
-            // Handle both old format (objects with id/name) and new format (strings)
-            $memberNames = array_map(function($member) {
-                return is_array($member) && isset($member['name']) ? $member['name'] : (is_string($member) ? $member : '');
-            }, $members);
-            $members = array_values(array_filter($memberNames));
-        }
+        $members = $this->normalizeMembers($meeting->members);
 
         return Inertia::render('Meeting/Show', [
             'meeting' => [
@@ -231,15 +255,7 @@ class MeetingController extends Controller
     {
         $this->authorize('update', $meeting);
 
-        // Get members as simple array of names
-        $members = $meeting->members ?? [];
-        if (is_array($members)) {
-            // Handle both old format (objects with id/name) and new format (strings)
-            $memberNames = array_map(function($member) {
-                return is_array($member) && isset($member['name']) ? $member['name'] : (is_string($member) ? $member : '');
-            }, $members);
-            $members = array_filter($memberNames);
-        }
+        $members = $this->normalizeMembers($meeting->members);
 
         return Inertia::render('Meeting/Edit', [
             'meeting' => [
@@ -251,7 +267,7 @@ class MeetingController extends Controller
                 'scheduled_at' => $meeting->scheduled_at,
                 'duration_minutes' => $meeting->duration_minutes,
                 'status' => $meeting->status,
-                'members' => array_values($members),
+                'members' => $members,
                 'is_recurring' => $meeting->is_recurring,
                 'offline_enabled' => $meeting->offline_enabled,
             ],
@@ -268,8 +284,8 @@ class MeetingController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'start_date' => 'required|string',
-            'end_date' => 'required|string',
+            'start_date' => ['required', 'string', new PersianDate()],
+            'end_date' => ['required', 'string', new PersianDate()],
             'members' => 'nullable|array',
             'members.*' => 'required|string|max:255',
         ]);
@@ -302,20 +318,14 @@ class MeetingController extends Controller
 
         try {
             DB::transaction(function () use ($meeting, $validated, $startDate, $endDate) {
-                // Prepare members as simple array of names
-                $membersArray = [];
-                if (isset($validated['members']) && is_array($validated['members'])) {
-                    $membersArray = array_filter(array_map('trim', $validated['members']), function($name) {
-                        return !empty($name);
-                    });
-                }
+                $membersArray = $this->prepareMembers($validated['members'] ?? null);
 
                 $meeting->update([
                     'title' => $validated['title'],
                     'description' => $validated['description'] ?? null,
                     'start_date' => $startDate,
                     'end_date' => $endDate,
-                    'members' => ! empty($membersArray) ? array_values($membersArray) : null,
+                    'members' => !empty($membersArray) ? $membersArray : null,
                 ]);
             });
 
