@@ -5,7 +5,7 @@ import { useTranslation } from '@/lib/i18n/translate';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Users, Edit, Trash2, ArrowLeft } from 'lucide-react';
+import { Calendar, Users, Edit, Trash2, ArrowLeft, Printer } from 'lucide-react';
 import PersianDateDisplay from '@/components/ui/PersianDateDisplay';
 
 interface User {
@@ -177,6 +177,12 @@ export default function Show({ auth, meeting }: MeetingShowProps) {
                 <Link href={route('meetings.index')}>
                   <Button variant="outline">
                     {t('common.back') || 'Back'}
+                  </Button>
+                </Link>
+                <Link href={route('meetings.print', meeting.id)}>
+                  <Button variant="outline">
+                    <Printer className="h-4 w-4 mr-1" />
+                    {t('common.print') || 'Print'}
                   </Button>
                 </Link>
                 <Link href={route('meetings.edit', meeting.id)}>

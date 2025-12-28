@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import { Calendar, Users, Edit, Trash2, Eye, CalendarDays, AlertTriangle } from 'lucide-react';
+import { Calendar, Users, Edit, Trash2, Eye, CalendarDays, AlertTriangle, Printer } from 'lucide-react';
 import PersianDateDisplay from '@/components/ui/PersianDateDisplay';
 import { Pagination } from '@/components/pagination';
 import Header from '@/components/template/header';

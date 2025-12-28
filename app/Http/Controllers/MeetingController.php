@@ -372,4 +372,36 @@ class MeetingController extends Controller
                 ->with('error', 'Failed to delete meeting. Please try again.');
         }
     }
+
+    /**
+     * Display the print view for a specific meeting.
+     */
+    public function print(Meeting $meeting): Response
+    {
+        $this->authorize('view', $meeting);
+
+        $meeting->loadMissing(['creator:id,name']);
+
+        $members = $this->normalizeMembers($meeting->members);
+
+        return Inertia::render('Meeting/Print', [
+            'meeting' => [
+                'id' => $meeting->id,
+                'title' => $meeting->title,
+                'description' => $meeting->description,
+                'meeting_code' => $meeting->meeting_code,
+                'start_date' => $meeting->start_date,
+                'end_date' => $meeting->end_date,
+                'scheduled_at' => $meeting->scheduled_at,
+                'duration_minutes' => $meeting->duration_minutes,
+                'status' => $meeting->status,
+                'members' => $members,
+                'is_recurring' => $meeting->is_recurring,
+                'offline_enabled' => $meeting->offline_enabled,
+                'created_by' => $meeting->created_by,
+                'created_at' => $meeting->created_at,
+                'creator' => $meeting->creator,
+            ],
+        ]);
+    }
 }
