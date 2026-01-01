@@ -22,4 +22,18 @@ Route::middleware(['auth'])->group(function () {
     // Fingerprint capture page
     Route::get('criminals/{criminal}/fingerprints', [CriminalController::class, 'fingerprints'])
         ->name('criminals.fingerprints');
+
+    // Fingerprint API routes (using web middleware for session auth)
+    Route::prefix('api/criminals/{criminal}/fingerprints')->group(function () {
+        Route::get('/', [App\Http\Controllers\Api\FingerprintController::class, 'index'])
+            ->name('api.criminals.fingerprints.index');
+        Route::post('/', [App\Http\Controllers\Api\FingerprintController::class, 'store'])
+            ->name('api.criminals.fingerprints.store');
+        Route::get('/{fingerPosition}', [App\Http\Controllers\Api\FingerprintController::class, 'show'])
+            ->name('api.criminals.fingerprints.show');
+        Route::delete('/{fingerPosition}', [App\Http\Controllers\Api\FingerprintController::class, 'destroy'])
+            ->name('api.criminals.fingerprints.destroy');
+        Route::get('/{fingerPosition}/template', [App\Http\Controllers\Api\FingerprintController::class, 'getTemplateForVerify'])
+            ->name('api.criminals.fingerprints.template');
+    });
 });

@@ -177,7 +177,7 @@ export default function Fingerprints({ criminal }: Props) {
         if (match) {
           toast.success(
             t('criminal.fingerprints.verify_success', { 
-              score: score || 'N/A' 
+              score: String(score || 'N/A')
             })
           );
         } else {

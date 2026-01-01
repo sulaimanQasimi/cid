@@ -35,12 +35,3 @@ Route::get('translations/{id}', [TranslationController::class, 'show']);
 Route::post('translations', [TranslationController::class, 'store']);
 Route::put('translations/{id}', [TranslationController::class, 'update']);
 Route::delete('translations/{id}', [TranslationController::class, 'destroy']);
-
-// Fingerprint API routes
-Route::middleware('auth')->group(function () {
-    Route::get('criminals/{criminal}/fingerprints', [App\Http\Controllers\Api\FingerprintController::class, 'index']);
-    Route::post('criminals/{criminal}/fingerprints', [App\Http\Controllers\Api\FingerprintController::class, 'store']);
-    Route::get('criminals/{criminal}/fingerprints/{fingerPosition}', [App\Http\Controllers\Api\FingerprintController::class, 'show']);
-    Route::delete('criminals/{criminal}/fingerprints/{fingerPosition}', [App\Http\Controllers\Api\FingerprintController::class, 'destroy']);
-    Route::get('criminals/{criminal}/fingerprints/{fingerPosition}/template', [App\Http\Controllers\Api\FingerprintController::class, 'getTemplateForVerify']);
-});

@@ -26,8 +26,8 @@ return new class extends Migration
                 'left_ring',
                 'left_pinky'
             ]);
-            $table->text('template'); // Base64 encoded template
-            $table->text('image_base64'); // Base64 encoded image
+            $table->longText('template'); // Base64 encoded template
+            $table->longText('image_base64'); // Base64 encoded image
             $table->integer('quality_score')->nullable();
             $table->timestamp('captured_at')->nullable();
             $table->foreignId('captured_by')->nullable()->constrained('users')->nullOnDelete();
