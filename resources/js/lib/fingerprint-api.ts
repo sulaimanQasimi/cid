@@ -205,15 +205,34 @@ export class FingerprintAPI {
       const data = await response.json();
       
       // Normalize response - handle both capitalized and lowercase keys
+      // API response format: {"Success":true,"Message":"Fingerprints match","Matched":true,"MatchScore":189}
+      // Check Matched/MatchScore first since that's what the API returns
+      const match = data.Matched !== undefined ? Boolean(data.Matched) : 
+                    data.Match !== undefined ? Boolean(data.Match) :
+                    data.Data?.Match !== undefined ? Boolean(data.Data.Match) :
+                    data.data?.match !== undefined ? Boolean(data.data.match) :
+                    data.matched !== undefined ? Boolean(data.matched) :
+                    data.match !== undefined ? Boolean(data.match) : false;
+      
+      const score = data.MatchScore !== undefined ? Number(data.MatchScore) :
+                    data.Score !== undefined ? Number(data.Score) :
+                    data.Data?.Score !== undefined ? Number(data.Data.Score) :
+                    data.data?.score !== undefined ? Number(data.data.score) :
+                    data.matchScore !== undefined ? Number(data.matchScore) :
+                    data.score !== undefined ? Number(data.score) : undefined;
+      
       const normalized: CompareResponse = {
-        success: data.Success !== undefined ? data.Success : data.success !== undefined ? data.success : false,
+        success: data.Success !== undefined ? Boolean(data.Success) : data.success !== undefined ? Boolean(data.success) : false,
         message: data.Message || data.message || '',
-        data: data.Data || data.data ? {
-          match: data.Data?.Match ?? data.data?.match ?? data.Match ?? false,
-          score: data.Data?.Score ?? data.data?.score ?? data.Score,
-        } : undefined,
+        data: {
+          match: match,
+          score: score,
+        },
         errorCode: data.ErrorCode || data.errorCode,
       };
+
+      console.log('Compare API Response (raw):', data);
+      console.log('Normalized Response:', normalized);
 
       return normalized;
     } catch (error) {
