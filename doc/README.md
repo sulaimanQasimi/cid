@@ -8,6 +8,7 @@ Welcome to the CID (Criminal Investigation Database) system documentation. This 
 
 - **[Overview](overview.md)** - System introduction, purpose, and key objectives
 - **[Architecture](architecture.md)** - Technical architecture, technology stack, and system design
+- **[Technical Design & Code Quality](technical-design.md)** - Comprehensive analysis of design patterns, code quality, and best practices
 
 ### Core Documentation
 
@@ -20,6 +21,10 @@ Welcome to the CID (Criminal Investigation Database) system documentation. This 
 
 - **[Development Guide](development.md)** - Development environment setup, workflow, and best practices
 - **[Deployment Guide](deployment.md)** - Production deployment instructions and server configuration
+
+### Requirements Documentation
+
+- **[SRS - Department (Dari)](srs-department-dari.md)** - Software Requirements Specification from department perspective in Dari language
 
 ### User Documentation
 
@@ -38,9 +43,10 @@ Welcome to the CID (Criminal Investigation Database) system documentation. This 
 
 1. Start with [Overview](overview.md) to understand the system
 2. Review [Architecture](architecture.md) for technical details
-3. Follow [Development Guide](development.md) to set up your environment
-4. Refer to [API Documentation](api.md) for API usage
-5. Check [Database Schema](database.md) for data structure
+3. Read [Technical Design & Code Quality](technical-design.md) for design patterns and code assessment
+4. Follow [Development Guide](development.md) to set up your environment
+5. Refer to [API Documentation](api.md) for API usage
+6. Check [Database Schema](database.md) for data structure
 
 ### For System Administrators
 
@@ -63,6 +69,7 @@ doc/
 ├── README.md              # This file
 ├── overview.md            # System overview
 ├── architecture.md         # Technical architecture
+├── technical-design.md     # Technical design & code quality analysis
 ├── features.md             # Feature documentation
 ├── api.md                  # API documentation
 ├── database.md             # Database schema

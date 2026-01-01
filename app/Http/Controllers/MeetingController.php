@@ -3,16 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Meeting;
-use App\Models\User;
 use App\Rules\PersianDate;
 use App\Services\PersianDateService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class MeetingController extends Controller
 {
@@ -24,20 +23,18 @@ class MeetingController extends Controller
     /**
      * Normalize members array to handle both old format (objects with id/name) and new format (strings).
      * Returns a clean array of member names.
-     *
-     * @param array|null $members
-     * @return array
      */
     private function normalizeMembers(?array $members): array
     {
-        if (!is_array($members) || empty($members)) {
+        if (! is_array($members) || empty($members)) {
             return [];
         }
 
-        $memberNames = array_map(function($member) {
+        $memberNames = array_map(function ($member) {
             if (is_array($member) && isset($member['name'])) {
                 return $member['name'];
             }
+
             return is_string($member) ? $member : '';
         }, $members);
 
@@ -46,24 +43,22 @@ class MeetingController extends Controller
 
     /**
      * Sanitize and prepare members array from validated input.
-     *
-     * @param array|null $members
-     * @return array
      */
     private function prepareMembers(?array $members): array
     {
-        if (!isset($members) || !is_array($members)) {
+        if (! isset($members) || ! is_array($members)) {
             return [];
         }
 
         return array_values(array_filter(
-            array_map(function($name) {
+            array_map(function ($name) {
                 // Trim and sanitize member names
                 return trim(strip_tags($name));
             }, $members),
-            fn($name) => !empty($name)
+            fn ($name) => ! empty($name)
         ));
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -75,10 +70,23 @@ class MeetingController extends Controller
             'search' => 'nullable|string|max:255',
             'per_page' => 'nullable|integer|min:5|max:100',
             'page' => 'nullable|integer|min:1',
+            'start_date' => ['nullable', 'string', new PersianDate],
+            'end_date' => ['nullable', 'string', new PersianDate],
+            'print' => 'nullable|boolean',
         ]);
 
         $query = Meeting::with(['creator:id,name'])
             ->where('created_by', Auth::id());
+
+        // Apply date range filter for print mode
+        if (! empty($validated['start_date']) && ! empty($validated['end_date'])) {
+            $startDate = PersianDateService::toDatabaseFormat($validated['start_date']);
+            $endDate = PersianDateService::toDatabaseFormat($validated['end_date']);
+
+            if ($startDate && $endDate) {
+                $query->whereBetween('start_date', [$startDate, $endDate]);
+            }
+        }
 
         // Apply search filter
         if (! empty($validated['search'])) {
@@ -92,31 +100,68 @@ class MeetingController extends Controller
         // Sort by newest first
         $query->orderBy('created_at', 'desc');
 
-        // Get paginated results
+        // Check if print mode
+        $isPrintMode = ! empty($validated['print']) && $validated['print'];
+
+        if ($isPrintMode) {
+            // For print mode, get all meetings without pagination
+            $meetings = $query->get()->map(function ($meeting) {
+                $members = $this->normalizeMembers($meeting->members);
+
+                return [
+                    'id' => $meeting->id,
+                    'title' => $meeting->title,
+                    'description' => $meeting->description,
+                    'meeting_code' => $meeting->meeting_code,
+                    'start_date' => $meeting->start_date,
+                    'end_date' => $meeting->end_date,
+                    'scheduled_at' => $meeting->scheduled_at,
+                    'status' => $meeting->status,
+                    'members' => $members,
+                    'member_count' => count($members),
+                    'created_by' => $meeting->created_by,
+                    'created_at' => $meeting->created_at,
+                    'creator' => $meeting->creator,
+                ];
+            });
+
+            return Inertia::render('Meeting/Index', [
+                'meetings' => $meetings,
+                'filters' => [
+                    'search' => $validated['search'] ?? '',
+                    'per_page' => 10,
+                    'start_date' => $validated['start_date'] ?? null,
+                    'end_date' => $validated['end_date'] ?? null,
+                ],
+                'printMode' => true,
+            ]);
+        }
+
+        // Get paginated results for normal listing
         $perPage = $validated['per_page'] ?? 10;
 
         $meetings = $query->paginate($perPage)
             ->through(function ($meeting) {
                 $members = $this->normalizeMembers($meeting->members);
-                
-            return [
-                'id' => $meeting->id,
-                'title' => $meeting->title,
-                'description' => $meeting->description,
-                'meeting_code' => $meeting->meeting_code,
-                'start_date' => $meeting->start_date,
-                'end_date' => $meeting->end_date,
-                'scheduled_at' => $meeting->scheduled_at,
-                'status' => $meeting->status,
-                'members' => $members,
-                'member_count' => count($members),
-                'created_by' => $meeting->created_by,
-                'created_at' => $meeting->created_at,
-                'creator' => $meeting->creator,
-                'can_view' => Auth::user()->can('view', $meeting),
-                'can_update' => Auth::user()->can('update', $meeting),
-                'can_delete' => Auth::user()->can('delete', $meeting),
-            ];
+
+                return [
+                    'id' => $meeting->id,
+                    'title' => $meeting->title,
+                    'description' => $meeting->description,
+                    'meeting_code' => $meeting->meeting_code,
+                    'start_date' => $meeting->start_date,
+                    'end_date' => $meeting->end_date,
+                    'scheduled_at' => $meeting->scheduled_at,
+                    'status' => $meeting->status,
+                    'members' => $members,
+                    'member_count' => count($members),
+                    'created_by' => $meeting->created_by,
+                    'created_at' => $meeting->created_at,
+                    'creator' => $meeting->creator,
+                    'can_view' => Auth::user()->can('view', $meeting),
+                    'can_update' => Auth::user()->can('update', $meeting),
+                    'can_delete' => Auth::user()->can('delete', $meeting),
+                ];
             });
 
         return Inertia::render('Meeting/Index', [
@@ -125,6 +170,7 @@ class MeetingController extends Controller
                 'search' => $validated['search'] ?? '',
                 'per_page' => $perPage,
             ],
+            'printMode' => false,
         ]);
     }
 
@@ -148,8 +194,8 @@ class MeetingController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'start_date' => ['required', 'string', new PersianDate()],
-            'end_date' => ['required', 'string', new PersianDate()],
+            'start_date' => ['required', 'string', new PersianDate],
+            'end_date' => ['required', 'string', new PersianDate],
             'members' => 'nullable|array',
             'members.*' => 'required|string|max:255',
         ]);
@@ -185,14 +231,14 @@ class MeetingController extends Controller
                 $membersArray = $this->prepareMembers($validated['members'] ?? null);
 
                 // Generate unique meeting code
-                $meetingCode = 'MTG-' . strtoupper(uniqid());
+                $meetingCode = 'MTG-'.strtoupper(uniqid());
 
                 Meeting::create([
                     'title' => $validated['title'],
                     'description' => $validated['description'] ?? null,
                     'start_date' => $startDate,
                     'end_date' => $endDate,
-                    'members' => !empty($membersArray) ? $membersArray : null,
+                    'members' => ! empty($membersArray) ? $membersArray : null,
                     'meeting_code' => $meetingCode,
                     'status' => self::STATUS_SCHEDULED,
                     'created_by' => Auth::id(),
@@ -284,8 +330,8 @@ class MeetingController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'start_date' => ['required', 'string', new PersianDate()],
-            'end_date' => ['required', 'string', new PersianDate()],
+            'start_date' => ['required', 'string', new PersianDate],
+            'end_date' => ['required', 'string', new PersianDate],
             'members' => 'nullable|array',
             'members.*' => 'required|string|max:255',
         ]);
@@ -325,7 +371,7 @@ class MeetingController extends Controller
                     'description' => $validated['description'] ?? null,
                     'start_date' => $startDate,
                     'end_date' => $endDate,
-                    'members' => !empty($membersArray) ? $membersArray : null,
+                    'members' => ! empty($membersArray) ? $membersArray : null,
                 ]);
             });
 
@@ -374,34 +420,65 @@ class MeetingController extends Controller
     }
 
     /**
-     * Display the print view for a specific meeting.
+     * Display the print view for meetings within a date range.
      */
-    public function print(Meeting $meeting): Response
+    public function print(Request $request): Response|RedirectResponse
     {
-        $this->authorize('view', $meeting);
+        $this->authorize('viewAny', Meeting::class);
 
-        $meeting->loadMissing(['creator:id,name']);
+        $validated = $request->validate([
+            'start_date' => ['required', 'string', new PersianDate],
+            'end_date' => ['required', 'string', new PersianDate],
+        ]);
 
-        $members = $this->normalizeMembers($meeting->members);
+        $startDate = PersianDateService::toDatabaseFormat($validated['start_date']);
+        $endDate = PersianDateService::toDatabaseFormat($validated['end_date']);
 
-        return Inertia::render('Meeting/Print', [
-            'meeting' => [
+        if (! $startDate || ! $endDate) {
+            return redirect()
+                ->route('meetings.index')
+                ->withErrors(['start_date' => 'Invalid date format. Please use Persian date format (YYYY/MM/DD).'])
+                ->withInput();
+        }
+
+        // Get all meetings for the given date range
+        $query = Meeting::with(['creator:id,name'])
+            ->where('created_by', Auth::id())
+            ->whereBetween('start_date', [$startDate, $endDate])
+            ->orderBy('created_at', 'desc');
+
+        // Map the meetings to the format required for the print view
+        $meetings = $query->get()->map(function ($meeting) {
+            $members = $this->normalizeMembers($meeting->members);
+            
+            // Return the meeting data in the format required for the print view
+            return [
                 'id' => $meeting->id,
                 'title' => $meeting->title,
                 'description' => $meeting->description,
                 'meeting_code' => $meeting->meeting_code,
-                'start_date' => $meeting->start_date,
-                'end_date' => $meeting->end_date,
-                'scheduled_at' => $meeting->scheduled_at,
-                'duration_minutes' => $meeting->duration_minutes,
+                'start_date' => $meeting->start_date ? PersianDateService::fromCarbon($meeting->start_date) : null,
+                'end_date' => $meeting->end_date ? PersianDateService::fromCarbon($meeting->end_date) : null,
+                'scheduled_at' => $meeting->scheduled_at ? PersianDateService::fromCarbon($meeting->scheduled_at) : null,
                 'status' => $meeting->status,
                 'members' => $members,
-                'is_recurring' => $meeting->is_recurring,
-                'offline_enabled' => $meeting->offline_enabled,
+                'member_count' => count($members),
                 'created_by' => $meeting->created_by,
-                'created_at' => $meeting->created_at,
+                'created_at' => $meeting->created_at ? PersianDateService::fromCarbon($meeting->created_at) : null,
                 'creator' => $meeting->creator,
+            ];
+        });
+
+        // Render the print view with the meetings data and filters
+        return Inertia::render('Meeting/Print', [
+            'meetings' => $meetings,
+            'filters' => [
+                'search' => '',
+                'per_page' => 10,
+                'start_date' => $validated['start_date'],
+                'end_date' => $validated['end_date'],
             ],
+            'printMode' => true,
         ]);
     }
 }
