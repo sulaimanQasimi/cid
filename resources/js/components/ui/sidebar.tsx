@@ -214,7 +214,7 @@ function Sidebar({
           }
           side="right"
         >
-          <div className="flex h-full w-full flex-col bg-[#fdfcfc] dark:bg-sidebar">{children}</div>
+          <div className="flex h-full w-full flex-col dark:bg-sidebar" style={{ backgroundColor: 'rgba(16, 24, 40, 1)' }}>{children}</div>
         </SheetContent>
       </Sheet>
     )
@@ -255,10 +255,11 @@ function Sidebar({
         <div
           data-sidebar="sidebar"
           className={cn(
-            "bg-[#fdfcfc] dark:bg-sidebar text-sidebar-foreground flex h-full w-full flex-col",
+            "dark:bg-sidebar text-sidebar-foreground flex h-full w-full flex-col",
             variant === "floating" && "rounded-lg border border-border shadow-lg",
             className
           )}
+          style={{ backgroundColor: 'rgba(16, 24, 40, 1)' }}
         >
           {children}
         </div>

@@ -15,8 +15,9 @@ import { useState } from 'react';
 export function NavMain({ items = [] }: { items: NavItem[] }) {
     const page = usePage();
     const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
-    const { state } = useSidebar();
+    const { state, isMobile } = useSidebar();
     const isCollapsed = state === 'collapsed';
+    const shouldShowText = !isCollapsed || isMobile;
 
     const toggleSubmenu = (title: string) => {
         setOpenSubmenu(openSubmenu === title ? null : title);
@@ -50,16 +51,16 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                     >
                         <div className="flex items-center gap-3 w-full">
                             {item.icon && <item.icon className="h-4 w-4 text-purple-900 dark:text-purple-300 group-hover:text-purple-900 dark:group-hover:text-purple-200 group-data-[active=true]:text-black dark:group-data-[active=true]:text-white" />}
-                            {!isCollapsed && <span className="text-sm font-medium">{item.title}</span>}
+                            {shouldShowText && <span className="text-sm font-medium">{item.title}</span>}
                         </div>
-                        {!isCollapsed && item.items && item.items.length > 0 && (
+                        {shouldShowText && item.items && item.items.length > 0 && (
                             <ChevronDown 
                                 className={`ml-4 mr-2 h-4 w-4 text-purple-900 dark:text-purple-300 group-hover:text-purple-900 dark:group-hover:text-purple-200 group-data-[active=true]:text-black dark:group-data-[active=true]:text-white transition-transform ${isOpen ? 'rotate-180' : ''}`}
                             />
                         )}
                     </SidebarMenuButton>
 
-                    {isOpen && !isCollapsed && item.items && item.items.length > 0 && (
+                    {isOpen && shouldShowText && item.items && item.items.length > 0 && (
                         <div className="ml-6 space-y-1 pl-2">
                             {item.items.map((subItem) => (
                                 <SidebarMenuButton
@@ -101,13 +102,13 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                     {isChatPage ? (
                         <div className="flex items-center gap-3 w-full cursor-pointer">
                             {item.icon && <item.icon className="h-4 w-4 text-purple-900 dark:text-purple-300 group-hover:text-purple-900 dark:group-hover:text-purple-200 group-data-[active=true]:text-black dark:group-data-[active=true]:text-white" />}
-                            {!isCollapsed && <span className="text-sm font-medium">{item.title}</span>}
+                            {shouldShowText && <span className="text-sm font-medium">{item.title}</span>}
                         </div>
                     ) : (
                         <Link href={item.href || '#'} prefetch>
                             <div className="flex items-center gap-3 w-full">
                                 {item.icon && <item.icon className="h-4 w-4 text-purple-900 dark:text-purple-300 group-hover:text-purple-900 dark:group-hover:text-purple-200 group-data-[active=true]:text-black dark:group-data-[active=true]:text-white" />}
-                                {!isCollapsed && <span className="text-sm font-medium">{item.title}</span>}
+                                {shouldShowText && <span className="text-sm font-medium">{item.title}</span>}
                             </div>
                         </Link>
                     )}
