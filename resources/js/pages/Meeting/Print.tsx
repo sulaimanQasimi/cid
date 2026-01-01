@@ -689,36 +689,33 @@ export default function Print({ meetings, filters }: MeetingPrintProps) {
 
         {/* Meetings Table */}
         <div className="mb-8">
-          <div className="overflow-hidden rounded-lg border border-gray-300 print:border-gray-800">
-            <table className="min-w-full border-collapse bg-white print:text-xs">
+          <div className="overflow-hidden border border-gray-300 print:border-gray-800">
+            <table className="min-w-full border-collapse bg-white" style={{ tableLayout: 'auto' }}>
               <thead>
-                <tr className="bg-gradient-to-b from-gray-700 to-gray-800 text-white print:bg-gray-900">
-                  <th className="border border-gray-400 px-4 py-3 text-center text-sm font-bold print:border-gray-800">
+                <tr className="bg-gray-100 print:bg-gray-200">
+                  <th className="border border-gray-300 px-3 py-2 text-center text-sm font-semibold text-gray-900 print:border-gray-800 whitespace-normal">
                     #
                   </th>
-                  <th className="border border-gray-400 px-4 py-3 text-center text-sm font-bold print:border-gray-800">
+                  <th className="border border-gray-300 px-3 py-2 text-center text-sm font-semibold text-gray-900 print:border-gray-800 whitespace-normal">
                     {t('meeting.print.topic') || 'ومری موضوع'}
                   </th>
-                  <th className="border border-gray-400 px-4 py-3 text-center text-sm font-bold print:border-gray-800">
+                  <th className="border border-gray-300 px-3 py-2 text-center text-sm font-semibold text-gray-900 print:border-gray-800 whitespace-normal">
                     {t('meeting.print.meeting_code') || 'د مجلس کوډ'}
                   </th>
-                  <th className="border border-gray-400 px-4 py-3 text-center text-sm font-bold print:border-gray-800">
+                  <th className="border border-gray-300 px-3 py-2 text-center text-sm font-semibold text-gray-900 print:border-gray-800 whitespace-normal">
                     {t('meeting.print.date_range') || 'د نیټو سلسله'}
                   </th>
-                  <th className="border border-gray-400 px-4 py-3 text-center text-sm font-bold print:border-gray-800">
+                  <th className="border border-gray-300 px-3 py-2 text-center text-sm font-semibold text-gray-900 print:border-gray-800 whitespace-normal">
                     {t('meeting.print.status') || 'حالت'}
                   </th>
-                  <th className="border border-gray-400 px-4 py-3 text-center text-sm font-bold print:border-gray-800">
+                  <th className="border border-gray-300 px-3 py-2 text-center text-sm font-semibold text-gray-900 print:border-gray-800 whitespace-normal">
                     {t('meeting.print.created_by') || 'جوړونکی'}
                   </th>
-                  <th className="border border-gray-400 px-4 py-3 text-center text-sm font-bold print:border-gray-800">
-                {t('meeting.print.members') || 'د مجلس غړي'}
+                  <th className="border border-gray-300 px-3 py-2 text-center text-sm font-semibold text-gray-900 print:border-gray-800 whitespace-normal">
+                    {t('meeting.print.members') || 'د مجلس غړي'}
                   </th>
-                  <th className="w-1/3 border border-gray-400 px-4 py-3 text-center text-sm font-bold print:border-gray-800">
+                  <th className="border border-gray-300 px-3 py-2 text-center text-sm font-semibold text-gray-900 print:border-gray-800 whitespace-normal">
                     {t('meeting.print.description') || 'تفصیلات'}
-                  </th>
-                  <th className="border border-gray-400 px-4 py-3 text-center text-sm font-bold print:border-gray-800">
-                    {t('meeting.print.created_at') || 'تاریخ ایجاد'}
                   </th>
                 </tr>
               </thead>
@@ -727,22 +724,18 @@ export default function Print({ meetings, filters }: MeetingPrintProps) {
                   meetings.map((meeting, index) => (
                     <tr
                       key={meeting.id}
-                      className={`transition-colors ${
-                        index % 2 === 0
-                          ? 'bg-white print:bg-white'
-                          : 'bg-gray-50 print:bg-gray-100'
-                      } hover:bg-gray-100 print:hover:bg-inherit`}
+                      className={index % 2 === 0 ? 'bg-white print:bg-white' : 'bg-gray-50 print:bg-gray-100'}
                     >
-                      <td className="border border-gray-300 px-4 py-2 text-center text-sm text-gray-900 print:border-gray-800">
+                      <td className="border border-gray-300 px-3 py-2 text-center text-sm text-gray-900 print:border-gray-800 whitespace-normal break-words">
                         {index + 1}
                       </td>
-                      <td className="border border-gray-300 px-4 py-2 text-center text-sm font-semibold text-gray-900 print:border-gray-800">
+                      <td className="border border-gray-300 px-3 py-2 text-center text-sm text-gray-900 print:border-gray-800 whitespace-normal break-words">
                         {meeting.title}
                       </td>
-                      <td className="border border-gray-300 px-4 py-2 text-center text-sm text-gray-900 print:border-gray-800">
+                      <td className="border border-gray-300 px-3 py-2 text-center text-sm text-gray-900 print:border-gray-800 whitespace-normal break-words">
                         <span className="font-mono">{meeting.meeting_code || '-'}</span>
                       </td>
-                      <td className="border border-gray-300 px-4 py-2 text-center text-sm text-gray-900 print:border-gray-800">
+                      <td className="border border-gray-300 px-3 py-2 text-center text-sm text-gray-900 print:border-gray-800 whitespace-normal break-words">
                         {meeting.start_date && meeting.end_date ? (
                           <>
                             {meeting.start_date} - {meeting.end_date}
@@ -751,38 +744,35 @@ export default function Print({ meetings, filters }: MeetingPrintProps) {
                           '-'
                         )}
                       </td>
-                      <td className="border border-gray-300 px-4 py-2 text-center text-sm text-gray-900 print:border-gray-800">
+                      <td className="border border-gray-300 px-3 py-2 text-center text-sm text-gray-900 print:border-gray-800 whitespace-normal break-words">
                         {t(`meeting.status.${meeting.status}`) || meeting.status}
                       </td>
-                      <td className="border border-gray-300 px-4 py-2 text-center text-sm text-gray-900 print:border-gray-800">
+                      <td className="border border-gray-300 px-3 py-2 text-center text-sm text-gray-900 print:border-gray-800 whitespace-normal break-words">
                         {meeting.creator?.name || '-'}
                       </td>
-                      <td className="border border-gray-300 px-4 py-2 text-center text-sm text-gray-900 print:border-gray-800">
+                      <td className="border border-gray-300 px-3 py-2 text-center text-sm text-gray-900 print:border-gray-800 whitespace-normal break-words">
                         {meeting.members && meeting.members.length > 0 ? (
                           <div className="text-right">
                             {meeting.members.map((member, memberIndex) => (
                               <div key={memberIndex} className="text-xs">
                                 {memberIndex + 1}. {member}
-                  </div>
-                ))}
-              </div>
+                              </div>
+                            ))}
+                          </div>
                         ) : (
                           '-'
                         )}
                       </td>
-                      <td className="border border-gray-300 px-4 py-2 text-justify text-sm leading-relaxed text-gray-900 break-words whitespace-normal print:border-gray-800">
+                      <td className="border border-gray-300 px-3 py-2 text-justify text-sm text-gray-900 print:border-gray-800 whitespace-normal break-words">
                         {meeting.description || '-'}
-                      </td>
-                      <td className="border border-gray-300 px-4 py-2 text-center text-sm font-medium text-gray-900 print:border-gray-800">
-                        {meeting.created_at || '-'}
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
                     <td
-                      colSpan={9}
-                      className="border border-gray-300 px-4 py-8 text-center text-sm text-gray-500 print:border-gray-800"
+                      colSpan={8}
+                      className="border border-gray-300 px-3 py-8 text-center text-sm text-gray-500 print:border-gray-800"
                     >
                       {t('meeting.print.no_meetings') || 'No meetings found in the selected date range.'}
                     </td>
