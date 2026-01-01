@@ -136,35 +136,66 @@ export default function Fingerprints({ criminal }: Props) {
     }
   };
 
-  const handleVerify = async (fingerPosition: string, template: string) => {
+  const handleVerify = async (fingerPosition: string) => {
     try {
-      const response = await axios.post(
-        `/api/criminals/${criminal.id}/fingerprints/${fingerPosition}/verify`,
-        {
-          template,
-          security_level: 'NORMAL',
-        }
+      // Get stored template from backend
+      const templateResponse = await axios.get(
+        `/api/criminals/${criminal.id}/fingerprints/${fingerPosition}/template`
       );
 
-      if (response.data.success) {
-        const result = response.data.data;
-        if (result.match) {
+      if (!templateResponse.data.success || !templateResponse.data.data.template) {
+        toast.error(t('criminal.fingerprints.verify_error'));
+        return { match: false };
+      }
+
+      const storedTemplate = templateResponse.data.data.template;
+
+      // Capture a new fingerprint for verification
+      const captureResponse = await fingerprintApi.capture({
+        timeout: 10000,
+        quality: 50,
+      });
+
+      if (!captureResponse.success || !captureResponse.data?.template) {
+        toast.error(captureResponse.message || t('criminal.fingerprints.verify_capture_error'));
+        return { match: false };
+      }
+
+      const verifyTemplate = captureResponse.data.template;
+
+      // Compare templates using fingerprint API client-side
+      const compareResult = await fingerprintApi.compare(
+        storedTemplate,
+        verifyTemplate,
+        'NORMAL'
+      );
+
+      if (compareResult.success && compareResult.data) {
+        const match = compareResult.data.match;
+        const score = compareResult.data.score;
+
+        if (match) {
           toast.success(
             t('criminal.fingerprints.verify_success', { 
-              score: result.score || 'N/A' 
+              score: score || 'N/A' 
             })
           );
         } else {
           toast.error(t('criminal.fingerprints.verify_no_match'));
         }
-        return result;
+
+        return {
+          match,
+          score,
+        };
       } else {
-        toast.error(response.data.message || t('criminal.fingerprints.verify_error'));
+        toast.error(compareResult.message || t('criminal.fingerprints.verify_error'));
         return { match: false };
       }
     } catch (error: any) {
+      console.error('Verify error:', error);
       toast.error(
-        error.response?.data?.message || t('criminal.fingerprints.verify_error')
+        error.response?.data?.message || error.message || t('criminal.fingerprints.verify_error')
       );
       return { match: false };
     }
@@ -302,7 +333,7 @@ export default function Fingerprints({ criminal }: Props) {
                     onCapture={(template, imageBase64, qualityScore) =>
                       handleCapture(position, template, imageBase64, qualityScore)
                     }
-                    onVerify={(template) => handleVerify(position, template)}
+                    onVerify={() => handleVerify(position)}
                     onDelete={() => handleDelete(position)}
                     existingImage={
                       fingerprints[position]?.image_base64
@@ -331,7 +362,7 @@ export default function Fingerprints({ criminal }: Props) {
                     onCapture={(template, imageBase64, qualityScore) =>
                       handleCapture(position, template, imageBase64, qualityScore)
                     }
-                    onVerify={(template) => handleVerify(position, template)}
+                    onVerify={() => handleVerify(position)}
                     onDelete={() => handleDelete(position)}
                     existingImage={
                       fingerprints[position]?.image_base64

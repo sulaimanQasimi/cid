@@ -9,7 +9,7 @@ interface FingerprintCaptureProps {
   fingerPosition: string;
   fingerprintApi: FingerprintAPI;
   onCapture: (template: string, imageBase64: string, qualityScore?: number) => Promise<void>;
-  onVerify?: (template: string) => Promise<{ match: boolean; score?: number }>;
+  onVerify?: () => Promise<{ match: boolean; score?: number }>;
   existingImage?: string | null;
   existingTemplate?: string | null;
   onDelete?: () => Promise<void>;
@@ -79,23 +79,9 @@ export default function FingerprintCapture({
     setVerifyResult(null);
 
     try {
-      // First capture a new fingerprint for verification
-      const response: CaptureResponse = await fingerprintApi.capture({
-        timeout: 10000,
-        quality: 50,
-      });
-
-      console.log('Verify capture response:', response);
-
-      if (response.success && response.data && response.data.template) {
-        // Call the verify handler
-        const result = await onVerify(response.data.template);
-        setVerifyResult(result);
-      } else {
-        const errorMsg = response.message || t('criminal.fingerprints.verify_capture_error');
-        console.error('Verify capture failed:', response);
-        setError(errorMsg);
-      }
+      // Call the verify handler (which handles everything client-side)
+      const result = await onVerify();
+      setVerifyResult(result);
     } catch (err) {
       console.error('Verify exception:', err);
       setError(err instanceof Error ? err.message : t('criminal.fingerprints.verify_error'));
@@ -162,7 +148,7 @@ export default function FingerprintCapture({
                     : 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-300'
                 }`} dir="rtl">
                   {verifyResult.match 
-                    ? t('criminal.fingerprints.verify_match', { score: verifyResult.score || 'N/A' })
+                    ? t('criminal.fingerprints.verify_match', { score: String(verifyResult.score || 'N/A') })
                     : t('criminal.fingerprints.verify_no_match')
                   }
                 </div>
