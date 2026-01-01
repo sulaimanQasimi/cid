@@ -2572,5 +2572,6 @@
     "meeting.print.end_date_placeholder": "د پای نیټه",
     "meeting.print.end_date": "د پای نیټه",
     "meeting.print.button": "چاپ کول",
-    "common.table.actions":"عملیات"
+    "common.table.actions":"عملیات",
+    "meeting.print.settings.labels.report_subtitle":"د راپور سابتیتل"
 }

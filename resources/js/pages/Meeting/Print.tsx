@@ -44,6 +44,7 @@ interface PrintSettings {
   ministryName: string;
   labels: {
     reportTitle: string;
+    reportSubtitle: string|null;
     topic: string;
     description: string;
     dateRange: string;
@@ -82,7 +83,8 @@ export default function Print({ meetings, filters }: MeetingPrintProps) {
     governmentName: 'امارت اسلامی افغانستان',
     ministryName: 'وزارت دفاع',
     labels: {
-      reportTitle: 'د افغانستان اسلامی امارت',
+      reportTitle: 'د استخباراتو معنیت',
+      reportSubtitle: 'د دفتر مدیریت',
       topic: 'ومری موضوع',
       description: 'تفصیلات',
       dateRange: 'د نیټو سلسله',
@@ -516,9 +518,21 @@ export default function Print({ meetings, filters }: MeetingPrintProps) {
                             onChange={(e) => handleSettingsChange('labels', { ...printSettings.labels, reportTitle: e.target.value })}
                             className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                           />
-            </div>
-          </div>
-        </div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('meeting.print.settings.labels.report_subtitle') || 'Report Subtitle'}
+                          </label>
+                          <input
+                            type="text"
+                            value={printSettings.labels.reportSubtitle || ''}
+                            onChange={(e) => handleSettingsChange('labels', { ...printSettings.labels, reportSubtitle: e.target.value })}
+                            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                            placeholder="د دفتر مدیریت"
+                          />
+                        </div>
+                      </div>
+                    </div>
 
                     <div className="border rounded-lg p-4 bg-gray-50">
                       <h4 className="font-medium text-gray-700 mb-2">{t('meeting.print.settings.labels.meeting_information') || 'Meeting Information'}</h4>
@@ -644,6 +658,11 @@ export default function Print({ meetings, filters }: MeetingPrintProps) {
                 <h3 className="text-xl font-medium text-gray-700 print:text-lg">
                   {printSettings.labels.reportTitle}
                 </h3>
+                {printSettings.labels.reportSubtitle && (
+                  <h4 className="text-lg font-medium text-gray-600 print:text-base">
+                    {printSettings.labels.reportSubtitle}
+                  </h4>
+                )}
               </div>
               <div className="flex-shrink-0">
                 <img
