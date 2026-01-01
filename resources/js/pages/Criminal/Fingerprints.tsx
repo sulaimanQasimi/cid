@@ -170,24 +170,28 @@ export default function Fingerprints({ criminal }: Props) {
         'NORMAL'
       );
 
-      if (compareResult.success && compareResult.data) {
-        const match = compareResult.data.match;
-        const score = compareResult.data.score;
+      console.log('Compare Result:', compareResult);
+      
+      if (compareResult.success) {
+        const match = compareResult.data?.match ?? false;
+        const score = compareResult.data?.score;
 
-        if (match) {
+        console.log('Match value:', match, 'Score:', score);
+
+        if (match === true) {
           toast.success(
             t('criminal.fingerprints.verify_success', { 
               score: String(score || 'N/A')
             })
           );
+          return {
+            match: true,
+            score,
+          };
         } else {
           toast.error(t('criminal.fingerprints.verify_no_match'));
+          return { match: false, score };
         }
-
-        return {
-          match,
-          score,
-        };
       } else {
         toast.error(compareResult.message || t('criminal.fingerprints.verify_error'));
         return { match: false };
