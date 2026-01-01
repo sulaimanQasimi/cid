@@ -197,12 +197,25 @@ export class FingerprintAPI {
         const errorData = await response.json().catch(() => ({}));
         return {
           success: false,
-          message: errorData.message || `HTTP error! status: ${response.status}`,
-          errorCode: errorData.errorCode,
+          message: errorData.message || errorData.Message || `HTTP error! status: ${response.status}`,
+          errorCode: errorData.errorCode || errorData.ErrorCode,
         };
       }
 
-      return await response.json();
+      const data = await response.json();
+      
+      // Normalize response - handle both capitalized and lowercase keys
+      const normalized: CompareResponse = {
+        success: data.Success !== undefined ? data.Success : data.success !== undefined ? data.success : false,
+        message: data.Message || data.message || '',
+        data: data.Data || data.data ? {
+          match: data.Data?.Match ?? data.data?.match ?? data.Match ?? false,
+          score: data.Data?.Score ?? data.data?.score ?? data.Score,
+        } : undefined,
+        errorCode: data.ErrorCode || data.errorCode,
+      };
+
+      return normalized;
     } catch (error) {
       console.error('Compare failed:', error);
       return {

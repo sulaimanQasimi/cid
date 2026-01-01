@@ -7,6 +7,7 @@ use App\Models\Criminal;
 use App\Models\CriminalFingerprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -149,9 +150,9 @@ class FingerprintController extends Controller
     }
 
     /**
-     * Verify a fingerprint against stored templates.
+     * Verify a fingerprint against a specific stored fingerprint.
      */
-    public function verify(Request $request, Criminal $criminal)
+    public function verify(Request $request, Criminal $criminal, string $fingerPosition)
     {
         $this->authorize('view', $criminal);
 
@@ -163,25 +164,74 @@ class FingerprintController extends Controller
         $securityLevel = $validated['security_level'] ?? 'NORMAL';
         $verifyTemplate = $validated['template'];
 
-        $fingerprints = $criminal->fingerprints()->get();
-        $matches = [];
+        // Get the stored fingerprint for this position
+        $storedFingerprint = $criminal->fingerprints()
+            ->where('finger_position', $fingerPosition)
+            ->first();
 
-        foreach ($fingerprints as $fingerprint) {
-            // Note: Actual comparison would be done via the fingerprint API
-            // This is a placeholder - you would call the fingerprint API compare endpoint
-            $matches[] = [
-                'finger_position' => $fingerprint->finger_position,
-                'match_score' => null, // Would be returned from API
-            ];
+        if (!$storedFingerprint) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Fingerprint not found for this position.',
+            ], 404);
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Verification completed.',
-            'data' => [
-                'matches' => $matches,
-                'total_fingerprints' => $fingerprints->count(),
-            ],
-        ]);
+        // Get client IP address
+        $clientIp = $request->ip();
+        
+        // Handle proxy headers if present
+        if ($request->header('X-Forwarded-For')) {
+            $ips = explode(',', $request->header('X-Forwarded-For'));
+            $clientIp = trim($ips[0]);
+        } elseif ($request->header('X-Real-IP')) {
+            $clientIp = $request->header('X-Real-IP');
+        } elseif ($request->header('CF-Connecting-IP')) {
+            $clientIp = $request->header('CF-Connecting-IP');
+        }
+
+        // Construct API URL using client IP
+        $apiUrl = "http://{$clientIp}:8080/api/fingerprint/compare";
+
+        // Call the fingerprint API to compare templates
+        try {
+            $response = Http::timeout(10)->post($apiUrl, [
+                'template1' => $storedFingerprint->template,
+                'template2' => $verifyTemplate,
+                'securityLevel' => $securityLevel,
+            ]);
+
+            if (!$response->successful()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Fingerprint API error: ' . $response->body(),
+                ], 500);
+            }
+
+            $result = $response->json();
+
+            // Normalize response - handle both capitalized and lowercase keys
+            $success = $result['Success'] ?? $result['success'] ?? false;
+            
+            // Extract match and score from nested data structure
+            $data = $result['Data'] ?? $result['data'] ?? $result;
+            $match = $data['Match'] ?? $data['match'] ?? $result['Match'] ?? false;
+            $score = $data['Score'] ?? $data['score'] ?? $result['Score'] ?? null;
+            $message = $result['Message'] ?? $result['message'] ?? 'Verification completed.';
+
+            return response()->json([
+                'success' => $success,
+                'message' => $message,
+                'data' => [
+                    'match' => (bool) $match,
+                    'score' => $score !== null ? (int) $score : null,
+                    'finger_position' => $fingerPosition,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Verification failed: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }

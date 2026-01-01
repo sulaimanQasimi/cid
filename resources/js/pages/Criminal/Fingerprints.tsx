@@ -23,6 +23,7 @@ interface Criminal {
 interface CriminalFingerprint {
   id: number;
   finger_position: string;
+  template: string;
   image_base64: string;
   quality_score: number | null;
   captured_at: string;
@@ -132,6 +133,40 @@ export default function Fingerprints({ criminal }: Props) {
       toast.error(
         error.response?.data?.message || t('criminal.fingerprints.save_error')
       );
+    }
+  };
+
+  const handleVerify = async (fingerPosition: string, template: string) => {
+    try {
+      const response = await axios.post(
+        `/api/criminals/${criminal.id}/fingerprints/${fingerPosition}/verify`,
+        {
+          template,
+          security_level: 'NORMAL',
+        }
+      );
+
+      if (response.data.success) {
+        const result = response.data.data;
+        if (result.match) {
+          toast.success(
+            t('criminal.fingerprints.verify_success', { 
+              score: result.score || 'N/A' 
+            })
+          );
+        } else {
+          toast.error(t('criminal.fingerprints.verify_no_match'));
+        }
+        return result;
+      } else {
+        toast.error(response.data.message || t('criminal.fingerprints.verify_error'));
+        return { match: false };
+      }
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message || t('criminal.fingerprints.verify_error')
+      );
+      return { match: false };
     }
   };
 
@@ -267,6 +302,7 @@ export default function Fingerprints({ criminal }: Props) {
                     onCapture={(template, imageBase64, qualityScore) =>
                       handleCapture(position, template, imageBase64, qualityScore)
                     }
+                    onVerify={(template) => handleVerify(position, template)}
                     onDelete={() => handleDelete(position)}
                     existingImage={
                       fingerprints[position]?.image_base64
@@ -275,6 +311,7 @@ export default function Fingerprints({ criminal }: Props) {
                           : `data:image/png;base64,${fingerprints[position].image_base64}`
                         : null
                     }
+                    existingTemplate={fingerprints[position]?.template || null}
                     disabled={!isConnected}
                   />
                 ))}
@@ -294,6 +331,7 @@ export default function Fingerprints({ criminal }: Props) {
                     onCapture={(template, imageBase64, qualityScore) =>
                       handleCapture(position, template, imageBase64, qualityScore)
                     }
+                    onVerify={(template) => handleVerify(position, template)}
                     onDelete={() => handleDelete(position)}
                     existingImage={
                       fingerprints[position]?.image_base64
@@ -302,6 +340,7 @@ export default function Fingerprints({ criminal }: Props) {
                           : `data:image/png;base64,${fingerprints[position].image_base64}`
                         : null
                     }
+                    existingTemplate={fingerprints[position]?.template || null}
                     disabled={!isConnected}
                   />
                 ))}

@@ -42,5 +42,5 @@ Route::middleware('auth')->group(function () {
     Route::post('criminals/{criminal}/fingerprints', [App\Http\Controllers\Api\FingerprintController::class, 'store']);
     Route::get('criminals/{criminal}/fingerprints/{fingerPosition}', [App\Http\Controllers\Api\FingerprintController::class, 'show']);
     Route::delete('criminals/{criminal}/fingerprints/{fingerPosition}', [App\Http\Controllers\Api\FingerprintController::class, 'destroy']);
-    Route::post('criminals/{criminal}/fingerprints/verify', [App\Http\Controllers\Api\FingerprintController::class, 'verify']);
+    Route::post('criminals/{criminal}/fingerprints/{fingerPosition}/verify', [App\Http\Controllers\Api\FingerprintController::class, 'verify']);
 });
