@@ -5,7 +5,7 @@ import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, Fingerprint, Wifi, WifiOff, Loader2, CheckCircle, XCircle, Info } from 'lucide-react';
+import { ArrowRight, Fingerprint, Wifi, WifiOff, Loader2, CheckCircle, XCircle, Info, Hand, TrendingUp, Clock, RefreshCw } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/translate';
 import { FingerprintAPI, DeviceInfo } from '@/lib/fingerprint-api';
 import FingerprintCapture from '@/components/FingerprintCapture';
@@ -257,61 +257,128 @@ export default function Fingerprints({ criminal }: Props) {
           }
         />
 
-        {/* Connection Status */}
-        <Card className="mb-6">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                {isConnected === null ? (
-                  <>
-                    <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-                    <span className="text-sm text-gray-600" dir="rtl">
-                      {t('criminal.fingerprints.checking_connection')}
-                    </span>
-                  </>
-                ) : isConnected ? (
-                  <>
-                    <Wifi className="h-5 w-5 text-green-500" />
-                    <span className="text-sm text-green-600" dir="rtl">
-                      {t('criminal.fingerprints.connected')}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <WifiOff className="h-5 w-5 text-red-500" />
-                    <span className="text-sm text-red-600" dir="rtl">
-                      {t('criminal.fingerprints.disconnected')}
-                    </span>
-                  </>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline">
-                  {capturedCount} / {FINGER_POSITIONS.length} {t('criminal.fingerprints.captured')}
-                </Badge>
+        {/* Connection Status & Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          {/* Connection Status Card */}
+          <Card className={`border-2 transition-all duration-300 ${
+            isConnected === null 
+              ? 'border-gray-300 bg-gray-50 dark:bg-gray-800' 
+              : isConnected 
+                ? 'border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20' 
+                : 'border-red-200 bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20'
+          }`}>
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  {isConnected === null ? (
+                    <>
+                      <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                        <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300" dir="rtl">
+                          {t('criminal.fingerprints.checking_connection')}
+                        </p>
+                      </div>
+                    </>
+                  ) : isConnected ? (
+                    <>
+                      <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                        <Wifi className="h-5 w-5 text-green-600 dark:text-green-400" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-green-700 dark:text-green-300" dir="rtl">
+                          {t('criminal.fingerprints.connected')}
+                        </p>
+                        <p className="text-xs text-green-600 dark:text-green-400" dir="rtl">
+                          {deviceInfo?.data?.deviceName || t('criminal.fingerprints.device_info')}
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
+                        <WifiOff className="h-5 w-5 text-red-600 dark:text-red-400" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-red-700 dark:text-red-300" dir="rtl">
+                          {t('criminal.fingerprints.disconnected')}
+                        </p>
+                      </div>
+                    </>
+                  )}
+                </div>
                 <Button
                   size="sm"
-                  variant="outline"
+                  variant="ghost"
                   onClick={checkConnection}
                   disabled={isConnected === null}
+                  className="h-8 w-8 p-0"
                 >
-                  {t('criminal.fingerprints.refresh_connection')}
+                  <RefreshCw className={`h-4 w-4 ${isConnected === null ? 'animate-spin' : ''}`} />
                 </Button>
               </div>
-            </div>
+            </CardContent>
+          </Card>
 
-            {deviceInfo?.data && (
-              <div className="mt-3 pt-3 border-t text-xs text-gray-500" dir="rtl">
+          {/* Progress Card */}
+          <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <Info className="h-4 w-4" />
-                  <span>
-                    {deviceInfo.data.deviceName || t('criminal.fingerprints.device_info')}
-                  </span>
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                    <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <p className="text-sm font-medium text-blue-700 dark:text-blue-300" dir="rtl">
+                    {t('criminal.fingerprints.progress')}
+                  </p>
                 </div>
+                <Badge variant="outline" className="bg-white dark:bg-gray-800">
+                  {capturedCount} / {FINGER_POSITIONS.length}
+                </Badge>
               </div>
-            )}
-          </CardContent>
-        </Card>
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                <div 
+                  className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2.5 rounded-full transition-all duration-500"
+                  style={{ width: `${(capturedCount / FINGER_POSITIONS.length) * 100}%` }}
+                />
+              </div>
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-2" dir="rtl">
+                {Math.round((capturedCount / FINGER_POSITIONS.length) * 100)}% {t('criminal.fingerprints.complete')}
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Quality Stats Card */}
+          <Card className="border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                  <Fingerprint className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                </div>
+                <p className="text-sm font-medium text-purple-700 dark:text-purple-300" dir="rtl">
+                  {t('criminal.fingerprints.average_quality')}
+                </p>
+              </div>
+              {capturedCount > 0 ? (
+                <>
+                  <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                    {Math.round(
+                      Object.values(fingerprints).reduce((sum, fp) => sum + (fp.quality_score || 0), 0) / capturedCount
+                    )}%
+                  </p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1" dir="rtl">
+                    {t('criminal.fingerprints.based_on_captured')}
+                  </p>
+                </>
+              ) : (
+                <p className="text-sm text-gray-500 dark:text-gray-400" dir="rtl">
+                  {t('criminal.fingerprints.no_data')}
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Fingerprint Grid */}
         {loading ? (
@@ -319,12 +386,19 @@ export default function Fingerprints({ criminal }: Props) {
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : (
-          <div>
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold mb-2" dir="rtl">
-                {t('criminal.fingerprints.right_hand')}
-              </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-6">
+          <div className="space-y-8">
+            {/* Right Hand Section */}
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                  <Hand className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200" dir="rtl">
+                  {t('criminal.fingerprints.right_hand')}
+                </h3>
+                <div className="flex-1 h-px bg-gradient-to-r from-blue-200 to-transparent" />
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                 {FINGER_POSITIONS.slice(0, 5).map((position) => (
                   <FingerprintCapture
                     key={position}
@@ -343,16 +417,24 @@ export default function Fingerprints({ criminal }: Props) {
                         : null
                     }
                     existingTemplate={fingerprints[position]?.template || null}
+                    existingQualityScore={fingerprints[position]?.quality_score || null}
                     disabled={!isConnected}
                   />
                 ))}
               </div>
             </div>
 
+            {/* Left Hand Section */}
             <div>
-              <h3 className="text-lg font-semibold mb-2" dir="rtl">
-                {t('criminal.fingerprints.left_hand')}
-              </h3>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                  <Hand className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200" dir="rtl">
+                  {t('criminal.fingerprints.left_hand')}
+                </h3>
+                <div className="flex-1 h-px bg-gradient-to-r from-purple-200 to-transparent" />
+              </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                 {FINGER_POSITIONS.slice(5, 10).map((position) => (
                   <FingerprintCapture
@@ -372,6 +454,7 @@ export default function Fingerprints({ criminal }: Props) {
                         : null
                     }
                     existingTemplate={fingerprints[position]?.template || null}
+                    existingQualityScore={fingerprints[position]?.quality_score || null}
                     disabled={!isConnected}
                   />
                 ))}
