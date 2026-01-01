@@ -18,4 +18,8 @@ Route::middleware(['auth'])->group(function () {
     // Print criminal record
     Route::get('criminals/{criminal}/print', [CriminalController::class, 'print'])
         ->name('criminals.print');
+
+    // Fingerprint capture page
+    Route::get('criminals/{criminal}/fingerprints', [CriminalController::class, 'fingerprints'])
+        ->name('criminals.fingerprints');
 });

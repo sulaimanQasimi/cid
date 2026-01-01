@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Pencil, Trash, UserRound, MapPin, FileText, Calendar, Building2, Phone, IdCard, Printer, BarChart3, Eye, Clock, Users, Shield, Home, Gavel, FileCheck, BookText, AlertTriangle, User, Star, Award, Target, Zap, Sparkles, Crown, Gem, ShieldCheck, Lock, Unlock, EyeOff, TrendingUp, Activity, Globe, Mail, MessageSquare, Heart, ThumbsUp, Share2, Download, ExternalLink, Info, CheckCircle, XCircle, AlertCircle, Plus, Minus, Edit3, Copy, Save, RefreshCw, Settings, MoreHorizontal, Filter, Search, SortAsc, SortDesc, Bell, BellOff, Volume2, VolumeX, Battery, BatteryLow, Signal, SignalHigh, SignalLow, SignalZero, SignalMedium, Wifi, WifiOff, WifiHigh, WifiLow } from 'lucide-react';
+import { ArrowRight, Pencil, Trash, UserRound, MapPin, FileText, Calendar, Building2, Phone, IdCard, Printer, BarChart3, Eye, Clock, Users, Shield, Home, Gavel, FileCheck, BookText, AlertTriangle, User, Star, Award, Target, Zap, Sparkles, Crown, Gem, ShieldCheck, Lock, Unlock, EyeOff, TrendingUp, Activity, Globe, Mail, MessageSquare, Heart, ThumbsUp, Share2, Download, ExternalLink, Info, CheckCircle, XCircle, AlertCircle, Plus, Minus, Edit3, Copy, Save, RefreshCw, Settings, MoreHorizontal, Filter, Search, SortAsc, SortDesc, Bell, BellOff, Volume2, VolumeX, Battery, BatteryLow, Signal, SignalHigh, SignalLow, SignalZero, SignalMedium, Wifi, WifiOff, WifiHigh, WifiLow, Fingerprint } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import {
   AlertDialog,
@@ -145,6 +145,19 @@ export default function CriminalShow({ criminal, auth }: Props) {
                         <Printer className="h-4 w-4" />
                       </div>
                       {t('criminal.show.print_button')}
+                    </div>
+                  </Link>
+                </Button>
+              )}
+
+              {auth.permissions.includes('criminal.update') && (
+                <Button asChild className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 rounded-xl shadow-lg px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105">
+                  <Link href={route('criminals.fingerprints', criminal.id)}>
+                    <div className="flex items-center gap-2">
+                      <div className="p-1 bg-white/20 rounded-lg">
+                        <Fingerprint className="h-4 w-4" />
+                      </div>
+                      {t('criminal.show.fingerprints_button')}
                     </div>
                   </Link>
                 </Button>

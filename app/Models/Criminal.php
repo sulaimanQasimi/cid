@@ -166,6 +166,14 @@ class Criminal extends Model
     }
 
     /**
+     * Get the fingerprints for this criminal.
+     */
+    public function fingerprints(): HasMany
+    {
+        return $this->hasMany(CriminalFingerprint::class);
+    }
+
+    /**
      * Get the users who have access to this criminal.
      */
     public function accessibleUsers(): HasMany

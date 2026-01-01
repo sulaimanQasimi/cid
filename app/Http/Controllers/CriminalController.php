@@ -435,6 +435,20 @@ class CriminalController extends Controller
     }
 
     /**
+     * Display the fingerprint capture page for a criminal.
+     */
+    public function fingerprints(Criminal $criminal)
+    {
+        $this->authorize('view', $criminal);
+        
+        $criminal->load(['fingerprints.capturedBy']);
+
+        return Inertia::render('Criminal/Fingerprints', [
+            'criminal' => $criminal,
+        ]);
+    }
+
+    /**
      * Display a printable version of the comprehensive list.
      */
     public function comprehensiveListPrint(Request $request)
